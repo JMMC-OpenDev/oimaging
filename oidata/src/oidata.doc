@@ -1,0 +1,99 @@
+/*******************************************************************************
+ * JMMC project
+ *
+ * "@(#) $Id: oidata.doc,v 1.10 2005-09-27 11:52:18 mella Exp $"
+ *
+ * History
+ * -------
+ * $Log: not supported by cvs2svn $
+ * Revision 1.9  2005/09/26 12:59:52  mella
+ * Add CheckColumns specialisation according nwave check
+ *
+ * Revision 1.8  2005/09/23 09:48:46  mella
+ * Add column unit test
+ *
+ * Revision 1.7  2005/09/22 07:27:15  mella
+ * Add method to get more column informations
+ *
+ * Revision 1.6  2005/09/15 09:26:11  mella
+ * Add extname to protected member and to constructor parameter list
+ *
+ * Revision 1.5  2005/09/14 15:29:56  mella
+ * Add some tests and do not work directly with cfitsio access during Load
+ *
+ * Revision 1.4  2005/08/31 20:07:59  mella
+ * First revision
+ *
+ * Revision 1.3  2005/06/28 13:27:27  mella
+ * Improve doc
+ *
+ * Revision 1.2  2005/06/24 14:01:59  mella
+ * minimum base
+ *
+ ******************************************************************************/
+
+/**
+\mainpage oidata : Optical Interferometry Data handling.
+
+\bdesc
+This module aims to facilitate OIFITS files handling.
+
+\ddesc
+It gives access to main OIDATA objects through a dedicated API.
+
+This module is based on OIFITS conventions.
+Specification is available from following web site:
+ - http://www.mrao.cam.ac.uk/~jsy1001/exchange/ 
+
+Following checks can be performed during file loading:
+ - OI_REVN should be present and equal to oidataACTUAL_REVISION ;
+ - EXTNAME beginning with OI_ should be one of  
+    -'OI_TARGET'
+    -'OI_ARRAY'
+    -'OI_WAVELENGTH'
+    -'OI_VIS'
+    -'OI_VIS2'
+    -'OI_T3'
+  - keyword presence and validity of content type
+  - column presence, column dimension, column units
+
+Following checks should be implemented:
+  - right number of OI_TABLES 
+  - EXTVER should be unique for multiple table of the same EXTNAME
+  - column contents
+  - null dimensions for flags
+  
+Following Mapping between FITS and C should be used:
+ - I -> mcsINT16
+ - A -> mcsSTRINGn
+ - E -> mcsFLOAT
+ - D -> mcsDOUBLE
+ - L -> mcsLOGICAL or sometimes char for Column Arrays
+
+\ex
+For example each OIFITS file must have one unique OI_TARGET then you can get 
+such kind of code:
+\code
+oidataFITS oidata;
+oidataOI_TARGET * oiTarget ;
+// Load one oifits file
+if ( oidata.Load(filename) == mcsFAILURE )
+{
+    printf("Error during file loading\n");
+    errResetStack();
+    exit(1);
+}
+// Get reference of the OI_TARGET
+if ( oidata.GetOiTarget(&oiTarget) == mcsFAILURE )
+{
+    printf("Error getting oiTarget reference\n");
+    errResetStack();
+    exit(1);
+}
+\endcode
+
+@todo implement mechanism to be able to create an empty OI_ARRAY if it is not
+given into one oidataDATA_TABLE
+@todo implement support for multiple record of the same source into OI_TARGET
+
+*/

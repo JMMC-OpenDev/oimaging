@@ -1,0 +1,15 @@
+This list give problem that should be detected during file loading.
+
+'' -> One table with OI_REVN > 1
+'' -> One table without OI_REVN 
+'' -> One oifits with one unknown OI_Table 'OI_BADNAME'
+'' -> One oifits without OI_VIS
+'' -> One oifits with two OI_VIS and same EXTVER
+'' -> One oifits with one OI_VIS linked to one missing OI_WAVELENTGH
+'' -> One oifits with one OI_VIS linked to one missing OI_ARRAY
+'' -> One Keyword of wrong type
+'' -> One Missing Keyword
+'' -> One Missing Column
+'' -> One Column with bad unit
+'' -> One Column of oidataDATA_TABLE with bad dimension according corresponding OI_WAVELENGTH table
+

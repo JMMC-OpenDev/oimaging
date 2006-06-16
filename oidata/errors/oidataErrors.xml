@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<errorList moduleName="oidata">
+   <error id="1">
+      <errName>ALLOC</errName>
+      <errSeverity>SEVERE</errSeverity>
+      <errFormat><![CDATA[Could not allocate or copy memory.]]></errFormat>
+   </error>
+   <error id="2">
+      <errName>FITS</errName>
+      <errSeverity>WARNING</errSeverity>
+      <errFormat><![CDATA[cfitsio error '%s']]></errFormat>
+   </error>
+   <error id="3">
+      <errName>NOT_LOADED</errName>
+      <errSeverity>WARNING</errSeverity>
+      <errFormat><![CDATA[No file has been loaded for %s]]></errFormat>
+   </error>
+   <error id="4">
+      <errName>GENERIC</errName>
+      <errSeverity>WARNING</errSeverity>
+      <errFormat><![CDATA[%s]]></errFormat>
+   </error>
+   <error id="5">
+      <errName>NO_REFERENCE</errName>
+      <errSeverity>WARNING</errSeverity>
+      <errFormat><![CDATA[%s not yet affected]]></errFormat>
+   </error>
+   <error id="8">
+      <errName>OITABLE_NOT_CONFORM</errName>
+      <errSeverity>SEVERE</errSeverity>
+      <errFormat><![CDATA[[%s, hdu:%d] %s]]></errFormat>
+   </error>
+</errorList>
