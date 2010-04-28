@@ -618,7 +618,9 @@ public class Header implements FitsElement {
 	
 	} catch (Exception e) {
 	    if (! (e instanceof EOFException) ) {
-	        throw new IOException("Invalid FITS Header", e);
+        // COMPILE FIX LAURENT : java 6 only
+//	        throw new IOException("Invalid FITS Header", e);
+        throw new IOException("Invalid FITS Header : " + e.getMessage());
 	    }
 	}
 	if (fileOffset >= 0) {
