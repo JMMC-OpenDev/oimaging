@@ -1,13 +1,16 @@
 #*******************************************************************************
 # JMMC project
 #
-# "@(#) $Id: Makefile,v 1.1 2010-04-14 08:34:33 ccmgr Exp $"
+# "@(#) $Id: Makefile,v 1.2 2010-04-28 15:14:48 bourgesl Exp $"
 #
 # Makefile of oitools module
 #
 # History
 # -------
 # $Log: not supported by cvs2svn $
+# Revision 1.1  2010/04/14 08:34:33  ccmgr
+# Fix directory structure and add additional files
+#
 #*******************************************************************************
 # REMARKS
 #    Makefile based on the VLT/ALMA Makefile
@@ -101,12 +104,14 @@ PY_SCRIPTS_L   =
 #
 # Jarfiles and their directories
 # ---------------------------------
-JARFILES        =
+JARFILES        = oitools
 
 #
-# <brief description of jjjfff jar files>
-jjjfff_DIRS     =
-jjjfff_EXTRAS   = 
+# <brief description of oitools jar files>
+oitools_DIRS     = fr \
+		   nom
+
+oitools_EXTRAS   =
 
 #
 # Java programs
