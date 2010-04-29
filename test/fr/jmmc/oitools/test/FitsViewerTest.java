@@ -1,15 +1,19 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FitsViewerTest.java,v 1.1 2010-04-28 14:39:19 bourgesl Exp $"
+ * "@(#) $Id: FitsViewerTest.java,v 1.2 2010-04-29 14:16:24 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:39:19  bourgesl
+ * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
+ *
  */
 package fr.jmmc.oitools.test;
 
 import fr.jmmc.oifits.visualizer.OifitsViewer;
+import fr.jmmc.oitools.OIFitsViewer;
 import java.io.File;
 
 /**
@@ -17,6 +21,8 @@ import java.io.File;
  * @author bourgesl
  */
 public class FitsViewerTest implements TestEnv {
+  /** flag to use OITools impl instead of OIValidator */
+  private final static boolean USE_OITOOLS = true;
 
   private FitsViewerTest() {
     super();
@@ -70,7 +76,11 @@ public class FitsViewerTest implements TestEnv {
 
       final long start = System.nanoTime();
 
-      new OifitsViewer(absFilePath);
+      if (USE_OITOOLS) {
+        new OIFitsViewer(absFilePath);
+      } else {
+        new OifitsViewer(absFilePath);
+      }
 
       System.out.println("dumpFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
 
