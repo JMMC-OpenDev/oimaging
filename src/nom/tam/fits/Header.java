@@ -422,7 +422,8 @@ public class Header implements FitsElement {
     }
 
 
-    /** Get the <CODE>String</CODE> value associated with the given key.
+    /**
+     * Get the <CODE>String</CODE> value associated with the given key.
      * 
       * @param key The header key.
       * @return The associated value or null if not found or if the value is not a string.
@@ -461,6 +462,24 @@ public class Header implements FitsElement {
 	return val;
     }
 
+
+  /**
+   * ENHANCEMENT : LAURENT :
+   * 
+   * Get the raw <CODE>String</CODE> value 
+   * 
+   * @param keyword	the FITS keyword
+   * @return either <CODE>null</CODE> or a String
+   */
+    public String getValue(final String keyword) {
+
+      final HeaderCard fcard = findCard(keyword);
+      if (fcard == null) {
+        return null;
+      }
+
+      return fcard.getValue();
+    }
 
   /**
    * ENHANCEMENT : LAURENT :
