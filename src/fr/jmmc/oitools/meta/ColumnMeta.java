@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: ColumnMeta.java,v 1.1 2010-04-28 14:45:44 bourgesl Exp $"
+ * "@(#) $Id: ColumnMeta.java,v 1.2 2010-04-29 15:46:02 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:45:44  bourgesl
+ * meta data package with Column and Keyword descriptors, Types and Units enumeration
+ *
  */
 package fr.jmmc.oitools.meta;
 
@@ -79,6 +82,14 @@ public class ColumnMeta extends CellMeta {
   public ColumnMeta(final String name, final String desc, final Types dataType, final int repeat,
                      final String[] acceptedValues) {
     super(MetaType.COLUMN, name, desc, dataType, repeat, NO_INT_VALUES, acceptedValues, Units.NO_UNIT);
+  }
+
+  /**
+   * Return true if the value is multiple (array)
+   * @return true if the value is multiple
+   */
+  public final boolean isArray() {
+    return getRepeat() > 1;
   }
 
   /**
@@ -157,13 +168,7 @@ public class ColumnMeta extends CellMeta {
     final short[] intAcceptedValues = getIntAcceptedValues();
     final String[] stringAcceptedValues = getStringAcceptedValues();
 
-
     if (intAcceptedValues.length != 0) {
-      StringBuffer sb = new StringBuffer();
-
-      for (int i = 0; i < intAcceptedValues.length; i++) {
-        sb.append("|" + intAcceptedValues[i]);
-      }
 
       for (int rowNb = 0; rowNb < noRows; rowNb++) {
         int[] values = fitsColumn.getInts(rowNb);
@@ -179,19 +184,14 @@ public class ColumnMeta extends CellMeta {
 
           if (error) {
             if (values.length > 1) {
-              l.severe("Invalid value at index " + r + " for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + sb.toString().substring(1) + "'");
+              l.severe("Invalid value at index " + r + " for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + getIntAcceptedValuesAsString() + "'");
             } else {
-              l.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + sb.toString().substring(1) + "'");
+              l.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + getIntAcceptedValuesAsString() + "'");
             }
           }
         }
       }
     } else if (stringAcceptedValues.length != 0) {
-      StringBuffer sb = new StringBuffer();
-
-      for (int i = 0; i < stringAcceptedValues.length; i++) {
-        sb.append("|" + stringAcceptedValues[i]);
-      }
 
       for (int rowNb = 0; rowNb < noRows; rowNb++) {
         String value;
@@ -210,7 +210,7 @@ public class ColumnMeta extends CellMeta {
         }
 
         if (error) {
-          l.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + value + "' should be '" + sb.toString().substring(1) + "'");
+          l.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + value + "' should be '" + getStringAcceptedValuesAsString() + "'");
         }
       }
     }

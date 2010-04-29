@@ -1,19 +1,25 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: KeywordMeta.java,v 1.1 2010-04-28 14:45:44 bourgesl Exp $"
+ * "@(#) $Id: KeywordMeta.java,v 1.2 2010-04-29 15:46:01 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:45:44  bourgesl
+ * meta data package with Column and Keyword descriptors, Types and Units enumeration
+ *
  */
 package fr.jmmc.oitools.meta;
 
-import java.util.logging.Logger;
-import org.eso.fits.FitsKeyword;
+import fr.jmmc.oitools.model.OIFitsChecker;
+import java.util.logging.Level;
 
 /**
- * This class describes a FITS keyword
+ * This class describes a FITS keyword.
+ * 
+ * Note : OIFits uses only 'A', 'I', 'D' types for keywords => Other types are not supported for keywords.
+ *
  * @author bourgesl
  */
 public class KeywordMeta extends CellMeta {
@@ -59,7 +65,6 @@ public class KeywordMeta extends CellMeta {
    * @param name keyword name
    * @param desc keyword descriptive comment
    * @param dataType keyword data type
-   * @param repeat keyword cardinality
    * @param acceptedValues integer possible values
    */
   public KeywordMeta(final String name, final String desc, final Types dataType,
@@ -75,115 +80,103 @@ public class KeywordMeta extends CellMeta {
    * @param dataType keyword data type
    * @param acceptedValues string possible values
    */
-  public KeywordMeta(final String name, final String desc, final Types dataType, 
+  public KeywordMeta(final String name, final String desc, final Types dataType,
                      final String[] acceptedValues) {
     super(MetaType.KEYWORD, name, desc, dataType, 1, NO_INT_VALUES, acceptedValues, Units.NO_UNIT);
   }
 
   /**
-   * Get data type.
-   * WARNING - a DATE format is converted in 'A'.
-   *
-   * TODO : remove Fits API dependency
-   *
-   * @param fType fits data type
-   *
-   * @return data type if it is known, '?' otherwise.
+   * Return true if the keyword is mandatory i.e. repeat > 0
+   * @return true if the keyword is mandatory
    */
-  protected char getDataType(final int fType) {
-    if (fType == FitsKeyword.BOOLEAN) {
-      return 'L';
-    }
-
-    if (fType == FitsKeyword.INTEGER) {
-      return 'I';
-    }
-
-    if (fType == FitsKeyword.REAL) {
-      return 'D';
-    }
-
-    if (fType == FitsKeyword.STRING) {
-      return 'A';
-    }
-
-    // Developper note: take care that DATE is down graded to STRING
-    if (getName().startsWith("DATE") && (fType == FitsKeyword.DATE)) {
-      return 'A';
-    }
-
-    logger.severe(getName() + " keyword type : '" + fType + "' is not supported by software");
-
-    return '?';
-
-    /* Not yet applicable
-    FitsKeyword.COMMENT
-    FitsKeyword.NONE
-     */
+  public final boolean isMandatory() {
+    return getRepeat() > 0;
   }
 
   /**
-   * Check if the input keyword is valid.
+   * Get the data type corresponding to the given value
+   * Does not support an array value
    *
-   * TODO : remove Fits API dependency
+   * @param value keyword value
    *
-   * @param fitsKeyword keyword to check.
-   * @param logger logger associated to input keyword
+   * @return data type if it is known, null otherwise.
    */
-  public void check(FitsKeyword fitsKeyword, Logger logger) {
-    logger.entering("" + this.getClass(), "checkKeyword", fitsKeyword);
+  protected Types getDataType(final Object value) {
 
-    // Check type
-    char kDataType = getDataType(fitsKeyword.getType());
-
-    if (kDataType != this.getType()) {
-      logger.severe("Invalid format for keyword '" + this.getName() + "', found '" + kDataType + "' should be '" + this.getType() + "'");
+    if (value instanceof String) {
+      return Types.TYPE_CHAR;
+    }
+    if (value instanceof Double) {
+      return Types.TYPE_DBL;
+    }
+    if (value instanceof Integer) {
+      return Types.TYPE_INT;
+    }
+    if (value instanceof Float) {
+      return Types.TYPE_REAL;
+    }
+    if (value instanceof Boolean) {
+      return Types.TYPE_LOGICAL;
     }
 
-    // Check accepted value
-    checkAcceptedValues(fitsKeyword, logger);
+    logger.severe(getName() + " keyword type for : '" + value + "' is not supported.");
+
+    return null;
+  }
+
+  /**
+   * Check if the given keyword value is valid.
+   *
+   * @param value keyword value to check
+   * @param checker checker component
+   */
+  public void check(final Object value, final OIFitsChecker checker) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("check : " + getName() + " = " + value);
+    }
+
+    // Check type
+    final Types kDataType = Types.getDataType(value);
+
+    if (kDataType != this.getDataType()) {
+      checker.severe("Invalid format for keyword '" + this.getName() + "', found '" + kDataType.getRepresentation() + "' should be '" + this.getType() + "'");
+    } else {
+      // Check accepted value
+      checkAcceptedValues(value, checker);
+    }
   }
 
   /**
    * If any are mentionned, check keyword values are fair.
    *
-   * TODO : remove Fits API dependency
-   *
-   * @param fitsKeyword keyword to check
-   * @param l logger associated to input keyword.
+   * @param value keyword value to check
+   * @param checker checker component
    */
-  private void checkAcceptedValues(FitsKeyword fitsKeyword, Logger l) {
+  private void checkAcceptedValues(final Object value, final OIFitsChecker checker) {
     final short[] intAcceptedValues = getIntAcceptedValues();
     final String[] stringAcceptedValues = getStringAcceptedValues();
 
     if (intAcceptedValues.length != 0) {
-      StringBuffer sb = new StringBuffer();
+      final short val = ((Number) value).shortValue();
 
-      for (int i = 0; i < intAcceptedValues.length; i++) {
-        int value = fitsKeyword.getInt();
-
-        if (value == intAcceptedValues[i]) {
+      for (int i = 0, len = intAcceptedValues.length; i < len; i++) {
+        if (val == intAcceptedValues[i]) {
           return;
         }
-
-        sb.append("|" + intAcceptedValues[i]);
       }
 
-      l.severe("Invalid value for keyword '" + this.getName() + "', found '" + fitsKeyword.getInt() + "' should be '" + sb.toString().substring(1) + "'");
+      checker.severe("Invalid value for keyword '" + this.getName() + "', found '" + val + "' should be '" + getIntAcceptedValuesAsString() + "'");
+
     } else if (stringAcceptedValues.length != 0) {
-      StringBuffer sb = new StringBuffer();
+      final String val = (String) value;
 
-      for (int i = 0; i < stringAcceptedValues.length; i++) {
-        String value = fitsKeyword.getString().trim();
-
-        if (value.equals(stringAcceptedValues[i].trim())) {
+      for (int i = 0, len = stringAcceptedValues.length; i < len; i++) {
+        if (val.equals(stringAcceptedValues[i])) {
           return;
         }
-
-        sb.append("|" + stringAcceptedValues[i]);
       }
 
-      l.severe("Invalid value for keyword '" + this.getName() + "', found '" + fitsKeyword.getString() + "' should be '" + sb.toString().substring(1) + "'");
+      checker.severe("Invalid value for keyword '" + this.getName() + "', found '" + val + "' should be '" + getStringAcceptedValuesAsString() + "'");
     }
   }
 }

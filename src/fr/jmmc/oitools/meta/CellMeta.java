@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: CellMeta.java,v 1.1 2010-04-28 14:45:44 bourgesl Exp $"
+ * "@(#) $Id: CellMeta.java,v 1.2 2010-04-29 15:46:02 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:45:44  bourgesl
+ * meta data package with Column and Keyword descriptors, Types and Units enumeration
+ *
  * Revision 1.12  2009/09/09 06:40:19  mella
  * add getter for type and unit
  *
@@ -54,7 +57,6 @@ public class CellMeta {
   /** Logger associated to meta model classes */
   protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
           "fr.jmmc.oitools.model");
-
   /** no int accepted values */
   protected final static short[] NO_INT_VALUES = new short[0];
   /** no string accepted values */
@@ -222,14 +224,6 @@ public class CellMeta {
   }
 
   /**
-   * Return true if the value is multiple (array)
-   * @return true if the value is multiple
-   */
-  public final boolean isArray() {
-    return getRepeat() > 1;
-  }
-
-  /**
    * Return the repeat value i.e. cardinality
    * Can be overriden to represent cross - references
    * @return repeat value i.e. cardinality
@@ -247,6 +241,21 @@ public class CellMeta {
     return acceptedValuesInteger;
   }
 
+  protected final String getIntAcceptedValuesAsString() {
+    final short[] intAcceptedValues = getIntAcceptedValues();
+
+    final StringBuilder sb = new StringBuilder(32);
+
+    for (int i = 0, len = intAcceptedValues.length; i < len; i++) {
+      if (i > 0) {
+        sb.append("|");
+      }
+      sb.append(intAcceptedValues[i]);
+    }
+
+    return sb.toString();
+  }
+
   /**
    * Return string possible values for column/keyword
    * Can be overriden to represent cross - references
@@ -254,6 +263,21 @@ public class CellMeta {
    */
   public String[] getStringAcceptedValues() {
     return acceptedValuesString;
+  }
+
+  protected final String getStringAcceptedValuesAsString() {
+    final String[] stringAcceptedValues = getStringAcceptedValues();
+
+    final StringBuilder sb = new StringBuilder(32);
+
+    for (int i = 0; i < stringAcceptedValues.length; i++) {
+      if (i > 0) {
+        sb.append("|");
+      }
+      sb.append(stringAcceptedValues[i]);
+    }
+
+    return sb.toString();
   }
 
   /**
