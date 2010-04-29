@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.1 2010-04-28 14:47:38 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.2 2010-04-29 15:47:01 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:38  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  * Revision 1.24  2009/09/20 15:55:09  mella
  * Add new getter
  *
@@ -82,14 +85,12 @@
  ******************************************************************************/
 package fr.jmmc.oitools.model;
 
-import fr.jmmc.oitools.validator.CheckHandler;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class represents the data model of an OIFits standard file.
@@ -104,8 +105,6 @@ public final class OIFitsFile extends OIFits {
   protected final LinkedList<String> extNames = new LinkedList<String>();
   /** Hashtable connecting each ARRNAME keyword value with associated OI_ARRAY table */
   protected final Map<String, List<OIArray>> arrNameToOiArray = new HashMap<String, List<OIArray>>();
-  /** Hashtable connecting each target identifier with associated target name */
-  protected final Map<Integer, String> targetIdToTargetName = new HashMap<Integer, String>();
   /** Hashtable connecting each INSNAME keyword value with associated OI_WAVELENGTH table */
   protected final Map<String, List<OIWavelength>> insNameToOiWavelength = new HashMap<String, List<OIWavelength>>();
 
@@ -276,108 +275,101 @@ public final class OIFitsFile extends OIFits {
   /** Return a short description of OIFITS content. */
   @Override
   public String toString() {
-    return "\nextNames:" + extNames + "\narrNameToOiArray:" + arrNameToOiArray + "\ntargetIdToTargetName:" + targetIdToTargetName + "\ninsNameToOiWavelength:" + insNameToOiWavelength + "\n";
+    return "\nextNames:" + extNames + "\narrNameToOiArray:" + arrNameToOiArray + "\ninsNameToOiWavelength:" + insNameToOiWavelength + "\n";
   }
 
   /**
    * Check the global structure of oifits file, including table presence and
    * syntax correction.
    *
-   * @param checkLogger validation logger
-   * @param checkHandler validation handler
+   * @param checker checker component
    */
-  public void check(final Logger checkLogger, final CheckHandler checkHandler) {
+  public void check(final OIFitsChecker checker) {
+    checker.info("Analysing values and references");
+
     logger.finest("Checking mandatory tables");
 
     /* Checking presence of one and only one OI_TARGET table */
     if (oiTargets.isEmpty()) {
-      checkLogger.severe(
+      checker.severe(
               "No OI_TARGET table found: one and only one must be present");
     }
 
     /* Checking presence of at least one OI_WAVELENGTH table */
     if (insNameToOiWavelength.isEmpty()) {
-      checkLogger.severe(
+      checker.severe(
               "No OI_WAVELENGTH table found: one or more must be present");
     }
 
     /* Starting syntactical analysis */
     logger.finest("Building list of table for keywords analysis");
 
-    for (int i = 0; i < getNbOiTables(); i++) {
-      OITable table = getOiTable(i);
-      table.checkSyntax(checkLogger);
+    for (OITable oiTable : oiTables) {
+      oiTable.checkSyntax(checker);
     }
 
     // Collect some data for post analysis (at fine level)
     // post analysis is done by one external tool that read the xml log
-    if (checkLogger.isLoggable(Level.FINE)) {
+    if (checker.isFineEnabled()) {
       if (getOiTarget() != null) {
-        checkLogger.fine("NBTARGETS");
-        checkLogger.fine("" + getOiTarget().getNbTargets());
+        checker.fine("NBTARGETS");
+        checker.fine("" + getOiTarget().getNbTargets());
       }
 
-      for (int i = 0; i < getNbOiTables(); i++) {
-        OITable table = getOiTable(i);
-        checkLogger.fine("TABLENAME");
-        checkLogger.fine(table.getExtName());
+      for (OITable oiTable : oiTables) {
+        checker.fine("TABLENAME");
+        checker.fine(oiTable.getExtName());
       }
 
-      Iterator<String> e = arrNameToOiArray.keySet().iterator();
-
-      while (e.hasNext()) {
-        checkLogger.fine("ARRNAME");
-        checkLogger.fine(e.next());
+      for (Iterator<String> it = arrNameToOiArray.keySet().iterator(); it.hasNext();) {
+        checker.fine("ARRNAME");
+        checker.fine(it.next());
       }
 
-      e = insNameToOiWavelength.keySet().iterator();
-
-      while (e.hasNext()) {
-        checkLogger.fine("INSNAME");
-        checkLogger.fine(e.next());
+      for (Iterator<String> it = insNameToOiWavelength.keySet().iterator(); it.hasNext();) {
+        checker.fine("INSNAME");
+        checker.fine(it.next());
       }
 
-      checkLogger.fine("WARNINGS");
-      checkLogger.fine("" + checkHandler.getNbWarnings());
+      checker.fine("WARNINGS");
+      checker.fine("" + checker.getCheckHandler().getNbWarnings());
 
-      checkLogger.fine("SEVERES");
-      checkLogger.fine("" + checkHandler.getNbSeveres());
+      checker.fine("SEVERES");
+      checker.fine("" + checker.getCheckHandler().getNbSeveres());
     }
   }
 
-  /** Check validity of cross references of non-data tables, ie check both
+  /**
+   * Check validity of cross references of non-data tables, ie check both
    * tables have different identifiers, or no mandatory identifier is not
    * defined.
    *
    * @param oiTable reference on table to check
-   * @param logger logger associated to this table.
+   * @param checker checker component
    */
-  public void checkCrossRefering(OITable oiTable, Logger logger) {
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("Checking cross references for " + oiTable.getExtName());
+  public void checkCrossRefering(final OITable oiTable, final OIFitsChecker checker) {
+    if (checker.isFineEnabled()) {
+      checker.fine("Checking cross references for " + oiTable.getExtName());
     }
 
     if (oiTable instanceof OITarget) {
       OITarget o = (OITarget) oiTable;
 
       if (o.getNbTargets() < 1) {
-        logger.severe("No target defined");
+        checker.severe("No target defined");
       }
-    }
-
-    /* Check for OiWavelength table */
-    if (oiTable instanceof OIWavelength) {
+    } else if (oiTable instanceof OIWavelength) {
       OIWavelength o = (OIWavelength) oiTable;
       String insName = o.getInsName();
 
       if (insName != null) {
-        /* Get OiWavelength asseociated to INSNAME value */
+        /* Get OiWavelength associated to INSNAME value */
         List<OIWavelength> v = insNameToOiWavelength.get(insName);
 
         if (v == null) {
           /* Problem: INSNAME value has not been encoutered during
            * building step, that should be impossible */
-          logger.severe("invalid INSNAME identifier");
+          checker.severe("invalid INSNAME identifier");
         } else {
           if (v.size() > 1) {
             /* Problem: more that one OiWavelength table associated
@@ -389,30 +381,26 @@ public final class OIFitsFile extends OIFits {
               sb.append("|").append(o.getExtNb());
             }
 
-            if (logger.isLoggable(Level.SEVERE)) {
-              logger.severe("OI_WAVELENGTH tables [" + sb.toString().substring(1) + "] are identified by same INSNAME='" + o.getInsName() + "'");
-            }
+            checker.severe("OI_WAVELENGTH tables [" + sb.toString().substring(1) + "] are identified by same INSNAME='" + o.getInsName() + "'");
           }
         }
       } else {
         /* Problem: INSNAME value is "", that should not be possible */
-        logger.severe(
+        checker.severe(
                 "INSNAME identifier is missing during reference checking step");
       }
-    }
-
-    if (oiTable instanceof OIArray) {
+    } else if (oiTable instanceof OIArray) {
       OIArray o = (OIArray) oiTable;
       String arrName = o.getArrName();
 
       if (arrName != null) {
-        /* Get OiArray asseociated to ARRNAME value */
+        /* Get OiArray associated to ARRNAME value */
         List<OIArray> v = arrNameToOiArray.get(arrName);
 
         if (v == null) {
           /* Problem: ARRNAME value has not been encoutered during
            * building step, that should be impossible */
-          logger.severe("invalid ARRNAME identifier");
+          checker.severe("invalid ARRNAME identifier");
         } else {
           if (v.size() > 1) {
             /* Problem: more that one OiArray table associated
@@ -424,14 +412,12 @@ public final class OIFitsFile extends OIFits {
               sb.append("|").append(o.getExtNb());
             }
 
-            if (logger.isLoggable(Level.SEVERE)) {
-              logger.severe("OI_ARRAY tables [" + sb.toString().substring(1) + "] are identified by same ARRNAME='" + o.getArrName() + "'");
-            }
+            checker.severe("OI_ARRAY tables [" + sb.toString().substring(1) + "] are identified by same ARRNAME='" + o.getArrName() + "'");
           }
         }
       } else {
         /* Problem: ARRNAME value is "", that should not be possible */
-        logger.severe(
+        checker.severe(
                 "ARRNAME identifier is missing during reference checking step");
       }
     }

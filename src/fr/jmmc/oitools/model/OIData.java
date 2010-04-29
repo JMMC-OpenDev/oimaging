@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIData.java,v 1.1 2010-04-28 14:47:38 bourgesl Exp $"
+ * "@(#) $Id: OIData.java,v 1.2 2010-04-29 15:47:01 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:38  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  * Revision 1.11  2009/09/08 16:10:42  mella
  * add same block for all oitable after optionnal specific data
  *
@@ -270,20 +273,19 @@ public class OIData extends OITable {
   }
 
   /**
-   * Add arrname and oiarray test in addition to OiTable.checkKeywords()
+   * Add arrname and oiarray test in addition to OITable.checkKeywords()
    *
-   * @param checkLogger validation logger
+   *
+   * @param checker checker component
    */
   @Override
-  public void checkKeywords(final Logger checkLogger) {
-    logger.entering("" + this.getClass(), "checkKeywords");
+  public final void checkKeywords(final OIFitsChecker checker) {
+    super.checkKeywords(checker);
 
     if (getArrName() != null && getOiArray() == null) {
       /* No keyword with keywordName name */
-      checkLogger.severe("Missing OI_ARRAY table that describes the '" + getArrName() + "' array");
+      checker.severe("Missing OI_ARRAY table that describes the '" + getArrName() + "' array");
     }
-
-    super.checkKeywords(checkLogger);
   }
 }
 /*___oOo___*/

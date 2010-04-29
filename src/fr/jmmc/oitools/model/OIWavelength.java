@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIWavelength.java,v 1.1 2010-04-28 14:47:37 bourgesl Exp $"
+ * "@(#) $Id: OIWavelength.java,v 1.2 2010-04-29 15:47:01 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:37  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  * Revision 1.12  2009/12/03 13:08:23  mella
  * format effWave values
  *
@@ -51,7 +54,6 @@ import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.meta.Units;
 import java.text.DecimalFormat;
-import java.util.logging.Logger;
 
 /**
  * Class for OI_WAVELENGTH table.
@@ -133,21 +135,23 @@ public class OIWavelength extends OITable {
   public String toString() {
     return super.toString() + " [ INSNAME=" + getInsName() + " | NWAVE=" + getNWave() + " ]";
   }
-  
+
   /** 
    * Do syntactical analysis.
+   *
+   * @param checker checker component
    */
   @Override
-  public void checkSyntax(final Logger checkLogger) {
-    super.checkSyntax(checkLogger);
+  public void checkSyntax(final OIFitsChecker checker) {
+    super.checkSyntax(checker);
 
-    if ((getInsName() != null) && (getInsName().length() == 0)) {
+    if (getInsName() != null && getInsName().length() == 0) {
       /* Problem: INSNAME keyword has value "", that should not be
        * possible. */
-      checkLogger.severe("INSNAME identifier has blank value");
+      checker.severe("INSNAME identifier has blank value");
     }
 
-    oifitsFile.checkCrossRefering(this, checkLogger);
+    this.oifitsFile.checkCrossRefering(this, checker);
   }
 
   /**
@@ -170,11 +174,10 @@ public class OIWavelength extends OITable {
       sb.append("<effwave>" + formatter.format(effWaves[i]) + "</effwave>");
     }
     sb.append("</effwaves>");
-    
+
     sb.append("</insname>\n\n");
 
     super.getXmlDesc(sb, detailled);
   }
-
 }
 /*___oOo___*/

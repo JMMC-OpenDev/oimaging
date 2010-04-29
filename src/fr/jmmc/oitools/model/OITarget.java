@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITarget.java,v 1.1 2010-04-28 14:47:38 bourgesl Exp $"
+ * "@(#) $Id: OITarget.java,v 1.2 2010-04-29 15:47:02 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:38  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  * Revision 1.13  2009/09/08 16:10:42  mella
  * add same block for all oitable after optionnal specific data
  *
@@ -52,7 +55,6 @@ import fr.jmmc.oitools.OIFitsConstants;
 import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.meta.Units;
-import java.util.logging.Logger;
 
 /**
  * Class for OI_TARGET table.
@@ -507,12 +509,14 @@ public class OITarget extends OITable {
     return getColumnString(OIFitsConstants.COLUMN_SPECTYP);
   }
 
-  /** 
-   * Do syntactical analysis
+  /**
+   * Do syntactical analysis.
+   *
+   * @param checker checker component
    */
   @Override
-  public void checkSyntax(final Logger checkLogger) {
-    super.checkSyntax(checkLogger);
+  public void checkSyntax(final OIFitsChecker checker) {
+    super.checkSyntax(checker);
 
     final int len = getNbTargets();
     final short[] targetIds = getAcceptedTargetIds();
@@ -521,16 +525,16 @@ public class OITarget extends OITable {
     for (int i = 0; i < len; i++) {
       for (int j = i + 1; j < len; j++) {
         if (targetIds[i] == targetIds[j]) {
-          checkLogger.severe("TARGET_ID duplicated on lines " + i + "|" + j);
+          checker.severe("TARGET_ID duplicated on lines " + i + "|" + j);
         }
 
         if (targetNames[i].equals(targetNames[j])) {
-          checkLogger.severe("TARGET duplicated on lines " + i + "|" + j);
+          checker.severe("TARGET duplicated on lines " + i + "|" + j);
         }
       }
     }
 
-    oifitsFile.checkCrossRefering(this, checkLogger);
+    oifitsFile.checkCrossRefering(this, checker);
   }
 
   /**

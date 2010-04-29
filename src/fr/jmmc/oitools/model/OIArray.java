@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIArray.java,v 1.1 2010-04-28 14:47:38 bourgesl Exp $"
+ * "@(#) $Id: OIArray.java,v 1.2 2010-04-29 15:47:02 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:38  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  * Revision 1.11  2009/09/15 12:00:15  mella
  * add more informations for oi_array
  *
@@ -47,7 +50,6 @@ import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.meta.Units;
-import java.util.logging.Logger;
 
 /**
  * Class for OI_ARRAY table.
@@ -162,19 +164,21 @@ public final class OIArray extends OITable {
   public String toString() {
     return super.toString() + " [ ARRNAME=" + getArrName() + " | " + getNbRows() + " telescopes ]";
   }
-  
+
   /**
-   * Do syntactical analysis of the table.
+   * Do syntactical analysis.
+   *
+   * @param checker checker component
    */
   @Override
-  public void checkSyntax(final Logger checkLogger) {
-    super.checkSyntax(checkLogger);
+  public void checkSyntax(final OIFitsChecker checker) {
+    super.checkSyntax(checker);
 
-    if ((getArrName() != null) && (getArrName().length() == 0)) {
-      checkLogger.severe("ARRNAME identifier has blank value");
+    if (getArrName() != null && getArrName().length() == 0) {
+      checker.severe("ARRNAME identifier has blank value");
     }
 
-    oifitsFile.checkCrossRefering(this, checkLogger);
+    oifitsFile.checkCrossRefering(this, checker);
   }
 
   /**
@@ -191,6 +195,5 @@ public final class OIArray extends OITable {
 
     super.getXmlDesc(sb, detailled);
   }
-
 }
 /*___oOo___*/

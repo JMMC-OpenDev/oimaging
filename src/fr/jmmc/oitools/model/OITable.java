@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.1 2010-04-28 14:47:38 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.2 2010-04-29 15:47:02 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:38  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  * Revision 1.15  2009/09/15 12:00:15  mella
  * add more informations for oi_array
  *
@@ -65,9 +68,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nom.tam.util.ArrayFuncs;
 import org.eso.fits.FitsColumn;
-import org.eso.fits.FitsHDUnit;
-import org.eso.fits.FitsHeader;
-import org.eso.fits.FitsKeyword;
 import org.eso.fits.FitsTable;
 
 /**
@@ -109,8 +109,6 @@ public class OITable extends ModelBase {
   protected final Map<String, Object> columnsValue = new HashMap<String, Object>();
 
   /* TODO : kill */
-  /** input Header Data Unit */
-  private FitsHDUnit fitsHDUnitKILL;
   /** Binary table of the HDU */
   private FitsTable fitsTableKILL;
 
@@ -195,11 +193,11 @@ public class OITable extends ModelBase {
   }
 
   protected final int getKeywordInt(final String key) {
-    return ((Integer) keywordsValue.get(key)).intValue();
+    return ((Number) keywordsValue.get(key)).intValue();
   }
 
   protected final double getKeywordDouble(final String key) {
-    return ((Double) keywordsValue.get(key)).doubleValue();
+    return ((Number) keywordsValue.get(key)).doubleValue();
   }
 
   /**
@@ -299,18 +297,18 @@ public class OITable extends ModelBase {
     return getExtName() + "#" + getExtNb();
   }
 
-
   /**
    * Do syntactical analysis of the table.
    *
-   * @param checkLogger validation logger
+   * @param checker checker component
    */
-  public void checkSyntax(final Logger checkLogger) {
-    checkLogger.info("Analysing table [" + getExtNb() + "]: " + getExtName());
-    // First analysing keywords
-    checkKeywords(checkLogger);
-    // Second analysing columns
-    checkColumns(checkLogger);
+  public void checkSyntax(final OIFitsChecker checker) {
+    checker.info("Analysing table [" + getExtNb() + "]: " + getExtName());
+
+    // First analyse keywords
+    checkKeywords(checker);
+    // Second analyse columns
+//    checkColumns(checkLogger);
   }
 
   /**
@@ -319,25 +317,30 @@ public class OITable extends ModelBase {
    * name, right format and right values (if they do belong to a given set of
    * accepted values).
    *
-   * @param checkLogger validation logger
+   * @param checker checker component
    */
-  public void checkKeywords(final Logger checkLogger) {
-    logger.entering("" + this.getClass(), "checkKeywords");
+  public void checkKeywords(final OIFitsChecker checker) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("checkKeywords : " + this.toString());
+    }
 
-    /* Get header of the HDU */
-    FitsHeader fitsHeader = fitsHDUnitKILL.getHeader();
-
+    String keywordName;
+    Object value;
     /* Get mandatory keywords names */
-    for (KeywordMeta c : keywordsDesc.values()) {
-      String keywordName = c.getName();
-      FitsKeyword fitsKeyword = fitsHeader.getKeyword(keywordName);
+    for (KeywordMeta keyword : keywordsDesc.values()) {
+      keywordName = keyword.getName();
 
-      if (fitsKeyword == null) {
-        /* No keyword with keywordName name */
-        checkLogger.severe("Missing keyword '" + keywordName + "'");
+      // get keyword value :
+      value = getKeywordValue(keywordName);
+
+      if (value == null) {
+        if (keyword.isMandatory()) {
+          /* No keyword with keywordName name */
+          checker.severe("Missing keyword '" + keywordName + "'");
+        }
       } else {
         /* Check the keyword validity */
-        c.check(fitsKeyword, checkLogger);
+        keyword.check(value, checker);
       }
     }
   }
@@ -452,6 +455,12 @@ public class OITable extends ModelBase {
     sb.append("</").append(getExtName()).append(">\n");
   }
 
+  /**
+   * Append the string representation (String or array) of the column value at the given row index
+   * @param column column descriptor
+   * @param rowIndex row index
+   * @param sb string buffer
+   */
   private void dumpColumnRow(final ColumnMeta column, final int rowIndex, final StringBuilder sb) {
     switch (column.getDataType()) {
       case TYPE_CHAR:
