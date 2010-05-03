@@ -1,19 +1,23 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: ColumnMeta.java,v 1.2 2010-04-29 15:46:02 bourgesl Exp $"
+ * "@(#) $Id: ColumnMeta.java,v 1.3 2010-05-03 14:28:46 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:46:02  bourgesl
+ * keyword checks refactored
+ *
  * Revision 1.1  2010/04/28 14:45:44  bourgesl
  * meta data package with Column and Keyword descriptors, Types and Units enumeration
  *
  */
 package fr.jmmc.oitools.meta;
 
-import java.util.logging.Logger;
-import org.eso.fits.FitsColumn;
+import fr.jmmc.oitools.model.OIFitsChecker;
+import java.util.logging.Level;
+import nom.tam.util.ArrayFuncs;
 
 /**
  * This class describes a FITS column
@@ -66,7 +70,7 @@ public class ColumnMeta extends CellMeta {
    * @param unit column unit
    */
   public ColumnMeta(final String name, final String desc, final Types dataType, final int repeat,
-                     final Units unit) {
+                    final Units unit) {
     super(MetaType.COLUMN, name, desc, dataType, repeat, NO_INT_VALUES, NO_STR_VALUES, unit);
   }
 
@@ -80,7 +84,7 @@ public class ColumnMeta extends CellMeta {
    * @param acceptedValues string possible values
    */
   public ColumnMeta(final String name, final String desc, final Types dataType, final int repeat,
-                     final String[] acceptedValues) {
+                    final String[] acceptedValues) {
     super(MetaType.COLUMN, name, desc, dataType, repeat, NO_INT_VALUES, acceptedValues, Units.NO_UNIT);
   }
 
@@ -95,88 +99,126 @@ public class ColumnMeta extends CellMeta {
   /**
    * Check if the input column is valid.
    *
-   * TODO : remove Fits API dependency
-   *
-   * @param fitsColumn column to check
-   * @param noRows number of rows in the column
-   * @param logger logger associated to input column
+   * @param value column data to check
+   * @param nbRows number of rows in the column
+   * @param checker checker component
    */
-  public void check(FitsColumn fitsColumn, int noRows, Logger logger) {
-    logger.entering("" + this.getClass(), "checkColumn", fitsColumn);
+  public void check(final Object value, final int nbRows, final OIFitsChecker checker) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("check : " + getName() + " = " + ArrayFuncs.arrayDescription(value));
+    }
 
     // Check type and cardinality
-    char cDataType = fitsColumn.getDataType();
-    int cRepeat = fitsColumn.getRepeat();
+    final Class<?> baseClass = ArrayFuncs.getBaseClass(value);
+    final char columnType = Types.getDataType(baseClass).getRepresentation();
 
-    if (this.getRepeat() != -1) {
+    final int[] dims = ArrayFuncs.getDimensions(value);
+    final int ndims = dims.length;
+
+    // check rows
+    final int columnRows = dims[0];
+    if (columnRows != nbRows) {
+      checker.severe("Invalid length for column '" + this.getName() + "', found " + columnRows +
+              "row(s) should be " + nbRows + " row(s)");
+    }
+
+    int columnRepeat;
+    if (ndims == 1) {
+      columnRepeat = 1;
+
+      if (columnType == Types.TYPE_CHAR.getRepresentation()) {
+        // For Strings, repeat corresponds to the number of characters :
+        int max = 0;
+        for (String val : (String[]) value) {
+          if (val != null) {
+            if (val.length() > max) {
+              max = val.length();
+            }
+          }
+        }
+        columnRepeat = max;
+      }
+
+    } else {
+      columnRepeat = dims[1];
+      if (ndims > 2) {
+        logger.severe("unsupported array dimensions : " + ArrayFuncs.arrayDescription(value));
+      }
+    }
+
+    // Note : ColumnMeta.getRepeat() is lazily computed from table references
+    final char descType = this.getType();
+    final int descRepeat = this.getRepeat();
+
+    if (descRepeat > 0) {
       boolean severe = false;
 
-      if (cDataType != this.getType()) {
+      if (columnType != descType) {
         severe = true;
       } else {
-        if (cDataType == 'A') {
-          if (cRepeat < this.getRepeat()) {
-            logger.warning("Invalid format for column '" + this.getName() + "', found '" + cRepeat + cDataType + "' should be '" + this.getRepeat() + this.getType() + "'");
-          } else if (cRepeat > this.getRepeat()) {
+        if (columnType == Types.TYPE_CHAR.getRepresentation()) {
+          // For String values, report only errors when the maximum length is exceeded.
+          if (columnRepeat > descRepeat) {
             severe = true;
           }
         } else {
-          if (cRepeat != this.getRepeat()) {
+          if (columnRepeat != descRepeat) {
             severe = true;
           }
         }
       }
 
       if (severe) {
-        logger.severe("Invalid format for column '" + this.getName() + "', found '" + cRepeat + cDataType + "' should be '" + this.getRepeat() + this.getType() + "'");
+        checker.severe("Invalid format for column '" + this.getName() + "', found '" + columnRepeat + columnType +
+                "' should be '" + descRepeat + descType + "'");
       }
     } else {
-      logger.warning("Can't check repeat for column '" + this.getName() + "'");
+      checker.warning("Can't check repeat for column '" + this.getName() + "'");
 
-      if (cDataType != this.getType()) {
-        logger.severe("Invalid format for column '" + this.getName() + "', found '" + cDataType + "' should be '" + this.getType() + "'");
+      if (columnType != descType) {
+        checker.severe("Invalid format for column '" + this.getName() + "', found '" + columnType +
+                "' should be '" + descType + "'");
       }
     }
 
-    // Check unit
-    String cUnit = fitsColumn.getUnit();
-
-    if (!checkUnit(cUnit)) {
-      if ((cUnit == null) || (cUnit.length() == 0)) {
-        logger.warning("Missing unit for column '" + this.getName() + "', should be '" + this.getUnit() + "'");
-      } else {
-        logger.warning("Invalid unit for column '" + this.getName() + "', found '" + cUnit + "' should be '" + this.getUnit() + "'");
-      }
-    }
+    // skip check units as the raw object has not this information.
 
     // Check accepted value
-    checkAcceptedValues(fitsColumn, noRows, logger);
+    checkAcceptedValues(value, columnRows, columnRepeat, checker);
   }
 
   /**
    * If any are mentionned, check column values are fair.
    *
-   * TODO : remove Fits API dependency
-   *
-   * @param fitsColumn column to check
-   * @param noRows number of rows
-   * @param l logger associated to input column.
+   * @param value column data to check
+   * @param columnRows number of rows in the given column
+   * @param columnRepeat number of values per row in the given column
+   * @param checker checker component
    */
-  private void checkAcceptedValues(FitsColumn fitsColumn, int noRows, Logger l) {
+  private void checkAcceptedValues(final Object value, final int columnRows, final int columnRepeat, final OIFitsChecker checker) {
     boolean error = true;
 
     final short[] intAcceptedValues = getIntAcceptedValues();
     final String[] stringAcceptedValues = getStringAcceptedValues();
 
     if (intAcceptedValues.length != 0) {
+      // OIData : STA_INDEX or TARGET_ID
 
-      for (int rowNb = 0; rowNb < noRows; rowNb++) {
-        int[] values = fitsColumn.getInts(rowNb);
+      final short[] single = new short[1];
+      short[] values;
 
-        for (int r = 0; r < values.length; r++) {
+      for (int rowNb = 0; rowNb < columnRows; rowNb++) {
+        if (columnRepeat > 1) {
+          values = ((short[][]) value)[rowNb];
+        } else {
+          single[0] = ((short[]) value)[rowNb];
+          values = single;
+        }
+
+        for (int r = 0, rlen = values.length; r < rlen; r++) {
           error = true;
 
-          for (int i = 0; i < intAcceptedValues.length; i++) {
+          for (int i = 0, len = intAcceptedValues.length; i < len; i++) {
             if (values[r] == intAcceptedValues[i]) {
               error = false;
             }
@@ -184,36 +226,39 @@ public class ColumnMeta extends CellMeta {
 
           if (error) {
             if (values.length > 1) {
-              l.severe("Invalid value at index " + r + " for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + getIntAcceptedValuesAsString() + "'");
+              checker.severe("Invalid value at index " + r + " for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + getIntAcceptedValuesAsString() + "'");
             } else {
-              l.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + getIntAcceptedValuesAsString() + "'");
+              checker.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + values[r] + "' should be '" + getIntAcceptedValuesAsString() + "'");
             }
           }
         }
       }
     } else if (stringAcceptedValues.length != 0) {
+      // OITarget : VELTYP, VELDEF
 
-      for (int rowNb = 0; rowNb < noRows; rowNb++) {
-        String value;
+      final String[] sValues = (String[]) value;
 
-        if (fitsColumn.getString(rowNb) == null) {
-          error = true;
-          value = "";
+      String val;
+      for (int rowNb = 0; rowNb < columnRows; rowNb++) {
+        error = true;
+
+        val = sValues[rowNb];
+
+        if (val == null) {
+          val = "";
         } else {
-          value = fitsColumn.getString(rowNb).trim();
-
-          for (int i = 0; i < stringAcceptedValues.length; i++) {
-            if (value.equals(stringAcceptedValues[i].trim())) {
+          for (int i = 0, len = stringAcceptedValues.length; i < len; i++) {
+            if (val.equals(stringAcceptedValues[i])) {
               error = false;
+              break;
             }
           }
         }
 
         if (error) {
-          l.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + value + "' should be '" + getStringAcceptedValuesAsString() + "'");
+          checker.severe("Invalid value for column '" + this.getName() + "' line " + rowNb + ", found '" + val + "' should be '" + getStringAcceptedValuesAsString() + "'");
         }
       }
     }
   }
-
 }
