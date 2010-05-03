@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIData.java,v 1.2 2010-04-29 15:47:01 bourgesl Exp $"
+ * "@(#) $Id: OIData.java,v 1.3 2010-05-03 14:25:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:47:01  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  * Revision 1.1  2010/04/28 14:47:38  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -240,7 +243,6 @@ public class OIData extends OITable {
     if (oiWavelength != null) {
       return oiWavelength.getNWave();
     }
-    // 0 != -1 for repeats : TODO test
     return 0;
   }
 

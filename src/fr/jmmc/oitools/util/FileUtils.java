@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FileUtils.java,v 1.1 2010-04-28 14:46:13 bourgesl Exp $"
+ * "@(#) $Id: FileUtils.java,v 1.2 2010-05-03 14:25:46 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:46:13  bourgesl
+ * Simple FileUtils to wget remote files
+ *
  */
 package fr.jmmc.oitools.util;
 
@@ -39,10 +42,6 @@ public class FileUtils {
   }
 
   /**
-   * TODO: is it still useful with nom.tam Fits ?
-   *
-   * Certainly to do "wget URL"
-   *
    * Save remote file or GZipped file or file given by its url into a
    * temporary file.
    *
