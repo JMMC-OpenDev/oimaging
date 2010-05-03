@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: Types.java,v 1.2 2010-04-29 15:46:18 bourgesl Exp $"
+ * "@(#) $Id: Types.java,v 1.3 2010-05-03 14:26:51 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:46:18  bourgesl
+ * added getDataType(Object)
+ *
  * Revision 1.1  2010/04/28 14:45:44  bourgesl
  * meta data package with Column and Keyword descriptors, Types and Units enumeration
  *
@@ -49,28 +52,43 @@ public enum Types {
   }
 
   /**
-   * Get the data type corresponding to the given value
+   * Get the data type corresponding to the given value class
    * Does not support an array value
    *
-   * @param value keyword value
+   * @param clazz value class
    *
    * @return data type if it is known, null otherwise.
    */
-  protected static Types getDataType(final Object value) {
+  public static Types getDataType(final Class<?> clazz) {
 
-    if (value instanceof String) {
+    if (clazz == String.class) {
       return Types.TYPE_CHAR;
     }
-    if (value instanceof Double) {
+    if (clazz  ==  Double.class) {
       return Types.TYPE_DBL;
     }
-    if (value instanceof Integer) {
+    if (clazz  ==  double.class) {
+      return Types.TYPE_DBL;
+    }
+    if (clazz  ==  Integer.class) {
       return Types.TYPE_INT;
     }
-    if (value instanceof Float) {
+    if (clazz  ==  int.class) {
+      return Types.TYPE_INT;
+    }
+    if (clazz  ==  short.class) {
+      return Types.TYPE_INT;
+    }
+    if (clazz  ==  Float.class) {
       return Types.TYPE_REAL;
     }
-    if (value instanceof Boolean) {
+    if (clazz  ==  float.class) {
+      return Types.TYPE_REAL;
+    }
+    if (clazz  ==  Boolean.class) {
+      return Types.TYPE_LOGICAL;
+    }
+    if (clazz  ==  boolean.class) {
       return Types.TYPE_LOGICAL;
     }
 
