@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.2 2010-04-29 15:47:02 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.3 2010-05-03 14:29:43 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:47:02  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  * Revision 1.1  2010/04/28 14:47:38  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -65,10 +68,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import nom.tam.util.ArrayFuncs;
-import org.eso.fits.FitsColumn;
-import org.eso.fits.FitsTable;
 
 /**
  * Class for OI_* tables.
@@ -83,7 +83,7 @@ public class OITable extends ModelBase {
           "number of table rows", Types.TYPE_INT);
   /** EXTNAME keyword descriptor */
   private final static KeywordMeta KEYWORD_EXTNAME = new KeywordMeta(OIFitsConstants.KEYWORD_EXT_NAME,
-          "extension name", Types.TYPE_CHAR, 
+          "extension name", Types.TYPE_CHAR,
           new String[]{OIFitsConstants.TABLE_OI_ARRAY, OIFitsConstants.TABLE_OI_TARGET, OIFitsConstants.TABLE_OI_WAVELENGTH,
                        OIFitsConstants.TABLE_OI_VIS, OIFitsConstants.TABLE_OI_VIS2, OIFitsConstants.TABLE_OI_T3});
   /** EXTVER keyword descriptor */
@@ -107,10 +107,6 @@ public class OITable extends ModelBase {
   protected final Map<String, Object> keywordsValue = new HashMap<String, Object>();
   /** Map storing column values */
   protected final Map<String, Object> columnsValue = new HashMap<String, Object>();
-
-  /* TODO : kill */
-  /** Binary table of the HDU */
-  private FitsTable fitsTableKILL;
 
   /**
    * OITable class constructor.
@@ -189,15 +185,15 @@ public class OITable extends ModelBase {
   }
 
   protected final String getKeyword(final String key) {
-    return (String) keywordsValue.get(key);
+    return (String) getKeywordValue(key);
   }
 
   protected final int getKeywordInt(final String key) {
-    return ((Number) keywordsValue.get(key)).intValue();
+    return ((Number) getKeywordValue(key)).intValue();
   }
 
   protected final double getKeywordDouble(final String key) {
-    return ((Number) keywordsValue.get(key)).doubleValue();
+    return ((Number) getKeywordValue(key)).doubleValue();
   }
 
   /**
@@ -215,32 +211,36 @@ public class OITable extends ModelBase {
     columnsValue.put(key, value);
   }
 
+  protected final Object getColumnValue(final String key) {
+    return columnsValue.get(key);
+  }
+
   protected final String[] getColumnString(final String key) {
-    return (String[]) columnsValue.get(key);
+    return (String[]) getColumnValue(key);
   }
 
   protected final short[] getColumnShort(final String key) {
-    return (short[]) columnsValue.get(key);
+    return (short[]) getColumnValue(key);
   }
 
   protected final short[][] getColumnShorts(final String key) {
-    return (short[][]) columnsValue.get(key);
+    return (short[][]) getColumnValue(key);
   }
 
   protected final float[] getColumnFloat(final String key) {
-    return (float[]) columnsValue.get(key);
+    return (float[]) getColumnValue(key);
   }
 
   protected final double[] getColumnDouble(final String key) {
-    return (double[]) columnsValue.get(key);
+    return (double[]) getColumnValue(key);
   }
 
   protected final double[][] getColumnDoubles(final String key) {
-    return (double[][]) columnsValue.get(key);
+    return (double[][]) getColumnValue(key);
   }
 
   protected final boolean[][] getColumnBooleans(final String key) {
-    return (boolean[][]) columnsValue.get(key);
+    return (boolean[][]) getColumnValue(key);
   }
 
   /**
@@ -303,12 +303,15 @@ public class OITable extends ModelBase {
    * @param checker checker component
    */
   public void checkSyntax(final OIFitsChecker checker) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("checkSyntax : " + this.toString());
+    }
     checker.info("Analysing table [" + getExtNb() + "]: " + getExtName());
 
     // First analyse keywords
     checkKeywords(checker);
     // Second analyse columns
-//    checkColumns(checkLogger);
+    checkColumns(checker);
   }
 
   /**
@@ -323,9 +326,9 @@ public class OITable extends ModelBase {
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("checkKeywords : " + this.toString());
     }
-
     String keywordName;
     Object value;
+
     /* Get mandatory keywords names */
     for (KeywordMeta keyword : keywordsDesc.values()) {
       keywordName = keyword.getName();
@@ -350,22 +353,26 @@ public class OITable extends ModelBase {
    * It consists in checking all mandatory columns are present, with right
    * name, right format and right associated unit.
    *
-   * @param checkLogger validation logger
+   * @param checker checker component
    */
-  public void checkColumns(final Logger checkLogger) {
-    logger.entering("" + this.getClass(), "checkColumns");
+  public void checkColumns(final OIFitsChecker checker) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("checkColumns : " + this.toString());
+    }
+    String columnName;
+    Object value;
 
     /* Get mandatory columns names */
     for (ColumnMeta c : columnsDesc.values()) {
-      String columnName = c.getName();
-      FitsColumn fitsColumn = fitsTableKILL.getColumn(columnName);
+      columnName = c.getName();
+      value = getColumnValue(columnName);
 
-      if (fitsColumn == null) {
+      if (value == null) {
         /* No column with columnName name */
-        checkLogger.severe("Missing column '" + columnName + "'");
+        checker.severe("Missing column '" + columnName + "'");
       } else {
         /* Check the column validity */
-        c.check(fitsColumn, getNbRows(), checkLogger);
+        c.check(value, getNbRows(), checker);
       }
     }
   }
