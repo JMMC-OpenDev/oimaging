@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: Units.java,v 1.1 2010-04-28 14:45:44 bourgesl Exp $"
+ * "@(#) $Id: Units.java,v 1.2 2010-05-03 14:26:20 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:45:44  bourgesl
+ * meta data package with Column and Keyword descriptors, Types and Units enumeration
+ *
  */
 package fr.jmmc.oitools.meta;
 
@@ -50,7 +53,7 @@ public enum Units {
    */
   private Units(final String allowedValues) {
     this.representation = allowedValues;
-    this.tokens = this.representation.split("|");
+    this.tokens = this.representation.split("\\|");
   }
   /** string representation separated by '|' */
   private final String representation;
@@ -81,27 +84,24 @@ public enum Units {
    * @return matching Units according to its tokens or null if no unit matches
    */
   public static Units parseUnit(final String unit) {
-    Units u = null;
-
-    // Check for noUnit,
     if (unit == null || unit.length() == 0) {
-      u = NO_UNIT;
+      return NO_UNIT;
     } else if (UNIT_METER.checkTokens(unit)) {
-      u = UNIT_METER;
+      return UNIT_METER;
     } else if (UNIT_DEGREE.checkTokens(unit)) {
-      u = UNIT_DEGREE;
+      return UNIT_DEGREE;
     } else if (UNIT_SECOND.checkTokens(unit)) {
-      u = UNIT_SECOND;
+      return UNIT_SECOND;
     } else if (UNIT_MJD.checkTokens(unit)) {
-      u = UNIT_MJD;
+      return UNIT_MJD;
     } else if (UNIT_YEAR.checkTokens(unit)) {
-      u = UNIT_YEAR;
+      return UNIT_YEAR;
     } else if (UNIT_METER_PER_SECOND.checkTokens(unit)) {
-      u = UNIT_METER_PER_SECOND;
+      return UNIT_METER_PER_SECOND;
     } else if (UNIT_DEGREE_PER_YEAR.checkTokens(unit)) {
-      u = UNIT_DEGREE_PER_YEAR;
+      return UNIT_DEGREE_PER_YEAR;
     }
 
-    return u;
+    return null;
   }
 }
