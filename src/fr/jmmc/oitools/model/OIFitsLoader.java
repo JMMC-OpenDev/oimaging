@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.2 2010-04-29 15:47:02 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.3 2010-05-03 14:29:14 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:47:02  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  * Revision 1.1  2010/04/28 14:47:38  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -16,6 +19,7 @@ import fr.jmmc.oitools.OIFitsConstants;
 import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
+import fr.jmmc.oitools.meta.Units;
 import fr.jmmc.oitools.util.FileUtils;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -27,6 +31,7 @@ import nom.tam.fits.Fits;
 import nom.tam.fits.FitsException;
 import nom.tam.fits.FitsFactory;
 import nom.tam.fits.Header;
+import nom.tam.util.ArrayFuncs;
 
 /**
  * This class loads an OIFits file to the OIFitsFile model
@@ -44,8 +49,6 @@ public class OIFitsLoader {
   private final OIFitsChecker checker;
   /** OIFits data model */
   private OIFitsFile oiFitsFile = null;
-  /** OIFits file */
-  private Fits fitsFile = null;
 
   static {
     // enable ESO HIERARCH keyword support in nom.tam Fits library :
@@ -111,6 +114,7 @@ public class OIFitsLoader {
       this.checker = new OIFitsChecker();
     }
   }
+
   /**
    * Load the given file in memory
    * @param absFilePath absolute File path on file system (not URL)
@@ -130,33 +134,29 @@ public class OIFitsLoader {
       final long start = System.nanoTime();
 
       // open the fits file :
-      this.fitsFile = new Fits(absFilePath);
+      final Fits fitsFile = new Fits(absFilePath);
 
       // read the complete file structure :
-
-      // TODO : use for loop on readHDU instead to get the truncated fits exception
-      // for files with extra bytes (no patch on Header.readHeader)
-
-      // log it in checkLogger severe !
-
-      final BasicHDU[] hdus = this.fitsFile.read();
+      final BasicHDU[] hdus = fitsFile.read();
 
       // process all HD units :
-      this.processHDUnits(hdus);
+      if (hdus != null) {
+        this.processHDUnits(hdus);
+      }
 
       if (logger.isLoggable(Level.FINE)) {
         logger.fine("load : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
       }
 
-      // TODO : remove test code :
-
+// TODO : remove test code :
       this.oiFitsFile.check(this.checker);
 
-
-      // validation results
-      if (logger.isLoggable(Level.FINE)) {
-        logger.fine("validation results\n" + this.checker.getCheckReport());
+// validation results
+      if (logger.isLoggable(Level.INFO)) {
+        logger.info("validation results\n" + this.checker.getCheckReport());
       }
+
+// HERE !
 
     } catch (FitsException fe) {
       logger.log(Level.SEVERE, "load failed ", fe);
@@ -387,42 +387,111 @@ public class OIFitsLoader {
       }
     }
 
+    // keep only OIFits columns i.e. extra column(s) are skipped :
+
     int idx;
-    String key;
+    String columnName;
     Object value;
     for (ColumnMeta column : columnsDesc.values()) {
-      key = column.getName();
+      columnName = column.getName();
 
-      idx = hdu.findColumn(key);
-
-      // keep only OIFits columns i.e. extra column(s) are skipped :
+      idx = hdu.findColumn(columnName);
 
       if (idx == -1) {
-        // TODO : check logger !
-        if (logger.isLoggable(Level.WARNING)) {
-          logger.warning("missing column [" + key + "] in " + table);
-        }
+        /* No column with columnName name */
+        this.checker.severe("Missing column '" + columnName + "'");
       } else {
-        // read all data and convert them to arrays[][] :
-        value = hdu.getColumn(idx);
 
         if (logger.isLoggable(Level.FINE)) {
-          logger.fine("COLUMN [" + key + "] [" + hdu.getColumnLength(idx) + " " + hdu.getColumnType(idx) + "]");
+          logger.fine("COLUMN [" + columnName + "] [" + hdu.getColumnLength(idx) + " " + hdu.getColumnType(idx) + "]");
         }
 
-        // TODO : convert fits data type to expected data model type :
-//        column.getDataType()
-
-        // ?? short[] => stored in memory as int[] ?
-        // ?? float/double[] => stored in memory as double[] ?
+        // read all data and convert them to arrays[][] :
+        // parse column value :
+        value = parseColumn(column, hdu.getColumnType(idx), hdu.getColumnLength(idx), hdu.getColumnUnit(idx), hdu.getColumn(idx));
 
         // store key and value :
-        table.setColumnValue(key, value);
+        if (value != null) {
+          table.setColumnValue(columnName, value);
+        }
       }
     }
   }
 
-private Double parseDouble(final String value) {
+  /**
+   * Parse the column value and check its format (data type, repeat, units)
+   * @param column column descriptor
+   * @param columnType fits column type
+   * @param columnRepeat fits column repeat (cardinality)
+   * @param columnUnit fits column unit
+   * @param columnValue column raw value
+   * @return converted column value or null
+   */
+  private Object parseColumn(final ColumnMeta column, final char columnType,
+                             final int columnRepeat, final String columnUnit,
+                             final Object columnValue) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("parseColumn : " + column.getName() + " = " + ArrayFuncs.arrayDescription(columnValue));
+    }
+
+    // Check type and cardinality
+
+    // Note : ColumnMeta.getRepeat() is lazily computed from table references
+    final char descType = column.getType();
+    final int descRepeat = column.getRepeat();
+
+    if (descRepeat > 0) {
+      boolean severe = false;
+
+      if (columnType != descType) {
+        severe = true;
+      } else {
+        if (columnType == Types.TYPE_CHAR.getRepresentation()) {
+          if (columnRepeat < descRepeat) {
+            checker.warning("Invalid format for column '" + column.getName() + "', found '" + columnRepeat + columnType +
+                    "' should be '" + descRepeat + descType + "'");
+          } else if (columnRepeat > descRepeat) {
+            severe = true;
+          }
+        } else {
+          if (columnRepeat != descRepeat) {
+            severe = true;
+          }
+        }
+      }
+
+      if (severe) {
+        checker.severe("Invalid format for column '" + column.getName() + "', found '" + columnRepeat + columnType +
+                "' should be '" + descRepeat + descType + "'");
+      }
+    } else {
+      checker.warning("Can't check repeat for column '" + column.getName() + "'");
+
+      if (columnType != descType) {
+        checker.severe("Invalid format for column '" + column.getName() + "', found '" + columnType +
+                "' should be '" + descType + "'");
+      }
+    }
+
+    // Check unit
+    if (column.getUnits() != Units.parseUnit(columnUnit)) {
+      if (columnUnit == null || columnUnit.length() == 0) {
+        checker.warning("Missing unit for column '" + column.getName() + "', should be '" + column.getUnit() + "'");
+      } else {
+        checker.warning("Invalid unit for column '" + column.getName() + "', found '" + columnUnit + "' should be '" + column.getUnit() + "'");
+      }
+    }
+
+    // TODO : convert fits data type to expected data model type :
+//        column.getDataType()
+
+    // ?? short[] => stored in memory as int[] ?
+    // ?? float/double[] => stored in memory as double[] ?
+
+    return columnValue;
+  }
+
+  private Double parseDouble(final String value) {
     Double res = null;
     try {
       res = Double.valueOf(value);
