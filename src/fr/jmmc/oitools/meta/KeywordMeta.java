@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: KeywordMeta.java,v 1.2 2010-04-29 15:46:01 bourgesl Exp $"
+ * "@(#) $Id: KeywordMeta.java,v 1.3 2010-05-03 14:27:02 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:46:01  bourgesl
+ * keyword checks refactored
+ *
  * Revision 1.1  2010/04/28 14:45:44  bourgesl
  * meta data package with Column and Keyword descriptors, Types and Units enumeration
  *
@@ -136,7 +139,7 @@ public class KeywordMeta extends CellMeta {
     }
 
     // Check type
-    final Types kDataType = Types.getDataType(value);
+    final Types kDataType = Types.getDataType(value.getClass());
 
     if (kDataType != this.getDataType()) {
       checker.severe("Invalid format for keyword '" + this.getName() + "', found '" + kDataType.getRepresentation() + "' should be '" + this.getType() + "'");
