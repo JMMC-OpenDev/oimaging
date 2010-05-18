@@ -1,13 +1,16 @@
 #*******************************************************************************
 # JMMC project
 #
-# "@(#) $Id: Makefile,v 1.2 2010-04-28 15:14:48 bourgesl Exp $"
+# "@(#) $Id: Makefile,v 1.3 2010-05-18 07:25:07 mella Exp $"
 #
 # Makefile of oitools module
 #
 # History
 # -------
 # $Log: not supported by cvs2svn $
+# Revision 1.2  2010/04/28 15:14:48  bourgesl
+# basic make file to compile archive
+#
 # Revision 1.1  2010/04/14 08:34:33  ccmgr
 # Fix directory structure and add additional files
 #
@@ -116,7 +119,14 @@ oitools_EXTRAS   =
 #
 # Java programs
 # ---------------------------------
-JAVA_EXECUTABLES=
+JAVA_EXECUTABLES = OIFitsViewer
+# OifitsValidator \
+				  
+
+#
+# <brief description of jjjjjj java program>
+#OifitsValidator_CLASS    = fr.jmmc.oitools.OifitsValidator
+OIFitsViewer_CLASS    = fr.jmmc.oitools.OIFitsViewer
 
 #
 # <brief description of jjjjjj java program>
