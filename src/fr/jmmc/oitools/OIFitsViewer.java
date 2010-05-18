@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsViewer.java,v 1.1 2010-04-29 14:14:39 bourgesl Exp $"
+ * "@(#) $Id: OIFitsViewer.java,v 1.2 2010-05-18 07:19:17 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/29 14:14:39  bourgesl
+ * refactored OIFitsViewer to use the OITools implementation
+ *
  * Revision 1.2  2009/09/08 16:10:42  mella
  * add same block for all oitable after optionnal specific data
  *
@@ -15,7 +18,6 @@
  ******************************************************************************/
 package fr.jmmc.oitools;
 
-import fr.jmmc.oifits.OifitsFile;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 
