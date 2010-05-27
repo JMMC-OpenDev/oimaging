@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: Units.java,v 1.2 2010-05-03 14:26:20 bourgesl Exp $"
+ * "@(#) $Id: Units.java,v 1.3 2010-05-27 14:44:07 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/05/03 14:26:20  bourgesl
+ * fixed parseUnit method
+ *
  * Revision 1.1  2010/04/28 14:45:44  bourgesl
  * meta data package with Column and Keyword descriptors, Types and Units enumeration
  *
@@ -68,6 +71,11 @@ public enum Units {
     return representation;
   }
 
+  /**
+   * Check if the given unit is present in the tokens
+   * @param unit unit to check
+   * @return true if the given unit is present in the tokens
+   */
   private boolean checkTokens(final String unit) {
     for (String token : tokens) {
       if (token.equalsIgnoreCase(unit)) {

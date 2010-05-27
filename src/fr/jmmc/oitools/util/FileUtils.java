@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FileUtils.java,v 1.2 2010-05-03 14:25:46 bourgesl Exp $"
+ * "@(#) $Id: FileUtils.java,v 1.3 2010-05-27 14:43:43 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/05/03 14:25:46  bourgesl
+ * removed comment
+ *
  * Revision 1.1  2010/04/28 14:46:13  bourgesl
  * Simple FileUtils to wget remote files
  *
@@ -33,10 +36,10 @@ public class FileUtils {
   /** Logger associated to meta model classes */
   protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
           "fr.jmmc.oitools.util.FileUtils");
-  /*
+
+  /**
    * Forbidden constructor
    */
-
   private FileUtils() {
     super();
   }

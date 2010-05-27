@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: CellMeta.java,v 1.2 2010-04-29 15:46:02 bourgesl Exp $"
+ * "@(#) $Id: CellMeta.java,v 1.3 2010-05-27 14:44:07 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:46:02  bourgesl
+ * keyword checks refactored
+ *
  * Revision 1.1  2010/04/28 14:45:44  bourgesl
  * meta data package with Column and Keyword descriptors, Types and Units enumeration
  *
@@ -65,7 +68,9 @@ public class CellMeta {
   /** keyword or column meta type */
   public enum MetaType {
 
+    /** keyword meta data */
     KEYWORD,
+    /** column meta data */
     COLUMN;
   }
 
@@ -140,7 +145,7 @@ public class CellMeta {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder sb = new StringBuilder(64);
     switch (getMetaType()) {
       case KEYWORD:
@@ -241,6 +246,10 @@ public class CellMeta {
     return acceptedValuesInteger;
   }
 
+  /**
+   * Return a string representation of the integer possible values separated by '|'
+   * @return string representation of the integer possible values
+   */
   protected final String getIntAcceptedValuesAsString() {
     final short[] intAcceptedValues = getIntAcceptedValues();
 
@@ -265,6 +274,10 @@ public class CellMeta {
     return acceptedValuesString;
   }
 
+  /**
+   * Return a string representation of the string possible values separated by '|'
+   * @return string representation of the string possible values
+   */
   protected final String getStringAcceptedValuesAsString() {
     final String[] stringAcceptedValues = getStringAcceptedValues();
 

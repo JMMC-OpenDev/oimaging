@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: Types.java,v 1.3 2010-05-03 14:26:51 bourgesl Exp $"
+ * "@(#) $Id: Types.java,v 1.4 2010-05-27 14:44:07 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/03 14:26:51  bourgesl
+ * getDataType(Class) supports both Object and primitive types
+ *
  * Revision 1.2  2010/04/29 15:46:18  bourgesl
  * added getDataType(Object)
  *
@@ -47,6 +50,10 @@ public enum Types {
   /** fits char representation */
   private final char representation;
 
+  /**
+   * Return the Fits Type character
+   * @return Fits Type character
+   */
   public char getRepresentation() {
     return representation;
   }
@@ -64,31 +71,31 @@ public enum Types {
     if (clazz == String.class) {
       return Types.TYPE_CHAR;
     }
-    if (clazz  ==  Double.class) {
+    if (clazz == Double.class) {
       return Types.TYPE_DBL;
     }
-    if (clazz  ==  double.class) {
+    if (clazz == double.class) {
       return Types.TYPE_DBL;
     }
-    if (clazz  ==  Integer.class) {
+    if (clazz == Integer.class) {
       return Types.TYPE_INT;
     }
-    if (clazz  ==  int.class) {
+    if (clazz == int.class) {
       return Types.TYPE_INT;
     }
-    if (clazz  ==  short.class) {
+    if (clazz == short.class) {
       return Types.TYPE_INT;
     }
-    if (clazz  ==  Float.class) {
+    if (clazz == Float.class) {
       return Types.TYPE_REAL;
     }
-    if (clazz  ==  float.class) {
+    if (clazz == float.class) {
       return Types.TYPE_REAL;
     }
-    if (clazz  ==  Boolean.class) {
+    if (clazz == Boolean.class) {
       return Types.TYPE_LOGICAL;
     }
-    if (clazz  ==  boolean.class) {
+    if (clazz == boolean.class) {
       return Types.TYPE_LOGICAL;
     }
 
