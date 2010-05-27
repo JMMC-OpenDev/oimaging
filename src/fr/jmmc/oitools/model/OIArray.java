@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIArray.java,v 1.2 2010-04-29 15:47:02 bourgesl Exp $"
+ * "@(#) $Id: OIArray.java,v 1.3 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:47:02  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  * Revision 1.1  2010/04/28 14:47:38  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -90,10 +93,8 @@ public final class OIArray extends OITable {
   private final static ColumnMeta COLUMN_STA_XYZ = new ColumnMeta(OIFitsConstants.COLUMN_STA_XYZ,
           "station coordinates relative to array center", Types.TYPE_DBL, 3, Units.UNIT_METER);
 
-  /* members */
   /**
-   * OIArray class constructor.
-   *
+   * Public OIArray class constructor.
    * @param oifitsFile main OifitsFile
    */
   public OIArray(final OIFitsFile oifitsFile) {
@@ -114,7 +115,6 @@ public final class OIArray extends OITable {
     // ARRAYZ  keyword definition
     addKeywordMeta(KEYWORD_ARRAY_Z);
 
-
     // TEL_NAME  column definition
     addColumnMeta(COLUMN_TEL_NAME);
 
@@ -131,11 +131,18 @@ public final class OIArray extends OITable {
     addColumnMeta(COLUMN_STA_XYZ);
   }
 
+  /* --- Keywords --- */
   /**
-   * Get station indexes defined in the binary table.
-   *
-   * TODO : int or short ?
-   *
+   * Get the value of ARRNAME keyword
+   * @return the value of ARRNAME keyword
+   */
+  public String getArrName() {
+    return getKeyword(OIFitsConstants.KEYWORD_ARRNAME);
+  }
+
+  /* --- Columns --- */
+  /**
+   * Get station indexes
    * @return an integer array containing station indexes.
    */
   public short[] getAcceptedStaIndexes() {
@@ -146,19 +153,10 @@ public final class OIArray extends OITable {
     return data;
   }
 
+  /* --- Other methods --- */
   /**
-   * Get value of ARRNAME keyword specifying the table.
-   *
-   * @return the value of ARRNAME keyword if it is present, NULL otherwise.
-   */
-  public String getArrName() {
-    return getKeyword(OIFitsConstants.KEYWORD_ARRNAME);
-  }
-
-  /**
-   * Returns a string representation of this component.
-   *
-   * @return a string representation of this component
+   * Returns a string representation of this table
+   * @return a string representation of this table
    */
   @Override
   public String toString() {
@@ -167,7 +165,6 @@ public final class OIArray extends OITable {
 
   /**
    * Do syntactical analysis.
-   *
    * @param checker checker component
    */
   @Override
@@ -178,7 +175,7 @@ public final class OIArray extends OITable {
       checker.severe("ARRNAME identifier has blank value");
     }
 
-    oifitsFile.checkCrossRefering(this, checker);
+    getOIFitsFile().checkCrossRefering(this, checker);
   }
 
   /**

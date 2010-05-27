@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITarget.java,v 1.2 2010-04-29 15:47:02 bourgesl Exp $"
+ * "@(#) $Id: OITarget.java,v 1.3 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:47:02  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  * Revision 1.1  2010/04/28 14:47:38  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -121,10 +124,8 @@ public class OITarget extends OITable {
   private final static ColumnMeta COLUMN_SPECTYP = new ColumnMeta(OIFitsConstants.COLUMN_SPECTYP,
           "spectral type", Types.TYPE_CHAR, 16);
 
-  /* members */
   /**
-   * OITarget class constructor.
-   *
+   * Public OITarget class constructor.
    * @param oifitsFile main OifitsFile
    */
   public OITarget(final OIFitsFile oifitsFile) {
@@ -190,12 +191,12 @@ public class OITarget extends OITable {
     return getNbRows();
   }
 
+  /* --- Columns --- */
   /**
-   * Get target identifiers defined in this table.
-   *
-   * @return an integer array containing all station indexes.
+   * Get TARGET_ID column
+   * @return the target identifiers
    */
-  public final short[] getAcceptedTargetIds() {
+  public final short[] getTargetId() {
     final short[] data = getColumnShort(OIFitsConstants.COLUMN_TARGET_ID);
 
     if (data == null) {
@@ -206,312 +207,136 @@ public class OITarget extends OITable {
   }
 
   /**
-   * Get target name defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the target name associated to the given targetId.
-   */
-  public final String getTargetName(final int targetId) {
-    return getTargetNames()[targetId];
-  }
-
-  /**
-   * Get target names.
-   *
+   * Get TARGET column.
    * @return the array of target names.
    */
-  public final String[] getTargetNames() {
+  public final String[] getTarget() {
     return getColumnString(OIFitsConstants.COLUMN_TARGET);
   }
 
   /**
-   * Get RAEP0 defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the RAEP0 associated to the given targetId.
-   */
-  public final double getRaEp0(final int targetId) {
-    return getRaEp0s()[targetId];
-  }
-
-  /**
-   * Get RAEP0s.
-   *
+   * Get RAEP0 column.
    * @return the array of RAEP0.
    */
-  public final double[] getRaEp0s() {
+  public final double[] getRaEp0() {
     return getColumnDouble(OIFitsConstants.COLUMN_RAEP0);
   }
 
   /**
-   * Get DECEP0 defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the DECEP0 associated to the given targetId.
-   */
-  public final double getDecEp0(final int targetId) {
-    return getDecEp0s()[targetId];
-  }
-
-  /**
-   * Get DECEP0s.
-   *
+   * Get DECEP0 column.
    * @return the array of DECEP0.
    */
-  public final double[] getDecEp0s() {
+  public final double[] getDecEp0() {
     return getColumnDouble(OIFitsConstants.COLUMN_DECEP0);
   }
 
   /**
-   * Get EQUINOX defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the EQUINOX associated to the given targetId.
-   */
-  public final float getEquinox(final int targetId) {
-    return getEquinoxs()[targetId];
-  }
-
-  /**
-   * Get EQUINOXs.
-   *
+   * Get EQUINOX column.
    * @return the array of EQUINOX.
    */
-  public final float[] getEquinoxs() {
+  public final float[] getEquinox() {
     return getColumnFloat(OIFitsConstants.COLUMN_EQUINOX);
   }
 
   /**
-   * Get RA_ERR defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the RA_ERR associated to the given targetId.
-   */
-  public final double getRaErr(final int targetId) {
-    return getRaErrs()[targetId];
-  }
-
-  /**
-   * Get RA_ERRs.
-   *
+   * Get RA_ERR column.
    * @return the array of RA_ERR.
    */
-  public final double[] getRaErrs() {
+  public final double[] getRaErr() {
     return getColumnDouble(OIFitsConstants.COLUMN_RA_ERR);
   }
 
   /**
-   * Get DEC_ERR defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the DEC_ERR associated to the given targetId.
-   */
-  public final double getDecErr(final int targetId) {
-    return getDecErrs()[targetId];
-  }
-
-  /**
-   * Get DEC_ERRs.
-   *
+   * Get DEC_ERR column.
    * @return the array of DEC_ERR.
    */
-  public final double[] getDecErrs() {
+  public final double[] getDecErr() {
     return getColumnDouble(OIFitsConstants.COLUMN_DEC_ERR);
   }
 
   /**
-   * Get SYSVEL defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the SYSVEL associated to the given targetId.
-   */
-  public final double getSysVel(final int targetId) {
-    return getSysVels()[targetId];
-  }
-
-  /**
-   * Get SYSVELs.
-   *
+   * Get SYSVEL column.
    * @return the array of SYSVEL.
    */
-  public final double[] getSysVels() {
+  public final double[] getSysVel() {
     return getColumnDouble(OIFitsConstants.COLUMN_SYSVEL);
   }
 
   /**
-   * Get VELTYP defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the VELTYP associated to the given targetId.
-   */
-  public final String getVelTyp(final int targetId) {
-    return getVelTyps()[targetId];
-  }
-
-  /**
-   * Get VELTYPs.
-   *
+   * Get VELTYP column.
    * @return the array of VELTYP.
    */
-  public final String[] getVelTyps() {
+  public final String[] getVelTyp() {
     return getColumnString(OIFitsConstants.COLUMN_VELTYP);
   }
 
   /**
-   * Get VELDEF defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the VELDEF associated to the given targetId.
-   */
-  public final String getVelDef(final int targetId) {
-    return getVelDefs()[targetId];
-  }
-
-  /**
-   * Get VELDEFs.
-   *
+   * Get VELDEF column.
    * @return the array of VELDEF.
    */
-  public final String[] getVelDefs() {
+  public final String[] getVelDef() {
     return getColumnString(OIFitsConstants.COLUMN_VELDEF);
   }
 
   /**
-   * Get PMRA defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the PMRA associated to the given targetId.
-   */
-  public final double getPmRa(final int targetId) {
-    return getPmRas()[targetId];
-  }
-
-  /**
-   * Get PMRAs.
-   *
+   * Get PMRA column.
    * @return the array of PMRA.
    */
-  public final double[] getPmRas() {
+  public final double[] getPmRa() {
     return getColumnDouble(OIFitsConstants.COLUMN_PMRA);
   }
 
   /**
-   * Get PMDEC defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the PMDEC associated to the given targetId.
-   */
-  public final double getPmDec(final int targetId) {
-    return getPmDecs()[targetId];
-  }
-
-  /**
-   * Get PMDECs.
-   *
+   * Get PMDEC column.
    * @return the array of PMDEC.
    */
-  public final double[] getPmDecs() {
+  public final double[] getPmDec() {
     return getColumnDouble(OIFitsConstants.COLUMN_PMDEC);
   }
 
   /**
-   * Get PMRA_ERR defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the PMRA_ERR associated to the given targetId.
-   */
-  public final double getPmRaErr(final int targetId) {
-    return getPmRaErrs()[targetId];
-  }
-
-  /**
-   * Get PMRA_ERRs.
-   *
+   * Get PMRA_ERR column.
    * @return the array of PMRA_ERR.
    */
-  public final double[] getPmRaErrs() {
+  public final double[] getPmRaErr() {
     return getColumnDouble(OIFitsConstants.COLUMN_PMRA_ERR);
   }
 
   /**
-   * Get PMDEC_ERR defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the PMDEC_ERR associated to the given targetId.
-   */
-  public final double getPmDecErr(final int targetId) {
-    return getPmDecErrs()[targetId];
-  }
-
-  /**
-   * Get PMDEC_ERRs.
-   *
+   * Get PMDEC_ERR column.
    * @return the array of PMDEC_ERR.
    */
-  public final double[] getPmDecErrs() {
+  public final double[] getPmDecErr() {
     return getColumnDouble(OIFitsConstants.COLUMN_PMDEC_ERR);
   }
 
   /**
-   * Get PARALLAX defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the PARALLAX associated to the given targetId.
-   */
-  public final float getParallax(final int targetId) {
-    return getParallaxs()[targetId];
-  }
-
-  /**
-   * Get PARALLAXs.
-   *
+   * Get PARALLAX column.
    * @return the array of PARALLAX.
    */
-  public final float[] getParallaxs() {
+  public final float[] getParallax() {
     return getColumnFloat(OIFitsConstants.COLUMN_PARALLAX);
   }
 
   /**
-   * Get PARA_ERR defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the PARA_ERR associated to the given targetId.
-   */
-  public final float getParaErr(final int targetId) {
-    return getParaErrs()[targetId];
-  }
-
-  /**
-   * Get PARA_ERRs.
-   *
+   * Get PARA_ERR column.
    * @return the array of PARA_ERR.
    */
-  public final float[] getParaErrs() {
+  public final float[] getParaErr() {
     return getColumnFloat(OIFitsConstants.COLUMN_PARA_ERR);
   }
 
   /**
-   * Get SPECTYP defined in this table according given target id.
-   *
-   * @param targetId target id
-   * @return the SPECTYP associated to the given targetId.
-   */
-  public final String getSpecTyp(final int targetId) {
-    return getSpecTyps()[targetId];
-  }
-
-  /**
-   * Get SPECTYPs.
-   *
+   * Get SPECTYP column.
    * @return the array of SPECTYP.
    */
-  public final String[] getSpecTyps() {
+  public final String[] getSpecTyp() {
     return getColumnString(OIFitsConstants.COLUMN_SPECTYP);
   }
 
+  /* --- Other methods --- */
   /**
    * Do syntactical analysis.
-   *
    * @param checker checker component
    */
   @Override
@@ -519,8 +344,8 @@ public class OITarget extends OITable {
     super.checkSyntax(checker);
 
     final int len = getNbTargets();
-    final short[] targetIds = getAcceptedTargetIds();
-    final String[] targetNames = getTargetNames();
+    final short[] targetIds = getTargetId();
+    final String[] targetNames = getTarget();
 
     for (int i = 0; i < len; i++) {
       for (int j = i + 1; j < len; j++) {
@@ -534,7 +359,7 @@ public class OITarget extends OITable {
       }
     }
 
-    oifitsFile.checkCrossRefering(this, checker);
+    getOIFitsFile().checkCrossRefering(this, checker);
   }
 
   /**
@@ -547,27 +372,25 @@ public class OITarget extends OITable {
 
     sb.append("<targets>");
 
-    final short[] targetIds = getAcceptedTargetIds();
-
     for (int i = 0, len = getNbTargets(); i < len; i++) {
       sb.append("<target>");
-      sb.append("<name>").append(getTargetName(i)).append("</name>");
-      sb.append("<id>").append(targetIds[i]).append("</id>");
-      sb.append("<raEp0>").append(getRaEp0(i)).append("</raEp0>");
-      sb.append("<decEp0>").append(getDecEp0(i)).append("</decEp0>");
-      sb.append("<equinox>").append(getEquinox(i)).append("</equinox>");
-      sb.append("<raErr>").append(getRaErr(i)).append("</raErr>");
-      sb.append("<decErr>").append(getDecErr(i)).append("</decErr>");
-      sb.append("<sysVel>").append(getSysVel(i)).append("</sysVel>");
-      sb.append("<velTyp>").append(getVelTyp(i)).append("</velTyp>");
-      sb.append("<velDef>").append(getVelDef(i)).append("</velDef>");
-      sb.append("<pmRa>").append(getPmRa(i)).append("</pmRa>");
-      sb.append("<pmDec>").append(getPmDec(i)).append("</pmDec>");
-      sb.append("<pmRaErr>").append(getPmRaErr(i)).append("</pmRaErr>");
-      sb.append("<pmDecErr>").append(getPmDecErr(i)).append("</pmDecErr>");
-      sb.append("<parallax>").append(getParallax(i)).append("</parallax>");
-      sb.append("<paraErr>").append(getParaErr(i)).append("</paraErr>");
-      sb.append("<specTyp>").append(getSpecTyp(i)).append("</specTyp>");
+      sb.append("<name>").append(getTarget()[i]).append("</name>");
+      sb.append("<id>").append(getTargetId()[i]).append("</id>");
+      sb.append("<raEp0>").append(getRaEp0()[i]).append("</raEp0>");
+      sb.append("<decEp0>").append(getDecEp0()[i]).append("</decEp0>");
+      sb.append("<equinox>").append(getEquinox()[i]).append("</equinox>");
+      sb.append("<raErr>").append(getRaErr()[i]).append("</raErr>");
+      sb.append("<decErr>").append(getDecErr()[i]).append("</decErr>");
+      sb.append("<sysVel>").append(getSysVel()[i]).append("</sysVel>");
+      sb.append("<velTyp>").append(getVelTyp()[i]).append("</velTyp>");
+      sb.append("<velDef>").append(getVelDef()[i]).append("</velDef>");
+      sb.append("<pmRa>").append(getPmRa()[i]).append("</pmRa>");
+      sb.append("<pmDec>").append(getPmDec()[i]).append("</pmDec>");
+      sb.append("<pmRaErr>").append(getPmRaErr()[i]).append("</pmRaErr>");
+      sb.append("<pmDecErr>").append(getPmDecErr()[i]).append("</pmDecErr>");
+      sb.append("<parallax>").append(getParallax()[i]).append("</parallax>");
+      sb.append("<paraErr>").append(getParaErr()[i]).append("</paraErr>");
+      sb.append("<specTyp>").append(getSpecTyp()[i]).append("</specTyp>");
       sb.append("</target>");
     }
 
@@ -577,18 +400,17 @@ public class OITarget extends OITable {
   }
 
   /**
-   * Return the stringified description.
-   *
-   * @return the description
+   * Returns a string representation of this table
+   * @return a string representation of this table
    */
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(128);
 
-    final short[] targetIds = getAcceptedTargetIds();
+    final short[] targetIds = getTargetId();
 
     for (int i = 0, len = getNbTargets(); i < len; i++) {
-      sb.append("| ").append(getTargetName(i)).append("(").append(targetIds[i]).append(") ");
+      sb.append("| ").append(getTarget()[i]).append("(").append(targetIds[i]).append(") ");
     }
 
     return super.toString() + " [ TARGETS[" + sb.toString().substring(1) + "]]";

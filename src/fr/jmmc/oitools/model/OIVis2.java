@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIVis2.java,v 1.1 2010-04-28 14:47:37 bourgesl Exp $"
+ * "@(#) $Id: OIVis2.java,v 1.2 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:37  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  * Revision 1.9  2009/03/09 10:27:24  mella
  * Add spacialFreq and spacialCoord getter
  *
@@ -46,12 +49,8 @@ import fr.jmmc.oitools.meta.WaveColumnMeta;
  */
 public class OIVis2 extends OIData {
 
-  /* constants */
-
-  /* members */
   /** 
-   * OIVis2 class constructor.
-   *
+   * Public OIVis2 class constructor.
    * @param oifitsFile main OifitsFile
    */
   public OIVis2(final OIFitsFile oifitsFile) {
@@ -82,61 +81,59 @@ public class OIVis2 extends OIData {
     addColumnMeta(new WaveColumnMeta(OIFitsConstants.COLUMN_FLAG, "flag", Types.TYPE_LOGICAL, this));
   }
 
+  /* --- Columns --- */
   /**
-   * Return the vis2data matrix.
-   *
-   * @return the vis2data matrix.
+   * Return the VIS2DATA column.
+   * @return the VIS2DATA column.
    */
   public double[][] getVis2Data() {
     return this.getColumnDoubles(OIFitsConstants.COLUMN_VIS2DATA);
   }
 
   /**
-   * Return the vis2err matrix.
-   *
-   * @return the vis2err matrix.
+   * Return the VIS2ERR column.
+   * @return the VIS2ERR column.
    */
   public double[][] getVis2Err() {
     return this.getColumnDoubles(OIFitsConstants.COLUMN_VIS2ERR);
   }
 
   /**
-   * Return the ucoord matrix.
-   *
-   * @return the ucoord matrix.
+   * Return the UCOORD column.
+   * @return the UCOORD column.
    */
   public double[] getUCoord() {
     return this.getColumnDouble(OIFitsConstants.COLUMN_UCOORD);
   }
 
   /**
-   * Return the vcoord matrix.
-   *
-   * @return the vcoord matrix.
+   * Return the VCOORD column.
+   * @return the VCOORD column.
    */
   public double[] getVCoord() {
     return this.getColumnDouble(OIFitsConstants.COLUMN_VCOORD);
   }
 
+  /* --- Alternate data representation methods --- */
   /**
-   * Return the spacial frequencies column. The computation is based
+   * Return the spacial frequencies column.  The computation is based
    * on ucoord and vcoord.
    * sqrt(ucoord^2+vcoord^2)/effWave
    *
-   * @return the computed spacial frequencies r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spacial frequencies r[x][y] (x,y for coordIndex,effWaveIndex)
    */
   public double[][] getSpacialFreq() {
-    double[][] r = new double[getNbRows()][getNWave()];
-    float[] effWaves = getOiWavelength().getEffWave();
-    double[] ucoord = getUCoord();
-    double[] vcoord = getVCoord();
+    final double[][] r = new double[getNbRows()][getNWave()];
+    final float[] effWaves = getOiWavelength().getEffWave();
+    final double[] ucoord = getUCoord();
+    final double[] vcoord = getVCoord();
 
-    for (int i = 0; i < ucoord.length; i++) {
-      for (int j = 0; j < effWaves.length; j++) {
-        double effWave = effWaves[j];
-        r[i][j] = (Math.sqrt((ucoord[i] * ucoord[i]) + (vcoord[i] * vcoord[i]))) / effWave;
+    for (int i = 0, sizeU = ucoord.length; i < sizeU; i++) {
+      for (int j = 0, sizeV = vcoord.length; j < sizeV; j++) {
+        r[i][j] = (Math.sqrt((ucoord[i] * ucoord[i]) + (vcoord[i] * vcoord[i]))) / effWaves[j];
       }
     }
+
     return r;
   }
 
@@ -147,14 +144,13 @@ public class OIVis2 extends OIData {
    * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
   public double[][] getSpacialUCoord() {
-    double[][] r = new double[getNbRows()][getNWave()];
-    float[] effWaves = getOiWavelength().getEffWave();
-    double[] ucoord = getUCoord();
+    final double[][] r = new double[getNbRows()][getNWave()];
+    final float[] effWaves = getOiWavelength().getEffWave();
+    final double[] ucoord = getUCoord();
 
-    for (int i = 0; i < ucoord.length; i++) {
-      for (int j = 0; j < effWaves.length; j++) {
-        double effWave = effWaves[j];
-        r[i][j] = ucoord[i] / effWave;
+    for (int i = 0, sizeU = ucoord.length; i < sizeU; i++) {
+      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
+        r[i][j] = ucoord[i] / effWaves[j];
       }
     }
     return r;
@@ -167,14 +163,13 @@ public class OIVis2 extends OIData {
    * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
   public double[][] getSpacialVCoord() {
-    double[][] r = new double[getNbRows()][getNWave()];
-    float[] effWaves = getOiWavelength().getEffWave();
-    double[] vcoord = getVCoord();
+    final double[][] r = new double[getNbRows()][getNWave()];
+    final float[] effWaves = getOiWavelength().getEffWave();
+    final double[] vcoord = getVCoord();
 
-    for (int i = 0; i < vcoord.length; i++) {
-      for (int j = 0; j < effWaves.length; j++) {
-        double effWave = effWaves[j];
-        r[i][j] = vcoord[i] / effWave;
+    for (int i = 0, sizeV = vcoord.length; i < sizeV; i++) {
+      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
+        r[i][j] = vcoord[i] / effWaves[j];
       }
     }
     return r;

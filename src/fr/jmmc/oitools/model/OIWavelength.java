@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIWavelength.java,v 1.2 2010-04-29 15:47:01 bourgesl Exp $"
+ * "@(#) $Id: OIWavelength.java,v 1.3 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:47:01  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  * Revision 1.1  2010/04/28 14:47:37  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -54,6 +57,8 @@ import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.meta.Units;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 /**
  * Class for OI_WAVELENGTH table.
@@ -61,7 +66,6 @@ import java.text.DecimalFormat;
 public class OIWavelength extends OITable {
 
   /* constants */
-
   /* static descriptors */
   /** INSNAME keyword descriptor */
   private final static KeywordMeta KEYWORD_INSNAME = new KeywordMeta(OIFitsConstants.KEYWORD_INSNAME,
@@ -73,10 +77,8 @@ public class OIWavelength extends OITable {
   private final static ColumnMeta COLUMN_EFF_BAND = new ColumnMeta(OIFitsConstants.COLUMN_EFF_BAND,
           "effective bandpass of channel", Types.TYPE_REAL, Units.UNIT_METER);
 
-  /* members */
   /** 
-   * OIWavelength class constructor.
-   *
+   * Public OIWavelength class constructor.
    * @param oifitsFile main OifitsFile
    */
   public OIWavelength(final OIFitsFile oifitsFile) {
@@ -93,23 +95,31 @@ public class OIWavelength extends OITable {
   }
 
   /**
-   * Get INSNAME keyword value.
-   *
-   * @return the value of INSNAME keyword if present, NULL otherwise.
-   */
-  public String getInsName() {
-    return getKeyword(OIFitsConstants.KEYWORD_INSNAME);
-  }
-
-  /**
    * Get number of wavelengths
-   *
    * @return the number of wavelengths.
    */
   public int getNWave() {
     return getNbRows();
   }
 
+  /* --- Keywords --- */
+  /**
+   * Get the INSNAME keyword value.
+   * @return the value of INSNAME keyword
+   */
+  public String getInsName() {
+    return getKeyword(OIFitsConstants.KEYWORD_INSNAME);
+  }
+
+  /**
+   * Define the INSNAME keyword value
+   * @param insName value of INSNAME keyword
+   */
+  public final void setInsName(final String insName) {
+    setKeyword(OIFitsConstants.KEYWORD_INSNAME, insName);
+  }
+
+  /* --- Columns --- */
   /**
    * Return the effective wavelength of channel
    * @return the wavelength of channel array
@@ -126,10 +136,10 @@ public class OIWavelength extends OITable {
     return this.getColumnFloat(OIFitsConstants.COLUMN_EFF_BAND);
   }
 
+  /* --- Other methods --- */
   /**
-   * Return a string representation of this component.
-   *
-   * @return a string representation of this component
+   * Returns a string representation of this table
+   * @return a string representation of this table
    */
   @Override
   public String toString() {
@@ -138,7 +148,6 @@ public class OIWavelength extends OITable {
 
   /** 
    * Do syntactical analysis.
-   *
    * @param checker checker component
    */
   @Override
@@ -151,7 +160,7 @@ public class OIWavelength extends OITable {
       checker.severe("INSNAME identifier has blank value");
     }
 
-    this.oifitsFile.checkCrossRefering(this, checker);
+    getOIFitsFile().checkCrossRefering(this, checker);
   }
 
   /**
@@ -166,9 +175,9 @@ public class OIWavelength extends OITable {
     sb.append("<nwave>" + getNWave() + "</nwave>");
     sb.append("<effwaves>");
 
-    final DecimalFormat formatter = new DecimalFormat("0.00E0");
+    final DecimalFormat formatter = new DecimalFormat("0.00E0", DecimalFormatSymbols.getInstance(Locale.US));
 
-    float[] effWaves = getEffWave();
+    final float[] effWaves = getEffWave();
 
     for (int i = 0, len = getNbRows(); i < len; i++) {
       sb.append("<effwave>" + formatter.format(effWaves[i]) + "</effwave>");

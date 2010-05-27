@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.3 2010-05-03 14:29:43 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.4 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/03 14:29:43  bourgesl
+ * refactored column checks (type, repeat, int or string values) to analyse Object value instead of FitsColumn
+ *
  * Revision 1.2  2010/04/29 15:47:02  bourgesl
  * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
  *
@@ -71,7 +74,7 @@ import java.util.logging.Level;
 import nom.tam.util.ArrayFuncs;
 
 /**
- * Class for OI_* tables.
+ * Base Class for all OI_* tables.
  */
 public class OITable extends ModelBase {
 
@@ -96,21 +99,22 @@ public class OITable extends ModelBase {
 
   /* members */
   /** Main OIFitsFile */
-  protected final OIFitsFile oifitsFile;
-  /** Map storing keyword definitions ordered according to OIFits specification */
-  protected final Map<String, KeywordMeta> keywordsDesc = new LinkedHashMap<String, KeywordMeta>();
-  /** Map storing column definitions ordered according to OIFits specification */
-  protected final Map<String, ColumnMeta> columnsDesc = new LinkedHashMap<String, ColumnMeta>();
+  private final OIFitsFile oifitsFile;
   /** Fits extension number */
-  protected int extNb;
+  private int extNb;
+  /* descriptors */
+  /** Map storing keyword definitions ordered according to OIFits specification */
+  private final Map<String, KeywordMeta> keywordsDesc = new LinkedHashMap<String, KeywordMeta>();
+  /** Map storing column definitions ordered according to OIFits specification */
+  private final Map<String, ColumnMeta> columnsDesc = new LinkedHashMap<String, ColumnMeta>();
+  /* data */
   /** Map storing keyword values */
-  protected final Map<String, Object> keywordsValue = new HashMap<String, Object>();
+  private final Map<String, Object> keywordsValue = new HashMap<String, Object>();
   /** Map storing column values */
-  protected final Map<String, Object> columnsValue = new HashMap<String, Object>();
+  private final Map<String, Object> columnsValue = new HashMap<String, Object>();
 
   /**
-   * OITable class constructor.
-   *
+   * Public OITable class constructor
    * @param oifitsFile main OifitsFile
    */
   public OITable(final OIFitsFile oifitsFile) {
@@ -134,11 +138,11 @@ public class OITable extends ModelBase {
   }
 
   /**
-   * Add the given keyword descriptor
-   * @param meta keyword descriptor
+   * Return the main OIFitsFile
+   * @return OIFitsFile
    */
-  protected final void addKeywordMeta(final KeywordMeta meta) {
-    keywordsDesc.put(meta.getName(), meta);
+  protected final OIFitsFile getOIFitsFile() {
+    return this.oifitsFile;
   }
 
   /**
@@ -146,15 +150,15 @@ public class OITable extends ModelBase {
    * @return Map storing keyword definitions
    */
   protected final Map<String, KeywordMeta> getKeywordsDesc() {
-    return keywordsDesc;
+    return this.keywordsDesc;
   }
 
   /**
-   * Add the given column descriptor
-   * @param meta column descriptor
+   * Add the given keyword descriptor
+   * @param meta keyword descriptor
    */
-  protected final void addColumnMeta(final ColumnMeta meta) {
-    columnsDesc.put(meta.getName(), meta);
+  protected final void addKeywordMeta(final KeywordMeta meta) {
+    this.keywordsDesc.put(meta.getName(), meta);
   }
 
   /**
@@ -162,7 +166,15 @@ public class OITable extends ModelBase {
    * @return Map storing column definitions
    */
   protected final Map<String, ColumnMeta> getColumnsDesc() {
-    return columnsDesc;
+    return this.columnsDesc;
+  }
+
+  /**
+   * Add the given column descriptor
+   * @param meta column descriptor
+   */
+  protected final void addColumnMeta(final ColumnMeta meta) {
+    this.columnsDesc.put(meta.getName(), meta);
   }
 
   /**
@@ -170,30 +182,111 @@ public class OITable extends ModelBase {
    * @return Map storing keyword values
    */
   protected final Map<String, Object> getKeywordsValue() {
-    return keywordsValue;
+    return this.keywordsValue;
   }
 
-  protected final void setKeywordValue(final String key, final Object value) {
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("KEYWORD [" + key + "] = '" + value + "' [" + ((value != null) ? value.getClass().getSimpleName() : "") + "]");
+  /**
+   * Return the keyword value given its name
+   * The returned value can be null if the keyword is optional or has never been defined
+   * @param name keyword name
+   * @return any object value or null if undefined
+   */
+  protected final Object getKeywordValue(final String name) {
+    return this.keywordsValue.get(name);
+  }
+
+  /**
+   * Return the keyword value given its name as a String
+   * @param name keyword name
+   * @return String value
+   */
+  protected final String getKeyword(final String name) {
+    return (String) getKeywordValue(name);
+  }
+
+  /**
+   * Return the keyword value given its name as an integer (primitive type)
+   * @param name keyword name
+   * @return int value or 0 if undefined
+   */
+  protected final int getKeywordInt(final String name) {
+    return getKeywordInt(name, 0);
+  }
+
+  /**
+   * Return the keyword value given its name as an integer (primitive type)
+   * @param name keyword name
+   * @param def default value
+   * @return int value or def if undefined
+   */
+  protected final int getKeywordInt(final String name, final int def) {
+    final Number value = (Number) getKeywordValue(name);
+    if (value == null) {
+      return def;
     }
-    keywordsValue.put(key, value);
+    return value.intValue();
   }
 
-  protected final Object getKeywordValue(final String key) {
-    return keywordsValue.get(key);
+  /**
+   * Return the keyword value given its name as a double (primitive type)
+   * @param name keyword name
+   * @return double value or 0d if undefined
+   */
+  protected final double getKeywordDouble(final String name) {
+    return getKeywordDouble(name, 0d);
   }
 
-  protected final String getKeyword(final String key) {
-    return (String) getKeywordValue(key);
+  /**
+   * Return the keyword value given its name as a double (primitive type)
+   * @param name keyword name
+   * @param def default value
+   * @return double value or 0d if undefined
+   */
+  protected final double getKeywordDouble(final String name, final double def) {
+    final Number value = (Number) getKeywordValue(name);
+    if (value == null) {
+      return def;
+    }
+    return value.doubleValue();
   }
 
-  protected final int getKeywordInt(final String key) {
-    return ((Number) getKeywordValue(key)).intValue();
+  /**
+   * Define the keyword value given its name and value
+   * @param name keyword name
+   * @param value any object value
+   */
+  protected final void setKeywordValue(final String name, final Object value) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("KEYWORD [" + name + "] = '" + value + "' [" + ((value != null) ? value.getClass().getSimpleName() : "") + "]");
+    }
+    this.keywordsValue.put(name, value);
   }
 
-  protected final double getKeywordDouble(final String key) {
-    return ((Number) getKeywordValue(key)).doubleValue();
+  /**
+   * Define the keyword value given its name and value as a String
+   * @param name keyword name
+   * @param value a String value
+   */
+  protected final void setKeyword(final String name, final String value) {
+    setKeywordValue(name, value);
+  }
+
+  /**
+   * Define the keyword value given its name and value as a String
+   * @param name keyword name
+   * @param value a String value
+   */
+  protected final void setKeywordInt(final String name, final int value) {
+    setKeywordValue(name, Integer.valueOf(value));
+  }
+
+  /**
+   * Define the keyword value given its name and value as a String
+   * @param name keyword name
+   * @param value a String value
+   */
+  protected final void setKeywordDouble(final String name, final double value) {
+    setKeywordValue(name, Double.valueOf(value));
   }
 
   /**
@@ -201,52 +294,104 @@ public class OITable extends ModelBase {
    * @return Map storing column values
    */
   protected final Map<String, Object> getColumnsValue() {
-    return columnsValue;
-  }
-
-  protected final void setColumnValue(final String key, final Object value) {
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("COLUMN [" + key + "] = " + ((value != null) ? ArrayFuncs.arrayDescription(value) : ""));
-    }
-    columnsValue.put(key, value);
-  }
-
-  protected final Object getColumnValue(final String key) {
-    return columnsValue.get(key);
-  }
-
-  protected final String[] getColumnString(final String key) {
-    return (String[]) getColumnValue(key);
-  }
-
-  protected final short[] getColumnShort(final String key) {
-    return (short[]) getColumnValue(key);
-  }
-
-  protected final short[][] getColumnShorts(final String key) {
-    return (short[][]) getColumnValue(key);
-  }
-
-  protected final float[] getColumnFloat(final String key) {
-    return (float[]) getColumnValue(key);
-  }
-
-  protected final double[] getColumnDouble(final String key) {
-    return (double[]) getColumnValue(key);
-  }
-
-  protected final double[][] getColumnDoubles(final String key) {
-    return (double[][]) getColumnValue(key);
-  }
-
-  protected final boolean[][] getColumnBooleans(final String key) {
-    return (boolean[][]) getColumnValue(key);
+    return this.columnsValue;
   }
 
   /**
-   * Get extension number
-   *
-   * @return the extension number.
+   * Return the column value given its name
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return any array value or null if undefined
+   */
+  protected final Object getColumnValue(final String name) {
+    return this.columnsValue.get(name);
+  }
+
+  /**
+   * Return the column value given its name as a String array
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return String array or null if undefined
+   */
+  protected final String[] getColumnString(final String name) {
+    return (String[]) getColumnValue(name);
+  }
+
+  /**
+   * Return the column value given its name as an integer array (short primitive type)
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return integer array or null if undefined
+   */
+  protected final short[] getColumnShort(final String name) {
+    return (short[]) getColumnValue(name);
+  }
+
+  /**
+   * Return the column value given its name as a 2D integer array (short primitive type)
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return 2D integer array or null if undefined
+   */
+  protected final short[][] getColumnShorts(final String name) {
+    return (short[][]) getColumnValue(name);
+  }
+
+  /**
+   * Return the column value given its name as a float array
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return float array or null if undefined
+   */
+  protected final float[] getColumnFloat(final String name) {
+    return (float[]) getColumnValue(name);
+  }
+
+  /**
+   * Return the column value given its name as a double array
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return double array or null if undefined
+   */
+  protected final double[] getColumnDouble(final String name) {
+    return (double[]) getColumnValue(name);
+  }
+
+  /**
+   * Return the column value given its name as a 2D double array
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return 2D double array or null if undefined
+   */
+  protected final double[][] getColumnDoubles(final String name) {
+    return (double[][]) getColumnValue(name);
+  }
+
+  /**
+   * Return the column value given its name as a 2D boolean array
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return 2D boolean array or null if undefined
+   */
+  protected final boolean[][] getColumnBooleans(final String name) {
+    return (boolean[][]) getColumnValue(name);
+  }
+
+  /**
+   * Define the column value given its name and an array value (String[] or a primitive array)
+   * @param name column name
+   * @param value any array value
+   */
+  protected final void setColumnValue(final String name, final Object value) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("COLUMN [" + name + "] = " + ((value != null) ? ArrayFuncs.arrayDescription(value) : ""));
+    }
+    this.columnsValue.put(name, value);
+  }
+
+  /**
+   * Get the extension number
+   * @return the extension number
    */
   public final int getExtNb() {
     return extNb;
@@ -260,18 +405,44 @@ public class OITable extends ModelBase {
     this.extNb = extNb;
   }
 
+  /* --- Keywords --- */
   /**
-   * Get EXTNAME value
-   *
-   * @return value of EXTNAME keyword.
+   * Get the EXTNAME keyword value
+   * @return value of EXTNAME keyword
    */
   public final String getExtName() {
     return getKeyword(OIFitsConstants.KEYWORD_EXT_NAME);
   }
 
   /**
-   * Get OI_REVN value
-   *
+   * Define the EXTNAME keyword value
+   * @param extName value of EXTNAME keyword
+   */
+  protected final void setExtName(final String extName) {
+    setKeyword(OIFitsConstants.KEYWORD_EXT_NAME, extName);
+  }
+
+  /**
+   * Get the EXTVER keyword value
+   * @return value of EXTVER keyword
+   */
+  public final int getExtVer() {
+    return getKeywordInt(OIFitsConstants.KEYWORD_EXT_VER);
+  }
+
+  /**
+   * Define the EXTVER keyword value
+   * @param extVer value of EXTVER keyword
+   */
+  protected final void setExtVer(final int extVer) {
+    setKeywordInt(OIFitsConstants.KEYWORD_EXT_VER, extVer);
+  }
+
+  /*
+   * TODO : see how to set keywords OI_REVN and NAXIS2
+   */
+  /**
+   * Get the OI_REVN keyword value
    * @return value of OI_REVN keyword
    */
   public final int getOiRevn() {
@@ -279,18 +450,17 @@ public class OITable extends ModelBase {
   }
 
   /**
-   * Return the number of rows.
-   *
-   * @return the number of rows.
+   * Return the number of rows
+   * @return the number of rows
    */
   public final int getNbRows() {
     return getKeywordInt(OIFitsConstants.KEYWORD_NAXIS2);
   }
 
+  /* --- Other methods --- */
   /**
-   * Returns a string representation of this component.
-   *
-   * @return a string representation of this component.
+   * Returns a string representation of this table
+   * @return a string representation of this table
    */
   @Override
   public String toString() {
@@ -298,8 +468,7 @@ public class OITable extends ModelBase {
   }
 
   /**
-   * Do syntactical analysis of the table.
-   *
+   * Do syntactical analysis of the table
    * @param checker checker component
    */
   public void checkSyntax(final OIFitsChecker checker) {
@@ -330,7 +499,7 @@ public class OITable extends ModelBase {
     Object value;
 
     /* Get mandatory keywords names */
-    for (KeywordMeta keyword : keywordsDesc.values()) {
+    for (KeywordMeta keyword : getKeywordsDesc().values()) {
       keywordName = keyword.getName();
 
       // get keyword value :
@@ -363,7 +532,7 @@ public class OITable extends ModelBase {
     Object value;
 
     /* Get mandatory columns names */
-    for (ColumnMeta c : columnsDesc.values()) {
+    for (ColumnMeta c : getColumnsDesc().values()) {
       columnName = c.getName();
       value = getColumnValue(columnName);
 
@@ -412,7 +581,7 @@ public class OITable extends ModelBase {
     sb.append("<keywords>\n");
 
     Object val;
-    for (KeywordMeta keyword : keywordsDesc.values()) {
+    for (KeywordMeta keyword : getKeywordsDesc().values()) {
       val = getKeywordValue(keyword.getName());
       // skip missing keywords :
       if (val != null) {
@@ -426,7 +595,7 @@ public class OITable extends ModelBase {
     // Print columns
     sb.append("<columns>\n");
 
-    for (ColumnMeta column : columnsDesc.values()) {
+    for (ColumnMeta column : getColumnsDesc().values()) {
       sb.append("<column><name>").append(column.getName()).append("</name>");
       sb.append("<description>").append(column.getDescription()).append("</description>");
       sb.append("<type>").append(column.getType()).append("</type>");
@@ -439,7 +608,7 @@ public class OITable extends ModelBase {
     if (detailled) {
       sb.append("<table>\n<tr>\n");
 
-      for (ColumnMeta column : columnsDesc.values()) {
+      for (ColumnMeta column : getColumnsDesc().values()) {
         sb.append("<th>").append(column.getName()).append("</th>");
       }
       sb.append("</tr>\n");
@@ -447,7 +616,7 @@ public class OITable extends ModelBase {
       for (int rowIndex = 0, len = getNbRows(); rowIndex < len; rowIndex++) {
         sb.append("<tr>");
 
-        for (ColumnMeta column : columnsDesc.values()) {
+        for (ColumnMeta column : getColumnsDesc().values()) {
           sb.append("<td>");
 
           this.dumpColumnRow(column, rowIndex, sb);

@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.3 2010-05-03 14:29:14 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.4 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/03 14:29:14  bourgesl
+ * added column checks (type, repeat, units)
+ *
  * Revision 1.2  2010/04/29 15:47:02  bourgesl
  * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
  *
@@ -300,25 +303,25 @@ public class OIFitsLoader {
       }
     }
 
-    String keywordName;
+    String name;
     Object value;
     for (KeywordMeta keyword : keywordsDesc.values()) {
-      keywordName = keyword.getName();
+      name = keyword.getName();
 
       // check mandatory keywords :
-      if (!header.containsKey(keywordName)) {
+      if (!header.containsKey(name)) {
         if (keyword.isMandatory()) {
           /* No keyword with keywordName name */
-          this.checker.severe("Missing keyword '" + keywordName + "'");
+          this.checker.severe("Missing keyword '" + name + "'");
         }
       } else {
 
         // parse keyword value :
-        value = parseKeyword(keyword, header.getValue(keywordName));
+        value = parseKeyword(keyword, header.getValue(name));
 
         // store key and value :
         if (value != null) {
-          table.setKeywordValue(keywordName, value);
+          table.setKeywordValue(name, value);
         }
       }
     }
@@ -371,6 +374,13 @@ public class OIFitsLoader {
     }
   }
 
+  /**
+   * Process the binary table to get columns used by the OITable (see column descriptors)
+   * and check missing keywords and their formats
+   * @param hdu binary table
+   * @param table OITable object
+   * @throws FitsException if any FITS error occured
+   */
   private void processData(final BinaryTableHDU hdu, final OITable table) throws FitsException {
 
     if (logger.isLoggable(Level.FINE)) {
@@ -390,20 +400,20 @@ public class OIFitsLoader {
     // keep only OIFits columns i.e. extra column(s) are skipped :
 
     int idx;
-    String columnName;
+    String name;
     Object value;
     for (ColumnMeta column : columnsDesc.values()) {
-      columnName = column.getName();
+      name = column.getName();
 
-      idx = hdu.findColumn(columnName);
+      idx = hdu.findColumn(name);
 
       if (idx == -1) {
         /* No column with columnName name */
-        this.checker.severe("Missing column '" + columnName + "'");
+        this.checker.severe("Missing column '" + name + "'");
       } else {
 
         if (logger.isLoggable(Level.FINE)) {
-          logger.fine("COLUMN [" + columnName + "] [" + hdu.getColumnLength(idx) + " " + hdu.getColumnType(idx) + "]");
+          logger.fine("COLUMN [" + name + "] [" + hdu.getColumnLength(idx) + " " + hdu.getColumnType(idx) + "]");
         }
 
         // read all data and convert them to arrays[][] :
@@ -412,7 +422,7 @@ public class OIFitsLoader {
 
         // store key and value :
         if (value != null) {
-          table.setColumnValue(columnName, value);
+          table.setColumnValue(name, value);
         }
       }
     }
@@ -491,6 +501,11 @@ public class OIFitsLoader {
     return columnValue;
   }
 
+  /**
+   * Parse the String value as a double
+   * @param value string value
+   * @return Double or null if number format exception
+   */
   private Double parseDouble(final String value) {
     Double res = null;
     try {
@@ -503,6 +518,11 @@ public class OIFitsLoader {
     return res;
   }
 
+  /**
+   * Parse the String value as an integer
+   * @param value string value
+   * @return Integer or null if number format exception
+   */
   private Integer parseInteger(final String value) {
     Integer res = null;
     try {

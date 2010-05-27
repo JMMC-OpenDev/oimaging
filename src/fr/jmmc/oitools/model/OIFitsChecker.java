@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsChecker.java,v 1.1 2010-04-29 15:47:02 bourgesl Exp $"
+ * "@(#) $Id: OIFitsChecker.java,v 1.2 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/29 15:47:02  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  */
 package fr.jmmc.oitools.model;
 
@@ -20,7 +23,7 @@ import java.util.logging.Logger;
 public class OIFitsChecker {
 
   /* members */
-    /** Specific logger dedicated to validation */
+  /** Specific logger dedicated to validation */
   private final Logger checkLogger;
   /** Handler associated to check logger */
   private final CheckHandler checkHandler;
@@ -44,6 +47,10 @@ public class OIFitsChecker {
 
   }
 
+  /**
+   * Return true if the FINE level is enabled
+   * @return true if the FINE level is enabled
+   */
   protected boolean isFineEnabled() {
     return this.checkLogger.isLoggable(Level.FINE);
   }
@@ -83,7 +90,6 @@ public class OIFitsChecker {
   /*
    * Getter - Setter -----------------------------------------------------------
    */
-
   /**
    * Return the checkHandler that get informations about checking process.
    *
@@ -117,5 +123,4 @@ public class OIFitsChecker {
   public void clearCheckReport() {
     checkHandler.clearReport();
   }
-
 }

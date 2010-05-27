@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.2 2010-04-29 15:47:01 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.3 2010-05-27 16:13:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 15:47:01  bourgesl
+ * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
+ *
  * Revision 1.1  2010/04/28 14:47:38  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -96,17 +99,16 @@ import java.util.logging.Level;
  * This class represents the data model of an OIFits standard file.
  */
 public final class OIFitsFile extends OIFits {
-  /* constants */
 
   /* members */
   /** absolute file path */
   private String absoluteFilePath = null;
   /** Storage of oi tables extension names : TODO : is it really useful ? */
-  protected final LinkedList<String> extNames = new LinkedList<String>();
+  private final LinkedList<String> extNames = new LinkedList<String>();
   /** Hashtable connecting each ARRNAME keyword value with associated OI_ARRAY table */
-  protected final Map<String, List<OIArray>> arrNameToOiArray = new HashMap<String, List<OIArray>>();
+  private final Map<String, List<OIArray>> arrNameToOiArray = new HashMap<String, List<OIArray>>();
   /** Hashtable connecting each INSNAME keyword value with associated OI_WAVELENGTH table */
-  protected final Map<String, List<OIWavelength>> insNameToOiWavelength = new HashMap<String, List<OIWavelength>>();
+  private final Map<String, List<OIWavelength>> insNameToOiWavelength = new HashMap<String, List<OIWavelength>>();
 
   /**
    * Public constructor
@@ -117,7 +119,6 @@ public final class OIFitsFile extends OIFits {
 
   /**
    * Public constructor
-   *
    * @param absoluteFilePath absolute file path
    */
   public OIFitsFile(final String absoluteFilePath) {
@@ -127,58 +128,49 @@ public final class OIFitsFile extends OIFits {
 
   /**
    * Register OI_* tables.
-   *
    * @param oiTable reference on one OI_* table
    */
+  @Override
   protected void registerOiTable(final OITable oiTable) {
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("Registering object for " + oiTable.getExtName());
     }
-    this.extNames.add(oiTable.getExtName());
-    this.oiTables.add(oiTable);
+    super.registerOiTable(oiTable);
 
-    if (oiTable instanceof OITarget) {
-      oiTargets.add((OITarget) oiTable);
-    } else if (oiTable instanceof OIWavelength) {
-      OIWavelength o = (OIWavelength) oiTable;
-      String insName = o.getInsName();
+    this.extNames.add(oiTable.getExtName());
+
+    if (oiTable instanceof OIWavelength) {
+      final OIWavelength o = (OIWavelength) oiTable;
+      final String insName = o.getInsName();
 
       if (insName != null) {
-        List<OIWavelength> v = insNameToOiWavelength.get(insName);
+        List<OIWavelength> v = this.insNameToOiWavelength.get(insName);
 
         if (v == null) {
           v = new LinkedList<OIWavelength>();
-          insNameToOiWavelength.put(insName, v);
+          this.insNameToOiWavelength.put(insName, v);
         }
 
         v.add((OIWavelength) oiTable);
       } else {
         logger.warning("INSNAME of OI_WAVELENGTH table is null during building step");
       }
-      oiWavelengths.add(o);
     } else if (oiTable instanceof OIArray) {
-      OIArray o = (OIArray) oiTable;
-      String arrName = o.getArrName();
+      final OIArray o = (OIArray) oiTable;
+      final String arrName = o.getArrName();
 
       if (arrName != null) {
-        List<OIArray> v = arrNameToOiArray.get(arrName);
+        List<OIArray> v = this.arrNameToOiArray.get(arrName);
 
         if (v == null) {
           v = new LinkedList<OIArray>();
-          arrNameToOiArray.put(arrName, v);
+          this.arrNameToOiArray.put(arrName, v);
         }
 
         v.add((OIArray) oiTable);
       } else {
         logger.warning("ARRNAME of OI_ARRAY table is null during building step");
       }
-      oiArrays.add(o);
-    } else if (oiTable instanceof OIVis) {
-      oiVisTables.add((OIVis) oiTable);
-    } else if (oiTable instanceof OIVis2) {
-      oiVis2Tables.add((OIVis2) oiTable);
-    } else if (oiTable instanceof OIT3) {
-      oiT3Tables.add((OIT3) oiTable);
     }
   }
 
@@ -191,12 +183,10 @@ public final class OIFitsFile extends OIFits {
    *  returns NULL
    */
   public OIArray getOiArray(final String arrName) {
-    final List<OIArray> v = arrNameToOiArray.get(arrName);
-
+    final List<OIArray> v = this.arrNameToOiArray.get(arrName);
     if (v == null) {
       return null;
     }
-
     return v.get(0);
   }
 
@@ -209,12 +199,10 @@ public final class OIFitsFile extends OIFits {
    *  associated, returns NULL
    */
   public OIWavelength getOiWavelength(final String insName) {
-    List<OIWavelength> v = insNameToOiWavelength.get(insName);
-
+    List<OIWavelength> v = this.insNameToOiWavelength.get(insName);
     if (v == null) {
       return null;
     }
-
     return v.get(0);
   }
 
@@ -229,38 +217,35 @@ public final class OIFitsFile extends OIFits {
     if (oiArray == null) {
       return EMPTY_SHORT_ARRAY;
     }
-
     return oiArray.getAcceptedStaIndexes();
   }
 
   /**
    * Get all INSNAME values already defined.
-   *
    * @return an string array containing all accepted values.
    */
   public String[] getAcceptedInsNames() {
-    final int len = insNameToOiWavelength.size();
+    final int len = this.insNameToOiWavelength.size();
     if (len == 0) {
       return EMPTY_STRING;
     }
-    return insNameToOiWavelength.keySet().toArray(new String[len]);
+    return this.insNameToOiWavelength.keySet().toArray(new String[len]);
   }
 
   /**
    * Get all ARRNAME values already defined.
-   *
    * @return an string array containing all accepted values.
    */
   public String[] getAcceptedArrNames() {
-    final int len = arrNameToOiArray.size();
+    final int len = this.arrNameToOiArray.size();
     if (len == 0) {
       return EMPTY_STRING;
     }
-    return arrNameToOiArray.keySet().toArray(new String[len]);
+    return this.arrNameToOiArray.keySet().toArray(new String[len]);
   }
 
-  /** Get all target identifiers defined, and then valid.
-   *
+  /**
+   * Get all target identifiers defined.
    * @return an integer array containing all accepted values.
    */
   public short[] getAcceptedTargetIds() {
@@ -269,13 +254,18 @@ public final class OIFitsFile extends OIFits {
       return EMPTY_SHORT_ARRAY;
     }
 
-    return oiTarget.getAcceptedTargetIds();
+    return oiTarget.getTargetId();
   }
 
-  /** Return a short description of OIFITS content. */
+  /** 
+   * Return a short description of OIFITS content.
+   * @return short description of OIFITS content
+   */
   @Override
   public String toString() {
-    return "\nextNames:" + extNames + "\narrNameToOiArray:" + arrNameToOiArray + "\ninsNameToOiWavelength:" + insNameToOiWavelength + "\n";
+    return "\nextNames:" + this.extNames +
+            "\narrNameToOiArray:" + this.arrNameToOiArray +
+            "\ninsNameToOiWavelength:" + this.insNameToOiWavelength + "\n";
   }
 
   /**
@@ -290,13 +280,13 @@ public final class OIFitsFile extends OIFits {
     logger.finest("Checking mandatory tables");
 
     /* Checking presence of one and only one OI_TARGET table */
-    if (oiTargets.isEmpty()) {
+    if (!hasOiTarget()) {
       checker.severe(
               "No OI_TARGET table found: one and only one must be present");
     }
 
     /* Checking presence of at least one OI_WAVELENGTH table */
-    if (insNameToOiWavelength.isEmpty()) {
+    if (this.insNameToOiWavelength.isEmpty()) {
       checker.severe(
               "No OI_WAVELENGTH table found: one or more must be present");
     }
@@ -304,7 +294,7 @@ public final class OIFitsFile extends OIFits {
     /* Starting syntactical analysis */
     logger.finest("Building list of table for keywords analysis");
 
-    for (OITable oiTable : oiTables) {
+    for (OITable oiTable : getOITableList()) {
       oiTable.checkSyntax(checker);
     }
 
@@ -316,17 +306,17 @@ public final class OIFitsFile extends OIFits {
         checker.fine("" + getOiTarget().getNbTargets());
       }
 
-      for (OITable oiTable : oiTables) {
+      for (OITable oiTable : getOITableList()) {
         checker.fine("TABLENAME");
         checker.fine(oiTable.getExtName());
       }
 
-      for (Iterator<String> it = arrNameToOiArray.keySet().iterator(); it.hasNext();) {
+      for (Iterator<String> it = this.arrNameToOiArray.keySet().iterator(); it.hasNext();) {
         checker.fine("ARRNAME");
         checker.fine(it.next());
       }
 
-      for (Iterator<String> it = insNameToOiWavelength.keySet().iterator(); it.hasNext();) {
+      for (Iterator<String> it = this.insNameToOiWavelength.keySet().iterator(); it.hasNext();) {
         checker.fine("INSNAME");
         checker.fine(it.next());
       }
@@ -364,7 +354,7 @@ public final class OIFitsFile extends OIFits {
 
       if (insName != null) {
         /* Get OiWavelength associated to INSNAME value */
-        List<OIWavelength> v = insNameToOiWavelength.get(insName);
+        List<OIWavelength> v = this.insNameToOiWavelength.get(insName);
 
         if (v == null) {
           /* Problem: INSNAME value has not been encoutered during
@@ -424,8 +414,7 @@ public final class OIFitsFile extends OIFits {
   }
 
   /**
-   * Return one xml string with file information.
-   *
+   * Return one xml string with file information
    * @return the xml description
    */
   public final String getXmlDesc() {
@@ -433,8 +422,7 @@ public final class OIFitsFile extends OIFits {
   }
 
   /**
-   * Return one xml string with file information.
-   *
+   * Return one xml string with file information
    * @param detailled if true the result will contain the table content
    * @return the xml description
    */
@@ -452,8 +440,7 @@ public final class OIFitsFile extends OIFits {
   }
 
   /**
-   * Fill the given buffer with file information.
-   *
+   * Fill the given buffer with file information
    * @param sb string buffer
    * @param detailled if true the result will contain the table content
    */
@@ -507,7 +494,6 @@ public final class OIFitsFile extends OIFits {
    */
   /**
    * Get the name of this OIFits file.
-   *
    *  @return a string containing the name of the OIFits file.
    */
   public String getName() {
