@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.4 2010-05-27 16:13:29 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.5 2010-05-28 14:57:22 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/05/27 16:13:29  bourgesl
+ * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
+ *
  * Revision 1.3  2010/05/03 14:29:14  bourgesl
  * added column checks (type, repeat, units)
  *
@@ -26,18 +29,18 @@ import fr.jmmc.oitools.meta.Units;
 import fr.jmmc.oitools.util.FileUtils;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.FitsException;
-import nom.tam.fits.FitsFactory;
 import nom.tam.fits.Header;
 import nom.tam.util.ArrayFuncs;
 
 /**
- * This class loads an OIFits file to the OIFitsFile model
+ * This statefull class loads an OIFits file to the OIFits data model with optional integrity checks
  * @author bourgesl
  */
 public class OIFitsLoader {
@@ -53,18 +56,13 @@ public class OIFitsLoader {
   /** OIFits data model */
   private OIFitsFile oiFitsFile = null;
 
-  static {
-    // enable ESO HIERARCH keyword support in nom.tam Fits library :
-    FitsFactory.setUseHierarch(true);
-  }
-
   /**
    * Main method to load an OI Fits File
    * @param fileLocation absolute File Path or remote URL
-   * @return OI Fits File
+   * @return OIFits data model
    * @throws MalformedURLException invalid url format
-   * @throws IOException IO failure
    * @throws FitsException if the fits can not be opened
+   * @throws IOException IO failure
    */
   public static OIFitsFile loadOIFits(final String fileLocation) throws MalformedURLException, IOException, FitsException {
     return loadOIFits(null, fileLocation);
@@ -74,10 +72,10 @@ public class OIFitsLoader {
    * Main method to load an OI Fits File with the given checker component
    * @param checker checker component
    * @param fileLocation absolute File Path or remote URL
-   * @return OI Fits File
+   * @return OIFits data model
    * @throws MalformedURLException invalid url format
-   * @throws IOException IO failure
    * @throws FitsException if the fits can not be opened
+   * @throws IOException IO failure
    */
   public static OIFitsFile loadOIFits(final OIFitsChecker checker, final String fileLocation) throws MalformedURLException, IOException, FitsException {
     String tmpFilename = fileLocation;
@@ -119,7 +117,8 @@ public class OIFitsLoader {
   }
 
   /**
-   * Load the given file in memory
+   * Load the given file into the OI Fits data model
+   *
    * @param absFilePath absolute File path on file system (not URL)
    * @throws FitsException if any FITS error occured
    */
@@ -165,7 +164,6 @@ public class OIFitsLoader {
       logger.log(Level.SEVERE, "load failed ", fe);
       throw fe;
     }
-
   }
 
   /**
@@ -180,6 +178,9 @@ public class OIFitsLoader {
 
     /*
      * ? Maybe process the primary HDU to load all keywords (ESO HIERARCH ...) ?
+     *
+     *   // enable ESO HIERARCH keyword support in nom.tam Fits library :
+     *   FitsFactory.setUseHierarch(true);
      */
 
     // Building process will be done in 2 steps
@@ -286,26 +287,26 @@ public class OIFitsLoader {
    * Process the binary table header to get keywords used by the OITable (see keyword descriptors)
    * and check missing keywords and their formats
    * @param header binary table header
-   * @param table OITable object
+   * @param table OI table
    * @throws FitsException if any FITS error occured
    */
   private void processKeywords(final Header header, final OITable table) throws FitsException {
     // Note : a fits keyword has a KEY, VALUE AND COMMENT
 
     // Get Keyword descriptors :
-    final Map<String, KeywordMeta> keywordsDesc = table.getKeywordsDesc();
+    final Collection<KeywordMeta> keywordsDesc = table.getKeywordDescCollection();
 
     // Dump table descriptors :
     if (logger.isLoggable(Level.FINEST)) {
       logger.finest("table keywords :");
-      for (KeywordMeta keyword : keywordsDesc.values()) {
+      for (KeywordMeta keyword : keywordsDesc) {
         logger.finest(keyword.toString());
       }
     }
 
     String name;
     Object value;
-    for (KeywordMeta keyword : keywordsDesc.values()) {
+    for (KeywordMeta keyword : keywordsDesc) {
       name = keyword.getName();
 
       // check mandatory keywords :
@@ -335,7 +336,7 @@ public class OIFitsLoader {
    */
   private Object parseKeyword(final KeywordMeta keyword, final String keywordValue) {
     if (logger.isLoggable(Level.FINE)) {
-      logger.fine("parseKeyword : " + keyword.getName() + " = '" + keywordValue + "'");
+      logger.fine("KEYWORD " + keyword.getName() + " = '" + keywordValue + "'");
     }
     final Types dataType = keyword.getDataType();
     Types kDataType = Types.TYPE_CHAR;
@@ -378,7 +379,7 @@ public class OIFitsLoader {
    * Process the binary table to get columns used by the OITable (see column descriptors)
    * and check missing keywords and their formats
    * @param hdu binary table
-   * @param table OITable object
+   * @param table OI table
    * @throws FitsException if any FITS error occured
    */
   private void processData(final BinaryTableHDU hdu, final OITable table) throws FitsException {
@@ -388,11 +389,11 @@ public class OIFitsLoader {
     }
 
     // Get Column descriptors :
-    final Map<String, ColumnMeta> columnsDesc = table.getColumnsDesc();
+    final Collection<ColumnMeta> columnsDesc = table.getColumnDescCollection();
 
     if (logger.isLoggable(Level.FINEST)) {
       logger.finest("table columns :");
-      for (ColumnMeta column : columnsDesc.values()) {
+      for (ColumnMeta column : columnsDesc) {
         logger.finest(column.toString());
       }
     }
@@ -402,7 +403,7 @@ public class OIFitsLoader {
     int idx;
     String name;
     Object value;
-    for (ColumnMeta column : columnsDesc.values()) {
+    for (ColumnMeta column : columnsDesc) {
       name = column.getName();
 
       idx = hdu.findColumn(name);
