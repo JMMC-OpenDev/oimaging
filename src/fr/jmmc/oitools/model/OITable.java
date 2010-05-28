@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.4 2010-05-27 16:13:29 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.5 2010-05-28 14:57:05 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/05/27 16:13:29  bourgesl
+ * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
+ *
  * Revision 1.3  2010/05/03 14:29:43  bourgesl
  * refactored column checks (type, repeat, int or string values) to analyse Object value instead of FitsColumn
  *
@@ -67,6 +70,7 @@ import fr.jmmc.oitools.OIFitsConstants;
 import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -154,6 +158,14 @@ public class OITable extends ModelBase {
   }
 
   /**
+   * Return the ordered collection of keyword definitions
+   * @return ordered collection of keyword definitions
+   */
+  protected final Collection<KeywordMeta> getKeywordDescCollection() {
+    return getKeywordsDesc().values();
+  }
+
+  /**
    * Add the given keyword descriptor
    * @param meta keyword descriptor
    */
@@ -167,6 +179,22 @@ public class OITable extends ModelBase {
    */
   protected final Map<String, ColumnMeta> getColumnsDesc() {
     return this.columnsDesc;
+  }
+
+  /**
+   * Return the ordered collection of column definitions
+   * @return ordered collection of column definitions
+   */
+  protected final Collection<ColumnMeta> getColumnDescCollection() {
+    return getColumnsDesc().values();
+  }
+
+  /**
+   * Return the number of columns
+   * @return the number of columns
+   */
+  public final int getNbColumns() {
+    return this.columnsDesc.size();
   }
 
   /**
@@ -499,7 +527,7 @@ public class OITable extends ModelBase {
     Object value;
 
     /* Get mandatory keywords names */
-    for (KeywordMeta keyword : getKeywordsDesc().values()) {
+    for (KeywordMeta keyword : getKeywordDescCollection()) {
       keywordName = keyword.getName();
 
       // get keyword value :
@@ -532,8 +560,8 @@ public class OITable extends ModelBase {
     Object value;
 
     /* Get mandatory columns names */
-    for (ColumnMeta c : getColumnsDesc().values()) {
-      columnName = c.getName();
+    for (ColumnMeta column : getColumnDescCollection()) {
+      columnName = column.getName();
       value = getColumnValue(columnName);
 
       if (value == null) {
@@ -541,7 +569,7 @@ public class OITable extends ModelBase {
         checker.severe("Missing column '" + columnName + "'");
       } else {
         /* Check the column validity */
-        c.check(value, getNbRows(), checker);
+        column.check(value, getNbRows(), checker);
       }
     }
   }
@@ -581,7 +609,7 @@ public class OITable extends ModelBase {
     sb.append("<keywords>\n");
 
     Object val;
-    for (KeywordMeta keyword : getKeywordsDesc().values()) {
+    for (KeywordMeta keyword : getKeywordDescCollection()) {
       val = getKeywordValue(keyword.getName());
       // skip missing keywords :
       if (val != null) {
@@ -595,7 +623,7 @@ public class OITable extends ModelBase {
     // Print columns
     sb.append("<columns>\n");
 
-    for (ColumnMeta column : getColumnsDesc().values()) {
+    for (ColumnMeta column : getColumnDescCollection()) {
       sb.append("<column><name>").append(column.getName()).append("</name>");
       sb.append("<description>").append(column.getDescription()).append("</description>");
       sb.append("<type>").append(column.getType()).append("</type>");
@@ -608,7 +636,7 @@ public class OITable extends ModelBase {
     if (detailled) {
       sb.append("<table>\n<tr>\n");
 
-      for (ColumnMeta column : getColumnsDesc().values()) {
+      for (ColumnMeta column : getColumnDescCollection()) {
         sb.append("<th>").append(column.getName()).append("</th>");
       }
       sb.append("</tr>\n");
@@ -616,7 +644,7 @@ public class OITable extends ModelBase {
       for (int rowIndex = 0, len = getNbRows(); rowIndex < len; rowIndex++) {
         sb.append("<tr>");
 
-        for (ColumnMeta column : getColumnsDesc().values()) {
+        for (ColumnMeta column : getColumnDescCollection()) {
           sb.append("<td>");
 
           this.dumpColumnRow(column, rowIndex, sb);
