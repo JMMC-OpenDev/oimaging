@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIArray.java,v 1.3 2010-05-27 16:13:29 bourgesl Exp $"
+ * "@(#) $Id: OIArray.java,v 1.4 2010-05-28 14:56:18 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/27 16:13:29  bourgesl
+ * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
+ *
  * Revision 1.2  2010/04/29 15:47:02  bourgesl
  * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
  *
@@ -70,13 +73,13 @@ public final class OIArray extends OITable {
           "coordinate frame", Types.TYPE_CHAR, new String[]{OIFitsConstants.KEYWORD_FRAME_GEOCENTRIC});
   /** ARRAYX  keyword descriptor */
   private final static KeywordMeta KEYWORD_ARRAY_X = new KeywordMeta(OIFitsConstants.KEYWORD_ARRAY_X,
-          "array center X-coordinate", Types.TYPE_DBL, Units.UNIT_METER);
+          "[m] array center X-coordinate", Types.TYPE_DBL);
   /** ARRAYY  keyword descriptor */
   private final static KeywordMeta KEYWORD_ARRAY_Y = new KeywordMeta(OIFitsConstants.KEYWORD_ARRAY_Y,
-          "array center Y-coordinate", Types.TYPE_DBL, Units.UNIT_METER);
+          "[m] array center Y-coordinate", Types.TYPE_DBL);
   /** ARRAYZ  keyword descriptor */
   private final static KeywordMeta KEYWORD_ARRAY_Z = new KeywordMeta(OIFitsConstants.KEYWORD_ARRAY_Z,
-          "array center Z-coordinate", Types.TYPE_DBL, Units.UNIT_METER);
+          "[m] array center Z-coordinate", Types.TYPE_DBL);
   /** TEL_NAME column descriptor */
   private final static ColumnMeta COLUMN_TEL_NAME = new ColumnMeta(OIFitsConstants.COLUMN_TEL_NAME,
           "telescope name", Types.TYPE_CHAR, 16);
