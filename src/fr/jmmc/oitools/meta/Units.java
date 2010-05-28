@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: Units.java,v 1.3 2010-05-27 14:44:07 bourgesl Exp $"
+ * "@(#) $Id: Units.java,v 1.4 2010-05-28 14:56:46 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/27 14:44:07  bourgesl
+ * javadoc
+ *
  * Revision 1.2  2010/05/03 14:26:20  bourgesl
  * fixed parseUnit method
  *
@@ -69,6 +72,17 @@ public enum Units {
    */
   public final String getRepresentation() {
     return representation;
+  }
+
+  /**
+   * Return the standard unit representation i.e. the first token
+   * @return standard unit representation or ""
+   */
+  public final String getStandardRepresentation() {
+    if (tokens != null && tokens.length > 0) {
+      return tokens[0];
+    }
+    return "";
   }
 
   /**
