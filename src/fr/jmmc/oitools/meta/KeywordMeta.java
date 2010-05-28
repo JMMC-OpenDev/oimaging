@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: KeywordMeta.java,v 1.3 2010-05-03 14:27:02 bourgesl Exp $"
+ * "@(#) $Id: KeywordMeta.java,v 1.4 2010-05-28 14:56:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/03 14:27:02  bourgesl
+ * use getDataType(Class)
+ *
  * Revision 1.2  2010/04/29 15:46:01  bourgesl
  * keyword checks refactored
  *
@@ -21,7 +24,9 @@ import java.util.logging.Level;
 /**
  * This class describes a FITS keyword.
  * 
- * Note : OIFits uses only 'A', 'I', 'D' types for keywords => Other types are not supported for keywords.
+ * Notes :
+ * - OIFits uses only 'A', 'I', 'D' types for keywords => Other types are not supported for keywords.
+ * - Keywords do not have units as the Fits standard does not support it
  *
  * @author bourgesl
  */
@@ -36,18 +41,6 @@ public class KeywordMeta extends CellMeta {
    */
   public KeywordMeta(final String name, final String desc, final Types dataType) {
     super(MetaType.KEYWORD, name, desc, dataType, 1, NO_INT_VALUES, NO_STR_VALUES, Units.NO_UNIT);
-  }
-
-  /**
-   * KeywordMeta class constructor
-   *
-   * @param name keyword name
-   * @param desc keyword descriptive comment
-   * @param dataType keyword data type
-   * @param unit keyword unit
-   */
-  public KeywordMeta(final String name, final String desc, final Types dataType, final Units unit) {
-    super(MetaType.KEYWORD, name, desc, dataType, 1, NO_INT_VALUES, NO_STR_VALUES, unit);
   }
 
   /**

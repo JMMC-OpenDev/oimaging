@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: CellMeta.java,v 1.3 2010-05-27 14:44:07 bourgesl Exp $"
+ * "@(#) $Id: CellMeta.java,v 1.4 2010-05-28 14:56:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/27 14:44:07  bourgesl
+ * javadoc
+ *
  * Revision 1.2  2010/04/29 15:46:02  bourgesl
  * keyword checks refactored
  *
@@ -220,9 +223,9 @@ public class CellMeta {
   }
 
   /**
-   * Return cell unit.
+   * Return all accepted cell units.
    *
-   * @return the cell unit.
+   * @return all accepted cell units.
    */
   public final String getUnit() {
     return this.unit.getRepresentation();
