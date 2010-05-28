@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIT3.java,v 1.3 2010-05-28 07:53:07 bourgesl Exp $"
+ * "@(#) $Id: OIT3.java,v 1.4 2010-05-28 14:55:54 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/28 07:53:07  bourgesl
+ * unified code to compute spacial coords
+ *
  * Revision 1.2  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -179,7 +182,7 @@ public class OIT3 extends OIData {
   /* --- Alternate data representation methods --- */
   /**
    * Return the spacial frequencies column. The computation is based
-   * on the maximum distance of u1,v1 u2,v2 and u1-u2,v1-v2 vectors.
+   * on the maximum distance of u1,v1 (AB), u2,v2 (BC) and -(u1+u2), - (v1+v2) (CA) vectors.
    *
    * @return the computed spacial frequencies.
    */
@@ -194,14 +197,14 @@ public class OIT3 extends OIData {
     for (int i = 0, sizeU = u1coord.length; i < sizeU; i++) {
       for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
 
-// Laurent : wrong code : dist1 = dist2 and u3,v3 does not correspond to u1-u2,v1-v2 vectors ?
-
         // mimic OIlib/yorick/oidata.i cridx3
-        double u3 = -(u1coord[i] + u2coord[i]);
-        double v3 = -(v1coord[i] + v2coord[i]);
         double dist1 = Math.sqrt((u1coord[i] * u1coord[i]) + (v1coord[i] * v1coord[i]));
-        double dist2 = Math.sqrt((u1coord[i] * u1coord[i]) + (v1coord[i] * v1coord[i]));
+        double dist2 = Math.sqrt((u2coord[i] * u2coord[i]) + (v2coord[i] * v2coord[i]));
+
+        double u3 = - (u1coord[i] + u2coord[i]);
+        double v3 = - (v1coord[i] + v2coord[i]);
         double dist3 = Math.sqrt((u3 * u3) + (v3 * v3));
+
         double dist = Math.max(Math.max(dist1, dist2), dist3);
         r[i][j] = dist / effWaves[j];
       }
