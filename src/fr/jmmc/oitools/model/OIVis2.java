@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIVis2.java,v 1.2 2010-05-27 16:13:29 bourgesl Exp $"
+ * "@(#) $Id: OIVis2.java,v 1.3 2010-05-28 07:53:07 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/05/27 16:13:29  bourgesl
+ * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
+ *
  * Revision 1.1  2010/04/28 14:47:37  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
@@ -144,16 +147,7 @@ public class OIVis2 extends OIData {
    * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
   public double[][] getSpacialUCoord() {
-    final double[][] r = new double[getNbRows()][getNWave()];
-    final float[] effWaves = getOiWavelength().getEffWave();
-    final double[] ucoord = getUCoord();
-
-    for (int i = 0, sizeU = ucoord.length; i < sizeU; i++) {
-      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
-        r[i][j] = ucoord[i] / effWaves[j];
-      }
-    }
-    return r;
+    return getSpacialCoord(getUCoord());
   }
 
   /**
@@ -163,16 +157,7 @@ public class OIVis2 extends OIData {
    * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
   public double[][] getSpacialVCoord() {
-    final double[][] r = new double[getNbRows()][getNWave()];
-    final float[] effWaves = getOiWavelength().getEffWave();
-    final double[] vcoord = getVCoord();
-
-    for (int i = 0, sizeV = vcoord.length; i < sizeV; i++) {
-      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
-        r[i][j] = vcoord[i] / effWaves[j];
-      }
-    }
-    return r;
+    return getSpacialCoord(getVCoord());
   }
 }
 /*___oOo___*/

@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIData.java,v 1.4 2010-05-27 16:13:29 bourgesl Exp $"
+ * "@(#) $Id: OIData.java,v 1.5 2010-05-28 07:53:07 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/05/27 16:13:29  bourgesl
+ * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
+ *
  * Revision 1.3  2010/05/03 14:25:36  bourgesl
  * removed comment
  *
@@ -258,6 +261,24 @@ public class OIData extends OITable {
    */
   public final boolean[][] getFlag() {
     return this.getColumnBooleans(OIFitsConstants.COLUMN_FLAG);
+  }
+
+  /* --- Alternate data representation methods --- */
+  /**
+   * Return the spacial coord given the coord array = coord / effWave
+   * @param coord coord array
+   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   */
+  protected double[][] getSpacialCoord(final double[] coord) {
+    final double[][] r = new double[getNbRows()][getNWave()];
+    final float[] effWaves = getOiWavelength().getEffWave();
+
+    for (int i = 0, size = coord.length; i < size; i++) {
+      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
+        r[i][j] = coord[i] / effWaves[j];
+      }
+    }
+    return r;
   }
 
   /* --- Utility methods for cross-referencing --- */
