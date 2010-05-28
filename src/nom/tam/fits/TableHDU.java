@@ -104,6 +104,28 @@ public abstract class TableHDU extends BasicHDU {
 	    myHeader.addValue("TTYPE"+(index+1), name, comment);
 	}
     }
+
+    /**
+     * Set both name and unit for the column
+     * 
+     * // LAURENT : added to specify the unit of the column
+     * 
+     * @param index The 0-based column index.
+     * @param name column name
+     * @param comment description of the column
+     * @param unit column unit
+     * @throws FitsException
+     */
+    public void setColumnName(final int index, final String name, final String comment, final String unit)
+      throws FitsException {
+      if (getNCols() > index && index >= 0) {
+          myHeader.positionAfterIndex("TFORM", index+1);
+          myHeader.addValue("TTYPE" + (index + 1), name, comment);
+          if (unit != null && unit.length() > 0) {
+            myHeader.addValue("TUNIT" + (index + 1), unit, null);
+          }
+      }
+    }
     
     /** 
      * Get the FITS type of a column in the table.
