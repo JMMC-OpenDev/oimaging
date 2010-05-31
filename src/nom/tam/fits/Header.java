@@ -1324,7 +1324,9 @@ public class Header implements FitsElement {
 	iter.setKey(prefix+colnum);
 	
 	if (iter.hasNext()) {
-	
+
+      // LAURENT : added flag :
+      boolean forward = false; // LAURENT
 	    String key;
 	    while (iter.hasNext()) {
 	    
@@ -1333,10 +1335,12 @@ public class Header implements FitsElement {
 		      key.length() <= colnum.length() ||
 		     !key.substring(key.length()-colnum.length()).equals(colnum)
 		   ) {
-		    break;
+            forward = true; // LAURENT
+            break;
 	        }
 	    }
-	    if (iter.hasNext()) {
+      // LAURENT : ordering bug issue occuring with the last column :
+      if (forward) {
 	        iter.prev();   // Gone one too far, so skip back an element.
 	    }
 	}
