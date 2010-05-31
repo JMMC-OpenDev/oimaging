@@ -581,7 +581,9 @@ public class BinaryTable extends Data implements TableData {
         String key = "TFORM"+(col+1);
         iter.add(key, new HeaderCard(key, tform, null));
 
-        if (dimens[col].length > 0 && !isVarCol(col)) {
+        // LAURENT : generate TDIM keyword only if dimensions > 1 :
+        if (dimens[col].length > 1 && !isVarCol(col)) {
+//        if (dimens[col].length > 0 && !isVarCol(col)) {
 
             StringBuffer tdim = new StringBuffer();
             char comma = '(';
