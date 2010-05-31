@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriter.java,v 1.1 2010-05-28 14:57:45 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriter.java,v 1.2 2010-05-31 15:56:17 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/05/28 14:57:45  bourgesl
+ * first attempt to write OIFits from a loaded OIFitsFile structure
+ *
  */
 package fr.jmmc.oitools.model;
 
@@ -16,12 +19,13 @@ import fr.jmmc.oitools.meta.Types;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.logging.Level;
+import nom.tam.fits.BinaryTable;
 import nom.tam.fits.BinaryTableHDU;
+import nom.tam.fits.Data;
 import nom.tam.fits.Fits;
 import nom.tam.fits.FitsException;
 import nom.tam.fits.FitsFactory;
 import nom.tam.fits.Header;
-import nom.tam.fits.HeaderCard;
 import nom.tam.util.BufferedFile;
 
 /**
@@ -118,7 +122,6 @@ public class OIFitsWriter {
    * @throws IOException IO failure
    */
   private void createHDUnits(final Fits fitsFile) throws FitsException, IOException {
-
     for (OITable oiTable : this.oiFitsFile.getOITableList()) {
       createBinaryTable(fitsFile, oiTable);
     }
@@ -133,7 +136,9 @@ public class OIFitsWriter {
    */
   private void createBinaryTable(final Fits fitsFile, final OITable table) throws FitsException, IOException {
 
-    logger.severe("createBinaryTable : " + table.toString());
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("createBinaryTable : " + table.toString());
+    }
 
     final int nbCols = table.getNbColumns();
 
@@ -148,54 +153,65 @@ public class OIFitsWriter {
       data[i++] = table.getColumnValue(column.getName());
     }
 
-    // create HDU from data :
-    fitsFile.addHDU(Fits.makeHDU(data));
+    // test complex data :
+/*
+    final float[] complex = new float[] { 0.5f, 1f};
 
-    final BinaryTableHDU hdu = (BinaryTableHDU) fitsFile.getHDU(fitsFile.getNumberOfHDUs() - 1);
+    final int len = table.getNbRows();
+
+    final float[][] complexCol = new float[len][2];
+    data[i] = complexCol;
+
+    for (i = 0; i < len; i++) {
+    complexCol[i] = complex;
+    }
+     */
+
+    // fix string length to have correct header length ('0A' issue) :
+
+    // TODO : use a dedicated method to fix string length :
+    i = 0;
+    for (ColumnMeta column : columnsDesc) {
+      if (column.getDataType() == Types.TYPE_CHAR) {
+        final String[] values = (String[]) data[i];
+        if (values.length > 0) {
+          while (values[0].length() < column.getRepeat()) {
+            values[0] = values[0] + " ";
+          }
+        }
+      }
+      i++;
+    }
+
+    // create HDU from data :
+//    final BinaryTableHDU hdu = (BinaryTableHDU)Fits.makeHDU(data);
+
+    // equivalent to :
+    final Data fitsData = new BinaryTable(data);
+
+    // automatic header generation :
+    final Header header = BinaryTableHDU.manufactureHeader(fitsData);
+
+    final BinaryTableHDU hdu = new BinaryTableHDU(header, fitsData);
 
     // Define column headers :
     i = 0;
     for (ColumnMeta column : columnsDesc) {
 
-     logger.severe("COLUMN [" + column.getName() + "] [" + hdu.getColumnLength(i) + " " + hdu.getColumnType(i) + "]");
-
-      hdu.setColumnName(i++, column.getName(), column.getDescription(), column.getUnits().getStandardRepresentation());
-    }
-
-    // Header :
-    final Header header = hdu.getHeader();
-
-    // fix column header for string length or complex types ...
-/*
-    int len = 0;
-    i = 0;
-    for (ColumnMeta column : columnsDesc) {
-      if (column.getDataType() == Types.TYPE_CHAR) {
-        logger.severe("old size = " + hdu.getColumnLength(i));
-        len -= hdu.getColumnLength(i);
-
-        header.addValue("TFORM"+ (i + 1), column.getRepeat() + "A", "Character string");
-
-        len += column.getRepeat();
-
-        logger.severe("new size = " + hdu.getColumnLength(i));
+      if (logger.isLoggable(Level.FINE)) {
+        logger.fine("COLUMN [" + column.getName() + "] [" + hdu.getColumnLength(i) + " " + hdu.getColumnType(i) + "]");
       }
+
+      hdu.setColumnName(i, column.getName(), column.getDescription(), column.getUnits().getStandardRepresentation());
+
       i++;
     }
 
-    logger.severe("len = " + len);
-    logger.severe("nAxis1 = " + header.getIntValue("NAXIS1"));
-
-    header.setNaxis(1, header.getIntValue("NAXIS1") + len);
-
-    logger.severe("nAxis1 = " + header.getIntValue("NAXIS1"));
-
-    hdu.info();
-
-    */
-
     // Add keywords :
     processKeywords(header, table);
+
+    // add HDU :
+    fitsFile.addHDU(hdu);
   }
 
   /**
@@ -227,7 +243,9 @@ public class OIFitsWriter {
         continue;
       }
 
-      logger.severe("KEYWORD " + keyword.getName() + " = '" + keywordValue + "'");
+      if (logger.isLoggable(Level.FINE)) {
+        logger.fine("KEYWORD " + keyword.getName() + " = '" + keywordValue + "'");
+      }
 
       switch (keyword.getDataType()) {
         case TYPE_INT:
