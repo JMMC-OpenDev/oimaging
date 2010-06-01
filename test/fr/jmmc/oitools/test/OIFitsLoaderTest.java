@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoaderTest.java,v 1.1 2010-04-28 14:39:20 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoaderTest.java,v 1.2 2010-06-01 16:03:55 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:39:20  bourgesl
+ * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
+ *
  */
 package fr.jmmc.oitools.test;
 
@@ -19,6 +22,9 @@ import java.io.File;
  */
 public class OIFitsLoaderTest implements TestEnv {
 
+  /**
+   * Forbidden constructor
+   */
   private OIFitsLoaderTest() {
     super();
   }
@@ -28,14 +34,20 @@ public class OIFitsLoaderTest implements TestEnv {
     int errors = 0;
 
     if (false) {
-      // Complex VISDATA :
+      // Bad File path :
+//      final String file = TEST_DIR + "toto";
+
+      // Invalid OI Fits (Fits image) :
+//      final String file = TEST_DIR + "other/YSO_disk.fits.gz";
+
+      // Complex visibilities in VISDATA / VISERR (OI_VIS table) :
 //      final String file = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39.fits";
 
       // 1 extra byte at the End of file + NaN in vis* data :
       final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI.oifits.gz";
 
-      // Bug (Fits image):
-//      final String file = TEST_DIR + "YSO_disk.fits.gz";
+      // Single Wave Length => NWAVE = 1 => 1D arrays instead of 2D arrays :
+//      final String file = TEST_DIR + "2004-data2.fits";
 
       n++;
       errors += load(file);
