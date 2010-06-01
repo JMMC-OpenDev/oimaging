@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsConstants.java,v 1.1 2010-04-28 14:45:00 bourgesl Exp $"
+ * "@(#) $Id: OIFitsConstants.java,v 1.2 2010-06-01 15:55:10 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:45:00  bourgesl
+ * String constants for OI Fits standard rev 1.0
+ *
  */
 package fr.jmmc.oitools;
 
@@ -153,6 +156,12 @@ public interface OIFitsConstants {
   public final static String COLUMN_VISPHI = "VISPHI";
   /** VISPHIERR column */
   public final static String COLUMN_VISPHIERR = "VISPHIERR";
+
+  /* Aspro Extension with complex visibilities (like AMBER OIFits) */
+  /** VISDATA column */
+  public final static String COLUMN_VISDATA = "VISDATA";
+  /** VISERR column */
+  public final static String COLUMN_VISERR = "VISERR";
 
   /* OI_VIS2 table */
   /** VIS2DATA column */
