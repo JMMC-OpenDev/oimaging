@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIVis.java,v 1.3 2010-05-28 07:53:07 bourgesl Exp $"
+ * "@(#) $Id: OIVis.java,v 1.4 2010-06-01 15:59:40 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/28 07:53:07  bourgesl
+ * unified code to compute spacial coords
+ *
  * Revision 1.2  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -60,6 +63,13 @@ public class OIVis extends OIData {
   public OIVis(final OIFitsFile oifitsFile) {
     super(oifitsFile);
 
+    // Optional Complex visibilities (ASPRO or AMBER - not OIFits) :
+    // VISDATA column definition
+    addColumnMeta(new WaveColumnMeta(OIFitsConstants.COLUMN_VISDATA, "raw complex visibilities", Types.TYPE_COMPLEX, true, this));
+
+    // VISERR  column definition
+    addColumnMeta(new WaveColumnMeta(OIFitsConstants.COLUMN_VISERR, "error in raw complex visibilities", Types.TYPE_COMPLEX, true, this));
+
     // VISAMP  column definition
     addColumnMeta(new WaveColumnMeta(OIFitsConstants.COLUMN_VISAMP, "visibility amplitude", Types.TYPE_DBL, this));
 
@@ -92,6 +102,22 @@ public class OIVis extends OIData {
   }
 
   /* --- Columns --- */
+  /**
+   * Return the optional VISDATA column.
+   * @return the VISDATA column or null if missing.
+   */
+  public float[][][] getVisData() {
+    return this.getColumnComplexes(OIFitsConstants.COLUMN_VISDATA);
+  }
+
+  /**
+   * Return the optional VISERR column.
+   * @return the VISERR column or null if missing.
+   */
+  public float[][][] getVisErr() {
+    return this.getColumnComplexes(OIFitsConstants.COLUMN_VISERR);
+  }
+
   /**
    * Return the VISAMP column.
    * @return the VISAMP column.
