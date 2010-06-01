@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: ColumnMeta.java,v 1.3 2010-05-03 14:28:46 bourgesl Exp $"
+ * "@(#) $Id: ColumnMeta.java,v 1.4 2010-06-01 15:57:56 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/03 14:28:46  bourgesl
+ * refactored checks (type, repeat, int or string values) to analyse Object value instead of FitsColumn
+ *
  * Revision 1.2  2010/04/29 15:46:02  bourgesl
  * keyword checks refactored
  *
@@ -93,7 +96,15 @@ public class ColumnMeta extends CellMeta {
    * @return true if the value is multiple
    */
   public final boolean isArray() {
-    return getRepeat() > 1;
+    return getRepeat() > 1 || this instanceof WaveColumnMeta;
+  }
+
+  /**
+   * Return true if the column is optional
+   * @return true if the column is optional
+   */
+  public boolean isOptional() {
+    return false;
   }
 
   /**
@@ -110,7 +121,7 @@ public class ColumnMeta extends CellMeta {
 
     // Check type and cardinality
     final Class<?> baseClass = ArrayFuncs.getBaseClass(value);
-    final char columnType = Types.getDataType(baseClass).getRepresentation();
+    char columnType = Types.getDataType(baseClass).getRepresentation();
 
     final int[] dims = ArrayFuncs.getDimensions(value);
     final int ndims = dims.length;
@@ -141,12 +152,22 @@ public class ColumnMeta extends CellMeta {
 
     } else {
       columnRepeat = dims[1];
+
       if (ndims > 2) {
-        logger.severe("unsupported array dimensions : " + ArrayFuncs.arrayDescription(value));
+        // special case for Complex type :
+        if (ndims == 3) {
+          if (dims[2] == 2 && baseClass == float.class) {
+              columnType = Types.TYPE_COMPLEX.getRepresentation();
+          } else {
+            logger.severe("unsupported array dimensions : " + ArrayFuncs.arrayDescription(value));
+          }
+        } else {
+          logger.severe("unsupported array dimensions : " + ArrayFuncs.arrayDescription(value));
+        }
       }
     }
 
-    // Note : ColumnMeta.getRepeat() is lazily computed from table references
+    // Note : ColumnMeta.getRepeat() is lazily computed for cross-reference columns
     final char descType = this.getType();
     final int descRepeat = this.getRepeat();
 
