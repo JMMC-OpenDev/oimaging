@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.5 2010-05-28 14:57:22 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.6 2010-06-01 16:02:25 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/05/28 14:57:22  bourgesl
+ * javadoc + minor refactoring
+ *
  * Revision 1.4  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -26,11 +29,13 @@ import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.meta.Units;
+import fr.jmmc.oitools.meta.WaveColumnMeta;
 import fr.jmmc.oitools.util.FileUtils;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.logging.Level;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
@@ -121,18 +126,25 @@ public class OIFitsLoader {
    *
    * @param absFilePath absolute File path on file system (not URL)
    * @throws FitsException if any FITS error occured
+   * @throws IOException IO failure
    */
-  private void load(final String absFilePath) throws FitsException {
+  private void load(final String absFilePath) throws FitsException, IOException {
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("loading " + absFilePath);
     }
 
     this.checker.info("Loading File: " + absFilePath);
 
-    // create new OIFits data model
-    this.oiFitsFile = new OIFitsFile(absFilePath);
+    // Check if the given file exists :
+    if (!new File(absFilePath).exists()) {
+      this.checker.severe("File not found : " + absFilePath);
+      throw new IOException("File not found : " + absFilePath);
+    }
 
     try {
+      // create new OIFits data model
+      this.oiFitsFile = new OIFitsFile(absFilePath);
+
       final long start = System.nanoTime();
 
       // open the fits file :
@@ -161,7 +173,9 @@ public class OIFitsLoader {
 // HERE !
 
     } catch (FitsException fe) {
-      logger.log(Level.SEVERE, "load failed ", fe);
+      logger.log(Level.SEVERE, "Unable to load the file : " + absFilePath, fe);
+      this.checker.severe("Unable to load the file " + absFilePath + " : " + fe.getMessage());
+
       throw fe;
     }
   }
@@ -409,8 +423,10 @@ public class OIFitsLoader {
       idx = hdu.findColumn(name);
 
       if (idx == -1) {
-        /* No column with columnName name */
-        this.checker.severe("Missing column '" + name + "'");
+        if (!column.isOptional()) {
+          /* No column with columnName name */
+          this.checker.severe("Missing column '" + name + "'");
+        }
       } else {
 
         if (logger.isLoggable(Level.FINE)) {
@@ -493,13 +509,54 @@ public class OIFitsLoader {
       }
     }
 
-    // TODO : convert fits data type to expected data model type :
-//        column.getDataType()
+    // column value :
+    Object value = columnValue;
 
-    // ?? short[] => stored in memory as int[] ?
-    // ?? float/double[] => stored in memory as double[] ?
+    if (columnType != descType) {
+      // convert fits data type to expected data model type :
 
-    return columnValue;
+      // Possible change (needs refactoring) :
+      // ?? short[] => stored in memory as int[] ?
+      // ?? float/double[] => stored in memory as double[] ?
+
+      switch (column.getDataType()) {
+        case TYPE_INT:
+          value = ArrayFuncs.convertArray(value, short.class, true);
+          break;
+
+        case TYPE_DBL:
+          value = ArrayFuncs.convertArray(value, double.class, true);
+          break;
+
+        case TYPE_REAL:
+          value = ArrayFuncs.convertArray(value, float.class, true);
+          break;
+
+        case TYPE_COMPLEX:
+          // Special case for complex visibilities :
+          value = ArrayFuncs.convertArray(value, float.class, true);
+          break;
+
+        case TYPE_LOGICAL:
+          // unsupported conversion : return arrays with false values
+          value = ArrayFuncs.mimicArray(value, boolean.class);
+          break;
+
+        case TYPE_CHAR:
+        // only numeric types
+        default:
+        // nothing to do
+      }
+    }
+
+    if (column instanceof WaveColumnMeta && columnRepeat == 1) {
+      // Special case : NWave = 1 means that Fits gives 1D arrays instead of 2D arrays :
+      // Applies to Complex / Double and Logical types :
+      final int[] dims = {Array.getLength(columnValue), 1};
+      value = ArrayFuncs.curl(value, dims);
+    }
+
+    return value;
   }
 
   /**
