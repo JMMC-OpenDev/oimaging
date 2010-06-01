@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.5 2010-05-28 14:57:05 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.6 2010-06-01 16:00:31 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/05/28 14:57:05  bourgesl
+ * simplified descriptors & values iteration
+ *
  * Revision 1.4  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -174,38 +177,6 @@ public class OITable extends ModelBase {
   }
 
   /**
-   * Return the Map storing column definitions
-   * @return Map storing column definitions
-   */
-  protected final Map<String, ColumnMeta> getColumnsDesc() {
-    return this.columnsDesc;
-  }
-
-  /**
-   * Return the ordered collection of column definitions
-   * @return ordered collection of column definitions
-   */
-  protected final Collection<ColumnMeta> getColumnDescCollection() {
-    return getColumnsDesc().values();
-  }
-
-  /**
-   * Return the number of columns
-   * @return the number of columns
-   */
-  public final int getNbColumns() {
-    return this.columnsDesc.size();
-  }
-
-  /**
-   * Add the given column descriptor
-   * @param meta column descriptor
-   */
-  protected final void addColumnMeta(final ColumnMeta meta) {
-    this.columnsDesc.put(meta.getName(), meta);
-  }
-
-  /**
    * Return the Map storing keyword values
    * @return Map storing keyword values
    */
@@ -220,7 +191,7 @@ public class OITable extends ModelBase {
    * @return any object value or null if undefined
    */
   protected final Object getKeywordValue(final String name) {
-    return this.keywordsValue.get(name);
+    return getKeywordsValue().get(name);
   }
 
   /**
@@ -318,11 +289,55 @@ public class OITable extends ModelBase {
   }
 
   /**
+   * Return the Map storing column definitions
+   * @return Map storing column definitions
+   */
+  private final Map<String, ColumnMeta> getColumnsDesc() {
+    return this.columnsDesc;
+  }
+
+  /**
+   * Return the ordered collection of column definitions
+   * @return ordered collection of column definitions
+   */
+  protected final Collection<ColumnMeta> getColumnDescCollection() {
+    return getColumnsDesc().values();
+  }
+
+  /**
+   * Return the number of columns
+   * @return the number of columns
+   */
+  public final int getNbColumns() {
+    return this.columnsDesc.size();
+  }
+
+  /**
+   * Add the given column descriptor
+   * @param meta column descriptor
+   */
+  protected final void addColumnMeta(final ColumnMeta meta) {
+    this.columnsDesc.put(meta.getName(), meta);
+  }
+
+  /**
    * Return the Map storing column values
    * @return Map storing column values
    */
-  protected final Map<String, Object> getColumnsValue() {
+  private final Map<String, Object> getColumnsValue() {
     return this.columnsValue;
+  }
+
+  /**
+   * Return true if the table contains the column given its column descriptor
+   * @param meta column descriptor
+   * @return true if the table contains the column
+   */
+  protected final boolean hasColumn(final ColumnMeta meta) {
+    if (meta.isOptional()) {
+      return getColumnValue(meta.getName()) != null;
+    }
+    return true;
   }
 
   /**
@@ -332,7 +347,7 @@ public class OITable extends ModelBase {
    * @return any array value or null if undefined
    */
   protected final Object getColumnValue(final String name) {
-    return this.columnsValue.get(name);
+    return getColumnsValue().get(name);
   }
 
   /**
@@ -393,6 +408,16 @@ public class OITable extends ModelBase {
    */
   protected final double[][] getColumnDoubles(final String name) {
     return (double[][]) getColumnValue(name);
+  }
+
+  /**
+   * Return the column value given its name as a 2D complex array
+   * The returned value can be null if the column has never been defined
+   * @param name column name
+   * @return 2D complex array or null if undefined
+   */
+  protected final float[][][] getColumnComplexes(final String name) {
+    return (float[][][]) getColumnValue(name);
   }
 
   /**
@@ -565,8 +590,10 @@ public class OITable extends ModelBase {
       value = getColumnValue(columnName);
 
       if (value == null) {
-        /* No column with columnName name */
-        checker.severe("Missing column '" + columnName + "'");
+        if (!column.isOptional()) {
+          /* No column with columnName name */
+          checker.severe("Missing column '" + columnName + "'");
+        }
       } else {
         /* Check the column validity */
         column.check(value, getNbRows(), checker);
@@ -624,11 +651,13 @@ public class OITable extends ModelBase {
     sb.append("<columns>\n");
 
     for (ColumnMeta column : getColumnDescCollection()) {
-      sb.append("<column><name>").append(column.getName()).append("</name>");
-      sb.append("<description>").append(column.getDescription()).append("</description>");
-      sb.append("<type>").append(column.getType()).append("</type>");
-      sb.append("<unit>").append(column.getUnit()).append("</unit>");
-      sb.append("</column>\n");
+      if (hasColumn(column)) {
+        sb.append("<column><name>").append(column.getName()).append("</name>");
+        sb.append("<description>").append(column.getDescription()).append("</description>");
+        sb.append("<type>").append(column.getType()).append("</type>");
+        sb.append("<unit>").append(column.getUnit()).append("</unit>");
+        sb.append("</column>\n");
+      }
     }
 
     sb.append("</columns>\n");
@@ -637,7 +666,9 @@ public class OITable extends ModelBase {
       sb.append("<table>\n<tr>\n");
 
       for (ColumnMeta column : getColumnDescCollection()) {
-        sb.append("<th>").append(column.getName()).append("</th>");
+        if (hasColumn(column)) {
+          sb.append("<th>").append(column.getName()).append("</th>");
+        }
       }
       sb.append("</tr>\n");
 
@@ -645,11 +676,13 @@ public class OITable extends ModelBase {
         sb.append("<tr>");
 
         for (ColumnMeta column : getColumnDescCollection()) {
-          sb.append("<td>");
+          if (hasColumn(column)) {
+            sb.append("<td>");
 
-          this.dumpColumnRow(column, rowIndex, sb);
+            this.dumpColumnRow(column, rowIndex, sb);
 
-          sb.append("</td>");
+            sb.append("</td>");
+          }
         }
         sb.append("</tr>\n");
       }
@@ -720,6 +753,25 @@ public class OITable extends ModelBase {
         sb.append(fValues[rowIndex]);
         break;
 
+      case TYPE_COMPLEX:
+        // Special case for complex visibilities :
+        if (column.isArray()) {
+          final float[][][] cValues = getColumnComplexes(column.getName());
+          final float[][] rowValues = cValues[rowIndex];
+          // append values :
+          for (int i = 0, len = rowValues.length; i < len; i++) {
+            if (i > 0) {
+              sb.append(" ");
+            }
+            // real,img pattern for complex values :
+            sb.append(rowValues[i][0]).append(",").append(rowValues[i][1]);
+          }
+          break;
+        }
+        // Impossible case in OIFits
+        sb.append("...");
+        break;
+
       case TYPE_LOGICAL:
         if (column.isArray()) {
           final boolean[][] bValues = getColumnBooleans(column.getName());
@@ -736,6 +788,7 @@ public class OITable extends ModelBase {
         // Impossible case in OIFits
         sb.append("...");
         break;
+
       default:
         sb.append("...");
     }
