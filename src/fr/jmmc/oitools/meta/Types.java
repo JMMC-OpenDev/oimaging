@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: Types.java,v 1.4 2010-05-27 14:44:07 bourgesl Exp $"
+ * "@(#) $Id: Types.java,v 1.5 2010-06-01 15:56:03 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/05/27 14:44:07  bourgesl
+ * javadoc
+ *
  * Revision 1.3  2010/05/03 14:26:51  bourgesl
  * getDataType(Class) supports both Object and primitive types
  *
@@ -25,6 +28,8 @@ package fr.jmmc.oitools.meta;
  *   - 'E' : real    (32 bits)
  *   - 'D' : double  (64 bits)
  *   - 'L' : logical (true/false)
+ * We added the complex type (VISDATA) :
+ *   - 'C' : complex (2 float values)
  * @author bourgesl
  */
 public enum Types {
@@ -38,7 +43,9 @@ public enum Types {
   /** double data type */
   TYPE_DBL('D'),
   /** logical data type */
-  TYPE_LOGICAL('L');
+  TYPE_LOGICAL('L'),
+  /** complex data type */
+  TYPE_COMPLEX('C');
 
   /**
    * Custom constructor
