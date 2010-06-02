@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriterTest.java,v 1.2 2010-06-02 11:52:27 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriterTest.java,v 1.3 2010-06-02 15:23:53 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/06/02 11:52:27  bourgesl
+ * use logger instead of System.out
+ *
  * Revision 1.1  2010/05/28 14:57:45  bourgesl
  * first attempt to write OIFits from a loaded OIFitsFile structure
  *
@@ -15,7 +18,9 @@ package fr.jmmc.oitools.test;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.jmmc.oitools.model.OITableUtils;
 import fr.jmmc.oitools.test.fits.TamFitsTest;
+import java.io.File;
 import java.util.logging.Level;
 
 /**
@@ -23,6 +28,9 @@ import java.util.logging.Level;
  * @author bourgesl
  */
 public class OIFitsWriterTest implements TestEnv {
+
+  /** flag to compare raw fits files */
+  private final static boolean COMPARE_FITS = false;
 
   /**
    * Forbidden constructor
@@ -43,13 +51,13 @@ public class OIFitsWriterTest implements TestEnv {
 //      final String file = TEST_DIR + "other/YSO_disk.fits.gz";
 
       // Complex visibilities in VISDATA / VISERR (OI_VIS table) :
-      final String fileSrc = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39";
-      final String ext = ".fits";
+//      final String fileSrc = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39";
+//      final String ext = ".fits";
 
       // 1 extra byte at the End of file + NaN in vis* data :
       // missing TEL_NAME (empty values) :
-//      final String fileSrc = TEST_DIR + "Mystery-Med_H-AmberVISPHI";
-//      final String ext = ".oifits.gz";
+      final String fileSrc = TEST_DIR + "Mystery-Med_H-AmberVISPHI";
+      final String ext = ".oifits.gz";
 
       // Single Wave Length => NWAVE = 1 => 1D arrays instead of 2D arrays :
 //      final String file = TEST_DIR + "2004-data2.fits";
@@ -59,25 +67,63 @@ public class OIFitsWriterTest implements TestEnv {
 //      final String ext = ".oifits";
 
       n++;
-      OIFitsFile oiFitsFile = load(fileSrc + ext);
-      if (oiFitsFile == null) {
+      final OIFitsFile srcOIFitsFile = load(fileSrc + ext);
+      if (srcOIFitsFile == null) {
         errors++;
       } else {
         final String fileTo = fileSrc + "-copy.oifits";
 
-        errors += write(fileTo, oiFitsFile);
+        errors += write(fileTo, srcOIFitsFile);
 
         // verify and check :
-        oiFitsFile = load(fileTo);
-        if (oiFitsFile == null) {
+        final OIFitsFile destOIFitsFile = load(fileTo);
+        if (destOIFitsFile == null) {
+          errors++;
+        } else if (!OITableUtils.compareOIFitsFile(srcOIFitsFile, destOIFitsFile)) {
           errors++;
         }
 
-        // compare fits files :
-        if (!TamFitsTest.compareFile(fileSrc + ext, fileTo)) {
+        // compare fits files at fits level (header / data) :
+        if (COMPARE_FITS && !TamFitsTest.compareFile(fileSrc + ext, fileTo)) {
           errors++;
         }
+      }
+    }
 
+    if (false) {
+      final File directory = new File(TEST_DIR);
+      if (directory.exists() && directory.isDirectory()) {
+
+        final long start = System.nanoTime();
+
+        final File[] files = directory.listFiles();
+
+        for (File f : files) {
+          if (f.isFile() && (f.getName().endsWith("fits") || f.getName().endsWith("fits.gz"))) {
+            n++;
+
+            final String fileSrc = f.getAbsolutePath();
+            final String fileTo = COPY_DIR + f.getName().replaceFirst("\\.", "-copy.").replaceFirst("\\.gz", "");
+
+            final OIFitsFile srcOIFitsFile = load(fileSrc);
+            if (srcOIFitsFile == null) {
+              errors++;
+            } else {
+
+              errors += write(fileTo, srcOIFitsFile);
+
+              // verify and check :
+              final OIFitsFile destOIFitsFile = load(fileTo);
+              if (destOIFitsFile == null) {
+                errors++;
+              } else if (!OITableUtils.compareOIFitsFile(srcOIFitsFile, destOIFitsFile)) {
+                errors++;
+              }
+            }
+          }
+        }
+
+        logger.info("copyDirectory : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
       }
     }
 
