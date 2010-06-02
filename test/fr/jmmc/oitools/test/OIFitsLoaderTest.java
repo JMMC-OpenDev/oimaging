@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoaderTest.java,v 1.2 2010-06-01 16:03:55 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoaderTest.java,v 1.3 2010-06-02 11:52:27 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/06/01 16:03:55  bourgesl
+ * added specific test cases
+ *
  * Revision 1.1  2010/04/28 14:39:20  bourgesl
  * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
  *
@@ -15,6 +18,7 @@ package fr.jmmc.oitools.test;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import java.io.File;
+import java.util.logging.Level;
 
 /**
  * This class provides test cases for the OIFitsLoader class
@@ -33,7 +37,7 @@ public class OIFitsLoaderTest implements TestEnv {
     int n = 0;
     int errors = 0;
 
-    if (false) {
+    if (true) {
       // Bad File path :
 //      final String file = TEST_DIR + "toto";
 
@@ -53,7 +57,7 @@ public class OIFitsLoaderTest implements TestEnv {
       errors += load(file);
     }
 
-    if (true) {
+    if (false) {
       final File directory = new File(TEST_DIR);
       if (directory.exists() && directory.isDirectory()) {
 
@@ -68,37 +72,33 @@ public class OIFitsLoaderTest implements TestEnv {
           }
         }
 
-        System.out.println("dumpDirectory : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+        logger.info("dumpDirectory : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
       }
     }
 
-    System.out.println("Errors = " + errors + " on " + n + " files.");
+    logger.info("Errors = " + errors + " on " + n + " files.");
   }
 
   private static int load(final String absFilePath) {
     int error = 0;
     try {
-      System.out.println("Loading file : " + absFilePath);
+      logger.info("Loading file : " + absFilePath);
 
       final long start = System.nanoTime();
 
       final OIFitsFile oiFitsFile = OIFitsLoader.loadOIFits(absFilePath);
 
-      System.out.println("load : toString : \n" + oiFitsFile.toString());
+      logger.info("load : toString : \n" + oiFitsFile.toString());
 
       if (true) {
         final boolean detailled = false;
-        System.out.println("load : XML DESC : \n" + oiFitsFile.getXmlDesc(detailled));
+        logger.info("load : XML DESC : \n" + oiFitsFile.getXmlDesc(detailled));
       }
 
-      System.out.println("load : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+      logger.info("load : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
 
     } catch (Throwable th) {
-      System.out.println("load : IO failure occured while reading file : " + absFilePath);
-      th.printStackTrace(System.out);
-      if (th.getCause() != null) {
-        th.getCause().printStackTrace(System.out);
-      }
+      logger.log(Level.SEVERE, "load : IO failure occured while reading file : " + absFilePath, th);
       error = 1;
     }
     return error;

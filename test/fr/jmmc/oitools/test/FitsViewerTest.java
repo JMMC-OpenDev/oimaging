@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FitsViewerTest.java,v 1.2 2010-04-29 14:16:24 bourgesl Exp $"
+ * "@(#) $Id: FitsViewerTest.java,v 1.3 2010-06-02 11:52:27 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/04/29 14:16:24  bourgesl
+ * added a flag to choose between OIValidator or OITools viewer
+ *
  * Revision 1.1  2010/04/28 14:39:19  bourgesl
  * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
  *
@@ -15,6 +18,7 @@ package fr.jmmc.oitools.test;
 import fr.jmmc.oifits.visualizer.OifitsViewer;
 import fr.jmmc.oitools.OIFitsViewer;
 import java.io.File;
+import java.util.logging.Level;
 
 /**
  * This class contains test cases for the OIFitsViewer component
@@ -61,18 +65,18 @@ public class FitsViewerTest implements TestEnv {
           }
         }
 
-        System.out.println("dumpDirectory : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+        logger.info("dumpDirectory : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
 
       }
     }
-    System.out.println("Errors = " + errors + " on " + n + " files.");
+    logger.info("Errors = " + errors + " on " + n + " files.");
   }
 
   public static int dumpFile(final String absFilePath) {
     int error = 0;
 
     try {
-      System.out.println("Reading file : " + absFilePath);
+      logger.info("Reading file : " + absFilePath);
 
       final long start = System.nanoTime();
 
@@ -82,11 +86,10 @@ public class FitsViewerTest implements TestEnv {
         new OifitsViewer(absFilePath);
       }
 
-      System.out.println("dumpFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+      logger.info("dumpFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
 
     } catch (Throwable th) {
-      System.out.println("IO failure occured while reading file : " + absFilePath);
-      th.printStackTrace(System.out);
+      logger.log(Level.SEVERE, "IO failure occured while reading file : " + absFilePath, th);
       error = 1;
     }
     return error;
