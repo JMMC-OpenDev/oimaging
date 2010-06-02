@@ -1,11 +1,15 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriter.java,v 1.2 2010-05-31 15:56:17 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriter.java,v 1.3 2010-06-02 15:29:29 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/05/31 15:56:17  bourgesl
+ * fixed ordering of column keywords (TFORM, TTYPE, TUNIT)
+ * removed TDIM keywords
+ *
  * Revision 1.1  2010/05/28 14:57:45  bourgesl
  * first attempt to write OIFits from a loaded OIFitsFile structure
  *
@@ -17,8 +21,13 @@ import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
+import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTable;
 import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Data;
@@ -70,13 +79,16 @@ public class OIFitsWriter {
   }
 
   /**
-   * Write the OI Fits data model into the given file
+   * Write the OI Fits data model into the given file.
+   *
+   * Note : This method supposes that the OI Fits data model was checked previously
+   * i.e. no column is null and values respect the OIFits standard (length, cardinality ...)
+   *
    * @param absFilePath absolute File path on file system (not URL)
    * @throws FitsException if any FITS error occured
    * @throws IOException IO failure
    */
   private void write(final String absFilePath) throws FitsException, IOException {
-
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("writing " + absFilePath);
     }
@@ -105,7 +117,8 @@ public class OIFitsWriter {
       }
 
     } catch (FitsException fe) {
-      logger.log(Level.SEVERE, "write failed ", fe);
+      logger.log(Level.SEVERE, "Unable to write the file : " + absFilePath, fe);
+
       throw fe;
     } finally {
       if (bf != null) {
@@ -123,95 +136,117 @@ public class OIFitsWriter {
    */
   private void createHDUnits(final Fits fitsFile) throws FitsException, IOException {
     for (OITable oiTable : this.oiFitsFile.getOITableList()) {
-      createBinaryTable(fitsFile, oiTable);
+      // add HDU to the fits file :
+      fitsFile.addHDU(createBinaryTable(oiTable));
     }
   }
 
   /**
    * Create a binary table HDU using the given OI table
-   * @param fitsFile fits file
    * @param table OI table
    * @throws FitsException if any FITS error occured
    * @throws IOException IO failure
+   * @return binary table HDU
    */
-  private void createBinaryTable(final Fits fitsFile, final OITable table) throws FitsException, IOException {
-
+  private BasicHDU createBinaryTable(final OITable table) throws FitsException, IOException {
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("createBinaryTable : " + table.toString());
     }
 
-    final int nbCols = table.getNbColumns();
-
     // Get Column descriptors :
     final Collection<ColumnMeta> columnsDesc = table.getColumnDescCollection();
 
-    // Prepare data to create HDU :
-    final Object[] data = new Object[nbCols];
+    // data list containing column data (not null) :
+    final List<Object> dataList = new ArrayList<Object>(columnsDesc.size());
+    // index map storing the column index keyed by column name :
+    final Map<String, Integer> columnIndex = new HashMap<String, Integer>();
 
+    // backup of modified String keyed by column name :
+    final Map<String, String> backupString = new HashMap<String, String>();
+
+    // define both data list and index map :
     int i = 0;
+    Integer idx;
+    Object value;
     for (ColumnMeta column : columnsDesc) {
-      data[i++] = table.getColumnValue(column.getName());
-    }
+      value = table.getColumnValue(column.getName());
 
-    // test complex data :
-/*
-    final float[] complex = new float[] { 0.5f, 1f};
+      if (value != null) {
+        // fix string length to have correct header length ('0A' issue) :
+        if (column.getDataType() == Types.TYPE_CHAR) {
+          final String[] values = (String[]) value;
+          if (values.length > 0) {
+            String val = values[0];
 
-    final int len = table.getNbRows();
+            // backup that string to restore it after HDU creation :
+            backupString.put(column.getName(), val);
 
-    final float[][] complexCol = new float[len][2];
-    data[i] = complexCol;
-
-    for (i = 0; i < len; i++) {
-    complexCol[i] = complex;
-    }
-     */
-
-    // fix string length to have correct header length ('0A' issue) :
-
-    // TODO : use a dedicated method to fix string length :
-    i = 0;
-    for (ColumnMeta column : columnsDesc) {
-      if (column.getDataType() == Types.TYPE_CHAR) {
-        final String[] values = (String[]) data[i];
-        if (values.length > 0) {
-          while (values[0].length() < column.getRepeat()) {
-            values[0] = values[0] + " ";
+            while (val.length() < column.getRepeat()) {
+              val += " ";
+            }
+            // set the first value of a character column to its maximum length :
+            values[0] = val;
           }
         }
+
+        // add column value in use :
+        dataList.add(value);
+        // column index corresponds to the position in the data list :
+        columnIndex.put(column.getName(), Integer.valueOf(i));
+        i++;
       }
-      i++;
     }
 
-    // create HDU from data :
-//    final BinaryTableHDU hdu = (BinaryTableHDU)Fits.makeHDU(data);
+    // Prepare the binary table to create HDU :
+    final Data fitsData = new BinaryTable(dataList.toArray());
 
-    // equivalent to :
-    final Data fitsData = new BinaryTable(data);
-
-    // automatic header generation :
+    // Generate the header from the binary table :
     final Header header = BinaryTableHDU.manufactureHeader(fitsData);
 
+    // create HDU :
     final BinaryTableHDU hdu = new BinaryTableHDU(header, fitsData);
 
-    // Define column headers :
-    i = 0;
-    for (ColumnMeta column : columnsDesc) {
-
-      if (logger.isLoggable(Level.FINE)) {
-        logger.fine("COLUMN [" + column.getName() + "] [" + hdu.getColumnLength(i) + " " + hdu.getColumnType(i) + "]");
-      }
-
-      hdu.setColumnName(i, column.getName(), column.getDescription(), column.getUnits().getStandardRepresentation());
-
-      i++;
+    // Restore String data :
+    for (Map.Entry<String, String> e : backupString.entrySet()) {
+      // restore in OI Table the initial string value :
+      table.getColumnString(e.getKey())[0] = e.getValue();
     }
 
-    // Add keywords :
+    // Finalize Header :
+
+    // Define column information (name, description, unit) :
+    for (ColumnMeta column : columnsDesc) {
+      idx = columnIndex.get(column.getName());
+
+      // column in use :
+      if (idx != null) {
+        i = idx.intValue();
+
+        if (logger.isLoggable(Level.FINE)) {
+          logger.fine("COLUMN [" + column.getName() + "] [" + hdu.getColumnLength(i) + " " + hdu.getColumnType(i) + "]");
+        }
+        hdu.setColumnName(i, column.getName(), column.getDescription(), column.getUnits().getStandardRepresentation());
+      }
+    }
+
+    // Add keywords after column definition in the header :
     processKeywords(header, table);
 
-    // add HDU :
-    fitsFile.addHDU(hdu);
+    // Fix header for Fits complex columns :
+    for (ColumnMeta column : columnsDesc) {
+      if (column.getDataType() == Types.TYPE_COMPLEX) {
+        idx = columnIndex.get(column.getName());
+
+        // column in use :
+        if (idx != null) {
+          i = idx.intValue();
+
+          // change the 2D float column to complex type :
+          hdu.setColumnComplex(i);
+        }
+      }
+    }
+    return hdu;
   }
 
   /**
