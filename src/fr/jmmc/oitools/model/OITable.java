@@ -1,11 +1,15 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.6 2010-06-01 16:00:31 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.7 2010-06-02 15:27:44 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  2010/06/01 16:00:31  bourgesl
+ * added complex type support
+ * added tests for optional columns
+ *
  * Revision 1.5  2010/05/28 14:57:05  bourgesl
  * simplified descriptors & values iteration
  *
@@ -292,7 +296,7 @@ public class OITable extends ModelBase {
    * Return the Map storing column definitions
    * @return Map storing column definitions
    */
-  private final Map<String, ColumnMeta> getColumnsDesc() {
+  protected final Map<String, ColumnMeta> getColumnsDesc() {
     return this.columnsDesc;
   }
 
@@ -324,7 +328,7 @@ public class OITable extends ModelBase {
    * Return the Map storing column values
    * @return Map storing column values
    */
-  private final Map<String, Object> getColumnsValue() {
+  protected final Map<String, Object> getColumnsValue() {
     return this.columnsValue;
   }
 
