@@ -1,11 +1,15 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: TamFitsTest.java,v 1.2 2010-06-02 11:52:50 bourgesl Exp $"
+ * "@(#) $Id: TamFitsTest.java,v 1.3 2010-06-02 15:24:40 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/06/02 11:52:50  bourgesl
+ * use logger instead of System.out
+ * several fixes in compareFile(source, copy)
+ *
  * Revision 1.1  2010/04/28 14:41:13  bourgesl
  * Test cases for nom.tam fits 1.04 + patchs (complex, header utility methods) to load many OI fits files (oidata folder)
  *
@@ -351,7 +355,7 @@ public class TamFitsTest implements TestEnv {
   }
 
   public static boolean compareFile(final String absSrcPath, final String absDestPath) {
-    boolean res = false;
+    boolean res = true;
 
     try {
       logger.info("Comparing files : " + absSrcPath + ", " + absDestPath);
@@ -377,9 +381,9 @@ public class TamFitsTest implements TestEnv {
             logger.info("ERROR:  different type of hdu " + sH.getClass() + " <> " + dH.getClass());
           } else {
             if (sH instanceof BinaryTableHDU) {
-              res = compareHDU((BinaryTableHDU) sH, (BinaryTableHDU) dH);
+              res &= compareHDU((BinaryTableHDU) sH, (BinaryTableHDU) dH);
             } else {
-              res = compareHDU(sH, dH);
+              res &= compareHDU(sH, dH);
             }
           }
         }
@@ -402,7 +406,7 @@ public class TamFitsTest implements TestEnv {
     // Headers :
     boolean res = compareHeader(sH.getHeader(), dH.getHeader());
 
-    res = compareData(sH, dH);
+    res &= compareData(sH, dH);
 
     return res;
   }
