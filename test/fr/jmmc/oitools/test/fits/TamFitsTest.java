@@ -1,18 +1,23 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: TamFitsTest.java,v 1.1 2010-04-28 14:41:13 bourgesl Exp $"
+ * "@(#) $Id: TamFitsTest.java,v 1.2 2010-06-02 11:52:50 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:41:13  bourgesl
+ * Test cases for nom.tam fits 1.04 + patchs (complex, header utility methods) to load many OI fits files (oidata folder)
+ *
  */
 package fr.jmmc.oitools.test.fits;
 
+import fr.jmmc.oitools.test.TestEnv;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.logging.Level;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTable;
 import nom.tam.fits.BinaryTableHDU;
@@ -28,19 +33,22 @@ import nom.tam.util.BufferedFile;
  * This class makes several tests on nom.tam fits library
  * @author bourgesl
  */
-public class TamFitsTest {
+public class TamFitsTest implements TestEnv {
 
-  /** folder containing oidata test files. By default $home/oidata/ */
-  private final static String TEST_DIR = System.getProperty("user.home") + "/oidata/";
   /** flag to disable infoFile() */
   private final static boolean INFO_ENABLE = false;
   /** flag to test complex data bug */
-  private final static boolean TEST_COMPLEX_BUG = true;
+  private final static boolean TEST_COMPLEX_BUG = false;
   /** flag to dump column content */
   private final static boolean PRINT_COL = false;
+  /** flag to compare keyword comments */
+  private final static boolean COMPARE_KEYWORD_COMMENTS = false;
   /** flag to enable HIERARCH keyword support */
   private final static boolean USE_HIERARCH_FITS_KEYWORDS = true;
 
+  /**
+   * Forbidden constructor
+   */
   private TamFitsTest() {
     super();
   }
@@ -53,19 +61,20 @@ public class TamFitsTest {
 
     if (false) {
       // 1 extra byte at the End of file :
-      final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI.oifits.gz";
+//      final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI.oifits.gz";
+      final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI-copy.oifits";
       errors += infoFile(file);
       errors += dumpFile(file);
     }
 
 
-    if (false) {
+    if (true) {
       // Complex Data (VISDATA) :
 
       // VISDATA is full of [0.0 0.0]
       //    dumpFile(TEST_DIR + "Theta1Ori2007Dec05_2.fits");
 
-      final String file = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39.fits";
+      final String file = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39-copy.oifits";
       errors += infoFile(file);
       errors += dumpFile(file);
     }
@@ -77,11 +86,11 @@ public class TamFitsTest {
       copyFile(src, dest);
 
       if (!compareFile(src, dest)) {
-        errors += 1;
+        errors++;
       }
     }
 
-    if (true) {
+    if (false) {
       final File directory = new File(TEST_DIR);
       if (directory.exists() && directory.isDirectory()) {
 
@@ -96,10 +105,10 @@ public class TamFitsTest {
           }
         }
 
-        System.out.println("dumpDirectory : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+        logger.info("dumpDirectory : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
       }
     }
-    System.out.println("Errors = " + errors);
+    logger.info("Errors = " + errors);
   }
 
   public static int infoFile(final String absFilePath) {
@@ -109,7 +118,7 @@ public class TamFitsTest {
     int error = 0;
 
     try {
-      System.out.println("Reading file : " + absFilePath);
+      logger.info("Reading file : " + absFilePath);
 
       final long start = System.nanoTime();
 
@@ -123,11 +132,11 @@ public class TamFitsTest {
         h = f.readHDU();
         if (h != null) {
           if (i == 0) {
-            System.out.println("\n\nPrimary header:\n");
+            logger.info("\n\nPrimary header:\n");
           } else {
-            System.out.println("\n\nExtension " + i + ":\n");
+            logger.info("\n\nExtension " + i + ":\n");
           }
-          i += 1;
+          i++;
 
           h.info();
 
@@ -142,14 +151,10 @@ public class TamFitsTest {
         }
       } while (h != null);
 
-      System.out.println("infoFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+      logger.info("infoFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
 
     } catch (Throwable th) {
-      System.out.println("infoFile : IO failure occured while reading file : " + absFilePath);
-      th.printStackTrace(System.out);
-      if (th.getCause() != null) {
-        th.getCause().printStackTrace(System.out);
-      }
+      logger.log(Level.SEVERE, "infoFile : IO failure occured while reading file : " + absFilePath, th);
       error = 1;
     }
     return error;
@@ -168,12 +173,12 @@ public class TamFitsTest {
 
       res = bt.getFlattenedColumn(idx);
       if (PRINT_COL) {
-        System.out.println("VISDATA (flat) = " + arrayToString(res));
+        logger.info("VISDATA (flat) = " + arrayToString(res));
       }
 
       res = bh.getColumn(idx);
       if (PRINT_COL) {
-        System.out.println("VISDATA (curl) = " + arrayToString(res));
+        logger.info("VISDATA (curl) = " + arrayToString(res));
       }
     }
   }
@@ -181,7 +186,7 @@ public class TamFitsTest {
   private static int dumpFile(final String absFilePath) {
     int error = 0;
 
-    System.out.println("Dump file : " + absFilePath);
+    logger.info("Dump file : " + absFilePath);
 
     final StringBuilder sb = new StringBuilder(16384);
 
@@ -208,15 +213,14 @@ public class TamFitsTest {
       }
 
     } catch (Throwable th) {
-      System.out.println("dumpFile : failure occured while dumping file : " + absFilePath);
-      th.printStackTrace(System.out);
+      logger.log(Level.SEVERE, "dumpFile : failure occured while dumping file : " + absFilePath, th);
       error = 1;
     } finally {
       final long end = System.nanoTime();
 
-      System.out.println(sb.toString());
-      System.out.println("buffer len = " + sb.length());
-      System.out.println("dumpFile : duration = " + 1e-6d * (end - start) + " ms.");
+      logger.info(sb.toString());
+      logger.info("buffer len = " + sb.length());
+      logger.info("dumpFile : duration = " + 1e-6d * (end - start) + " ms.");
     }
 
     return error;
@@ -237,7 +241,9 @@ public class TamFitsTest {
     final String sExtName = sHeader.getTrimmedStringValue("EXTNAME");
 
     sb.append("--------------------------------------------------------------------------------\n");
-    sb.append("EXTNAME = ").append(sExtName).append("\n");
+    if (sExtName != null) {
+      sb.append("EXTNAME = ").append(sExtName).append("\n");
+    }
 
     final int sCard = sHeader.getNumberOfCards();
 
@@ -258,7 +264,11 @@ public class TamFitsTest {
       if (sHc.getValue() != null) {
         sb.append("'").append(sHc.getValue()).append("'");
       }
-      sb.append("\t// ").append(sHc.getComment()).append("\n");
+      sb.append("\t// ");
+      if (sHc.getComment() != null) {
+        sb.append(sHc.getComment());
+      }
+      sb.append("\n");
     }
   }
 
@@ -307,7 +317,7 @@ public class TamFitsTest {
 
     BufferedFile bf = null;
     try {
-      System.out.println("Copying file : " + absSrcPath + " to " + absDestPath);
+      logger.info("Copying file : " + absSrcPath + " to " + absDestPath);
 
       final long start = System.nanoTime();
 
@@ -322,19 +332,17 @@ public class TamFitsTest {
       bf.close();
       bf = null;
 
-      System.out.println("copyFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+      logger.info("copyFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
 
     } catch (Exception e) {
-      System.out.println("copyFile : IO failure occured while copying file : " + absSrcPath);
-      e.printStackTrace(System.out);
+      logger.log(Level.SEVERE, "copyFile : IO failure occured while copying file : " + absSrcPath, e);
       error = 1;
     } finally {
       if (bf != null) {
         try {
           bf.close();
         } catch (IOException ioe) {
-          System.out.println("copyFile : IO failure occured while closing file : " + absDestPath);
-          ioe.printStackTrace(System.out);
+          logger.log(Level.SEVERE, "copyFile : IO failure occured while closing file : " + absDestPath, ioe);
           error = 1;
         }
       }
@@ -342,11 +350,11 @@ public class TamFitsTest {
     return error;
   }
 
-  private static boolean compareFile(final String absSrcPath, final String absDestPath) {
+  public static boolean compareFile(final String absSrcPath, final String absDestPath) {
     boolean res = false;
 
     try {
-      System.out.println("Comparing files : " + absSrcPath + ", " + absDestPath);
+      logger.info("Comparing files : " + absSrcPath + ", " + absDestPath);
 
       final Fits s = new Fits(absSrcPath);
       final Fits d = new Fits(absDestPath);
@@ -355,10 +363,10 @@ public class TamFitsTest {
       final BasicHDU[] dHdu = d.read();
 
       if (sHdu.length != dHdu.length) {
-        System.out.println("ERROR:  different number of hdu " + sHdu.length + " <> " + dHdu.length);
+        logger.info("ERROR:  different number of hdu " + sHdu.length + " <> " + dHdu.length);
       } else {
         final int len = sHdu.length;
-        System.out.println("HDUs = " + len);
+        logger.info("HDUs = " + len);
 
         BasicHDU sH, dH;
         for (int i = 0; i < len; i++) {
@@ -366,7 +374,7 @@ public class TamFitsTest {
           dH = dHdu[i];
 
           if (sH.getClass() != dH.getClass()) {
-            System.out.println("ERROR:  different type of hdu " + sH.getClass() + " <> " + dH.getClass());
+            logger.info("ERROR:  different type of hdu " + sH.getClass() + " <> " + dH.getClass());
           } else {
             if (sH instanceof BinaryTableHDU) {
               res = compareHDU((BinaryTableHDU) sH, (BinaryTableHDU) dH);
@@ -378,8 +386,7 @@ public class TamFitsTest {
       }
 
     } catch (Throwable th) {
-      System.out.println("compareFile : failure occured while comparing files : " + absSrcPath + ", " + absDestPath);
-      th.printStackTrace(System.out);
+      logger.log(Level.SEVERE, "compareFile : failure occured while comparing files : " + absSrcPath + ", " + absDestPath, th);
       res = false;
     }
 
@@ -407,53 +414,63 @@ public class TamFitsTest {
     final String dExtName = dHeader.getTrimmedStringValue("EXTNAME");
 
     if (sExtName != null && !sExtName.equals(dExtName)) {
-      System.out.println("ERROR:  different extension name " + sExtName + " <> " + dExtName);
+      logger.info("ERROR:  different extension name " + sExtName + " <> " + dExtName);
       res = false;
     } else {
-      System.out.println("--------------------------------------------------------------------------------");
-      System.out.println("EXTNAME = " + sExtName);
+      logger.info("--------------------------------------------------------------------------------");
+      logger.info("EXTNAME = " + sExtName);
 
       final int sCard = sHeader.getNumberOfCards();
       final int dCard = dHeader.getNumberOfCards();
 
       if (sCard != dCard) {
-        System.out.println("ERROR:  different number of header card " + sCard + " <> " + dCard);
+        logger.info("ERROR:  different number of header card " + sCard + " <> " + dCard);
         res = false;
-      } else {
-        System.out.println("KEYWORDS = " + sCard);
+      }
+      logger.info("KEYWORDS = " + sCard);
 
-        HeaderCard sHc, dHc;
-        String key;
-        for (Iterator<?> it = sHeader.iterator(); it.hasNext();) {
-          sHc = (HeaderCard) it.next();
+      HeaderCard sHc, dHc;
+      String key;
+      for (Iterator<?> it = sHeader.iterator(); it.hasNext();) {
+        sHc = (HeaderCard) it.next();
 
-          key = sHc.getKey();
+        key = sHc.getKey();
 
-          if ("END".equals(key)) {
-            break;
-          }
+        if ("END".equals(key)) {
+          break;
+        }
 
-          dHc = dHeader.findCard(key);
+        dHc = dHeader.findCard(key);
 
-          if (dHc == null) {
-            System.out.println("ERROR:  Missing header card " + key);
-            res = false;
-          } else {
-            System.out.println("KEYWORD " + key + " = " + (sHc.getValue() != null ? "'" + sHc.getValue() + "'" : "") + "\t// " + sHc.getComment());
+        if (dHc == null) {
+          logger.info("ERROR:  Missing header card " + key);
+          res = false;
+        } else {
+          logger.info("KEYWORD " + key + " = " + (sHc.getValue() != null ? "'" + sHc.getValue() + "'" : "") + "\t// " + sHc.getComment());
 
-            if (!sHc.getValue().equals(dHc.getValue())) {
-              System.out.println("ERROR:  different value   of header card[" + key + "] '" + sHc.getValue() + "' <> '" + dHc.getValue() + "'");
-              res = false;
-            } else if (!sHc.getComment().trim().equals(dHc.getComment().trim())) {
-              System.out.println("ERROR:  different comment of header card[" + key + "] '" + sHc.getComment() + "' <> '" + dHc.getComment() + "'");
+          if (!sHc.getValue().equals(dHc.getValue())) {
+
+            if (key.startsWith("TUNIT")) {
+              logger.info("WARNING:  different value   of header card[" + key + "] '" + sHc.getValue() + "' <> '" + dHc.getValue() + "'");
+            } else if (key.startsWith("TFORM") && ("1" + sHc.getValue()).equals(dHc.getValue())) {
+              logger.info("INFO:  different value   of header card[" + key + "] '" + sHc.getValue() + "' <> '" + dHc.getValue() + "'");
+            } else {
+              logger.info("ERROR:  different value   of header card[" + key + "] '" + sHc.getValue() + "' <> '" + dHc.getValue() + "'");
               res = false;
             }
+          } else if (COMPARE_KEYWORD_COMMENTS && isChanged(sHc.getComment(), dHc.getComment())) {
+            logger.info("ERROR:  different comment of header card[" + key + "] '" + sHc.getComment() + "' <> '" + dHc.getComment() + "'");
+            res = false;
           }
         }
       }
     }
 
     return res;
+  }
+
+  private static boolean isChanged(final String value1, final String value2) {
+    return (value1 == null && value2 != null) || (value1 != null && value2 == null) || (value1 != null && value2 != null && !value1.trim().equalsIgnoreCase(value2.trim()));
   }
 
   private static boolean compareData(final BinaryTableHDU sH, final BinaryTableHDU dH) throws FitsException {
@@ -467,20 +484,20 @@ public class TamFitsTest {
     final int dCol = dData.getNCols();
 
     if (sCol != dCol) {
-      System.out.println("ERROR:  different number of columns " + sCol + " <> " + dCol);
+      logger.info("ERROR:  different number of columns " + sCol + " <> " + dCol);
       res = false;
     } else {
-      System.out.println("--------------------------------------------------------------------------------");
-      System.out.println("NCOLS = " + sCol);
+      logger.info("--------------------------------------------------------------------------------");
+      logger.info("NCOLS = " + sCol);
 
       final int sRow = sData.getNRows();
       final int dRow = dData.getNRows();
 
       if (sCol != dCol) {
-        System.out.println("ERROR:  different number of rows " + sRow + " <> " + dRow);
+        logger.info("ERROR:  different number of rows " + sRow + " <> " + dRow);
         res = false;
       } else {
-        System.out.println("NROWS = " + sRow);
+        logger.info("NROWS = " + sRow);
 
         Object sArray, dArray;
         for (int i = 0; i < sCol; i++) {
@@ -491,13 +508,13 @@ public class TamFitsTest {
           dArray = dData.getFlattenedColumn(i);
            */
           if (!ArrayFuncs.arrayEquals(sArray, dArray)) {
-            System.out.println("ERROR:  different values for column[" + sH.getColumnName(i) + "]\nSRC=" + arrayToString(sArray) + "\nDST=" + arrayToString(dArray));
+            logger.info("ERROR:  different values for column[" + sH.getColumnName(i) + "]\nSRC=" + arrayToString(sArray) + "\nDST=" + arrayToString(dArray));
             res = false;
           } else {
             if (PRINT_COL) {
-              System.out.println("COLUMN " + sH.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray) + "\n" + arrayToString(sArray));
+              logger.info("COLUMN " + sH.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray) + "\n" + arrayToString(sArray));
             } else {
-              System.out.println("COLUMN " + sH.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray));
+              logger.info("COLUMN " + sH.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray));
             }
           }
         }
