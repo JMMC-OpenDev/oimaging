@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIData.java,v 1.5 2010-05-28 07:53:07 bourgesl Exp $"
+ * "@(#) $Id: OIData.java,v 1.6 2010-06-17 14:59:52 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/05/28 07:53:07  bourgesl
+ * unified code to compute spacial coords
+ *
  * Revision 1.4  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -102,11 +105,11 @@ public class OIData extends OITable {
   private OIWavelength oiWavelengthRef = null;
 
   /**
-   * OIData class contructor
+   * Protected OIData class contructor
    *
    * @param oifitsFile main OifitsFile
    */
-  public OIData(final OIFitsFile oifitsFile) {
+  protected OIData(final OIFitsFile oifitsFile) {
     super(oifitsFile);
 
     // since every class constructor of OI_VIS, OI_VIS2, OI_T3 calls super
