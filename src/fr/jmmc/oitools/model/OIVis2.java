@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIVis2.java,v 1.3 2010-05-28 07:53:07 bourgesl Exp $"
+ * "@(#) $Id: OIVis2.java,v 1.4 2010-06-17 15:01:56 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/28 07:53:07  bourgesl
+ * unified code to compute spacial coords
+ *
  * Revision 1.2  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -50,7 +53,7 @@ import fr.jmmc.oitools.meta.WaveColumnMeta;
 /**
  * Class for OI_VIS2 table.
  */
-public class OIVis2 extends OIData {
+public final class OIVis2 extends OIData {
 
   /** 
    * Public OIVis2 class constructor.

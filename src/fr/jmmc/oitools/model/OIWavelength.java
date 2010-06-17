@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIWavelength.java,v 1.5 2010-06-17 10:02:15 bourgesl Exp $"
+ * "@(#) $Id: OIWavelength.java,v 1.6 2010-06-17 15:01:56 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/17 10:02:15  bourgesl
+ * fixed string concat in string buffer usage
+ *
  * Revision 1.4  2010/05/28 07:58:29  bourgesl
  * removed Java 6 dependency in DecimalFormat constructor
  *
@@ -69,7 +72,7 @@ import java.util.Locale;
 /**
  * Class for OI_WAVELENGTH table.
  */
-public class OIWavelength extends OITable {
+public final class OIWavelength extends OITable {
 
   /* constants */
   /* static descriptors */
@@ -121,7 +124,7 @@ public class OIWavelength extends OITable {
    * Define the INSNAME keyword value
    * @param insName value of INSNAME keyword
    */
-  public final void setInsName(final String insName) {
+  public void setInsName(final String insName) {
     setKeyword(OIFitsConstants.KEYWORD_INSNAME, insName);
   }
 

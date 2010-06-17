@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITarget.java,v 1.3 2010-05-27 16:13:29 bourgesl Exp $"
+ * "@(#) $Id: OITarget.java,v 1.4 2010-06-17 15:01:56 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/27 16:13:29  bourgesl
+ * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
+ *
  * Revision 1.2  2010/04/29 15:47:02  bourgesl
  * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
  *
@@ -62,7 +65,7 @@ import fr.jmmc.oitools.meta.Units;
 /**
  * Class for OI_TARGET table.
  */
-public class OITarget extends OITable {
+public final class OITarget extends OITable {
 
   /* constants */
 
@@ -198,11 +201,9 @@ public class OITarget extends OITable {
    */
   public final short[] getTargetId() {
     final short[] data = getColumnShort(OIFitsConstants.COLUMN_TARGET_ID);
-
     if (data == null) {
       return EMPTY_SHORT_ARRAY;
     }
-
     return data;
   }
 

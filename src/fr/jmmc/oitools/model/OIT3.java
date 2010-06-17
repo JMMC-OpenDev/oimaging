@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIT3.java,v 1.4 2010-05-28 14:55:54 bourgesl Exp $"
+ * "@(#) $Id: OIT3.java,v 1.5 2010-06-17 15:01:56 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/05/28 14:55:54  bourgesl
+ * fixed bug in getSpacial()
+ *
  * Revision 1.3  2010/05/28 07:53:07  bourgesl
  * unified code to compute spacial coords
  *
@@ -54,7 +57,7 @@ import fr.jmmc.oitools.meta.WaveColumnMeta;
 /**
  * Class for OI_T3 table.
  */
-public class OIT3 extends OIData {
+public final class OIT3 extends OIData {
 
   /* static descriptors */
   /** U1COORD column descriptor */
