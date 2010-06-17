@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.7 2010-06-02 15:27:44 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.8 2010-06-17 15:01:12 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.7  2010/06/02 15:27:44  bourgesl
+ * private methods made protected
+ *
  * Revision 1.6  2010/06/01 16:00:31  bourgesl
  * added complex type support
  * added tests for optional columns
@@ -125,10 +128,10 @@ public class OITable extends ModelBase {
   private final Map<String, Object> columnsValue = new HashMap<String, Object>();
 
   /**
-   * Public OITable class constructor
+   * Protected OITable class constructor
    * @param oifitsFile main OifitsFile
    */
-  public OITable(final OIFitsFile oifitsFile) {
+  protected OITable(final OIFitsFile oifitsFile) {
     super();
     this.oifitsFile = oifitsFile;
 
@@ -495,9 +498,6 @@ public class OITable extends ModelBase {
     setKeywordInt(OIFitsConstants.KEYWORD_EXT_VER, extVer);
   }
 
-  /*
-   * TODO : see how to set keywords OI_REVN and NAXIS2
-   */
   /**
    * Get the OI_REVN keyword value
    * @return value of OI_REVN keyword
@@ -507,11 +507,27 @@ public class OITable extends ModelBase {
   }
 
   /**
-   * Return the number of rows
-   * @return the number of rows
+   * Define the OI_REVN keyword value
+   * @param oiRevn value of OI_REVN keyword
+   */
+  protected final void setOiRevn(final int oiRevn) {
+    setKeywordInt(OIFitsConstants.KEYWORD_OI_REVN, oiRevn);
+  }
+
+  /**
+   * Return the number of rows i.e. the Fits NAXIS2 keyword value
+   * @return the number of rows i.e. the Fits NAXIS2 keyword value
    */
   public final int getNbRows() {
     return getKeywordInt(OIFitsConstants.KEYWORD_NAXIS2);
+  }
+
+  /**
+   * Define the number of rows i.e. the Fits NAXIS2 keyword value
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  protected final void setNbRows(final int nbRows) {
+    setKeywordInt(OIFitsConstants.KEYWORD_NAXIS2, nbRows);
   }
 
   /* --- Other methods --- */
