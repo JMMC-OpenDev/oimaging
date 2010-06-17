@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIArray.java,v 1.5 2010-05-31 15:51:19 bourgesl Exp $"
+ * "@(#) $Id: OIArray.java,v 1.6 2010-06-17 15:02:27 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/05/31 15:51:19  bourgesl
+ * restored units in keywords used in xml output
+ *
  * Revision 1.4  2010/05/28 14:56:18  bourgesl
  * removed arrayXYZ unit which is now in description
  *
@@ -146,17 +149,96 @@ public final class OIArray extends OITable {
     return getKeyword(OIFitsConstants.KEYWORD_ARRNAME);
   }
 
+  /**
+   * Define the ARRNAME keyword value
+   * @param arrName value of ARRNAME keyword
+   */
+  public void setArrName(final String arrName) {
+    setKeyword(OIFitsConstants.KEYWORD_ARRNAME, arrName);
+  }
+
+  /**
+   * Get the value of FRAME keyword
+   * @return the value of FRAME keyword
+   */
+  public String getFrame() {
+    return getKeyword(OIFitsConstants.KEYWORD_FRAME);
+  }
+
+  /**
+   * Define the FRAME keyword value
+   * @param frame value of FRAME keyword
+   */
+  public void setFrame(final String frame) {
+    setKeyword(OIFitsConstants.KEYWORD_FRAME, frame);
+  }
+
+  /**
+   * Get the value of ARRAYX, ARRAYY, ARRAYZ keywords
+   * @return the value of ARRAYX, ARRAYY, ARRAYZ keywords
+   */
+  public double[] getArrayXYZ() {
+    return new double[]{
+              getKeywordDouble(OIFitsConstants.KEYWORD_ARRAY_X),
+              getKeywordDouble(OIFitsConstants.KEYWORD_ARRAY_Y),
+              getKeywordDouble(OIFitsConstants.KEYWORD_ARRAY_Z)};
+  }
+
+  /**
+   * Define the value of ARRAYX, ARRAYY, ARRAYZ keywords
+   * @param values value of ARRAYX, ARRAYY, ARRAYZ keywords
+   */
+  public void setArrayXYZ(final double[] values) {
+    if (values != null && values.length == 3) {
+      setKeywordDouble(OIFitsConstants.KEYWORD_ARRAY_X, values[0]);
+      setKeywordDouble(OIFitsConstants.KEYWORD_ARRAY_Y, values[1]);
+      setKeywordDouble(OIFitsConstants.KEYWORD_ARRAY_Z, values[2]);
+    }
+  }
+
   /* --- Columns --- */
   /**
-   * Get station indexes
-   * @return an integer array containing station indexes.
+   * Get TEL_NAME column.
+   * @return the array of TEL_NAME.
    */
-  public short[] getAcceptedStaIndexes() {
+  public final String[] getTelName() {
+    return getColumnString(OIFitsConstants.COLUMN_TEL_NAME);
+  }
+
+  /**
+   * Get STA_NAME column.
+   * @return the array of STA_NAME.
+   */
+  public final String[] getStaName() {
+    return getColumnString(OIFitsConstants.COLUMN_STA_NAME);
+  }
+
+  /**
+   * Return the STA_INDEX column.
+   * @return the STA_INDEX column i.e. an array containing station indexes.
+   */
+  public short[] getStaIndex() {
     final short[] data = getColumnShort(OIFitsConstants.COLUMN_STA_INDEX);
     if (data == null) {
       return EMPTY_SHORT_ARRAY;
     }
     return data;
+  }
+
+  /**
+   * Get DIAMETER column.
+   * @return the array of DIAMETER.
+   */
+  public final float[] getDiameter() {
+    return getColumnFloat(OIFitsConstants.COLUMN_DIAMETER);
+  }
+
+  /**
+   * Get STAXYZ column.
+   * @return the array of STAXYZ.
+   */
+  public double[][] getStaXYZ() {
+    return this.getColumnDoubles(OIFitsConstants.COLUMN_STA_XYZ);
   }
 
   /* --- Other methods --- */

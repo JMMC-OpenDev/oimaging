@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.3 2010-05-27 16:13:29 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.4 2010-06-17 15:02:27 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/27 16:13:29  bourgesl
+ * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
+ *
  * Revision 1.2  2010/04/29 15:47:01  bourgesl
  * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
  *
@@ -217,7 +220,7 @@ public final class OIFitsFile extends OIFits {
     if (oiArray == null) {
       return EMPTY_SHORT_ARRAY;
     }
-    return oiArray.getAcceptedStaIndexes();
+    return oiArray.getStaIndex();
   }
 
   /**
