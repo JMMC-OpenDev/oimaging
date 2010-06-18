@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: CellMeta.java,v 1.4 2010-05-28 14:56:29 bourgesl Exp $"
+ * "@(#) $Id: CellMeta.java,v 1.5 2010-06-18 15:41:26 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/05/28 14:56:29  bourgesl
+ * javadoc
+ *
  * Revision 1.3  2010/05/27 14:44:07  bourgesl
  * javadoc
  *
@@ -62,7 +65,7 @@ public class CellMeta {
 
   /** Logger associated to meta model classes */
   protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
-          "fr.jmmc.oitools.model");
+          "fr.jmmc.oitools.meta");
   /** no int accepted values */
   protected final static short[] NO_INT_VALUES = new short[0];
   /** no string accepted values */

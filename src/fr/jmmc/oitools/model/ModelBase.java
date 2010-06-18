@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: ModelBase.java,v 1.1 2010-04-28 14:47:37 bourgesl Exp $"
+ * "@(#) $Id: ModelBase.java,v 1.2 2010-06-18 15:41:26 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/04/28 14:47:37  bourgesl
+ * refactored OIValidator classes to represent the OIFits data model
+ *
  */
 package fr.jmmc.oitools.model;
 
@@ -16,9 +19,9 @@ package fr.jmmc.oitools.model;
 public class ModelBase {
   /* constants */
 
-  /** Logger associated to meta model classes */
+  /** Logger associated to model classes */
   protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
-          "fr.jmmc.oitools.meta");
+          "fr.jmmc.oitools.model");
 
   /** empty int array */
   protected final static short[] EMPTY_SHORT_ARRAY = new short[0];
