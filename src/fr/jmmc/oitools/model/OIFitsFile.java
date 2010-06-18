@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.4 2010-06-17 15:02:27 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.5 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/06/17 15:02:27  bourgesl
+ * added getter / setter methods for keywords and columns
+ *
  * Revision 1.3  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -130,7 +133,21 @@ public final class OIFitsFile extends OIFits {
   }
 
   /**
-   * Register OI_* tables.
+   * Add the given OI_* tables to this OIFitsFile structure
+   * @param oiTable new OI_* table
+   */
+  public void addOiTable(final OITable oiTable) {
+
+    // Prepare other fields :
+    // TODO
+    // ext number
+    // ext version
+
+    this.registerOiTable(oiTable);
+  }
+
+  /**
+   * Register valid OI_* tables (keyword and column values must be defined).
    * @param oiTable reference on one OI_* table
    */
   @Override
@@ -266,9 +283,9 @@ public final class OIFitsFile extends OIFits {
    */
   @Override
   public String toString() {
-    return "\nextNames:" + this.extNames +
-            "\narrNameToOiArray:" + this.arrNameToOiArray +
-            "\ninsNameToOiWavelength:" + this.insNameToOiWavelength + "\n";
+    return "\nextNames:" + this.extNames
+            + "\narrNameToOiArray:" + this.arrNameToOiArray
+            + "\ninsNameToOiWavelength:" + this.insNameToOiWavelength + "\n";
   }
 
   /**

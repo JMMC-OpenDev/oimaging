@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIVis.java,v 1.5 2010-06-17 15:01:56 bourgesl Exp $"
+ * "@(#) $Id: OIVis.java,v 1.6 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/17 15:01:56  bourgesl
+ * classes made final
+ *
  * Revision 1.4  2010/06/01 15:59:40  bourgesl
  * added added VISDATA / VISERR optional columns to store raw complex visibilities / error
  *
@@ -60,7 +63,7 @@ import fr.jmmc.oitools.meta.WaveColumnMeta;
 public final class OIVis extends OIData {
 
   /** 
-   * Public OIVis class constructor.
+   * Public OIVis class constructor
    * @param oifitsFile main OifitsFile
    */
   public OIVis(final OIFitsFile oifitsFile) {
@@ -102,6 +105,20 @@ public final class OIVis extends OIData {
 
     // FLAG  column definition
     addColumnMeta(new WaveColumnMeta(OIFitsConstants.COLUMN_FLAG, "flag", Types.TYPE_LOGICAL, this));
+  }
+
+  /**
+   * Public OIVis class constructor to create a new table
+   * @param oifitsFile main OifitsFile
+   * @param insName value of INSNAME keyword
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  public OIVis(final OIFitsFile oifitsFile, final String insName, final int nbRows) {
+    this(oifitsFile);
+
+    setInsName(insName);
+
+    this.initializeTable(nbRows);
   }
 
   /* --- Columns --- */

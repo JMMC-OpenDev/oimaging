@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITarget.java,v 1.4 2010-06-17 15:01:56 bourgesl Exp $"
+ * "@(#) $Id: OITarget.java,v 1.5 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/06/17 15:01:56  bourgesl
+ * classes made final
+ *
  * Revision 1.3  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -128,7 +131,7 @@ public final class OITarget extends OITable {
           "spectral type", Types.TYPE_CHAR, 16);
 
   /**
-   * Public OITarget class constructor.
+   * Public OITarget class constructor
    * @param oifitsFile main OifitsFile
    */
   public OITarget(final OIFitsFile oifitsFile) {
@@ -184,6 +187,17 @@ public final class OITarget extends OITable {
 
     // SPECTYP  column definition
     addColumnMeta(COLUMN_SPECTYP);
+  }
+
+  /**
+   * Public OITarget class constructor to create a new table
+   * @param oifitsFile main OifitsFile
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  public OITarget(final OIFitsFile oifitsFile, final int nbRows) {
+    this(oifitsFile);
+
+    this.initializeTable(nbRows);
   }
 
   /** 

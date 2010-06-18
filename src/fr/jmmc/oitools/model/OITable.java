@@ -1,11 +1,15 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.8 2010-06-17 15:01:12 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.9 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.8  2010/06/17 15:01:12  bourgesl
+ * protected constuctor
+ * added setter for OI_REVN / NAXIS2
+ *
  * Revision 1.7  2010/06/02 15:27:44  bourgesl
  * private methods made protected
  *
@@ -149,6 +153,95 @@ public class OITable extends ModelBase {
 
     // OI_REVN   keyword definition
     addKeywordMeta(KEYWORD_OI_REVN);
+  }
+
+  /**
+   * Initialize the table with minimal keywords and empty columns
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  protected final void initializeTable(final int nbRows) {
+    String extName = null;
+    if (this instanceof OITarget) {
+      extName = OIFitsConstants.TABLE_OI_TARGET;
+    } else if (this instanceof OIWavelength) {
+      extName = OIFitsConstants.TABLE_OI_WAVELENGTH;
+    } else if (this instanceof OIArray) {
+      extName = OIFitsConstants.TABLE_OI_ARRAY;
+    } else if (this instanceof OIVis) {
+      extName = OIFitsConstants.TABLE_OI_VIS;
+    } else if (this instanceof OIVis2) {
+      extName = OIFitsConstants.TABLE_OI_VIS2;
+    } else if (this instanceof OIT3) {
+      extName = OIFitsConstants.TABLE_OI_T3;
+    }
+    this.setExtName(extName);
+    this.setOiRevn(OIFitsConstants.KEYWORD_OI_REVN_1);
+    this.setNbRows(nbRows);
+
+    this.initializeColumnArrays(nbRows);
+  }
+
+  /**
+   * Initialize column arrays according to their format and nb rows (NAXIS2)
+   *
+   * TODO : test : VISDATA(complex type) with only 1 wavelength
+   *
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  private void initializeColumnArrays(final int nbRows) {
+    String name;    // column name
+    int repeat;     // repeat = row size
+    Types type;     // data type
+    Class<?> clazz; // base class
+    int ndims;      // number of dimensions
+    int[] dims;     // dimensions
+    Object value;   // array value
+
+    for (ColumnMeta column : getColumnDescCollection()) {
+      name = column.getName();
+
+      repeat = column.getRepeat();
+      type = column.getDataType();
+
+      if (logger.isLoggable(Level.FINE)) {
+        logger.fine("COLUMN [" + name + "] [" + repeat + column.getType() + "]");
+      }
+
+      // base class :
+      clazz = Types.getBaseClass(type);
+
+      // extract dimensions :
+      ndims = 1;
+      if (column.isArray() && type != Types.TYPE_CHAR) {
+        ndims++;
+      }
+      if (type == Types.TYPE_COMPLEX) {
+        ndims++;
+      }
+
+      dims = new int[ndims];
+
+      ndims = 0;
+      dims[ndims] = nbRows;
+      ndims++;
+
+      if (column.isArray() && type != Types.TYPE_CHAR) {
+        dims[ndims] = repeat;
+        ndims++;
+      }
+      if (type == Types.TYPE_COMPLEX) {
+        dims[ndims] = 2;
+      }
+
+      value = ArrayFuncs.newInstance(clazz, dims);
+
+      if (logger.isLoggable(Level.FINE)) {
+        logger.fine("column array = " + ArrayFuncs.arrayDescription(value));
+      }
+
+      // store key and value :
+      setColumnValue(name, value);
+    }
   }
 
   /**

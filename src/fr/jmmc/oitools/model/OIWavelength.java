@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIWavelength.java,v 1.6 2010-06-17 15:01:56 bourgesl Exp $"
+ * "@(#) $Id: OIWavelength.java,v 1.7 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  2010/06/17 15:01:56  bourgesl
+ * classes made final
+ *
  * Revision 1.5  2010/06/17 10:02:15  bourgesl
  * fixed string concat in string buffer usage
  *
@@ -87,7 +90,7 @@ public final class OIWavelength extends OITable {
           "effective bandpass of channel", Types.TYPE_REAL, Units.UNIT_METER);
 
   /** 
-   * Public OIWavelength class constructor.
+   * Public OIWavelength class constructor
    * @param oifitsFile main OifitsFile
    */
   public OIWavelength(final OIFitsFile oifitsFile) {
@@ -101,6 +104,17 @@ public final class OIWavelength extends OITable {
 
     // EFF_BAND  column definition
     addColumnMeta(COLUMN_EFF_BAND);
+  }
+
+  /**
+   * Public OIWavelength class constructor to create a new table
+   * @param oifitsFile main OifitsFile
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  public OIWavelength(final OIFitsFile oifitsFile, final int nbRows) {
+    this(oifitsFile);
+
+    this.initializeTable(nbRows);
   }
 
   /**

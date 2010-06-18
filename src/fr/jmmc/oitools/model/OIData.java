@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIData.java,v 1.6 2010-06-17 14:59:52 bourgesl Exp $"
+ * "@(#) $Id: OIData.java,v 1.7 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  2010/06/17 14:59:52  bourgesl
+ * protected constuctor
+ *
  * Revision 1.5  2010/05/28 07:53:07  bourgesl
  * unified code to compute spacial coords
  *
@@ -106,7 +109,6 @@ public class OIData extends OITable {
 
   /**
    * Protected OIData class contructor
-   *
    * @param oifitsFile main OifitsFile
    */
   protected OIData(final OIFitsFile oifitsFile) {
@@ -211,7 +213,7 @@ public class OIData extends OITable {
    * Define the INSNAME keyword value
    * @param insName value of INSNAME keyword
    */
-  public final void setInsName(final String insName) {
+  protected final void setInsName(final String insName) {
     setKeyword(OIFitsConstants.KEYWORD_INSNAME, insName);
     // reset cached reference :
     this.oiWavelengthRef = null;

@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIT3.java,v 1.5 2010-06-17 15:01:56 bourgesl Exp $"
+ * "@(#) $Id: OIT3.java,v 1.6 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/17 15:01:56  bourgesl
+ * classes made final
+ *
  * Revision 1.4  2010/05/28 14:55:54  bourgesl
  * fixed bug in getSpacial()
  *
@@ -74,7 +77,7 @@ public final class OIT3 extends OIData {
           "V coordinate of baseline BC of the triangle", Types.TYPE_DBL, Units.UNIT_METER);
 
   /** 
-   * Public OIT3 class constructor.
+   * Public OIT3 class constructor
    * @param oifitsFile main OifitsFile
    */
   public OIT3(final OIFitsFile oifitsFile) {
@@ -115,6 +118,20 @@ public final class OIT3 extends OIData {
 
     // FLAG  column definition
     addColumnMeta(new WaveColumnMeta(OIFitsConstants.COLUMN_FLAG, "flag", Types.TYPE_LOGICAL, this));
+  }
+
+  /**
+   * Public OIT3 class constructor to create a new table
+   * @param oifitsFile main OifitsFile
+   * @param insName value of INSNAME keyword
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  public OIT3(final OIFitsFile oifitsFile, final String insName, final int nbRows) {
+    this(oifitsFile);
+
+    setInsName(insName);
+
+    this.initializeTable(nbRows);
   }
 
   /* --- Columns --- */
@@ -204,8 +221,8 @@ public final class OIT3 extends OIData {
         double dist1 = Math.sqrt((u1coord[i] * u1coord[i]) + (v1coord[i] * v1coord[i]));
         double dist2 = Math.sqrt((u2coord[i] * u2coord[i]) + (v2coord[i] * v2coord[i]));
 
-        double u3 = - (u1coord[i] + u2coord[i]);
-        double v3 = - (v1coord[i] + v2coord[i]);
+        double u3 = -(u1coord[i] + u2coord[i]);
+        double v3 = -(v1coord[i] + v2coord[i]);
         double dist3 = Math.sqrt((u3 * u3) + (v3 * v3));
 
         double dist = Math.max(Math.max(dist1, dist2), dist3);

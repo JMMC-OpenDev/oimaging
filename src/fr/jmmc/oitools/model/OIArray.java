@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIArray.java,v 1.6 2010-06-17 15:02:27 bourgesl Exp $"
+ * "@(#) $Id: OIArray.java,v 1.7 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  2010/06/17 15:02:27  bourgesl
+ * added getter / setter methods for keywords and columns
+ *
  * Revision 1.5  2010/05/31 15:51:19  bourgesl
  * restored units in keywords used in xml output
  *
@@ -103,7 +106,7 @@ public final class OIArray extends OITable {
           "station coordinates relative to array center", Types.TYPE_DBL, 3, Units.UNIT_METER);
 
   /**
-   * Public OIArray class constructor.
+   * Public OIArray class constructor
    * @param oifitsFile main OifitsFile
    */
   public OIArray(final OIFitsFile oifitsFile) {
@@ -138,6 +141,17 @@ public final class OIArray extends OITable {
 
     // STAXYZ  column definition
     addColumnMeta(COLUMN_STA_XYZ);
+  }
+
+  /**
+   * Public OIArray class constructor to create a new table
+   * @param oifitsFile main OifitsFile
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  public OIArray(final OIFitsFile oifitsFile, final int nbRows) {
+    this(oifitsFile);
+
+    this.initializeTable(nbRows);
   }
 
   /* --- Keywords --- */

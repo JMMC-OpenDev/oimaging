@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIVis2.java,v 1.4 2010-06-17 15:01:56 bourgesl Exp $"
+ * "@(#) $Id: OIVis2.java,v 1.5 2010-06-18 15:42:36 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/06/17 15:01:56  bourgesl
+ * classes made final
+ *
  * Revision 1.3  2010/05/28 07:53:07  bourgesl
  * unified code to compute spacial coords
  *
@@ -56,7 +59,7 @@ import fr.jmmc.oitools.meta.WaveColumnMeta;
 public final class OIVis2 extends OIData {
 
   /** 
-   * Public OIVis2 class constructor.
+   * Public OIVis2 class constructor
    * @param oifitsFile main OifitsFile
    */
   public OIVis2(final OIFitsFile oifitsFile) {
@@ -85,6 +88,20 @@ public final class OIVis2 extends OIData {
 
     // FLAG  column definition
     addColumnMeta(new WaveColumnMeta(OIFitsConstants.COLUMN_FLAG, "flag", Types.TYPE_LOGICAL, this));
+  }
+
+  /**
+   * Public OIVis2 class constructor to create a new table
+   * @param oifitsFile main OifitsFile
+   * @param insName value of INSNAME keyword
+   * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   */
+  public OIVis2(final OIFitsFile oifitsFile, final String insName, final int nbRows) {
+    this(oifitsFile);
+
+    setInsName(insName);
+
+    this.initializeTable(nbRows);
   }
 
   /* --- Columns --- */
