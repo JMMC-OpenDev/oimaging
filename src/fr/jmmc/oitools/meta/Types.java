@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: Types.java,v 1.5 2010-06-01 15:56:03 bourgesl Exp $"
+ * "@(#) $Id: Types.java,v 1.6 2010-06-18 15:41:39 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/01 15:56:03  bourgesl
+ * added Complex type
+ *
  * Revision 1.4  2010/05/27 14:44:07  bourgesl
  * javadoc
  *
@@ -66,8 +69,32 @@ public enum Types {
   }
 
   /**
+   * Return the java class representation of the given data type
+   * @param type data type
+   * @return java class representation
+   */
+  public static Class<?> getBaseClass(final Types type) {
+    switch (type) {
+      case TYPE_CHAR:
+        return String.class;
+      case TYPE_DBL:
+        return double.class;
+      case TYPE_INT:
+        return short.class;
+      case TYPE_REAL:
+      case TYPE_COMPLEX:
+        return float.class;
+      case TYPE_LOGICAL:
+        return boolean.class;
+      default:
+        return null;
+    }
+  }
+
+  /**
    * Get the data type corresponding to the given value class
-   * Does not support an array value
+   * Does not support an array value and 
+   * does not guess Complex type (return TYPE_REAL)
    *
    * @param clazz value class
    *
