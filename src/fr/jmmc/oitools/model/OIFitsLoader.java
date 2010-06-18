@@ -1,11 +1,18 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.6 2010-06-01 16:02:25 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.7 2010-06-18 15:42:05 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  2010/06/01 16:02:25  bourgesl
+ * check if the given file does not exist
+ * check if a column is optional
+ * added complex type support
+ * added numeric type cross-conversions
+ * fixed bug on array dimensions if NWAVE = 1 i.e. 1D instead of 2D
+ *
  * Revision 1.5  2010/05/28 14:57:22  bourgesl
  * javadoc + minor refactoring
  *
@@ -435,7 +442,12 @@ public class OIFitsLoader {
 
         // read all data and convert them to arrays[][] :
         // parse column value :
-        value = parseColumn(column, hdu.getColumnType(idx), hdu.getColumnLength(idx), hdu.getColumnUnit(idx), hdu.getColumn(idx));
+        value = parseColumn(
+                column,
+                hdu.getColumnType(idx),
+                hdu.getColumnLength(idx),
+                hdu.getColumnUnit(idx),
+                hdu.getColumn(idx));
 
         // store key and value :
         if (value != null) {
@@ -475,8 +487,8 @@ public class OIFitsLoader {
       } else {
         if (columnType == Types.TYPE_CHAR.getRepresentation()) {
           if (columnRepeat < descRepeat) {
-            checker.warning("Invalid format for column '" + column.getName() + "', found '" + columnRepeat + columnType +
-                    "' should be '" + descRepeat + descType + "'");
+            checker.warning("Invalid format for column '" + column.getName() + "', found '" + columnRepeat + columnType
+                    + "' should be '" + descRepeat + descType + "'");
           } else if (columnRepeat > descRepeat) {
             severe = true;
           }
@@ -488,15 +500,15 @@ public class OIFitsLoader {
       }
 
       if (severe) {
-        checker.severe("Invalid format for column '" + column.getName() + "', found '" + columnRepeat + columnType +
-                "' should be '" + descRepeat + descType + "'");
+        checker.severe("Invalid format for column '" + column.getName() + "', found '" + columnRepeat + columnType
+                + "' should be '" + descRepeat + descType + "'");
       }
     } else {
       checker.warning("Can't check repeat for column '" + column.getName() + "'");
 
       if (columnType != descType) {
-        checker.severe("Invalid format for column '" + column.getName() + "', found '" + columnType +
-                "' should be '" + descType + "'");
+        checker.severe("Invalid format for column '" + column.getName() + "', found '" + columnType
+                + "' should be '" + descType + "'");
       }
     }
 
