@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriterTest.java,v 1.3 2010-06-02 15:23:53 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriterTest.java,v 1.4 2010-06-18 15:43:07 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/06/02 15:23:53  bourgesl
+ * added a test case which copy all OIFits files from oidata/ to oidata/copy and compare files
+ *
  * Revision 1.2  2010/06/02 11:52:27  bourgesl
  * use logger instead of System.out
  *
@@ -15,10 +18,18 @@
  */
 package fr.jmmc.oitools.test;
 
+import fr.jmmc.oitools.OIFitsConstants;
+import fr.jmmc.oitools.model.OIArray;
+import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.jmmc.oitools.model.OIT3;
 import fr.jmmc.oitools.model.OITableUtils;
+import fr.jmmc.oitools.model.OITarget;
+import fr.jmmc.oitools.model.OIVis;
+import fr.jmmc.oitools.model.OIVis2;
+import fr.jmmc.oitools.model.OIWavelength;
 import fr.jmmc.oitools.test.fits.TamFitsTest;
 import java.io.File;
 import java.util.logging.Level;
@@ -43,7 +54,7 @@ public class OIFitsWriterTest implements TestEnv {
     int n = 0;
     int errors = 0;
 
-    if (true) {
+    if (false) {
       // Bad File path :
 //      final String file = TEST_DIR + "toto";
 
@@ -88,6 +99,16 @@ public class OIFitsWriterTest implements TestEnv {
           errors++;
         }
       }
+    }
+
+    if (true) {
+      final String file = COPY_DIR + "test-create.oifits";
+      // create an oifits file :
+      create(file);
+      /*
+      final OIFitsFile loadOIFitsFile = load(file);
+      logger.info("create : XML DESC : \n" + loadOIFitsFile.getXmlDesc(true));
+       */
     }
 
     if (false) {
@@ -163,5 +184,131 @@ public class OIFitsWriterTest implements TestEnv {
       error = 1;
     }
     return error;
+  }
+
+  private static int create(final String absFilePath) {
+    int error = 0;
+    try {
+      logger.info("Creating file : " + absFilePath);
+
+      final long start = System.nanoTime();
+
+      final OIFitsFile oiFitsFile = new OIFitsFile();
+
+      fill(oiFitsFile);
+
+      logger.info("create : XML DESC : \n" + oiFitsFile.getXmlDesc(true));
+
+      final OIFitsChecker checker = new OIFitsChecker();
+      oiFitsFile.check(checker);
+
+      // validation results
+      logger.info("create : validation results\n" + checker.getCheckReport());
+
+      OIFitsWriter.writeOIFits(absFilePath, oiFitsFile);
+
+      logger.info("create : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
+
+    } catch (Throwable th) {
+      logger.log(Level.SEVERE, "create : IO failure occured while writing file : " + absFilePath, th);
+      error = 1;
+    }
+    return error;
+  }
+
+  private static void fill(final OIFitsFile oiFitsFile) {
+
+    final String arrName = "VLTI-like";
+    final String insName = "AMBER-like";
+
+    final OIArray array = new OIArray(oiFitsFile, 3);
+    array.setArrName(arrName);
+    array.setFrame(OIFitsConstants.KEYWORD_FRAME_GEOCENTRIC);
+    array.setArrayXYZ(new double[]{1942042.8584924d, -5455305.996911d, -2654521.4011759d});
+
+    array.getTelName()[0] = "UT1";
+    array.getStaName()[0] = "U1";
+    array.getStaIndex()[0] = 1;
+    array.getDiameter()[0] = 8f;
+    array.getStaXYZ()[0] = new double[]{-0.73422599479242d, -9.92488562146125d, -22.03283353519204d};
+
+    array.getTelName()[1] = "UT2";
+    array.getStaName()[1] = "U2";
+    array.getStaIndex()[1] = 2;
+    array.getDiameter()[1] = 8f;
+    array.getStaXYZ()[1] = new double[]{20.45018397209875d, 14.88732843219187d, 24.17944630588896d};
+
+    array.getTelName()[2] = "UT3";
+    array.getStaName()[2] = "U3";
+    array.getStaIndex()[2] = 3;
+    array.getDiameter()[2] = 8f;
+    array.getStaXYZ()[2] = new double[]{35.32766648520568d, 44.91458329169021d, 56.61105628712381d};
+
+    oiFitsFile.addOiTable(array);
+
+    final int nWave = 512;
+    final OIWavelength waves = new OIWavelength(oiFitsFile, nWave);
+    waves.setInsName(insName);
+
+    final float wMin = 1.54E-6f;
+    final float wMax = 1.82E-6f;
+    final float step = (wMax - wMin) / (nWave - 1);
+
+    float waveLength = wMin;
+    for (int i = 0; i < nWave; i++) {
+      waves.getEffWave()[i] = waveLength;
+      waves.getEffBand()[i] = 5.48E-10f;
+
+      waveLength += step;
+    }
+
+    oiFitsFile.addOiTable(waves);
+
+    final OITarget target = new OITarget(oiFitsFile, 1);
+    target.getTargetId()[0] = 1;
+    target.getTarget()[0] = "V*zet And";
+
+    target.getRaEp0()[0] = 11.77854d;
+    target.getDecEp0()[0] = 24.268334d;
+    target.getEquinox()[0] = 2000f;
+
+    target.getRaErr()[0] = 1e-4d;
+    target.getDecErr()[0] = 1e-4d;
+
+    target.getSysVel()[0] = 120d;
+    target.getVelTyp()[0] = OIFitsConstants.COLUMN_VELTYP_LSR;
+    target.getVelDef()[0] = OIFitsConstants.COLUMN_VELDEF_OPTICAL;
+
+    target.getPmRa()[0] = -2.8119e-5d;
+    target.getPmDec()[0] = -2.2747e-5d;
+
+    target.getPmRaErr()[0] = 2e-7d;
+    target.getPmDecErr()[0] = 3e-7d;
+
+    target.getParallax()[0] = 0.004999f;
+    target.getParaErr()[0] = 1e-5f;
+
+    target.getSpecTyp()[0] = "AOV";
+
+    oiFitsFile.addOiTable(target);
+
+    final OIVis vis = new OIVis(oiFitsFile, insName, 5);
+    vis.setArrName(arrName);
+    vis.setDateObs("2010-06-18");
+
+    oiFitsFile.addOiTable(vis);
+
+    final OIVis2 vis2 = new OIVis2(oiFitsFile, insName, 5);
+    vis.setArrName(arrName);
+    vis.setDateObs("2010-06-18");
+
+    oiFitsFile.addOiTable(vis2);
+
+    final OIT3 t3 = new OIT3(oiFitsFile, insName, 5);
+    vis.setArrName(arrName);
+    vis.setDateObs("2010-06-18");
+
+    oiFitsFile.addOiTable(t3);
+
   }
 }
