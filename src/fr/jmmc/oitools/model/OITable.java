@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.9 2010-06-18 15:42:36 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.10 2010-06-21 10:04:33 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.9  2010/06/18 15:42:36  bourgesl
+ * new constructors to create OI_* tables from scratch
+ *
  * Revision 1.8  2010/06/17 15:01:12  bourgesl
  * protected constuctor
  * added setter for OI_REVN / NAXIS2
@@ -158,8 +161,14 @@ public class OITable extends ModelBase {
   /**
    * Initialize the table with minimal keywords and empty columns
    * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
+   * @throws IllegalArgumentException if the number of rows is less than 1
    */
-  protected final void initializeTable(final int nbRows) {
+  protected final void initializeTable(final int nbRows) throws IllegalArgumentException {
+
+    if (nbRows < 1) {
+      throw new IllegalArgumentException("Invalid number of rows : the table must have at least 1 row !");
+    }
+
     String extName = null;
     if (this instanceof OITarget) {
       extName = OIFitsConstants.TABLE_OI_TARGET;
@@ -183,8 +192,6 @@ public class OITable extends ModelBase {
 
   /**
    * Initialize column arrays according to their format and nb rows (NAXIS2)
-   *
-   * TODO : test : VISDATA(complex type) with only 1 wavelength
    *
    * @param nbRows number of rows i.e. the Fits NAXIS2 keyword value
    */
