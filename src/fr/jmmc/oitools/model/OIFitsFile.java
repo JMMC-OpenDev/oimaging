@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.5 2010-06-18 15:42:36 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.6 2010-06-21 15:43:54 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/18 15:42:36  bourgesl
+ * new constructors to create OI_* tables from scratch
+ *
  * Revision 1.4  2010/06/17 15:02:27  bourgesl
  * added getter / setter methods for keywords and columns
  *
@@ -139,9 +142,30 @@ public final class OIFitsFile extends OIFits {
   public void addOiTable(final OITable oiTable) {
 
     // Prepare other fields :
-    // TODO
-    // ext number
-    // ext version
+    // ext number :
+    oiTable.setExtNb(getNbOiTables());
+
+    // ext version :
+    int extVer = 0;
+    if (oiTable instanceof OITarget) {
+      // only 1 OI_TARGET table allowed.
+      if (hasOiTarget()) {
+        throw new IllegalArgumentException("OI_TARGET is already defined !");
+      }
+    } else if (oiTable instanceof OIWavelength) {
+      extVer = getNbOiWavelengths();
+    } else if (oiTable instanceof OIArray) {
+      extVer = getNbOiArrays();
+    } else if (oiTable instanceof OIVis) {
+      extVer = getNbOiVis();
+    } else if (oiTable instanceof OIVis2) {
+      extVer = getNbOiVis2();
+    } else if (oiTable instanceof OIT3) {
+      extVer = getNbOiT3();
+    }
+
+    extVer++;
+    oiTable.setExtVer(extVer);
 
     this.registerOiTable(oiTable);
   }
