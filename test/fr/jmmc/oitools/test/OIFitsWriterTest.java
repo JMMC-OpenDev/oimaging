@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriterTest.java,v 1.4 2010-06-18 15:43:07 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriterTest.java,v 1.5 2010-06-21 10:03:14 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/06/18 15:43:07  bourgesl
+ * new test case : create an OIFits file from scratch
+ *
  * Revision 1.3  2010/06/02 15:23:53  bourgesl
  * added a test case which copy all OIFits files from oidata/ to oidata/copy and compare files
  *
@@ -221,6 +224,12 @@ public class OIFitsWriterTest implements TestEnv {
     final String arrName = "VLTI-like";
     final String insName = "AMBER-like";
 
+    final short targetId = 1;
+    final short sta1Id = 1;
+    final short sta2Id = 2;
+    final short sta3Id = 3;
+
+    // OI_ARRAY :
     final OIArray array = new OIArray(oiFitsFile, 3);
     array.setArrName(arrName);
     array.setFrame(OIFitsConstants.KEYWORD_FRAME_GEOCENTRIC);
@@ -228,25 +237,26 @@ public class OIFitsWriterTest implements TestEnv {
 
     array.getTelName()[0] = "UT1";
     array.getStaName()[0] = "U1";
-    array.getStaIndex()[0] = 1;
+    array.getStaIndex()[0] = sta1Id;
     array.getDiameter()[0] = 8f;
     array.getStaXYZ()[0] = new double[]{-0.73422599479242d, -9.92488562146125d, -22.03283353519204d};
 
     array.getTelName()[1] = "UT2";
     array.getStaName()[1] = "U2";
-    array.getStaIndex()[1] = 2;
+    array.getStaIndex()[1] = sta2Id;
     array.getDiameter()[1] = 8f;
     array.getStaXYZ()[1] = new double[]{20.45018397209875d, 14.88732843219187d, 24.17944630588896d};
 
     array.getTelName()[2] = "UT3";
     array.getStaName()[2] = "U3";
-    array.getStaIndex()[2] = 3;
+    array.getStaIndex()[2] = sta3Id;
     array.getDiameter()[2] = 8f;
     array.getStaXYZ()[2] = new double[]{35.32766648520568d, 44.91458329169021d, 56.61105628712381d};
 
     oiFitsFile.addOiTable(array);
 
-    final int nWave = 512;
+    // OI_WAVELENGTH :
+    final int nWave = 48;
     final OIWavelength waves = new OIWavelength(oiFitsFile, nWave);
     waves.setInsName(insName);
 
@@ -254,18 +264,22 @@ public class OIFitsWriterTest implements TestEnv {
     final float wMax = 1.82E-6f;
     final float step = (wMax - wMin) / (nWave - 1);
 
+    final float[] effWave = waves.getEffWave();
+    final float[] effBand = waves.getEffBand();
+
     float waveLength = wMin;
     for (int i = 0; i < nWave; i++) {
-      waves.getEffWave()[i] = waveLength;
-      waves.getEffBand()[i] = 5.48E-10f;
+      effWave[i] = waveLength;
+      effBand[i] = 5.48E-10f;
 
       waveLength += step;
     }
 
     oiFitsFile.addOiTable(waves);
 
+    // OI_TARGET :
     final OITarget target = new OITarget(oiFitsFile, 1);
-    target.getTargetId()[0] = 1;
+    target.getTargetId()[0] = targetId;
     target.getTarget()[0] = "V*zet And";
 
     target.getRaEp0()[0] = 11.77854d;
@@ -292,23 +306,57 @@ public class OIFitsWriterTest implements TestEnv {
 
     oiFitsFile.addOiTable(target);
 
-    final OIVis vis = new OIVis(oiFitsFile, insName, 5);
+    // OI_VIS :
+    final int nRows = 7;
+    short[] targetIds;
+    short[][] staIndexes;
+
+    final OIVis vis = new OIVis(oiFitsFile, insName, nRows);
     vis.setArrName(arrName);
     vis.setDateObs("2010-06-18");
+
+    targetIds  = vis.getTargetId();
+    staIndexes = vis.getStaIndex();
+
+    for (int i = 0; i < nRows; i++) {
+      targetIds[i] = targetId;
+      staIndexes[i][0] = sta1Id;
+      staIndexes[i][1] = sta2Id;
+    }
 
     oiFitsFile.addOiTable(vis);
 
-    final OIVis2 vis2 = new OIVis2(oiFitsFile, insName, 5);
-    vis.setArrName(arrName);
-    vis.setDateObs("2010-06-18");
+    // OI_VIS2 :
+    final OIVis2 vis2 = new OIVis2(oiFitsFile, insName, nRows);
+    vis2.setArrName(arrName);
+    vis2.setDateObs("2010-06-18");
+
+    targetIds = vis2.getTargetId();
+    staIndexes = vis2.getStaIndex();
+
+    for (int i = 0; i < nRows; i++) {
+      targetIds[i] = targetId;
+      staIndexes[i][0] = sta1Id;
+      staIndexes[i][1] = sta2Id;
+    }
 
     oiFitsFile.addOiTable(vis2);
 
-    final OIT3 t3 = new OIT3(oiFitsFile, insName, 5);
-    vis.setArrName(arrName);
-    vis.setDateObs("2010-06-18");
+    // OI_T3 :
+    final OIT3 t3 = new OIT3(oiFitsFile, insName, nRows);
+    t3.setArrName(arrName);
+    t3.setDateObs("2010-06-18");
+
+    targetIds = t3.getTargetId();
+    staIndexes = t3.getStaIndex();
+
+    for (int i = 0; i < nRows; i++) {
+      targetIds[i] = targetId;
+      staIndexes[i][0] = sta1Id;
+      staIndexes[i][1] = sta2Id;
+      staIndexes[i][2] = sta3Id;
+    }
 
     oiFitsFile.addOiTable(t3);
-
   }
 }
