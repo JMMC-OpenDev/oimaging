@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.6 2010-06-21 15:43:54 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.7 2010-06-28 14:33:55 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  2010/06/21 15:43:54  bourgesl
+ * properly set extNb and extVer for added tables
+ *
  * Revision 1.5  2010/06/18 15:42:36  bourgesl
  * new constructors to create OI_* tables from scratch
  *
@@ -462,7 +465,7 @@ public final class OIFitsFile extends OIFits {
    * @return the xml description
    */
   public final String getXmlDesc() {
-    return this.getXmlDesc(false);
+    return this.getXmlDesc(false, false);
   }
 
   /**
@@ -471,10 +474,20 @@ public final class OIFitsFile extends OIFits {
    * @return the xml description
    */
   public final String getXmlDesc(final boolean detailled) {
+    return this.getXmlDesc(detailled, false);
+  }
+
+  /**
+   * Return one xml string with file information
+   * @param detailled if true the result will contain the table content
+   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
+   * @return the xml description
+   */
+  public final String getXmlDesc(final boolean detailled, final boolean useBeautyfier) {
     final StringBuilder sb = new StringBuilder(16384);
 
     // fill the buffer :
-    this.getXmlDesc(sb, detailled);
+    this.getXmlDesc(sb, detailled, useBeautyfier);
 
     if (logger.isLoggable(Level.FINEST)) {
       logger.finest("xmlDesc buffer = " + sb.length());
@@ -487,10 +500,13 @@ public final class OIFitsFile extends OIFits {
    * Fill the given buffer with file information
    * @param sb string buffer
    * @param detailled if true the result will contain the table content
+   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
    */
-  public final void getXmlDesc(final StringBuilder sb, final boolean detailled) {
+  public final void getXmlDesc(final StringBuilder sb, final boolean detailled, final boolean useBeautyfier) {
     sb.append("<oifits>\n");
-    sb.append("<filename>").append(getName()).append("</filename>\n");
+    if (getName() != null) {
+      sb.append("<filename>").append(getName()).append("</filename>\n");
+    }
 
     String[] strings;
     OITable t;
@@ -501,7 +517,7 @@ public final class OIFitsFile extends OIFits {
     for (int i = 0, len = strings.length; i < len; i++) {
       t = getOiArray(strings[i]);
       if (t != null) {
-        t.getXmlDesc(sb, true);
+        t.getXmlDesc(sb, true, useBeautyfier);
       }
     }
     sb.append("</arrnames>\n");
@@ -512,7 +528,7 @@ public final class OIFitsFile extends OIFits {
     for (int i = 0, len = strings.length; i < len; i++) {
       t = getOiWavelength(strings[i]);
       if (t != null) {
-        t.getXmlDesc(sb, detailled);
+        t.getXmlDesc(sb, detailled, useBeautyfier);
       }
     }
     sb.append("</insnames>\n");
@@ -520,13 +536,13 @@ public final class OIFitsFile extends OIFits {
     // targets
     final OITarget oiTarget = getOiTarget();
     if (oiTarget != null) {
-      oiTarget.getXmlDesc(sb, detailled);
+      oiTarget.getXmlDesc(sb, detailled, useBeautyfier);
     }
 
     // data tables
     for (OITable oiTable : getOiTables()) {
       if (oiTable instanceof OIData) {
-        oiTable.getXmlDesc(sb, detailled);
+        oiTable.getXmlDesc(sb, detailled, useBeautyfier);
       }
     }
 

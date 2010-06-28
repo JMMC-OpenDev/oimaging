@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIWavelength.java,v 1.7 2010-06-18 15:42:36 bourgesl Exp $"
+ * "@(#) $Id: OIWavelength.java,v 1.8 2010-06-28 14:33:55 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.7  2010/06/18 15:42:36  bourgesl
+ * new constructors to create OI_* tables from scratch
+ *
  * Revision 1.6  2010/06/17 15:01:56  bourgesl
  * classes made final
  *
@@ -69,8 +72,6 @@ import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.meta.Units;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
 /**
  * Class for OI_WAVELENGTH table.
@@ -198,7 +199,7 @@ public final class OIWavelength extends OITable {
     sb.append("<nwave>").append(getNWave()).append("</nwave>");
     sb.append("<effwaves>");
 
-    final DecimalFormat formatter = new DecimalFormat("0.00E0", new DecimalFormatSymbols(Locale.US));
+    final DecimalFormat formatter = new DecimalFormat("0.00E0", US_SYMBOLS);
 
     final float[] effWaves = getEffWave();
 

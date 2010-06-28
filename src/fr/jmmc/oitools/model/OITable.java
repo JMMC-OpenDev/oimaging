@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.10 2010-06-21 10:04:33 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.11 2010-06-28 14:33:55 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.10  2010/06/21 10:04:33  bourgesl
+ * added in initializeTable() a test on the given number of rows to be >= 1
+ *
  * Revision 1.9  2010/06/18 15:42:36  bourgesl
  * new constructors to create OI_* tables from scratch
  *
@@ -87,9 +90,13 @@ import fr.jmmc.oitools.OIFitsConstants;
 import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import nom.tam.util.ArrayFuncs;
@@ -117,6 +124,12 @@ public class OITable extends ModelBase {
   private final static KeywordMeta KEYWORD_OI_REVN = new KeywordMeta(OIFitsConstants.KEYWORD_OI_REVN,
           "revision number of the table definition", Types.TYPE_INT,
           new short[]{OIFitsConstants.KEYWORD_OI_REVN_1});
+  /** US number format symbols */
+  protected final static DecimalFormatSymbols US_SYMBOLS = new DecimalFormatSymbols(Locale.US);
+  /** beautifier number formatter for standard values > 1e-2 and < 1e7 */
+  private final static NumberFormat DF_BEAUTY_STD = new DecimalFormat("#0.###", US_SYMBOLS);
+  /** beautifier number formatter for other values */
+  private final static NumberFormat DF_BEAUTY_SCI = new DecimalFormat("0.###E0", US_SYMBOLS);
 
   /* members */
   /** Main OIFitsFile */
@@ -749,6 +762,16 @@ public class OITable extends ModelBase {
    * @param detailled if true the result will contain the table content
    */
   public void getXmlDesc(final StringBuilder sb, final boolean detailled) {
+    getXmlDesc(sb, detailled, false);
+  }
+
+  /**
+   * Fill the given buffer with the xml serialisation of the table.
+   * @param sb string buffer
+   * @param detailled if true the result will contain the table content
+   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
+   */
+  public void getXmlDesc(final StringBuilder sb, final boolean detailled, final boolean useBeautyfier) {
 
     sb.append("<").append(getExtName()).append(">\n");
 
@@ -799,7 +822,7 @@ public class OITable extends ModelBase {
           if (hasColumn(column)) {
             sb.append("<td>");
 
-            this.dumpColumnRow(column, rowIndex, sb);
+            this.dumpColumnRow(column, rowIndex, sb, useBeautyfier);
 
             sb.append("</td>");
           }
@@ -817,8 +840,9 @@ public class OITable extends ModelBase {
    * @param column column descriptor
    * @param rowIndex row index
    * @param sb string buffer
+   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
    */
-  private void dumpColumnRow(final ColumnMeta column, final int rowIndex, final StringBuilder sb) {
+  private void dumpColumnRow(final ColumnMeta column, final int rowIndex, final StringBuilder sb, final boolean useBeautyfier) {
     switch (column.getDataType()) {
       case TYPE_CHAR:
         final String[] sValues = getColumnString(column.getName());
@@ -853,13 +877,21 @@ public class OITable extends ModelBase {
             if (i > 0) {
               sb.append(" ");
             }
-            sb.append(rowValues[i]);
+            if (useBeautyfier) {
+              sb.append(format(rowValues[i]));
+            } else {
+              sb.append(rowValues[i]);
+            }
           }
           break;
         }
         final double[] dValues = getColumnDouble(column.getName());
         // append value :
-        sb.append(dValues[rowIndex]);
+        if (useBeautyfier) {
+          sb.append(format(dValues[rowIndex]));
+        } else {
+          sb.append(dValues[rowIndex]);
+        }
         break;
 
       case TYPE_REAL:
@@ -870,7 +902,11 @@ public class OITable extends ModelBase {
         }
         final float[] fValues = getColumnFloat(column.getName());
         // append value :
-        sb.append(fValues[rowIndex]);
+        if (useBeautyfier) {
+          sb.append(format(fValues[rowIndex]));
+        } else {
+          sb.append(fValues[rowIndex]);
+        }
         break;
 
       case TYPE_COMPLEX:
@@ -884,7 +920,11 @@ public class OITable extends ModelBase {
               sb.append(" ");
             }
             // real,img pattern for complex values :
-            sb.append(rowValues[i][0]).append(",").append(rowValues[i][1]);
+            if (useBeautyfier) {
+              sb.append(format(rowValues[i][0])).append(",").append(format(rowValues[i][1]));
+            } else {
+              sb.append(rowValues[i][0]).append(",").append(rowValues[i][1]);
+            }
           }
           break;
         }
@@ -901,7 +941,15 @@ public class OITable extends ModelBase {
             if (i > 0) {
               sb.append(" ");
             }
-            sb.append(rowValues[i]);
+            if (useBeautyfier) {
+              if (rowValues[i]) {
+                sb.append("T");
+              } else {
+                sb.append("F");
+              }
+            } else {
+              sb.append(rowValues[i]);
+            }
           }
           break;
         }
@@ -911,6 +959,26 @@ public class OITable extends ModelBase {
 
       default:
         sb.append("...");
+    }
+  }
+
+  /**
+   * Format the given number using the beautifier formatter
+   * @param value any float or double value
+   * @return string representation
+   */
+  private static String format(final double value) {
+    final double v = (value >= 0d) ? value : -value;
+    if (v == 0d) {
+      return "0";
+    }
+    if (v > 1e-2d && v < 1e7d) {
+      synchronized (DF_BEAUTY_STD) {
+        return DF_BEAUTY_STD.format(value);
+      }
+    }
+    synchronized (DF_BEAUTY_SCI) {
+      return DF_BEAUTY_SCI.format(value);
     }
   }
 }
