@@ -1,11 +1,15 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriter.java,v 1.3 2010-06-02 15:29:29 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriter.java,v 1.4 2010-06-29 11:54:26 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/06/02 15:29:29  bourgesl
+ * added complex type support ('C' instead of 'E') and optional columns (complex again)
+ * the modified string (string length fix for Fits Header) are restored after the HDU creation
+ *
  * Revision 1.2  2010/05/31 15:56:17  bourgesl
  * fixed ordering of column keywords (TFORM, TTYPE, TUNIT)
  * removed TDIM keywords
@@ -66,6 +70,8 @@ public class OIFitsWriter {
    * @throws IOException IO failure
    */
   public static void writeOIFits(final String absFilePath, final OIFitsFile oiFitsFile) throws IOException, FitsException {
+    oiFitsFile.setAbsoluteFilePath(absFilePath);
+
     final OIFitsWriter writer = new OIFitsWriter(oiFitsFile);
     writer.write(absFilePath);
   }
