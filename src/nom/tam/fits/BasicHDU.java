@@ -438,11 +438,10 @@ public abstract class BasicHDU implements FitsElement {
       int gcount = myHeader.getIntValue("GCOUNT", 1);
       int naxis = myHeader.getIntValue("NAXIS", 0);
       myHeader.deleteKey("EXTEND");
-      HeaderCard card;
+
       HeaderCard pcard = myHeader.findCard("PCOUNT");
       HeaderCard gcard = myHeader.findCard("GCOUNT");
 
-      myHeader.getCard(2 + naxis);
       if (pcard == null) {
         myHeader.addValue("PCOUNT", pcount, "Required value");
       }
