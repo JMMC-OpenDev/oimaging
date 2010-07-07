@@ -1,5 +1,8 @@
 package nom.tam.fits;
 
+import nom.tam.util.ArrayDataOutput;
+import nom.tam.util.ArrayFuncs;
+
 /*
  * Copyright: Thomas McGlynn 1997-1998.
  * This code may be used for any purpose, non-commercial
@@ -10,12 +13,8 @@ package nom.tam.fits;
  * Many thanks to David Glowacki (U. Wisconsin) for substantial
  * improvements, enhancements and bug fixes.
  */
-import nom.tam.util.*;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-
 /** FITS binary table header/data unit */
-public class BinaryTableHDU
+public final class BinaryTableHDU
         extends TableHDU {
 
   private BinaryTable table;
@@ -63,8 +62,8 @@ public class BinaryTableHDU
     } else if (o instanceof Object[]) {
       return new BinaryTable((Object[]) o);
     } else {
-      throw new FitsException("Unable to encapsulate object of type:" +
-              o.getClass().getName() + " as BinaryTable");
+      throw new FitsException("Unable to encapsulate object of type:"
+              + o.getClass().getName() + " as BinaryTable");
     }
   }
 
@@ -98,8 +97,8 @@ public class BinaryTableHDU
    */
   public static boolean isData(Object o) {
 
-    if (o instanceof nom.tam.util.ColumnTable || o instanceof Object[][] ||
-            o instanceof Object[]) {
+    if (o instanceof nom.tam.util.ColumnTable || o instanceof Object[][]
+            || o instanceof Object[]) {
       return true;
     } else {
       return false;
@@ -126,20 +125,21 @@ public class BinaryTableHDU
   }
 
   // Need to tell header about the Heap before writing.
+  @Override
   public void write(ArrayDataOutput ado) throws FitsException {
 
     int oldSize = myHeader.getIntValue("PCOUNT");
     if (oldSize != table.getHeapSize()) {
-      myHeader.addValue("PCOUNT", table.getHeapSize(), "Includes Heap");
+      myHeader.addValue("PCOUNT", table.getHeapSize(), "size of special data area");
     }
 
     if (myHeader.getIntValue("PCOUNT") == 0) {
       myHeader.deleteKey("THEAP");
     } else {
       myHeader.getIntValue("TFIELDS");
-      int offset = myHeader.getIntValue("NAXIS1") *
-              myHeader.getIntValue("NAXIS2") +
-              table.getHeapOffset();
+      int offset = myHeader.getIntValue("NAXIS1")
+              * myHeader.getIntValue("NAXIS2")
+              + table.getHeapOffset();
       myHeader.addValue("THEAP", offset, "");
     }
 
@@ -169,7 +169,7 @@ public class BinaryTableHDU
     System.out.print("          " + nhcol + " fields");
     System.out.println(", " + nrow + " rows of length " + rowsize);
 
-    for (int i = 1; i <= nhcol; i += 1) {
+    for (int i = 1; i <= nhcol; i ++) {
       System.out.print("           " + i + ":");
       prtField("Name", "TTYPE" + i);
       prtField("Format", "TFORM" + i);
@@ -178,8 +178,8 @@ public class BinaryTableHDU
     }
 
     System.out.println("      Data Information:");
-    if (myData == null ||
-            table.getNRows() == 0 || table.getNCols() == 0) {
+    if (myData == null
+            || table.getNRows() == 0 || table.getNCols() == 0) {
       System.out.println("         No data present");
       if (table.getHeapSize() > 0) {
         System.out.println("         Heap size is: " + table.getHeapSize() + " bytes");
@@ -192,7 +192,7 @@ public class BinaryTableHDU
         System.out.println("          Heap size is: " + table.getHeapSize() + " bytes");
       }
       Object[] cols = table.getFlatColumns();
-      for (int i = 0; i < cols.length; i += 1) {
+      for (int i = 0; i < cols.length; i ++) {
         System.out.println("           " + i + ":" + ArrayFuncs.arrayDescription(cols[i]));
       }
     }
@@ -304,8 +304,9 @@ public class BinaryTableHDU
             final int nRows = dims[0];
 
             final String tform = "" + nRows + cType;
+
             // replace previous TFORM keyword value 'aF' by 'bC' :
-            myHeader.addValue("TFORM" + (index + 1), tform, null);
+            myHeader.addValue("TFORM" + (index + 1), tform, "data format of field " + (index + 1));
             // remove TDIM keyword :
             myHeader.removeCard("TDIM" + (index + 1));
           }

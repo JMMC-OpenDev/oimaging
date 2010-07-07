@@ -1,5 +1,7 @@
 package nom.tam.fits;
 
+import nom.tam.util.Cursor;
+
 /** This class allows FITS binary and ASCII tables to
  *  be accessed via a common interface.
  * 
@@ -8,7 +10,6 @@ package nom.tam.fits;
 public abstract class TableHDU extends BasicHDU {
 
   private TableData table;
-  private int currentColumn;
 
   TableHDU(TableData td) {
     table = td;
@@ -49,7 +50,7 @@ public abstract class TableHDU extends BasicHDU {
   public int addRow(Object[] newRow) throws FitsException {
 
     int row = table.addRow(newRow);
-    myHeader.addValue("NAXIS2", row, null);
+    myHeader.addValue("NAXIS2", row, "number of rows in table");
     return row;
   }
 
@@ -92,16 +93,21 @@ public abstract class TableHDU extends BasicHDU {
     return myHeader.getTrimmedStringValue("TTYPE" + (index + 1));
   }
 
-  public void setColumnName(int index, String name, String comment)
+  /**
+   * Set the name of a column in the table.
+   *
+   * @param index The 0-based column index.
+   * @param name column name
+   * @param comment description of the column
+   * @throws FitsException
+   */
+  public void setColumnName(final int index, final String name, final String comment)
           throws FitsException {
-    if (getNCols() > index && index >= 0) {
-      myHeader.positionAfterIndex("TFORM", index + 1);
-      myHeader.addValue("TTYPE" + (index + 1), name, comment);
-    }
+    setColumnName(index, name, comment, null);
   }
 
   /**
-   * Set both name and unit for the column
+   * Set the name and unit of a column in the table.
    *
    * // LAURENT : added to specify the unit of the column
    *
@@ -114,10 +120,15 @@ public abstract class TableHDU extends BasicHDU {
   public void setColumnName(final int index, final String name, final String comment, final String unit)
           throws FitsException {
     if (getNCols() > index && index >= 0) {
-      myHeader.positionAfterIndex("TFORM", index + 1);
+      final Cursor iter = myHeader.positionAfterIndex("TFORM", index + 1);
+      // Insert TTYPE keyword before TFORM
+      iter.prev();
       myHeader.addValue("TTYPE" + (index + 1), name, comment);
+      // Set cursor position after TFORM
+      iter.next();
       if (unit != null && unit.length() > 0) {
-        myHeader.addValue("TUNIT" + (index + 1), unit, null);
+        // Insert TUNIT keyword after TFORM
+        myHeader.addValue("TUNIT" + (index + 1), unit, "physical unit of field " + (index + 1));
       }
     }
   }
@@ -185,7 +196,7 @@ public abstract class TableHDU extends BasicHDU {
     }
 
     table.deleteRows(firstRow, nRow);
-    myHeader.setNaxis(2, getNRows());
+    myHeader.setNaxis(2, getNRows(), "number of rows in table");
   }
 
   /** Delete a set of columns from a table.
@@ -231,16 +242,16 @@ public abstract class TableHDU extends BasicHDU {
 
 
     // Get rid of the keywords for the deleted columns
-    for (int col = column; col < column + len; col += 1) {
-      for (int fld = 0; fld < fields.length; fld += 1) {
+    for (int col = column; col < column + len; col++) {
+      for (int fld = 0; fld < fields.length; fld ++) {
         String key = fields[fld] + (col + 1);
         myHeader.deleteKey(key);
       }
     }
 
     // Shift the keywords for the columns after the deleted columns
-    for (int col = column + len; col < ncol; col += 1) {
-      for (int fld = 0; fld < fields.length; fld += 1) {
+    for (int col = column + len; col < ncol; col ++) {
+      for (int fld = 0; fld < fields.length; fld ++) {
         String oldKey = fields[fld] + (col + 1);
         String newKey = fields[fld] + (col + 1 - len);
         if (myHeader.containsKey(oldKey)) {
@@ -249,7 +260,7 @@ public abstract class TableHDU extends BasicHDU {
       }
     }
     // Update the number of fields.
-    myHeader.addValue("TFIELDS", getNCols(), "Number of table fields");
+    myHeader.addValue("TFIELDS", getNCols(), "number of fields in each row");
 
     // Give the data sections a chance to update the header too.
     table.updateAfterDelete(ncol, myHeader);
