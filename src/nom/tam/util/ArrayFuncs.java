@@ -9,7 +9,7 @@ package nom.tam.util;
  * in the source code or included in or referred to in any
  * derived software.
  */
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /** This is a package of static functions which perform
@@ -17,7 +17,7 @@ import java.util.Arrays;
  * to complete without throwing errors by ignoring data
  * they cannot understand.
  */
-public class ArrayFuncs implements PrimitiveInfo {
+public final class ArrayFuncs implements PrimitiveInfo {
 
   /** Compute the size of an object.  Note that this only handles
    * arrays or scalars of the primitive objects and Strings.  It
@@ -182,7 +182,7 @@ public class ArrayFuncs implements PrimitiveInfo {
     while (classname.charAt(ndim) == '[') {
       ndim += 1;
     }
-    Class baseClass;
+    Class<?> baseClass;
     if (classname.charAt(ndim) != 'L') {
       baseClass = getBaseClass(o);
     } else {
@@ -232,9 +232,9 @@ public class ArrayFuncs implements PrimitiveInfo {
       return null;
     }
 
-    Class[] argTypes = new Class[0];
+    Class<?>[] argTypes = new Class<?>[0];
     Object[] args = new Object[0];
-    Class type = o.getClass();
+    Class<?> type = o.getClass();
 
     try {
       return type.getMethod("clone", argTypes).invoke(o, args);
@@ -346,7 +346,7 @@ public class ArrayFuncs implements PrimitiveInfo {
   /** This routine returns the base class of an object.  This is just
    * the class of the object for non-arrays.
    */
-  public static Class getBaseClass(Object o) {
+  public static Class<?> getBaseClass(Object o) {
 
     if (o == null) {
       return Void.TYPE;
@@ -419,7 +419,7 @@ public class ArrayFuncs implements PrimitiveInfo {
    * @param dims      The desired dimensions.
    * @return An array object populated with a simple test pattern.
    */
-  public static Object generateArray(Class baseType, int[] dims) {
+  public static Object generateArray(Class<?> baseType, int[] dims) {
 
     // Generate an array and populate it with a test pattern of
     // data.
@@ -456,14 +456,14 @@ public class ArrayFuncs implements PrimitiveInfo {
    */
   public static String arrayDescription(Object o) {
 
-    Class base = getBaseClass(o);
+    Class<?> base = getBaseClass(o);
     if (base == Void.TYPE) {
       return "NULL";
     }
 
-    int[] dims = getDimensions(o);
+    final int[] dims = getDimensions(o);
 
-    StringBuffer desc = new StringBuffer();
+    final StringBuffer desc = new StringBuffer();
 
     // Note that all instances Class describing a given class are
     // the same so we can use == here.
@@ -484,14 +484,14 @@ public class ArrayFuncs implements PrimitiveInfo {
     if (dims != null) {
       desc.append("[");
       for (int i = 0; i < dims.length; i++) {
-        desc.append("" + dims[i]);
+        desc.append(dims[i]);
         if (i < dims.length - 1) {
           desc.append("][");
         }
       }
       desc.append("]");
     }
-    return new String(desc);
+    return desc.toString();
   }
 
   /** Examine the structure of an array in detail.
@@ -503,8 +503,8 @@ public class ArrayFuncs implements PrimitiveInfo {
     // If we have a two-d array, or if the array is a one-d array
     // of Objects, then recurse over the next dimension.  We handle
     // Object specially because each element could itself be an array.
-    if (className.substring(0, 2).equals("[[") ||
-            className.equals("[Ljava.lang.Object;")) {
+    if (className.substring(0, 2).equals("[[")
+            || className.equals("[Ljava.lang.Object;")) {
       System.out.println("[");
       for (int i = 0; i < ((Object[]) o).length; i++) {
         examinePrimitiveArray(((Object[]) o)[i]);
@@ -513,8 +513,8 @@ public class ArrayFuncs implements PrimitiveInfo {
     } else if (className.charAt(0) != '[') {
       System.out.println(className);
     } else {
-      System.out.println("[" + java.lang.reflect.Array.getLength(o) + "]" +
-              className.substring(1));
+      System.out.println("[" + java.lang.reflect.Array.getLength(o) + "]"
+              + className.substring(1));
     }
   }
 
@@ -524,16 +524,16 @@ public class ArrayFuncs implements PrimitiveInfo {
    */
   public static Object flatten(Object input) {
 
-    int[] dimens = getDimensions(input);
-    if (dimens.length <= 1) {
+    final int[] dims = getDimensions(input);
+    if (dims.length <= 1) {
       return input;
     }
     int size = 1;
-    for (int i = 0; i < dimens.length; i++) {
-      size *= dimens[i];
+    for (int i = 0; i < dims.length; i++) {
+      size *= dims[i];
     }
 
-    Object flat = ArrayFuncs.newInstance(getBaseClass(input), size);
+    final Object flat = ArrayFuncs.newInstance(getBaseClass(input), size);
 
     if (size == 0) {
       return flat;
@@ -599,7 +599,7 @@ public class ArrayFuncs implements PrimitiveInfo {
       throw new RuntimeException("Curled array does not fit desired dimensions");
     }
 
-    Class base = getBaseClass(input);
+    Class<?> base = getBaseClass(input);
 
     Object newArray = ArrayFuncs.newInstance(base, dimens);
 
@@ -643,7 +643,7 @@ public class ArrayFuncs implements PrimitiveInfo {
    * @param newType The desired output type.  This should be one of the
    *                class descriptors for primitive numeric data, e.g., double.type.
    */
-  public static Object mimicArray(Object array, Class newType) {
+  public static Object mimicArray(Object array, Class<?> newType) {
 
     String classname = array.getClass().getName();
     if (classname.charAt(0) != '[') {
@@ -687,7 +687,7 @@ public class ArrayFuncs implements PrimitiveInfo {
    * @param preserve If set, and the requested type is the same as the
    *                  original, then the original is returned.
    */
-  public static Object convertArray(Object array, Class newType, boolean reuse) {
+  public static Object convertArray(Object array, Class<?> newType, boolean reuse) {
 
     if (getBaseClass(array) == newType && reuse) {
       return array;
@@ -702,7 +702,7 @@ public class ArrayFuncs implements PrimitiveInfo {
    * @param newType The desired output type.  This should be one of the
    *                class descriptors for primitive numeric data, e.g., double.type.
    */
-  public static Object convertArray(Object array, Class newType) {
+  public static Object convertArray(Object array, Class<?> newType) {
 
     /* We break this up into two steps so that users
      * can reuse an array many times and only allocate a
@@ -751,8 +751,8 @@ public class ArrayFuncs implements PrimitiveInfo {
       float[] xfarr;
       double[] xdarr;
 
-      Class base = getBaseClass(array);
-      Class newType = getBaseClass(mimic);
+      Class<?> base = getBaseClass(array);
+      Class<?> newType = getBaseClass(mimic);
 
       if (base == byte.class) {
         byte[] barr = (byte[]) array;
@@ -1071,7 +1071,7 @@ public class ArrayFuncs implements PrimitiveInfo {
    *  @return The allocated array.
    *  @throws An OutOfMemoryError if insufficient space is available.
    */
-  public static Object newInstance(Class cl, int dim) {
+  public static Object newInstance(Class<?> cl, int dim) {
 
     Object o = Array.newInstance(cl, dim);
     if (o == null) {
@@ -1089,7 +1089,7 @@ public class ArrayFuncs implements PrimitiveInfo {
    *  @return The allocated array.
    *  @throws An OutOfMemoryError if insufficient space is available.
    */
-  public static Object newInstance(Class cl, int[] dims) {
+  public static Object newInstance(Class<?> cl, int[] dims) {
 
     if (dims.length == 0) {
       // Treat a scalar as a 1-d array of length 1
@@ -1147,8 +1147,8 @@ public class ArrayFuncs implements PrimitiveInfo {
       return false;
     }
 
-    Class xClass = x.getClass();
-    Class yClass = y.getClass();
+    Class<?> xClass = x.getClass();
+    Class<?> yClass = y.getClass();
 
     if (xClass != yClass) {
       return false;
