@@ -836,10 +836,10 @@ public final class BufferedFile
     final byte[] b = buffer;
     final int x = bufferOffset;
 
-    b[x + 1] = (byte) (i >>> 24);
-    b[x + 2] = (byte) (i >>> 16);
-    b[x + 3] = (byte) (i >>> 8);
-    b[x + 4] = (byte) i;
+    b[x] = (byte) (i >>> 24);
+    b[x + 1] = (byte) (i >>> 16);
+    b[x + 2] = (byte) (i >>> 8);
+    b[x + 3] = (byte) i;
     bufferOffset += 4;
   }
 
