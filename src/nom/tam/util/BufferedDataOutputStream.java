@@ -33,7 +33,7 @@ import java.io.IOException;
  * Testing and timing for this class is
  * peformed in the nom.tam.util.test.BufferedFileTester class.
  */
-public class BufferedDataOutputStream
+public final class BufferedDataOutputStream
         extends BufferedOutputStream
         implements ArrayDataOutput {
 
@@ -283,9 +283,9 @@ public class BufferedDataOutputStream
 
   /** Write a segment of an array of booleans.
    */
-  public void write(boolean[] b, int start, int len) throws IOException {
+  public void write(final boolean[] b, final int start, final int len) throws IOException {
 
-    for (int i = start; i < start + len; i++) {
+    for (int i = start, size = start + len; i < size; i++) {
 
       if (count + 1 > buf.length) {
         checkBuf(1);
@@ -306,9 +306,9 @@ public class BufferedDataOutputStream
 
   /** Write a segment of an array of shorts.
    */
-  public void write(short[] s, int start, int len) throws IOException {
+  public void write(final short[] s, final int start, final int len) throws IOException {
 
-    for (int i = start; i < start + len; i++) {
+    for (int i = start, size = start + len; i < size; i++) {
       if (count + 2 > buf.length) {
         checkBuf(2);
       }
@@ -325,9 +325,9 @@ public class BufferedDataOutputStream
 
   /** Write a segment of an array of char's.
    */
-  public void write(char[] c, int start, int len) throws IOException {
+  public void write(final char[] c, final int start, final int len) throws IOException {
 
-    for (int i = start; i < start + len; i++) {
+    for (int i = start, size = start + len; i < size; i++) {
       if (count + 2 > buf.length) {
         checkBuf(2);
       }
@@ -344,9 +344,9 @@ public class BufferedDataOutputStream
 
   /** Write a segment of an array of int's.
    */
-  public void write(int[] i, int start, int len) throws IOException {
+  public void write(final int[] i, final int start, final int len) throws IOException {
 
-    for (int ii = start; ii < start + len; ii++) {
+    for (int ii = start, size = start + len; ii < size; ii++) {
       if (count + 4 > buf.length) {
         checkBuf(4);
       }
@@ -368,13 +368,14 @@ public class BufferedDataOutputStream
 
   /** Write a segement of an array of longs.
    */
-  public void write(long[] l, int start, int len) throws IOException {
+  public void write(final long[] l, final int start, final int len) throws IOException {
 
-    for (int i = start; i < start + len; i++) {
+    int t;
+    for (int i = start, size = start + len; i < size; i++) {
       if (count + 8 > buf.length) {
         checkBuf(8);
       }
-      int t = (int) (l[i] >>> 32);
+      t = (int) (l[i] >>> 32);
 
       buf[count++] = (byte) (t >>> 24);
       buf[count++] = (byte) (t >>> 16);
@@ -396,14 +397,14 @@ public class BufferedDataOutputStream
     write(f, 0, f.length);
   }
 
-  public void write(float[] f, int start, int len) throws IOException {
-
-    for (int i = start; i < start + len; i++) {
+  public void write(final float[] f, final int start, final int len) throws IOException {
+    int t;
+    for (int i = start, size = start + len; i < size; i++) {
 
       if (count + 4 > buf.length) {
         checkBuf(4);
       }
-      int t = Float.floatToIntBits(f[i]);
+      t = Float.floatToIntBits(f[i]);
       buf[count++] = (byte) (t >>> 24);
       buf[count++] = (byte) (t >>> 16);
       buf[count++] = (byte) (t >>> 8);
@@ -417,15 +418,16 @@ public class BufferedDataOutputStream
     write(d, 0, d.length);
   }
 
-  public void write(double[] d, int start, int len) throws IOException {
-
-    for (int i = start; i < start + len; i++) {
+  public void write(final double[] d, final int start, final int len) throws IOException {
+    long t;
+    int ix;
+    for (int i = start, size = start + len; i < size; i++) {
       if (count + 8 > buf.length) {
         checkBuf(8);
       }
-      long t = Double.doubleToLongBits(d[i]);
+      t = Double.doubleToLongBits(d[i]);
 
-      int ix = (int) (t >>> 32);
+      ix = (int) (t >>> 32);
 
       buf[count++] = (byte) (ix >>> 24);
       buf[count++] = (byte) (ix >>> 16);

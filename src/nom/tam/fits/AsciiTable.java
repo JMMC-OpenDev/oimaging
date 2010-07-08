@@ -783,7 +783,7 @@ public final class AsciiTable extends Data implements TableData {
     System.arraycopy(types, start + len, newTypes, start, nFields - start - len);
     System.arraycopy(nulls, start + len, newNulls, start, nFields - start - len);
 
-    for (int i = start; i < start + len; i++) {
+    for (int i = start, size = start + len; i < size; i++) {
       rowLen -= (lengths[i] + 1);
     }
 

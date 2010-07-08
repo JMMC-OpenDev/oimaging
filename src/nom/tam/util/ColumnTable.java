@@ -797,7 +797,7 @@ public final class ColumnTable implements DataTable {
       return rowSize;
     }
 
-    for (int i = start; i < start + len; i++) {
+    for (int i = start, size = start + len; i < size; i++) {
       rowSize -= sizes[i] * ArrayFuncs.getBaseLength(arrays[i]);
     }
 

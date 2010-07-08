@@ -11,7 +11,7 @@ package nom.tam.fits;
  *  no other changes should be needed in the FITS libraries.
  * 
  */
-public class FitsFactory {
+public final class FitsFactory {
 
   private static boolean useAsciiTables = true;
   private static boolean useHierarch = false;
@@ -19,7 +19,7 @@ public class FitsFactory {
   /** Indicate whether ASCII tables should be used
    *  where feasible.
    */
-  public static void setUseAsciiTables(boolean flag) {
+  public static void setUseAsciiTables(final boolean flag) {
     useAsciiTables = flag;
   }
 
@@ -29,7 +29,7 @@ public class FitsFactory {
   }
 
   /** Enable/Disable hierarchical keyword processing. */
-  public static void setUseHierarch(boolean flag) {
+  public static void setUseHierarch(final boolean flag) {
     useHierarch = flag;
   }
 
@@ -40,7 +40,7 @@ public class FitsFactory {
 
   /** Given a Header return an appropriate datum.
    */
-  public static Data dataFactory(Header hdr) throws FitsException {
+  public static Data dataFactory(final Header hdr) throws FitsException {
 
     if (ImageHDU.isHeader(hdr)) {
       return ImageHDU.manufactureData(hdr);
@@ -62,7 +62,7 @@ public class FitsFactory {
    *  FITS header to describe it.
    *  @param	o 	The object to be described.
    */
-  public static BasicHDU HDUFactory(Object o) throws FitsException {
+  public static BasicHDU HDUFactory(final Object o) throws FitsException {
     Data d;
     Header h;
     if (ImageHDU.isData(o)) {
@@ -91,7 +91,7 @@ public class FitsFactory {
   /** Given Header and data objects return
    *  the appropriate type of HDU.
    */
-  public static BasicHDU HDUFactory(Header hdr, Data d) throws
+  public static BasicHDU HDUFactory(final Header hdr, final Data d) throws
           FitsException {
 
     if (d instanceof ImageData) {

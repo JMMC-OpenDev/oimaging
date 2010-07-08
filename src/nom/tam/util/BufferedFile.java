@@ -64,7 +64,7 @@ public final class BufferedFile
   private boolean doingInput;
 
   /** Create a read-only buffered file */
-  public BufferedFile(String filename) throws IOException {
+  public BufferedFile(final String filename) throws IOException {
     this(filename, "r", 32768);
   }
 
@@ -73,17 +73,17 @@ public final class BufferedFile
    *  @param mode     A string composed of "r" and "w" for
    *                  read and write access.
    */
-  public BufferedFile(String filename, String mode) throws IOException {
+  public BufferedFile(final String filename, final String mode) throws IOException {
     this(filename, mode, 32768);
   }
 
   /** Create a buffered file from a File descriptor */
-  public BufferedFile(File file) throws IOException {
+  public BufferedFile(final File file) throws IOException {
     this(file, "r", 32768);
   }
 
   /** Create a buffered file from a File descriptor */
-  public BufferedFile(File file, String mode) throws IOException {
+  public BufferedFile(final File file, final String mode) throws IOException {
     this(file, mode, 32768);
   }
 
@@ -97,18 +97,18 @@ public final class BufferedFile
    *                  defaults to 32768 bytes in the other
    *                  constructors.
    */
-  public BufferedFile(String filename, String mode, int bufferSize) throws IOException {
+  public BufferedFile(final String filename, final String mode, final int bufferSize) throws IOException {
 
     File file = new File(filename);
     initialize(file, mode, bufferSize);
   }
 
   /** Create a buffered file from a file descriptor */
-  public BufferedFile(File file, String mode, int bufferSize) throws IOException {
+  public BufferedFile(final File file, final String mode, final int bufferSize) throws IOException {
     initialize(file, mode, bufferSize);
   }
 
-  protected void initialize(File file, String mode, int bufferSize) throws IOException {
+  protected void initialize(final File file, final String mode, final int bufferSize) throws IOException {
 
     raf = new RandomAccessFile(file, mode);
     buffer = new byte[bufferSize];
@@ -127,7 +127,7 @@ public final class BufferedFile
    *  only at an end-of-file.
    *  @param buf The array to be filled.
    */
-  public int read(byte[] buf) throws IOException {
+  public int read(final byte[] buf) throws IOException {
     return read(buf, 0, buf.length);
   }
 
@@ -137,7 +137,7 @@ public final class BufferedFile
    *  @param length The number of bytes to be read.  Fewer bytes
    *                will be read if an EOF is reached.
    */
-  public int read(byte[] buf, int offset, int len) throws IOException {
+  public int read(final byte[] buf, int offset, int len) throws IOException {
 
     checkBuffer(-1);
     int total = 0;
@@ -190,7 +190,9 @@ public final class BufferedFile
    * bytes is required (substantially smaller than
    * bufferSize.
    */
-  private void checkBuffer(int needBytes) throws IOException {
+  private void checkBuffer(final int neededBytes) throws IOException {
+
+    int needBytes = neededBytes;
 
     // Check if the buffer has some pending output.
     if (!doingInput && bufferOffset > 0) {
@@ -327,8 +329,11 @@ public final class BufferedFile
   /** Get an integer value from the buffer */
   private int convertToInt() throws IOException {
     checkBuffer(4);
-    int x = bufferOffset;
-    int i = buffer[x] << 24 | (buffer[x + 1] & 0xFF) << 16 | (buffer[x + 2] & 0xFF) << 8 | (buffer[x + 3] & 0xFF);
+
+    final byte[] b = buffer;
+    final int x = bufferOffset;
+
+    final int i = b[x] << 24 | (b[x + 1] & 0xFF) << 16 | (b[x + 2] & 0xFF) << 8 | (b[x + 3] & 0xFF);
     bufferOffset += 4;
     return i;
   }
@@ -380,10 +385,12 @@ public final class BufferedFile
   /** Get a long value from the buffer */
   private long convertToLong() throws IOException {
     checkBuffer(8);
-    int x = bufferOffset;
 
-    int i1 = buffer[x] << 24 | (buffer[x + 1] & 0xFF) << 16 | (buffer[x + 2] & 0xFF) << 8 | (buffer[x + 3] & 0xFF);
-    int i2 = buffer[x + 4] << 24 | (buffer[x + 5] & 0xFF) << 16 | (buffer[x + 6] & 0xFF) << 8 | (buffer[x + 7] & 0xFF);
+    final byte[] b = buffer;
+    final int x = bufferOffset;
+
+    final int i1 = b[x] << 24 | (b[x + 1] & 0xFF) << 16 | (b[x + 2] & 0xFF) << 8 | (b[x + 3] & 0xFF);
+    final int i2 = b[x + 4] << 24 | (b[x + 5] & 0xFF) << 16 | (b[x + 6] & 0xFF) << 8 | (b[x + 7] & 0xFF);
     bufferOffset += 8;
 
     return (((long) i1) << 32) | (((long) i2) & 0x00000000ffffffffL);
@@ -408,7 +415,7 @@ public final class BufferedFile
    *  buffer, the only difference with readFully is that
    *  readFully will signal an EOF if the buffer cannot be filled.
    */
-  public void readFully(byte[] b) throws IOException {
+  public void readFully(final byte[] b) throws IOException {
     readFully(b, 0, b.length);
   }
 
@@ -417,7 +424,7 @@ public final class BufferedFile
    *  buffer, the only difference with readFully is that
    *  readFully will signal an EOF if the buffer cannot be filled.
    */
-  public void readFully(byte[] b, int off, int len) throws IOException {
+  public void readFully(final byte[] b, final int off, final int len) throws IOException {
 
     if (off < 0 || len < 0 || off + len > b.length) {
       throw new IOException("Attempt to read outside byte array");
@@ -435,11 +442,11 @@ public final class BufferedFile
    *  supposed to happen with a random access file,
    *  so there is probably no operational difference).
    */
-  public int skipBytes(int toSkip) throws IOException {
+  public int skipBytes(final int toSkip) throws IOException {
     return (int) skipBytes((long) toSkip);
   }
 
-  public long skipBytes(long toSkip) throws IOException {
+  public long skipBytes(final long toSkip) throws IOException {
 
     // Note that we allow negative skips...
     if (skip(toSkip) < toSkip) {
@@ -491,7 +498,7 @@ public final class BufferedFile
    *  @param o  The object to be read.  It must be an array of a primitive type,
    *           or an array of Object's.
    */
-  public int readArray(Object o) throws IOException {
+  public int readArray(final Object o) throws IOException {
     return (int) readLArray(o);
   }
 
@@ -501,7 +508,7 @@ public final class BufferedFile
    *            (or any dimension), or an array of Objects which contains
    *            pointers to primitive arrays or other object arrays.
    */
-  public long readLArray(Object o) throws IOException {
+  public long readLArray(final Object o) throws IOException {
 
 
     // Note that we assume that only a single thread is
@@ -514,7 +521,7 @@ public final class BufferedFile
     return primitiveArrayRecurse(o);
   }
 
-  protected long primitiveArrayRecurse(Object o) throws IOException {
+  protected long primitiveArrayRecurse(final Object o) throws IOException {
 
     if (o == null) {
       return primitiveArrayCount;
@@ -578,15 +585,15 @@ public final class BufferedFile
     return primitiveArrayCount;
   }
 
-  public int read(boolean[] b) throws IOException {
+  public int read(final boolean[] b) throws IOException {
     return read(b, 0, b.length);
   }
 
-  public int read(boolean[] b, int start, int length) throws IOException {
+  public int read(final boolean[] b, final int start, final int length) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + length; i++) {
+      for (final int size = start + length; i < size; i++) {
         b[i] = convertToBoolean();
       }
       return length;
@@ -595,15 +602,15 @@ public final class BufferedFile
     }
   }
 
-  public int read(short[] s) throws IOException {
+  public int read(final short[] s) throws IOException {
     return read(s, 0, s.length);
   }
 
-  public int read(short[] s, int start, int length) throws IOException {
+  public int read(final short[] s, final int start, final int length) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + length; i++) {
+      for (final int size = start + length; i < size; i++) {
         s[i] = convertToShort();
       }
       return length * 2;
@@ -612,15 +619,15 @@ public final class BufferedFile
     }
   }
 
-  public int read(char[] c) throws IOException {
+  public int read(final char[] c) throws IOException {
     return read(c, 0, c.length);
   }
 
-  public int read(char[] c, int start, int length) throws IOException {
+  public int read(final char[] c, final int start, final int length) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + length; i++) {
+      for (final int size = start + length; i < size; i++) {
         c[i] = convertToChar();
       }
       return length * 2;
@@ -629,15 +636,15 @@ public final class BufferedFile
     }
   }
 
-  public int read(int[] i) throws IOException {
+  public int read(final int[] i) throws IOException {
     return read(i, 0, i.length);
   }
 
-  public int read(int[] i, int start, int length) throws IOException {
+  public int read(final int[] i, final int start, final int length) throws IOException {
 
     int ii = start;
     try {
-      for (; ii < start + length; ii++) {
+      for (final int size = start + length; ii < size; ii++) {
         i[ii] = convertToInt();
       }
       return length * 4;
@@ -646,15 +653,15 @@ public final class BufferedFile
     }
   }
 
-  public int read(long[] l) throws IOException {
+  public int read(final long[] l) throws IOException {
     return read(l, 0, l.length);
   }
 
-  public int read(long[] l, int start, int length) throws IOException {
+  public int read(final long[] l, final int start, final int length) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + length; i++) {
+      for (final int size = start + length; i < size; i++) {
         l[i] = convertToLong();
       }
       return length * 8;
@@ -664,15 +671,15 @@ public final class BufferedFile
 
   }
 
-  public int read(float[] f) throws IOException {
+  public int read(final float[] f) throws IOException {
     return read(f, 0, f.length);
   }
 
-  public int read(float[] f, int start, int length) throws IOException {
+  public int read(final float[] f, final int start, final int length) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + length; i++) {
+      for (final int size = start + length; i < size; i++) {
         f[i] = Float.intBitsToFloat(convertToInt());
       }
       return length * 4;
@@ -681,15 +688,15 @@ public final class BufferedFile
     }
   }
 
-  public int read(double[] d) throws IOException {
+  public int read(final double[] d) throws IOException {
     return read(d, 0, d.length);
   }
 
-  public int read(double[] d, int start, int length) throws IOException {
+  public int read(final double[] d, final int start, final int length) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + length; i++) {
+      for (final int size = start + length; i < size; i++) {
         d[i] = Double.longBitsToDouble(convertToLong());
       }
       return length * 8;
@@ -699,7 +706,7 @@ public final class BufferedFile
   }
 
   /** See if an exception should be thrown during an array read. */
-  private int eofCheck(EOFException e, int start, int index, int length)
+  private int eofCheck(final EOFException e, final int start, final int index, final int length)
           throws EOFException {
     if (start == index) {
       throw e;
@@ -709,7 +716,7 @@ public final class BufferedFile
   }
 
   /**** Output Routines ****/
-  private void needBuffer(int need) throws IOException {
+  private void needBuffer(final int need) throws IOException {
 
     if (doingInput) {
 
@@ -729,15 +736,15 @@ public final class BufferedFile
     }
   }
 
-  public void write(int buf) throws IOException {
+  public void write(final int buf) throws IOException {
     convertFromByte(buf);
   }
 
-  public void write(byte[] buf) throws IOException {
+  public void write(final byte[] buf) throws IOException {
     write(buf, 0, buf.length);
   }
 
-  public void write(byte[] buf, int offset, int length) throws IOException {
+  public void write(final byte[] buf, final int offset, final int length) throws IOException {
 
     if (length < bufferSize) {
       /* If we can use the buffer do so... */
@@ -792,11 +799,11 @@ public final class BufferedFile
    * @param b  The value to be written.  Externally true is represented as
    *           a byte of 1 and false as a byte value of 0.
    */
-  public void writeBoolean(boolean b) throws IOException {
+  public void writeBoolean(final boolean b) throws IOException {
     convertFromBoolean(b);
   }
 
-  private void convertFromBoolean(boolean b) throws IOException {
+  private void convertFromBoolean(final boolean b) throws IOException {
     needBuffer(1);
     if (b) {
       buffer[bufferOffset] = (byte) 1;
@@ -808,38 +815,42 @@ public final class BufferedFile
 
   /** Write a byte value.
    */
-  public void writeByte(int b) throws IOException {
+  public void writeByte(final int b) throws IOException {
     convertFromByte(b);
   }
 
-  private void convertFromByte(int b) throws IOException {
+  private void convertFromByte(final int b) throws IOException {
     needBuffer(1);
     buffer[bufferOffset++] = (byte) b;
   }
 
   /** Write an integer value.
    */
-  public void writeInt(int i) throws IOException {
+  public void writeInt(final int i) throws IOException {
     convertFromInt(i);
   }
 
-  private void convertFromInt(int i) throws IOException {
-
+  private void convertFromInt(final int i) throws IOException {
     needBuffer(4);
-    buffer[bufferOffset++] = (byte) (i >>> 24);
-    buffer[bufferOffset++] = (byte) (i >>> 16);
-    buffer[bufferOffset++] = (byte) (i >>> 8);
-    buffer[bufferOffset++] = (byte) i;
+
+    final byte[] b = buffer;
+    final int x = bufferOffset;
+
+    b[x + 1] = (byte) (i >>> 24);
+    b[x + 2] = (byte) (i >>> 16);
+    b[x + 3] = (byte) (i >>> 8);
+    b[x + 4] = (byte) i;
+    bufferOffset += 4;
   }
 
   /** Write a short value.
    */
-  public void writeShort(int s) throws IOException {
+  public void writeShort(final int s) throws IOException {
 
     convertFromShort(s);
   }
 
-  private void convertFromShort(int s) throws IOException {
+  private void convertFromShort(final int s) throws IOException {
     needBuffer(2);
 
     buffer[bufferOffset++] = (byte) (s >>> 8);
@@ -848,11 +859,11 @@ public final class BufferedFile
 
   /** Write a char value.
    */
-  public void writeChar(int c) throws IOException {
+  public void writeChar(final int c) throws IOException {
     convertFromChar(c);
   }
 
-  private void convertFromChar(int c) throws IOException {
+  private void convertFromChar(final int c) throws IOException {
     needBuffer(2);
     buffer[bufferOffset++] = (byte) (c >>> 8);
     buffer[bufferOffset++] = (byte) c;
@@ -860,32 +871,36 @@ public final class BufferedFile
 
   /** Write a long value.
    */
-  public void writeLong(long l) throws IOException {
+  public void writeLong(final long l) throws IOException {
     convertFromLong(l);
   }
 
-  private void convertFromLong(long l) throws IOException {
+  private void convertFromLong(final long l) throws IOException {
     needBuffer(8);
 
-    buffer[bufferOffset++] = (byte) (l >>> 56);
-    buffer[bufferOffset++] = (byte) (l >>> 48);
-    buffer[bufferOffset++] = (byte) (l >>> 40);
-    buffer[bufferOffset++] = (byte) (l >>> 32);
-    buffer[bufferOffset++] = (byte) (l >>> 24);
-    buffer[bufferOffset++] = (byte) (l >>> 16);
-    buffer[bufferOffset++] = (byte) (l >>> 8);
-    buffer[bufferOffset++] = (byte) l;
+    final byte[] b = buffer;
+    final int x = bufferOffset;
+
+    b[x] = (byte) (l >>> 56);
+    b[x + 1] = (byte) (l >>> 48);
+    b[x + 2] = (byte) (l >>> 40);
+    b[x + 3] = (byte) (l >>> 32);
+    b[x + 4] = (byte) (l >>> 24);
+    b[x + 5] = (byte) (l >>> 16);
+    b[x + 6] = (byte) (l >>> 8);
+    b[x + 7] = (byte) l;
+    bufferOffset += 8;
   }
 
   /** Write a float value.
    */
-  public void writeFloat(float f) throws IOException {
+  public void writeFloat(final float f) throws IOException {
     convertFromInt(Float.floatToIntBits(f));
   }
 
   /** Write a double value.
    */
-  public void writeDouble(double d) throws IOException {
+  public void writeDouble(final double d) throws IOException {
     convertFromLong(Double.doubleToLongBits(d));
   }
 
@@ -893,13 +908,13 @@ public final class BufferedFile
    *
    * @param s   The string to be written.
    */
-  public void writeBytes(String s) throws IOException {
+  public void writeBytes(final String s) throws IOException {
     write(s.getBytes(), 0, s.length());
   }
 
   /** Write a string as an array of chars.
    */
-  public void writeChars(String s) throws IOException {
+  public void writeChars(final String s) throws IOException {
 
     int len = s.length();
     for (int i = 0; i < len; i++) {
@@ -909,7 +924,7 @@ public final class BufferedFile
 
   /** Write a string as a UTF.
    */
-  public void writeUTF(String s) throws IOException {
+  public void writeUTF(final String s) throws IOException {
     flush();
     raf.writeUTF(s);
     fileOffset = raf.getFilePointer();
@@ -928,7 +943,7 @@ public final class BufferedFile
    * @param o  The object to be written.  It must be an array of a primitive
    *           type, Object, or String.
    */
-  public void writeArray(Object o) throws IOException {
+  public void writeArray(final Object o) throws IOException {
     String className = o.getClass().getName();
 
     if (className.charAt(0) != '[') {
@@ -991,100 +1006,98 @@ public final class BufferedFile
 
   /** Write an array of booleans.
    */
-  public void write(boolean[] b) throws IOException {
+  public void write(final boolean[] b) throws IOException {
     write(b, 0, b.length);
   }
 
-  public void write(boolean[] b, int start, int length) throws IOException {
-    for (int i = start; i < start + length; i++) {
+  public void write(final boolean[] b, final int start, final int length) throws IOException {
+    for (int i = start, size = start + length; i < size; i++) {
       convertFromBoolean(b[i]);
     }
   }
 
   /** Write an array of shorts.
    */
-  public void write(short[] s) throws IOException {
+  public void write(final short[] s) throws IOException {
     write(s, 0, s.length);
   }
 
-  public void write(short[] s, int start, int length) throws IOException {
+  public void write(final short[] s, final int start, final int length) throws IOException {
 
-    for (int i = start; i < start + length; i++) {
+    for (int i = start, size = start + length; i < size; i++) {
       convertFromShort(s[i]);
     }
   }
 
   /** Write an array of char's.
    */
-  public void write(char[] c) throws IOException {
+  public void write(final char[] c) throws IOException {
     write(c, 0, c.length);
   }
 
-  public void write(char[] c, int start, int length) throws IOException {
+  public void write(final char[] c, final int start, final int length) throws IOException {
 
-    for (int i = start; i < start + length; i++) {
+    for (int i = start, size = start + length; i < size; i++) {
       convertFromChar(c[i]);
     }
   }
 
   /** Write an array of int's.
    */
-  public void write(int[] i) throws IOException {
+  public void write(final int[] i) throws IOException {
     write(i, 0, i.length);
   }
 
-  public void write(int[] i, int start, int length) throws IOException {
-    for (int ii = start; ii < start + length; ii++) {
+  public void write(final int[] i, final int start, final int length) throws IOException {
+    for (int ii = start, size = start + length; ii < size; ii++) {
       convertFromInt(i[ii]);
     }
   }
 
   /** Write an array of longs.
    */
-  public void write(long[] l) throws IOException {
+  public void write(final long[] l) throws IOException {
     write(l, 0, l.length);
   }
 
-  public void write(long[] l, int start, int length) throws IOException {
-
-    for (int i = start; i < start + length; i++) {
+  public void write(final long[] l, final int start, final int length) throws IOException {
+    for (int i = start, size = start + length; i < size; i++) {
       convertFromLong(l[i]);
     }
   }
 
   /** Write an array of floats.
    */
-  public void write(float[] f) throws IOException {
+  public void write(final float[] f) throws IOException {
     write(f, 0, f.length);
   }
 
-  public void write(float[] f, int start, int length) throws IOException {
-    for (int i = start; i < start + length; i++) {
+  public void write(final float[] f, final int start, final int length) throws IOException {
+    for (int i = start, size = start + length; i < size; i++) {
       convertFromInt(Float.floatToIntBits(f[i]));
     }
   }
 
   /** Write an array of doubles.
    */
-  public void write(double[] d) throws IOException {
+  public void write(final double[] d) throws IOException {
     write(d, 0, d.length);
   }
 
-  public void write(double[] d, int start, int length) throws IOException {
-
-    for (int i = start; i < start + length; i++) {
+  public void write(final double[] d, final int start, final int length) throws IOException {
+    for (int i = start, size = start + length; i < size; i++) {
       convertFromLong(Double.doubleToLongBits(d[i]));
     }
   }
 
   /** Write an array of Strings -- equivalent to calling writeBytes for each string.
    */
-  public void write(String[] s) throws IOException {
+  public void write(final String[] s) throws IOException {
     write(s, 0, s.length);
   }
 
-  public void write(String[] s, int start, int length) throws IOException {
-    for (int i = start; i < start + length; i++) {
+  public void write(final String[] s, final int start, final int length) throws IOException {
+    for (int i = start, size = start + length; i < size; i++) {
       writeBytes(s[i]);
     }
   }
@@ -1138,7 +1151,7 @@ public final class BufferedFile
    *                  is set.
    *
    */
-  public void setLength(long newLength) throws IOException {
+  public void setLength(final long newLength) throws IOException {
 
     flush();
     raf.setLength(newLength);

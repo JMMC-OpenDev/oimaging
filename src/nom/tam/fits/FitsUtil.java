@@ -23,10 +23,10 @@ import java.util.List;
  *  utility functions used throughout
  *  the FITS classes.
  */
-public class FitsUtil {
+public final class FitsUtil {
 
   /** Reposition a random access stream to a requested offset */
-  public static void reposition(Object o, long offset)
+  public static void reposition(final Object o, final long offset)
           throws FitsException {
 
     if (o == null) {
@@ -49,7 +49,7 @@ public class FitsUtil {
   }
 
   /** Find out where we are in a random access file */
-  public static long findOffset(Object o) {
+  public static long findOffset(final Object o) {
 
     if (o instanceof RandomAccess) {
       return ((RandomAccess) o).getFilePointer();
@@ -59,11 +59,11 @@ public class FitsUtil {
   }
 
   /** How many bytes are needed to fill the last 2880 block? */
-  public static int padding(int size) {
+  public static int padding(final int size) {
     return padding((long) size);
   }
 
-  public static int padding(long size) {
+  public static int padding(final long size) {
 
     int mod = (int) (size % 2880);
     if (mod > 0) {
@@ -73,23 +73,23 @@ public class FitsUtil {
   }
 
   /** Total size of blocked FITS element */
-  public static int addPadding(int size) {
+  public static int addPadding(final int size) {
     return size + padding(size);
   }
 
-  public static long addPadding(long size) {
+  public static long addPadding(final long size) {
     return size + padding(size);
   }
 
   /** Is a file compressed? */
-  public static boolean isCompressed(File test) {
+  public static boolean isCompressed(final File test) {
     InputStream fis = null;
     try {
       if (test.exists()) {
         fis = new FileInputStream(test);
         int mag1 = fis.read();
         int mag2 = fis.read();
-        fis.close();
+
         if (mag1 == 0x1f && (mag2 == 0x8b || mag2 == 0x9d)) {
           return true;
         } else {
@@ -114,7 +114,7 @@ public class FitsUtil {
 
   /** Check if a file seems to be compressed.
    */
-  public static boolean isCompressed(String filename) {
+  public static boolean isCompressed(final String filename) {
     if (filename == null) {
       return false;
     }
@@ -130,7 +130,7 @@ public class FitsUtil {
 
   /** Get the maximum length of a String in a String array.
    */
-  public static int maxLength(String[] o) throws FitsException {
+  public static int maxLength(final String[] o) throws FitsException {
 
     int max = 0;
     for (int i = 0; i < o.length; i++) {
@@ -142,7 +142,7 @@ public class FitsUtil {
   }
 
   /** Copy an array of Strings to bytes.*/
-  public static byte[] stringsToByteArray(String[] o, int maxLen) {
+  public static byte[] stringsToByteArray(final String[] o, final int maxLen) {
     byte[] res = new byte[o.length * maxLen];
     for (int i = 0; i < o.length; i++) {
       byte[] bstr;
@@ -164,7 +164,7 @@ public class FitsUtil {
   }
 
   /** Convert bytes to Strings */
-  public static String[] byteArrayToStrings(byte[] o, int maxLen) {
+  public static String[] byteArrayToStrings(final byte[] o, final int maxLen) {
 
     String[] res = new String[o.length / maxLen];
     for (int i = 0; i < res.length; i++) {
@@ -193,7 +193,7 @@ public class FitsUtil {
   }
 
   /** Convert an array of booleans to bytes */
-  static byte[] booleanToByte(boolean[] bool) {
+  static byte[] booleanToByte(final boolean[] bool) {
 
     byte[] byt = new byte[bool.length];
     for (int i = 0; i < bool.length; i++) {
@@ -203,7 +203,7 @@ public class FitsUtil {
   }
 
   /** Convert an array of bytes to booleans */
-  static boolean[] byteToBoolean(byte[] byt) {
+  static boolean[] byteToBoolean(final byte[] byt) {
     boolean[] bool = new boolean[byt.length];
 
     for (int i = 0; i < byt.length; i++) {
@@ -217,7 +217,7 @@ public class FitsUtil {
    *  protocol than the original request, then the redirection
    *  is not handled automatically.
    */
-  public static InputStream getURLStream(URL url, int level) throws IOException {
+  public static InputStream getURLStream(final URL url, final int level) throws IOException {
 
     // Hard coded....sigh
     if (level > 5) {

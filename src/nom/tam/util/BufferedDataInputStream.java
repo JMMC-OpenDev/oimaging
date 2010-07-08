@@ -52,7 +52,7 @@ import java.io.EOFException;
  * arrays.  Additional work is required to handle very large arrays
  * generally.
  */
-public class BufferedDataInputStream
+public final class BufferedDataInputStream
         extends BufferedInputStream
         implements ArrayDataInput {
 
@@ -468,9 +468,11 @@ public class BufferedDataInputStream
    *  if they cannot be obtained.  Note that this
    *  routine will try to fill the buffer completely.
    *
-   *  @param The required number of bytes.
+   *  @param needed The required number of bytes.
    */
-  private void fillBuf(int need) throws IOException {
+  private void fillBuf(int needed) throws IOException {
+
+    int need = needed;
 
     if (count > pos) {
       System.arraycopy(buf, pos, buf, 0, count - pos);
@@ -482,10 +484,10 @@ public class BufferedDataInputStream
       pos = 0;
     }
 
+    int len;
     while (need > 0) {
 
-
-      int len = in.read(buf, count, buf.length - count);
+      len = in.read(buf, count, buf.length - count);
       if (len <= 0) {
         throw new EOFException();
       }
@@ -501,11 +503,11 @@ public class BufferedDataInputStream
 
   /** Read a boolean array.
    */
-  public int read(boolean[] b, int start, int len) throws IOException {
+  public int read(final boolean[] b, final int start, final int len) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + len; i++) {
+      for (final int size = start + len; i < size; i++) {
 
         if (pos >= count) {
           fillBuf(1);
@@ -530,11 +532,11 @@ public class BufferedDataInputStream
   }
 
   /** Read a short array */
-  public int read(short[] s, int start, int len) throws IOException {
+  public int read(final short[] s, final int start, final int len) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + len; i++) {
+      for (final int size = start + len; i < size; i++) {
         if (count - pos < 2) {
           fillBuf(2);
         }
@@ -553,11 +555,11 @@ public class BufferedDataInputStream
   }
 
   /** Read a character array */
-  public int read(char[] c, int start, int len) throws IOException {
+  public int read(final char[] c, final int start, final int len) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + len; i++) {
+      for (final int size = start + len; i < size; i++) {
         if (count - pos < 2) {
           fillBuf(2);
         }
@@ -576,11 +578,11 @@ public class BufferedDataInputStream
   }
 
   /** Read an integer array */
-  public int read(int[] i, int start, int len) throws IOException {
+  public int read(final int[] i, final int start, final int len) throws IOException {
 
     int ii = start;
     try {
-      for (; ii < start + len; ii++) {
+      for (final int size = start + len; ii < size; ii++) {
 
         if (count - pos < 4) {
           fillBuf(4);
@@ -604,16 +606,17 @@ public class BufferedDataInputStream
   }
 
   /** Read a long array */
-  public int read(long[] l, int start, int len) throws IOException {
+  public int read(final long[] l, final int start, final int len) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + len; i++) {
+      int i1, i2;
+      for (final int size = start + len; i < size; i++) {
         if (count - pos < 8) {
           fillBuf(8);
         }
-        int i1 = buf[pos] << 24 | (buf[pos + 1] & 0xFF) << 16 | (buf[pos + 2] & 0xFF) << 8 | (buf[pos + 3] & 0xFF);
-        int i2 = buf[pos + 4] << 24 | (buf[pos + 5] & 0xFF) << 16 | (buf[pos + 6] & 0xFF) << 8 | (buf[pos + 7] & 0xFF);
+        i1 = buf[pos] << 24 | (buf[pos + 1] & 0xFF) << 16 | (buf[pos + 2] & 0xFF) << 8 | (buf[pos + 3] & 0xFF);
+        i2 = buf[pos + 4] << 24 | (buf[pos + 5] & 0xFF) << 16 | (buf[pos + 6] & 0xFF) << 8 | (buf[pos + 7] & 0xFF);
         l[i] = ((long) i1) << 32 | ((long) i2 & 0x00000000FFFFFFFFL);
         pos += 8;
       }
@@ -630,15 +633,16 @@ public class BufferedDataInputStream
   }
 
   /** Read a float array */
-  public int read(float[] f, int start, int len) throws IOException {
+  public int read(final float[] f, final int start, final int len) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + len; i++) {
+      int t;
+      for (final int size = start + len; i < size; i++) {
         if (count - pos < 4) {
           fillBuf(4);
         }
-        int t = buf[pos] << 24
+        t = buf[pos] << 24
                 | (buf[pos + 1] & 0xFF) << 16
                 | (buf[pos + 2] & 0xFF) << 8
                 | (buf[pos + 3] & 0xFF);
@@ -657,17 +661,18 @@ public class BufferedDataInputStream
   }
 
   /** Read a double array */
-  public int read(double[] d, int start, int len) throws IOException {
+  public int read(final double[] d, final int start, final int len) throws IOException {
 
     int i = start;
     try {
-      for (; i < start + len; i++) {
+      int i1, i2;
+      for (final int size = start + len; i < size; i++) {
 
         if (count - pos < 8) {
           fillBuf(8);
         }
-        int i1 = buf[pos] << 24 | (buf[pos + 1] & 0xFF) << 16 | (buf[pos + 2] & 0xFF) << 8 | (buf[pos + 3] & 0xFF);
-        int i2 = buf[pos + 4] << 24 | (buf[pos + 5] & 0xFF) << 16 | (buf[pos + 6] & 0xFF) << 8 | (buf[pos + 7] & 0xFF);
+        i1 = buf[pos] << 24 | (buf[pos + 1] & 0xFF) << 16 | (buf[pos + 2] & 0xFF) << 8 | (buf[pos + 3] & 0xFF);
+        i2 = buf[pos + 4] << 24 | (buf[pos + 5] & 0xFF) << 16 | (buf[pos + 6] & 0xFF) << 8 | (buf[pos + 7] & 0xFF);
         d[i] = Double.longBitsToDouble(
                 ((long) i1) << 32 | ((long) i2 & 0x00000000FFFFFFFFL));
         pos += 8;
