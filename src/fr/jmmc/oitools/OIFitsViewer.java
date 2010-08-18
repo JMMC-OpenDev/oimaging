@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsViewer.java,v 1.3 2010-08-17 14:17:53 mella Exp $"
+ * "@(#) $Id: OIFitsViewer.java,v 1.4 2010-08-18 08:37:10 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/08/17 14:17:53  mella
+ * Output data in extended mode
+ *
  * Revision 1.2  2010/05/18 07:19:17  mella
  * remove import of one old Class
  *
@@ -40,8 +43,8 @@ public class OIFitsViewer {
     try {
       OIFitsChecker checker = new OIFitsChecker();
       final OIFitsFile oiFitsFile = OIFitsLoader.loadOIFits(checker,filename);
-      // output the full beautified content of given file in xml
-      System.out.println(oiFitsFile.getXmlDesc(true, true));
+      // output the minimal information in xml format
+      System.out.println(oiFitsFile.getXmlDesc(false, false));
 
     } catch (Exception e) {
       e.printStackTrace(System.err);
