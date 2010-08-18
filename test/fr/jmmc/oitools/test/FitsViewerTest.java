@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FitsViewerTest.java,v 1.3 2010-06-02 11:52:27 bourgesl Exp $"
+ * "@(#) $Id: FitsViewerTest.java,v 1.4 2010-08-18 09:39:56 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/06/02 11:52:27  bourgesl
+ * use logger instead of System.out
+ *
  * Revision 1.2  2010/04/29 14:16:24  bourgesl
  * added a flag to choose between OIValidator or OITools viewer
  *
@@ -18,6 +21,9 @@ package fr.jmmc.oitools.test;
 import fr.jmmc.oifits.visualizer.OifitsViewer;
 import fr.jmmc.oitools.OIFitsViewer;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -25,6 +31,7 @@ import java.util.logging.Level;
  * @author bourgesl
  */
 public class FitsViewerTest implements TestEnv {
+
   /** flag to use OITools impl instead of OIValidator */
   private final static boolean USE_OITOOLS = true;
 
@@ -32,7 +39,7 @@ public class FitsViewerTest implements TestEnv {
     super();
   }
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     int n = 0;
     int errors = 0;
 
@@ -47,7 +54,7 @@ public class FitsViewerTest implements TestEnv {
       final String file = TEST_DIR + "YSO_disk.fits.gz";
 
       n++;
-      errors += dumpFile(file);
+      errors += dumpFile(args, file);
     }
 
     if (true) {
@@ -61,7 +68,7 @@ public class FitsViewerTest implements TestEnv {
         for (File f : files) {
           if (f.isFile() && (f.getName().endsWith("fits") || f.getName().endsWith("fits.gz"))) {
             n++;
-            errors += dumpFile(f.getAbsolutePath());
+            errors += dumpFile(args, f.getAbsolutePath());
           }
         }
 
@@ -72,7 +79,7 @@ public class FitsViewerTest implements TestEnv {
     logger.info("Errors = " + errors + " on " + n + " files.");
   }
 
-  public static int dumpFile(final String absFilePath) {
+  public static int dumpFile(final String[] args, final String absFilePath) {
     int error = 0;
 
     try {
@@ -81,7 +88,10 @@ public class FitsViewerTest implements TestEnv {
       final long start = System.nanoTime();
 
       if (USE_OITOOLS) {
-        new OIFitsViewer(absFilePath);
+        final List<String> arguments = new ArrayList<String>();
+        arguments.addAll(Arrays.asList(args));
+        arguments.add(absFilePath);
+        OIFitsViewer.main(arguments.toArray(new String[0]));
       } else {
         new OifitsViewer(absFilePath);
       }
