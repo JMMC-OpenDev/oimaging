@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITarget.java,v 1.5 2010-06-18 15:42:36 bourgesl Exp $"
+ * "@(#) $Id: OITarget.java,v 1.6 2010-08-18 08:31:31 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/18 15:42:36  bourgesl
+ * new constructors to create OI_* tables from scratch
+ *
  * Revision 1.4  2010/06/17 15:01:56  bourgesl
  * classes made final
  *
@@ -375,43 +378,6 @@ public final class OITarget extends OITable {
     }
 
     getOIFitsFile().checkCrossRefering(this, checker);
-  }
-
-  /**
-   * Fill the given buffer with the xml serialisation of the table.
-   * @param sb string buffer
-   * @param detailled if true the result will contain the table content
-   */
-  @Override
-  public void getXmlDesc(final StringBuilder sb, final boolean detailled) {
-
-    sb.append("<targets>");
-
-    for (int i = 0, len = getNbTargets(); i < len; i++) {
-      sb.append("<target>");
-      sb.append("<name>").append(getTarget()[i]).append("</name>");
-      sb.append("<id>").append(getTargetId()[i]).append("</id>");
-      sb.append("<raEp0>").append(getRaEp0()[i]).append("</raEp0>");
-      sb.append("<decEp0>").append(getDecEp0()[i]).append("</decEp0>");
-      sb.append("<equinox>").append(getEquinox()[i]).append("</equinox>");
-      sb.append("<raErr>").append(getRaErr()[i]).append("</raErr>");
-      sb.append("<decErr>").append(getDecErr()[i]).append("</decErr>");
-      sb.append("<sysVel>").append(getSysVel()[i]).append("</sysVel>");
-      sb.append("<velTyp>").append(getVelTyp()[i]).append("</velTyp>");
-      sb.append("<velDef>").append(getVelDef()[i]).append("</velDef>");
-      sb.append("<pmRa>").append(getPmRa()[i]).append("</pmRa>");
-      sb.append("<pmDec>").append(getPmDec()[i]).append("</pmDec>");
-      sb.append("<pmRaErr>").append(getPmRaErr()[i]).append("</pmRaErr>");
-      sb.append("<pmDecErr>").append(getPmDecErr()[i]).append("</pmDecErr>");
-      sb.append("<parallax>").append(getParallax()[i]).append("</parallax>");
-      sb.append("<paraErr>").append(getParaErr()[i]).append("</paraErr>");
-      sb.append("<specTyp>").append(getSpecTyp()[i]).append("</specTyp>");
-      sb.append("</target>");
-    }
-
-    sb.append("</targets>\n\n");
-
-    super.getXmlDesc(sb, detailled);
   }
 
   /**

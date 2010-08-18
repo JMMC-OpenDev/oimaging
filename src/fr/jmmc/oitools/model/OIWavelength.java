@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIWavelength.java,v 1.8 2010-06-28 14:33:55 bourgesl Exp $"
+ * "@(#) $Id: OIWavelength.java,v 1.9 2010-08-18 08:31:31 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.8  2010/06/28 14:33:55  bourgesl
+ * added beautified output for XML description using custom number formatters
+ *
  * Revision 1.7  2010/06/18 15:42:36  bourgesl
  * new constructors to create OI_* tables from scratch
  *
@@ -185,32 +188,6 @@ public final class OIWavelength extends OITable {
     }
 
     getOIFitsFile().checkCrossRefering(this, checker);
-  }
-
-  /**
-   * Fill the given buffer with the xml serialisation of the table.
-   * @param sb string buffer
-   * @param detailled if true the result will contain the table content
-   */
-  @Override
-  public void getXmlDesc(final StringBuilder sb, final boolean detailled) {
-    sb.append("<insname>");
-    sb.append("<name>").append(getInsName()).append("</name>");
-    sb.append("<nwave>").append(getNWave()).append("</nwave>");
-    sb.append("<effwaves>");
-
-    final DecimalFormat formatter = new DecimalFormat("0.00E0", US_SYMBOLS);
-
-    final float[] effWaves = getEffWave();
-
-    for (int i = 0, len = getNbRows(); i < len; i++) {
-      sb.append("<effwave>").append(formatter.format(effWaves[i])).append("</effwave>");
-    }
-    sb.append("</effwaves>");
-
-    sb.append("</insname>\n\n");
-
-    super.getXmlDesc(sb, detailled);
   }
 }
 /*___oOo___*/

@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.7 2010-06-28 14:33:55 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.8 2010-08-18 08:31:30 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.7  2010/06/28 14:33:55  bourgesl
+ * added beautified output for XML description using custom number formatters
+ *
  * Revision 1.6  2010/06/21 15:43:54  bourgesl
  * properly set extNb and extVer for added tables
  *
@@ -512,7 +515,6 @@ public final class OIFitsFile extends OIFits {
     OITable t;
 
     // arrnames
-    sb.append("<arrnames>");
     strings = getAcceptedArrNames();
     for (int i = 0, len = strings.length; i < len; i++) {
       t = getOiArray(strings[i]);
@@ -520,23 +522,20 @@ public final class OIFitsFile extends OIFits {
         t.getXmlDesc(sb, true, useBeautyfier);
       }
     }
-    sb.append("</arrnames>\n");
 
     // insnames
-    sb.append("<insnames>");
     strings = getAcceptedInsNames();
     for (int i = 0, len = strings.length; i < len; i++) {
       t = getOiWavelength(strings[i]);
       if (t != null) {
-        t.getXmlDesc(sb, detailled, useBeautyfier);
+        t.getXmlDesc(sb, true, useBeautyfier);
       }
     }
-    sb.append("</insnames>\n");
 
     // targets
     final OITarget oiTarget = getOiTarget();
     if (oiTarget != null) {
-      oiTarget.getXmlDesc(sb, detailled, useBeautyfier);
+      oiTarget.getXmlDesc(sb, true, useBeautyfier);
     }
 
     // data tables

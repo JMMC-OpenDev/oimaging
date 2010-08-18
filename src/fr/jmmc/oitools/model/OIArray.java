@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIArray.java,v 1.7 2010-06-18 15:42:36 bourgesl Exp $"
+ * "@(#) $Id: OIArray.java,v 1.8 2010-08-18 08:31:31 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.7  2010/06/18 15:42:36  bourgesl
+ * new constructors to create OI_* tables from scratch
+ *
  * Revision 1.6  2010/06/17 15:02:27  bourgesl
  * added getter / setter methods for keywords and columns
  *
@@ -278,21 +281,6 @@ public final class OIArray extends OITable {
     }
 
     getOIFitsFile().checkCrossRefering(this, checker);
-  }
-
-  /**
-   * Fill the given buffer with the xml serialisation of the table.
-   * @param sb string buffer
-   * @param detailled if true the result will contain the table content
-   */
-  @Override
-  public void getXmlDesc(final StringBuilder sb, final boolean detailled) {
-    sb.append("<arrname>");
-    sb.append("<name>").append(getArrName()).append("</name>");
-    sb.append("<positions>").append(getNbRows()).append("</positions>");
-    sb.append("</arrname>\n\n");
-
-    super.getXmlDesc(sb, detailled);
   }
 }
 /*___oOo___*/
