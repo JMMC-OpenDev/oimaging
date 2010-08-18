@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.7 2010-06-18 15:42:05 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.8 2010-08-18 12:45:10 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.7  2010/06/18 15:42:05  bourgesl
+ * code formatting
+ *
  * Revision 1.6  2010/06/01 16:02:25  bourgesl
  * check if the given file does not exist
  * check if a column is optional
@@ -92,9 +95,11 @@ public class OIFitsLoader {
   public static OIFitsFile loadOIFits(final OIFitsChecker checker, final String fileLocation) throws MalformedURLException, IOException, FitsException {
     String tmpFilename = fileLocation;
 
+    boolean remote = false;
     // If the given file is remote :
     if (fileLocation.contains("://")) {
       // Only remote files are retrieved :
+      remote = true;
 
       // Load it and unarchive it as the Fits library does not manage remote file.
       tmpFilename = FileUtils.saveToFile(fileLocation);
@@ -103,6 +108,11 @@ public class OIFitsLoader {
     final OIFitsLoader loader = new OIFitsLoader(checker);
 
     loader.load(tmpFilename);
+    
+    if (remote) {
+      // store the URL instead of the temporary file location :
+      loader.getOIFitsFile().setAbsoluteFilePath(fileLocation);
+    }
 
     return loader.getOIFitsFile();
   }

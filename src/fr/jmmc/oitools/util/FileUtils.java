@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FileUtils.java,v 1.3 2010-05-27 14:43:43 bourgesl Exp $"
+ * "@(#) $Id: FileUtils.java,v 1.4 2010-08-18 12:45:10 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/05/27 14:43:43  bourgesl
+ * javadoc
+ *
  * Revision 1.2  2010/05/03 14:25:46  bourgesl
  * removed comment
  *
@@ -87,6 +90,8 @@ public class FileUtils {
 
     /* Generating temporary file relative to input parameter */
     final File outFile = File.createTempFile(filename, ".fits");
+    outFile.deleteOnExit();
+
     final String outFilename = outFile.getCanonicalPath();
 
     if (logger.isLoggable(Level.FINE)) {
