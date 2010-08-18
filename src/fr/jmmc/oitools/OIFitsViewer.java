@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsViewer.java,v 1.5 2010-08-18 09:39:56 bourgesl Exp $"
+ * "@(#) $Id: OIFitsViewer.java,v 1.6 2010-08-18 14:29:34 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/08/18 09:39:56  bourgesl
+ * added command line arguments (-format -verbose -help)
+ *
  * Revision 1.4  2010/08/18 08:37:10  mella
  * Change default output format
  *
@@ -30,6 +33,7 @@ package fr.jmmc.oitools;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
+import fr.jmmc.oitools.model.XmlOutputVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,10 +44,8 @@ import java.util.List;
 public final class OIFitsViewer {
 
   /* members */
-  /** use number formatter */
-  private final boolean format;
-  /** use verbose output */
-  private final boolean verbose;
+  /** internal XML serializer */
+  private final XmlOutputVisitor xmlSerializer;
   /** internal OIFits checker */
   private final OIFitsChecker checker;
 
@@ -57,13 +59,11 @@ public final class OIFitsViewer {
   /**
    * Creates a new OifitsViewer object.
    *
-   * @param format use number formatter
-   * @param verbose use verbose output
+   * @param format flag to represent data with less accuracy but a better string representation
+   * @param verbose if true the result will contain the table content
    */
   public OIFitsViewer(final boolean format, final boolean verbose) {
-    this.format = format;
-    this.verbose = verbose;
-
+    this.xmlSerializer = new XmlOutputVisitor(format, verbose);
     this.checker = new OIFitsChecker();
   }
 
@@ -75,12 +75,15 @@ public final class OIFitsViewer {
   public void process(final String filename) {
     try {
       final OIFitsFile oiFitsFile = OIFitsLoader.loadOIFits(this.checker, filename);
-      // output the minimal information in xml format
-      System.out.println(oiFitsFile.getXmlDesc(this.verbose, this.format));
+
+      oiFitsFile.accept(this.xmlSerializer);
+
+      System.out.println(this.xmlSerializer.toString());
 
     } catch (Exception e) {
       e.printStackTrace(System.err);
       System.out.println("Error reading file '" + filename + "'");
+      this.xmlSerializer.reset();
     }
   }
 
@@ -148,7 +151,7 @@ public final class OIFitsViewer {
     System.out.println(
             "|-----------------------------------------------------------------------|");
     System.out.println(
-            "| [-f] or [-format]            Use the number foramtter                 |");
+            "| [-f] or [-format]            Use the number formatter                 |");
     System.out.println(
             "| [-v] or [-verbose]           Dump all column data                     |");
     System.out.println(

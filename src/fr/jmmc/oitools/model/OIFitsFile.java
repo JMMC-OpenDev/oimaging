@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.8 2010-08-18 08:31:30 mella Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.9 2010-08-18 14:29:33 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.8  2010/08/18 08:31:30  mella
+ * Clean old xml output
+ *
  * Revision 1.7  2010/06/28 14:33:55  bourgesl
  * added beautified output for XML description using custom number formatters
  *
@@ -464,88 +467,11 @@ public final class OIFitsFile extends OIFits {
   }
 
   /**
-   * Return one xml string with file information
-   * @return the xml description
+   * Implements the Visitor pattern
+   * @param visitor visitor implementation
    */
-  public final String getXmlDesc() {
-    return this.getXmlDesc(false, false);
-  }
-
-  /**
-   * Return one xml string with file information
-   * @param detailled if true the result will contain the table content
-   * @return the xml description
-   */
-  public final String getXmlDesc(final boolean detailled) {
-    return this.getXmlDesc(detailled, false);
-  }
-
-  /**
-   * Return one xml string with file information
-   * @param detailled if true the result will contain the table content
-   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
-   * @return the xml description
-   */
-  public final String getXmlDesc(final boolean detailled, final boolean useBeautyfier) {
-    final StringBuilder sb = new StringBuilder(16384);
-
-    // fill the buffer :
-    this.getXmlDesc(sb, detailled, useBeautyfier);
-
-    if (logger.isLoggable(Level.FINEST)) {
-      logger.finest("xmlDesc buffer = " + sb.length());
-    }
-
-    return sb.toString();
-  }
-
-  /**
-   * Fill the given buffer with file information
-   * @param sb string buffer
-   * @param detailled if true the result will contain the table content
-   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
-   */
-  public final void getXmlDesc(final StringBuilder sb, final boolean detailled, final boolean useBeautyfier) {
-    sb.append("<oifits>\n");
-    if (getName() != null) {
-      sb.append("<filename>").append(getName()).append("</filename>\n");
-    }
-
-    String[] strings;
-    OITable t;
-
-    // arrnames
-    strings = getAcceptedArrNames();
-    for (int i = 0, len = strings.length; i < len; i++) {
-      t = getOiArray(strings[i]);
-      if (t != null) {
-        t.getXmlDesc(sb, true, useBeautyfier);
-      }
-    }
-
-    // insnames
-    strings = getAcceptedInsNames();
-    for (int i = 0, len = strings.length; i < len; i++) {
-      t = getOiWavelength(strings[i]);
-      if (t != null) {
-        t.getXmlDesc(sb, true, useBeautyfier);
-      }
-    }
-
-    // targets
-    final OITarget oiTarget = getOiTarget();
-    if (oiTarget != null) {
-      oiTarget.getXmlDesc(sb, true, useBeautyfier);
-    }
-
-    // data tables
-    for (OITable oiTable : getOiTables()) {
-      if (oiTable instanceof OIData) {
-        oiTable.getXmlDesc(sb, detailled, useBeautyfier);
-      }
-    }
-
-    sb.append("</oifits>\n");
+  public final void accept(final ModelVisitor visitor) {
+    visitor.visit(this);
   }
 
   /*

@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.11 2010-06-28 14:33:55 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.12 2010-08-18 14:29:33 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.11  2010/06/28 14:33:55  bourgesl
+ * added beautified output for XML description using custom number formatters
+ *
  * Revision 1.10  2010/06/21 10:04:33  bourgesl
  * added in initializeTable() a test on the given number of rows to be >= 1
  *
@@ -90,13 +93,9 @@ import fr.jmmc.oitools.OIFitsConstants;
 import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import nom.tam.util.ArrayFuncs;
@@ -124,12 +123,6 @@ public class OITable extends ModelBase {
   private final static KeywordMeta KEYWORD_OI_REVN = new KeywordMeta(OIFitsConstants.KEYWORD_OI_REVN,
           "revision number of the table definition", Types.TYPE_INT,
           new short[]{OIFitsConstants.KEYWORD_OI_REVN_1});
-  /** US number format symbols */
-  protected final static DecimalFormatSymbols US_SYMBOLS = new DecimalFormatSymbols(Locale.US);
-  /** beautifier number formatter for standard values > 1e-2 and < 1e7 */
-  private final static NumberFormat DF_BEAUTY_STD = new DecimalFormat("#0.###", US_SYMBOLS);
-  /** beautifier number formatter for other values */
-  private final static NumberFormat DF_BEAUTY_SCI = new DecimalFormat("0.###E0", US_SYMBOLS);
 
   /* members */
   /** Main OIFitsFile */
@@ -735,251 +728,11 @@ public class OITable extends ModelBase {
   }
 
   /**
-   * Return the default simple xml serialisation of the table.
-   * @return the xml representation string.
+   * Implements the Visitor pattern
+   * @param visitor visitor implementation
    */
-  public final String getXmlDesc() {
-    return this.getXmlDesc(false);
-  }
-
-  /**
-   * Return the default simple xml serialisation of the table.
-   * @param detailled if true the result will contain the table content
-   * @return the xml representation string.
-   */
-  public final String getXmlDesc(final boolean detailled) {
-    final StringBuilder sb = new StringBuilder(1024);
-
-    // fill the buffer :
-    this.getXmlDesc(sb, detailled);
-
-    return sb.toString();
-  }
-
-  /**
-   * Fill the given buffer with the xml serialisation of the table.
-   * @param sb string buffer
-   * @param detailled if true the result will contain the table content
-   */
-  public void getXmlDesc(final StringBuilder sb, final boolean detailled) {
-    getXmlDesc(sb, detailled, false);
-  }
-
-  /**
-   * Fill the given buffer with the xml serialisation of the table.
-   * @param sb string buffer
-   * @param detailled if true the result will contain the table content
-   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
-   */
-  public void getXmlDesc(final StringBuilder sb, final boolean detailled, final boolean useBeautyfier) {
-
-    sb.append("<").append(getExtName()).append(">\n");
-
-    // Print keywords
-    sb.append("<keywords>\n");
-
-    Object val;
-    for (KeywordMeta keyword : getKeywordDescCollection()) {
-      val = getKeywordValue(keyword.getName());
-      // skip missing keywords :
-      if (val != null) {
-        sb.append("<keyword><name>").append(keyword.getName()).append("</name><value>").append(val);
-        sb.append("</value><description>").append(keyword.getDescription()).append("</description><type>");
-        sb.append(keyword.getType()).append("</type><unit>").append(keyword.getUnit()).append("</unit></keyword>\n");
-      }
-    }
-    sb.append("</keywords>\n");
-
-    // Print columns
-    sb.append("<columns>\n");
-
-    for (ColumnMeta column : getColumnDescCollection()) {
-      if (hasColumn(column)) {
-        sb.append("<column><name>").append(column.getName()).append("</name>");
-        sb.append("<description>").append(column.getDescription()).append("</description>");
-        sb.append("<type>").append(column.getType()).append("</type>");
-        sb.append("<unit>").append(column.getUnit()).append("</unit>");
-        sb.append("</column>\n");
-      }
-    }
-
-    sb.append("</columns>\n");
-
-    if (detailled) {
-      sb.append("<table>\n<tr>\n");
-
-      for (ColumnMeta column : getColumnDescCollection()) {
-        if (hasColumn(column)) {
-          sb.append("<th>").append(column.getName()).append("</th>");
-        }
-      }
-      sb.append("</tr>\n");
-
-      for (int rowIndex = 0, len = getNbRows(); rowIndex < len; rowIndex++) {
-        sb.append("<tr>");
-
-        for (ColumnMeta column : getColumnDescCollection()) {
-          if (hasColumn(column)) {
-            sb.append("<td>");
-
-            this.dumpColumnRow(column, rowIndex, sb, useBeautyfier);
-
-            sb.append("</td>");
-          }
-        }
-        sb.append("</tr>\n");
-      }
-
-      sb.append("</table>\n");
-    }
-    sb.append("</").append(getExtName()).append(">\n");
-  }
-
-  /**
-   * Append the string representation (String or array) of the column value at the given row index
-   * @param column column descriptor
-   * @param rowIndex row index
-   * @param sb string buffer
-   * @param useBeautyfier flag to represent data with less accuracy but a better string representation
-   */
-  private void dumpColumnRow(final ColumnMeta column, final int rowIndex, final StringBuilder sb, final boolean useBeautyfier) {
-    switch (column.getDataType()) {
-      case TYPE_CHAR:
-        final String[] sValues = getColumnString(column.getName());
-        // append value :
-        sb.append(sValues[rowIndex]);
-        break;
-
-      case TYPE_INT:
-        if (column.isArray()) {
-          final short[][] iValues = getColumnShorts(column.getName());
-          final short[] rowValues = iValues[rowIndex];
-          // append values :
-          for (int i = 0, len = rowValues.length; i < len; i++) {
-            if (i > 0) {
-              sb.append(" ");
-            }
-            sb.append(rowValues[i]);
-          }
-          break;
-        }
-        final short[] iValues = getColumnShort(column.getName());
-        // append value :
-        sb.append(iValues[rowIndex]);
-        break;
-
-      case TYPE_DBL:
-        if (column.isArray()) {
-          final double[][] dValues = getColumnDoubles(column.getName());
-          final double[] rowValues = dValues[rowIndex];
-          // append values :
-          for (int i = 0, len = rowValues.length; i < len; i++) {
-            if (i > 0) {
-              sb.append(" ");
-            }
-            if (useBeautyfier) {
-              sb.append(format(rowValues[i]));
-            } else {
-              sb.append(rowValues[i]);
-            }
-          }
-          break;
-        }
-        final double[] dValues = getColumnDouble(column.getName());
-        // append value :
-        if (useBeautyfier) {
-          sb.append(format(dValues[rowIndex]));
-        } else {
-          sb.append(dValues[rowIndex]);
-        }
-        break;
-
-      case TYPE_REAL:
-        if (column.isArray()) {
-          // Impossible case in OIFits
-          sb.append("...");
-          break;
-        }
-        final float[] fValues = getColumnFloat(column.getName());
-        // append value :
-        if (useBeautyfier) {
-          sb.append(format(fValues[rowIndex]));
-        } else {
-          sb.append(fValues[rowIndex]);
-        }
-        break;
-
-      case TYPE_COMPLEX:
-        // Special case for complex visibilities :
-        if (column.isArray()) {
-          final float[][][] cValues = getColumnComplexes(column.getName());
-          final float[][] rowValues = cValues[rowIndex];
-          // append values :
-          for (int i = 0, len = rowValues.length; i < len; i++) {
-            if (i > 0) {
-              sb.append(" ");
-            }
-            // real,img pattern for complex values :
-            if (useBeautyfier) {
-              sb.append(format(rowValues[i][0])).append(",").append(format(rowValues[i][1]));
-            } else {
-              sb.append(rowValues[i][0]).append(",").append(rowValues[i][1]);
-            }
-          }
-          break;
-        }
-        // Impossible case in OIFits
-        sb.append("...");
-        break;
-
-      case TYPE_LOGICAL:
-        if (column.isArray()) {
-          final boolean[][] bValues = getColumnBooleans(column.getName());
-          final boolean[] rowValues = bValues[rowIndex];
-          // append values :
-          for (int i = 0, len = rowValues.length; i < len; i++) {
-            if (i > 0) {
-              sb.append(" ");
-            }
-            if (useBeautyfier) {
-              if (rowValues[i]) {
-                sb.append("T");
-              } else {
-                sb.append("F");
-              }
-            } else {
-              sb.append(rowValues[i]);
-            }
-          }
-          break;
-        }
-        // Impossible case in OIFits
-        sb.append("...");
-        break;
-
-      default:
-        sb.append("...");
-    }
-  }
-
-  /**
-   * Format the given number using the beautifier formatter
-   * @param value any float or double value
-   * @return string representation
-   */
-  private static String format(final double value) {
-    final double v = (value >= 0d) ? value : -value;
-    if (v == 0d) {
-      return "0";
-    }
-    if (v > 1e-2d && v < 1e7d) {
-      synchronized (DF_BEAUTY_STD) {
-        return DF_BEAUTY_STD.format(value);
-      }
-    }
-    synchronized (DF_BEAUTY_SCI) {
-      return DF_BEAUTY_SCI.format(value);
-    }
+  public final void accept(final ModelVisitor visitor) {
+    visitor.visit(this);
   }
 }
 /*___oOo___*/

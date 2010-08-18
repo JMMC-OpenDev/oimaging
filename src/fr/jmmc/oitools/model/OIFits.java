@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFits.java,v 1.3 2010-06-21 15:43:54 bourgesl Exp $"
+ * "@(#) $Id: OIFits.java,v 1.4 2010-08-18 14:29:33 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/06/21 15:43:54  bourgesl
+ * properly set extNb and extVer for added tables
+ *
  * Revision 1.2  2010/05/27 16:13:29  bourgesl
  * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
  *
@@ -22,7 +25,7 @@ import java.util.List;
  * This class represents the data model of an OIFits standard file.
  * @author bourgesl
  */
-public class OIFits extends ModelBase {
+public abstract class OIFits extends ModelBase {
 
   /* members */
   /* OIFits structure */
