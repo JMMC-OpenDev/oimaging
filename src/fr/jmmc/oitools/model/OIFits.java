@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFits.java,v 1.4 2010-08-18 14:29:33 bourgesl Exp $"
+ * "@(#) $Id: OIFits.java,v 1.5 2010-09-02 15:48:49 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/08/18 14:29:33  bourgesl
+ * use the visitor pattern to refactor the XML serialization
+ *
  * Revision 1.3  2010/06/21 15:43:54  bourgesl
  * properly set extNb and extVer for added tables
  *
@@ -240,6 +243,28 @@ public abstract class OIFits extends ModelBase {
       this.oiVis2Tables.add((OIVis2) oiTable);
     } else if (oiTable instanceof OIT3) {
       this.oiT3Tables.add((OIT3) oiTable);
+    }
+  }
+
+  /**
+   * Unregister an OI_* table.
+   * @param oiTable reference on one OI_* table
+   */
+  protected void unregisterOiTable(final OITable oiTable) {
+    this.oiTables.remove(oiTable);
+
+    if (oiTable instanceof OITarget) {
+      this.oiTargets.remove((OITarget) oiTable);
+    } else if (oiTable instanceof OIWavelength) {
+      this.oiWavelengths.remove((OIWavelength) oiTable);
+    } else if (oiTable instanceof OIArray) {
+      this.oiArrays.remove((OIArray) oiTable);
+    } else if (oiTable instanceof OIVis) {
+      this.oiVisTables.remove((OIVis) oiTable);
+    } else if (oiTable instanceof OIVis2) {
+      this.oiVis2Tables.remove((OIVis2) oiTable);
+    } else if (oiTable instanceof OIT3) {
+      this.oiT3Tables.remove((OIT3) oiTable);
     }
   }
 }
