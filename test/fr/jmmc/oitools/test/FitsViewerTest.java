@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FitsViewerTest.java,v 1.4 2010-08-18 09:39:56 bourgesl Exp $"
+ * "@(#) $Id: FitsViewerTest.java,v 1.5 2010-09-06 14:04:17 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/08/18 09:39:56  bourgesl
+ * added command line arguments (-format -verbose -help)
+ *
  * Revision 1.3  2010/06/02 11:52:27  bourgesl
  * use logger instead of System.out
  *
@@ -18,7 +21,6 @@
  */
 package fr.jmmc.oitools.test;
 
-import fr.jmmc.oifits.visualizer.OifitsViewer;
 import fr.jmmc.oitools.OIFitsViewer;
 import java.io.File;
 import java.util.ArrayList;
@@ -31,9 +33,6 @@ import java.util.logging.Level;
  * @author bourgesl
  */
 public class FitsViewerTest implements TestEnv {
-
-  /** flag to use OITools impl instead of OIValidator */
-  private final static boolean USE_OITOOLS = true;
 
   private FitsViewerTest() {
     super();
@@ -87,14 +86,10 @@ public class FitsViewerTest implements TestEnv {
 
       final long start = System.nanoTime();
 
-      if (USE_OITOOLS) {
-        final List<String> arguments = new ArrayList<String>();
-        arguments.addAll(Arrays.asList(args));
-        arguments.add(absFilePath);
-        OIFitsViewer.main(arguments.toArray(new String[0]));
-      } else {
-        new OifitsViewer(absFilePath);
-      }
+      final List<String> arguments = new ArrayList<String>();
+      arguments.addAll(Arrays.asList(args));
+      arguments.add(absFilePath);
+      OIFitsViewer.main(arguments.toArray(new String[0]));
 
       logger.info("dumpFile : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
 

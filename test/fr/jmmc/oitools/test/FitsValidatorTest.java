@@ -1,18 +1,20 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: FitsValidatorTest.java,v 1.2 2010-06-02 11:52:27 bourgesl Exp $"
+ * "@(#) $Id: FitsValidatorTest.java,v 1.3 2010-09-06 14:04:17 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  2010/06/02 11:52:27  bourgesl
+ * use logger instead of System.out
+ *
  * Revision 1.1  2010/04/28 14:39:20  bourgesl
  * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
  *
  */
 package fr.jmmc.oitools.test;
 
-import fr.jmmc.oifits.validator.OifitsValidator;
 import java.io.File;
 import java.util.logging.Level;
 
@@ -49,7 +51,8 @@ public class FitsValidatorTest implements TestEnv {
     try {
       logger.info("Checking file : " + absFilePath);
 
-      OifitsValidator.main(new String[] {absFilePath});
+      // TODO port OifitsValidator in oitools
+//      OifitsValidator.main(new String[] {absFilePath});
 
     } catch (Throwable th) {
       logger.log(Level.SEVERE, "IO failure occured while reading file : " + absFilePath, th);
