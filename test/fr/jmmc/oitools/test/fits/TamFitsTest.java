@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: TamFitsTest.java,v 1.3 2010-06-02 15:24:40 bourgesl Exp $"
+ * "@(#) $Id: TamFitsTest.java,v 1.4 2010-09-06 13:49:50 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  2010/06/02 15:24:40  bourgesl
+ * minor fixes to return correct error flag when comparing files
+ *
  * Revision 1.2  2010/06/02 11:52:50  bourgesl
  * use logger instead of System.out
  * several fixes in compareFile(source, copy)
@@ -71,14 +74,18 @@ public class TamFitsTest implements TestEnv {
       errors += dumpFile(file);
     }
 
-
     if (true) {
       // Complex Data (VISDATA) :
 
       // VISDATA is full of [0.0 0.0]
       //    dumpFile(TEST_DIR + "Theta1Ori2007Dec05_2.fits");
 
-      final String file = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39-copy.oifits";
+//      final String file = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39.fits";
+//      final String file = TEST_DIR + "copy-ASPRO-STAR_1-AMBER.fits";
+//      final String file = COPY_DIR + "2008-Contest1_H-copy.oifits";
+
+      final String file = COPY_DIR + "test-create.oifits";
+
       errors += infoFile(file);
       errors += dumpFile(file);
     }

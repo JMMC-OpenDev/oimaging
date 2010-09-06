@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriterTest.java,v 1.5 2010-06-21 10:03:14 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriterTest.java,v 1.6 2010-09-06 13:49:50 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/21 10:03:14  bourgesl
+ * updated creation code to produce a valid OIFits file
+ *
  * Revision 1.4  2010/06/18 15:43:07  bourgesl
  * new test case : create an OIFits file from scratch
  *
@@ -33,6 +36,7 @@ import fr.jmmc.oitools.model.OITarget;
 import fr.jmmc.oitools.model.OIVis;
 import fr.jmmc.oitools.model.OIVis2;
 import fr.jmmc.oitools.model.OIWavelength;
+import fr.jmmc.oitools.model.XmlOutputVisitor;
 import fr.jmmc.oitools.test.fits.TamFitsTest;
 import java.io.File;
 import java.util.logging.Level;
@@ -104,17 +108,13 @@ public class OIFitsWriterTest implements TestEnv {
       }
     }
 
-    if (true) {
+    if (false) {
       final String file = COPY_DIR + "test-create.oifits";
       // create an oifits file :
       create(file);
-      /*
-      final OIFitsFile loadOIFitsFile = load(file);
-      logger.info("create : XML DESC : \n" + loadOIFitsFile.getXmlDesc(true));
-       */
     }
 
-    if (false) {
+    if (true) {
       final File directory = new File(TEST_DIR);
       if (directory.exists() && directory.isDirectory()) {
 
@@ -137,11 +137,13 @@ public class OIFitsWriterTest implements TestEnv {
               errors += write(fileTo, srcOIFitsFile);
 
               // verify and check :
-              final OIFitsFile destOIFitsFile = load(fileTo);
-              if (destOIFitsFile == null) {
-                errors++;
-              } else if (!OITableUtils.compareOIFitsFile(srcOIFitsFile, destOIFitsFile)) {
-                errors++;
+              if (true) {
+                final OIFitsFile destOIFitsFile = load(fileTo);
+                if (destOIFitsFile == null) {
+                  errors++;
+                } else if (!OITableUtils.compareOIFitsFile(srcOIFitsFile, destOIFitsFile)) {
+                  errors++;
+                }
               }
             }
           }
@@ -200,7 +202,9 @@ public class OIFitsWriterTest implements TestEnv {
 
       fill(oiFitsFile);
 
-      logger.info("create : XML DESC : \n" + oiFitsFile.getXmlDesc(true));
+      if (false) {
+        logger.info("create : XML DESC : \n" + XmlOutputVisitor.getXmlDesc(oiFitsFile, false));
+      }
 
       final OIFitsChecker checker = new OIFitsChecker();
       oiFitsFile.check(checker);
@@ -256,7 +260,7 @@ public class OIFitsWriterTest implements TestEnv {
     oiFitsFile.addOiTable(array);
 
     // OI_WAVELENGTH :
-    final int nWave = 48;
+    final int nWave = 512;
     final OIWavelength waves = new OIWavelength(oiFitsFile, nWave);
     waves.setInsName(insName);
 
@@ -315,7 +319,7 @@ public class OIFitsWriterTest implements TestEnv {
     vis.setArrName(arrName);
     vis.setDateObs("2010-06-18");
 
-    targetIds  = vis.getTargetId();
+    targetIds = vis.getTargetId();
     staIndexes = vis.getStaIndex();
 
     for (int i = 0; i < nRows; i++) {
