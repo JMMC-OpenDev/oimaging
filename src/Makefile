@@ -1,13 +1,16 @@
 #*******************************************************************************
 # JMMC project
 #
-# "@(#) $Id: Makefile,v 1.3 2010-05-18 07:25:07 mella Exp $"
+# "@(#) $Id: Makefile,v 1.4 2010-09-13 14:00:10 bourgesl Exp $"
 #
 # Makefile of oitools module
 #
 # History
 # -------
 # $Log: not supported by cvs2svn $
+# Revision 1.3  2010/05/18 07:25:07  mella
+# Add generation of OIFitsViewer program
+#
 # Revision 1.2  2010/04/28 15:14:48  bourgesl
 # basic make file to compile archive
 #
@@ -114,7 +117,7 @@ JARFILES        = oitools
 oitools_DIRS     = fr \
 		   nom
 
-oitools_EXTRAS   =
+oitools_EXTRAS   = nom/tam/fits/License.txt
 
 #
 # Java programs
