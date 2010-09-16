@@ -8,7 +8,7 @@
   </text>
   <dependences>
     <package name="nom.tam.fits"
-             description="A Java FITS library has been developed which provides efficient -- at least for Java -- I/O for FITS images and binary tables. The Java libraries support all basic FITS formats and gzip compressed files. Support for access to data subsets is included and the HIERARCH convention may be used."
+             description="The Java FITS library (nom.tam.fits) has been developed which provides efficient I/O for FITS images and binary tables. Made by Dr Thomas A. McGlynn, HEASARC"
              link="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/"/>
     <!--
      Copyright: Thomas McGlynn 1997-1999.
