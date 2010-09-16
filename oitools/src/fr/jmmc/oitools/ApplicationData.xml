@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ApplicationData link="http://www.jmmc.fr/oitools">
+  <program name="OITools" version="0.1.0"/>
+  <compilation date="21/09/2009" compiler="JDK 1.5.0_16"/>
+  <text>
+    <![CDATA[OITools module is a Java library dedicated to OIFits manipulation (load, save and validation)]]>
+  </text>
+  <dependences>
+    <package name="nom.tam.fits"
+             description="The Java FITS library (nom.tam.fits) has been developed which provides efficient I/O for FITS images and binary tables. Made by Dr Thomas A. McGlynn, HEASARC"
+             link="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/"/>
+    <!--
+     Copyright: Thomas McGlynn 1997-1999.
+     This code may be used for any purpose, non-commercial
+     or commercial so long as this copyright notice is retained
+     in the source code or included in or referred to in any
+     derived software.
+    -->
+  </dependences>
+
+  <releasenotes>
+    <release version="0.1">
+      <prerelease version="0.1.0">
+        <change>First official release : included in Aspro 2</change>
+      </prerelease>
+    </release>
+  </releasenotes>
+    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center]]></acknowledgment>
+</ApplicationData>
