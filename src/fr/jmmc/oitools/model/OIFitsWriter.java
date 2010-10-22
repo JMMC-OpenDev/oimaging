@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsWriter.java,v 1.4 2010-06-29 11:54:26 bourgesl Exp $"
+ * "@(#) $Id: OIFitsWriter.java,v 1.5 2010-10-22 13:35:22 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/06/29 11:54:26  bourgesl
+ * update oiFitsFile path when the file is written
+ *
  * Revision 1.3  2010/06/02 15:29:29  bourgesl
  * added complex type support ('C' instead of 'E') and optional columns (complex again)
  * the modified string (string length fix for Fits Header) are restored after the HDU creation
@@ -31,15 +34,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTable;
-import nom.tam.fits.BinaryTableHDU;
-import nom.tam.fits.Data;
-import nom.tam.fits.Fits;
-import nom.tam.fits.FitsException;
-import nom.tam.fits.FitsFactory;
-import nom.tam.fits.Header;
-import nom.tam.util.BufferedFile;
+import fr.nom.tam.fits.BasicHDU;
+import fr.nom.tam.fits.BinaryTable;
+import fr.nom.tam.fits.BinaryTableHDU;
+import fr.nom.tam.fits.Data;
+import fr.nom.tam.fits.Fits;
+import fr.nom.tam.fits.FitsException;
+import fr.nom.tam.fits.FitsFactory;
+import fr.nom.tam.fits.Header;
+import fr.nom.tam.util.BufferedFile;
 
 /**
  * This statefull class writes an OIFits file from the OIFitsFile model

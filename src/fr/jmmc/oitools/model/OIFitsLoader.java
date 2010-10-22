@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.8 2010-08-18 12:45:10 bourgesl Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.9 2010-10-22 13:35:22 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.8  2010/08/18 12:45:10  bourgesl
+ * for remote files, store the URL instead of the temporary file path
+ *
  * Revision 1.7  2010/06/18 15:42:05  bourgesl
  * code formatting
  *
@@ -47,12 +50,12 @@ import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.logging.Level;
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTableHDU;
-import nom.tam.fits.Fits;
-import nom.tam.fits.FitsException;
-import nom.tam.fits.Header;
-import nom.tam.util.ArrayFuncs;
+import fr.nom.tam.fits.BasicHDU;
+import fr.nom.tam.fits.BinaryTableHDU;
+import fr.nom.tam.fits.Fits;
+import fr.nom.tam.fits.FitsException;
+import fr.nom.tam.fits.Header;
+import fr.nom.tam.util.ArrayFuncs;
 
 /**
  * This statefull class loads an OIFits file to the OIFits data model with optional integrity checks

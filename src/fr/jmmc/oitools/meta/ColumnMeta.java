@@ -1,11 +1,15 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: ColumnMeta.java,v 1.4 2010-06-01 15:57:56 bourgesl Exp $"
+ * "@(#) $Id: ColumnMeta.java,v 1.5 2010-10-22 13:35:23 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/06/01 15:57:56  bourgesl
+ * added optional flag
+ * fixed complex type support in check()
+ *
  * Revision 1.3  2010/05/03 14:28:46  bourgesl
  * refactored checks (type, repeat, int or string values) to analyse Object value instead of FitsColumn
  *
@@ -20,7 +24,7 @@ package fr.jmmc.oitools.meta;
 
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.util.logging.Level;
-import nom.tam.util.ArrayFuncs;
+import fr.nom.tam.util.ArrayFuncs;
 
 /**
  * This class describes a FITS column

@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITable.java,v 1.12 2010-08-18 14:29:33 bourgesl Exp $"
+ * "@(#) $Id: OITable.java,v 1.13 2010-10-22 13:35:22 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.12  2010/08/18 14:29:33  bourgesl
+ * use the visitor pattern to refactor the XML serialization
+ *
  * Revision 1.11  2010/06/28 14:33:55  bourgesl
  * added beautified output for XML description using custom number formatters
  *
@@ -98,7 +101,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import nom.tam.util.ArrayFuncs;
+import fr.nom.tam.util.ArrayFuncs;
 
 /**
  * Base Class for all OI_* tables.
