@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIVis2.java,v 1.5 2010-06-18 15:42:36 bourgesl Exp $"
+ * "@(#) $Id: OIVis2.java,v 1.6 2010-10-22 13:28:26 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/06/18 15:42:36  bourgesl
+ * new constructors to create OI_* tables from scratch
+ *
  * Revision 1.4  2010/06/17 15:01:56  bourgesl
  * classes made final
  *
@@ -152,7 +155,7 @@ public final class OIVis2 extends OIData {
     final double[] vcoord = getVCoord();
 
     for (int i = 0, sizeU = ucoord.length; i < sizeU; i++) {
-      for (int j = 0, sizeV = vcoord.length; j < sizeV; j++) {
+      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
         r[i][j] = (Math.sqrt((ucoord[i] * ucoord[i]) + (vcoord[i] * vcoord[i]))) / effWaves[j];
       }
     }
