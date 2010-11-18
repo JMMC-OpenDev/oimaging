@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: TamFitsTest.java,v 1.4 2010-09-06 13:49:50 bourgesl Exp $"
+ * "@(#) $Id: TamFitsTest.java,v 1.5 2010-11-18 13:18:31 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2010/09/06 13:49:50  bourgesl
+ * update tests
+ *
  * Revision 1.3  2010/06/02 15:24:40  bourgesl
  * minor fixes to return correct error flag when comparing files
  *
@@ -20,21 +23,21 @@
 package fr.jmmc.oitools.test.fits;
 
 import fr.jmmc.oitools.test.TestEnv;
+import fr.nom.tam.fits.BasicHDU;
+import fr.nom.tam.fits.BinaryTable;
+import fr.nom.tam.fits.BinaryTableHDU;
+import fr.nom.tam.fits.Fits;
+import fr.nom.tam.fits.FitsException;
+import fr.nom.tam.fits.FitsFactory;
+import fr.nom.tam.fits.Header;
+import fr.nom.tam.fits.HeaderCard;
+import fr.nom.tam.util.ArrayFuncs;
+import fr.nom.tam.util.BufferedFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTable;
-import nom.tam.fits.BinaryTableHDU;
-import nom.tam.fits.Fits;
-import nom.tam.fits.FitsException;
-import nom.tam.fits.FitsFactory;
-import nom.tam.fits.Header;
-import nom.tam.fits.HeaderCard;
-import nom.tam.util.ArrayFuncs;
-import nom.tam.util.BufferedFile;
 
 /**
  * This class makes several tests on nom.tam fits library

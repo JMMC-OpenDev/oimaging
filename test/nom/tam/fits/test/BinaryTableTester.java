@@ -1,14 +1,20 @@
 package nom.tam.fits.test;
 
-import nom.tam.util.*;
-import nom.tam.fits.*;
-import java.io.*;
+import fr.nom.tam.fits.FitsUtil;
+import java.io.FileOutputStream;
+import fr.nom.tam.fits.BasicHDU;
+import fr.nom.tam.fits.BinaryTable;
+import fr.nom.tam.fits.BinaryTableHDU;
+import fr.nom.tam.fits.Fits;
+import fr.nom.tam.fits.FitsFactory;
+import fr.nom.tam.fits.Header;
+import fr.nom.tam.util.ArrayFuncs;
+import fr.nom.tam.util.BufferedDataOutputStream;
+import fr.nom.tam.util.BufferedFile;
 
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import junit.framework.JUnit4TestAdapter;
-import java.lang.reflect.*;
 
 /** This class tests the binary table classes for
  *  the Java FITS library, notably BinaryTableHDU,
@@ -517,7 +523,7 @@ public class BinaryTableTester {
     String[] sarr = {"abc", " de", "f"};
     byte[] barr = {'a', 'b', 'c', ' ', 'b', 'c', 'a', 'b', ' '};
 
-    byte[] obytes = nom.tam.fits.FitsUtil.stringsToByteArray(sarr, 3);
+    byte[] obytes = FitsUtil.stringsToByteArray(sarr, 3);
     assertEquals("blen", obytes.length, 9);
     assertEquals("b1", obytes[0], (byte) 'a');
     assertEquals("b1", obytes[1], (byte) 'b');
@@ -529,7 +535,7 @@ public class BinaryTableTester {
     assertEquals("b1", obytes[7], (byte) ' ');
     assertEquals("b1", obytes[8], (byte) ' ');
 
-    String[] ostrings = nom.tam.fits.FitsUtil.byteArrayToStrings(barr, 3);
+    String[] ostrings = FitsUtil.byteArrayToStrings(barr, 3);
     assertEquals("slen", ostrings.length, 3);
     assertEquals("s1", ostrings[0], "abc");
     assertEquals("s2", ostrings[1], "bc");

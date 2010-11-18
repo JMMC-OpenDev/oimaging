@@ -1,11 +1,13 @@
 package nom.tam.fits.test;
 
-import nom.tam.fits.*;
-import nom.tam.util.*;
-
+import fr.nom.tam.fits.Fits;
+import fr.nom.tam.fits.Header;
+import fr.nom.tam.fits.HeaderCard;
+import fr.nom.tam.fits.ImageHDU;
+import fr.nom.tam.util.BufferedFile;
+import fr.nom.tam.util.Cursor;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import junit.framework.JUnit4TestAdapter;
 
 public class HeaderTester {
     

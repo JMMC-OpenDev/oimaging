@@ -1,20 +1,23 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OITableUtils.java,v 1.1 2010-06-02 15:23:53 bourgesl Exp $"
+ * "@(#) $Id: OITableUtils.java,v 1.2 2010-11-18 13:18:31 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/06/02 15:23:53  bourgesl
+ * added a test case which copy all OIFits files from oidata/ to oidata/copy and compare files
+ *
  */
 package fr.jmmc.oitools.model;
 
 import fr.jmmc.oitools.meta.ColumnMeta;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.test.TestEnv;
+import fr.nom.tam.util.ArrayFuncs;
 import java.util.Arrays;
 import java.util.logging.Level;
-import nom.tam.util.ArrayFuncs;
 
 /**
  *

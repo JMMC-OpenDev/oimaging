@@ -1,14 +1,16 @@
 package nom.tam.fits.test;
 
+import fr.nom.tam.image.ImageTiler;
+import fr.nom.tam.fits.BasicHDU;
+import fr.nom.tam.fits.Fits;
+import fr.nom.tam.fits.Header;
+import fr.nom.tam.fits.HeaderCard;
+import fr.nom.tam.fits.ImageHDU;
+import fr.nom.tam.fits.PaddingException;
+import fr.nom.tam.util.BufferedFile;
+import fr.nom.tam.util.Cursor;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import junit.framework.JUnit4TestAdapter;
-
-import nom.tam.image.*;
-import nom.tam.util.*;
-import nom.tam.fits.*;
-
-import java.io.File;
 
 /** Test that we can read files that fail due to lack of padding in the final HDU.
  */
@@ -65,7 +67,7 @@ public class PaddingTester {
 	assertEquals("Update header:", hdu0.getHeader().getStringValue("NEWKEY"), "TESTVALUE");
 	
 	
-	nom.tam.image.ImageTiler it = hdu0.getTiler();
+	ImageTiler it = hdu0.getTiler();
 	
 	// Remember that the tile is always a flattened
 	// 1-D representation of the data.
