@@ -19,9 +19,8 @@ import java.net.URLConnection;
 import java.util.Map;
 import java.util.List;
 
-/** This class comprises static
- *  utility functions used throughout
- *  the FITS classes.
+/** 
+ * This class comprises static utility functions used throughout the FITS classes.
  */
 public final class FitsUtil {
 
@@ -131,9 +130,8 @@ public final class FitsUtil {
   /** Get the maximum length of a String in a String array.
    */
   public static int maxLength(final String[] o) throws FitsException {
-
     int max = 0;
-    for (int i = 0; i < o.length; i++) {
+    for (int i = 0, len = o.length; i < len; i++) {
       if (o[i] != null && o[i].length() > max) {
         max = o[i].length();
       }
@@ -141,62 +139,112 @@ public final class FitsUtil {
     return max;
   }
 
-  /** Copy an array of Strings to bytes.*/
+  /** 
+   * Copy an array of Strings to bytes. For each string value :
+   * if the string length is higher than maxLen, a substring is done with maxLen chars;
+   * else the byte array is filled with 0x20 (space char) up to maxLen.
+   */
   public static byte[] stringsToByteArray(final String[] o, final int maxLen) {
-    byte[] res = new byte[o.length * maxLen];
-    for (int i = 0; i < o.length; i++) {
-      byte[] bstr;
+    final int len = o.length;
+    final byte[] res = new byte[len * maxLen];
+    byte[] bstr;
+    for (int i = 0, cnt, j; i < len; i++) {
       if (o[i] == null) {
         bstr = new byte[0];
       } else {
         bstr = o[i].getBytes();
       }
-      int cnt = bstr.length;
+      cnt = bstr.length;
       if (cnt > maxLen) {
         cnt = maxLen;
       }
+
+      // TODO : check that bytes are valid ASCII text chars : see byteArrayToStrings
+
       System.arraycopy(bstr, 0, res, i * maxLen, cnt);
-      for (int j = cnt; j < maxLen; j++) {
+      for (j = cnt; j < maxLen; j++) {
         res[i * maxLen + j] = (byte) ' ';
       }
     }
     return res;
   }
 
-  /** Convert bytes to Strings */
+  /** 
+   * Convert bytes to Strings.
+   *
+   * Fits spec extract :
+   * - ASCII text ASCII characters hexadecimal (20–7E)
+   *
+   * Character If the value of the TFORMn keyword specifies data type A, field n shall
+   * contain a character string of zero or more members, composed of ASCII text.
+   * This character string may be terminated before the length specified by the repeat count
+   * by an ASCII NULL (hexadecimal code 00).
+   * Characters after the first ASCII NULL are not defined.
+   * A string with the number of characters specified by the repeat count is not NULL terminated.
+   * Null strings are defined by the presence of an ASCII NULL as the first character.
+   * 
+   * @param o byte array to convert to strings
+   * @param maxLen maximum length for strings
+   * @return String array
+   */
   public static String[] byteArrayToStrings(final byte[] o, final int maxLen) {
+    final String[] res = new String[o.length / maxLen];
 
-    String[] res = new String[o.length / maxLen];
-    for (int i = 0; i < res.length; i++) {
+    byte b;
+    for (int i = 0, j = 0, len = res.length, start, end, slen; i < len; i++) {
 
-      int start = i * maxLen;
-      int end = start + maxLen;
+      start = i * maxLen;
+      end = start + maxLen;
+
+      // First pass to fix invalid characters (including ASCII NULL) :
+      for (j = start; j < end; j++) {
+        b = o[j];
+        if (b == 0) {
+          // ASCII NULL : string termination char
+
+          // adjust end to the current char (stop string)
+          end = j;
+          break;
+
+        } else if (b < 32 || b >= 127) {
+          // Not ascii text : convert to space char (32) :
+          // note : as it is not valid against the specification, throw an exception ?
+          o[j] = 32;
+        }
+      }
+
       // Pre-trim the string to avoid keeping memory
       // hanging around. (Suggested by J.C. Segovia, ESA).
+
+      // trim spaces from left to right :
       for (; start < end; start++) {
         if (o[start] != 32) {
           break; // Skip only spaces.
         }
       }
 
+      // trim spaces from right to left :
       for (; end > start; end--) {
         if (o[end - 1] != 32) {
           break;
         }
       }
 
-      res[i] = new String(o, start, end - start);
-
+      slen = end - start;
+      if (slen == 0) {
+        res[i] = "";
+      } else {
+        res[i] = new String(o, start, end - start);
+      }
     }
     return res;
-
   }
 
   /** Convert an array of booleans to bytes */
   static byte[] booleanToByte(final boolean[] bool) {
-
-    byte[] byt = new byte[bool.length];
-    for (int i = 0; i < bool.length; i++) {
+    final int len = bool.length;
+    final byte[] byt = new byte[len];
+    for (int i = 0; i < len; i++) {
       byt[i] = bool[i] ? (byte) 'T' : (byte) 'F';
     }
     return byt;
@@ -204,9 +252,10 @@ public final class FitsUtil {
 
   /** Convert an array of bytes to booleans */
   static boolean[] byteToBoolean(final byte[] byt) {
-    boolean[] bool = new boolean[byt.length];
+    final int len = byt.length;
+    final boolean[] bool = new boolean[len];
 
-    for (int i = 0; i < byt.length; i++) {
+    for (int i = 0; i < len; i++) {
       bool[i] = (byt[i] == 'T');
     }
     return bool;
