@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: TamFitsTest.java,v 1.5 2010-11-18 13:18:31 bourgesl Exp $"
+ * "@(#) $Id: TamFitsTest.java,v 1.6 2010-12-15 17:17:04 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2010/11/18 13:18:31  bourgesl
+ * fixed wrong imports due to nom.tam package refactoring
+ *
  * Revision 1.4  2010/09/06 13:49:50  bourgesl
  * update tests
  *
@@ -50,7 +53,7 @@ public class TamFitsTest implements TestEnv {
   /** flag to test complex data bug */
   private final static boolean TEST_COMPLEX_BUG = false;
   /** flag to dump column content */
-  private final static boolean PRINT_COL = false;
+  private final static boolean PRINT_COL = true;
   /** flag to compare keyword comments */
   private final static boolean COMPARE_KEYWORD_COMMENTS = false;
   /** flag to enable HIERARCH keyword support */
@@ -69,15 +72,21 @@ public class TamFitsTest implements TestEnv {
     // enable / disable HIERARCH keyword support :
     FitsFactory.setUseHierarch(USE_HIERARCH_FITS_KEYWORDS);
 
-    if (false) {
-      // 1 extra byte at the End of file :
-//      final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI.oifits.gz";
-      final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI-copy.oifits";
+    if (true) {
+      final String file = TEST_DIR + "test_2010-12-02_HD37806_Pionier.fits";
       errors += infoFile(file);
       errors += dumpFile(file);
     }
 
-    if (true) {
+    if (false) {
+      // 1 extra byte at the End of file :
+      final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI.oifits.gz";
+//      final String file = TEST_DIR + "Mystery-Med_H-AmberVISPHI-copy.oifits";
+      errors += infoFile(file);
+      errors += dumpFile(file);
+    }
+
+    if (false) {
       // Complex Data (VISDATA) :
 
       // VISDATA is full of [0.0 0.0]
@@ -567,11 +576,25 @@ public class TamFitsTest implements TestEnv {
     } else if (oClass == byte[].class) {
       return Arrays.toString((byte[]) o);
     } else {
+/*
+      if (oClass == String[].class) {
+        StringBuilder sb = new StringBuilder(128).append("[");
+        for (String val : (String[])o) {
+          sb.append("'").append(val).append("'").append("=[");
+
+          for (char ch : val.toCharArray()) {
+            sb.append("0x").append(Integer.toHexString(ch)).append(' ');
+          }
+
+          sb.append("], ");
+        }
+        return sb.append("]").toString();
+      }
+*/
       // Non-primitive and multidimensional arrays can be
       // cast to Object[]
       final Object[] objArray = (Object[]) o;
       return Arrays.deepToString(objArray);
     }
-
   }
 }
