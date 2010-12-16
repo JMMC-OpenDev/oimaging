@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -23,6 +24,15 @@ import java.util.List;
  * This class comprises static utility functions used throughout the FITS classes.
  */
 public final class FitsUtil {
+
+  private static boolean checkAsciiText = true;
+
+  /**
+   * Indicate whether character field values must be checked against FITS invalid characters.
+   */
+  public static void setCheckAsciiText(final boolean flag) {
+    checkAsciiText = flag;
+  }
 
   /** Reposition a random access stream to a requested offset */
   public static void reposition(final Object o, final long offset)
@@ -117,7 +127,6 @@ public final class FitsUtil {
     if (filename == null) {
       return false;
     }
-    FileInputStream fis = null;
     File test = new File(filename);
     if (test.exists()) {
       return isCompressed(test);
@@ -127,16 +136,90 @@ public final class FitsUtil {
     return len > 2 && (filename.substring(len - 3).equalsIgnoreCase(".gz") || filename.substring(len - 2).equals(".Z"));
   }
 
-  /** Get the maximum length of a String in a String array.
+  /**
+   * Get the maximum length of a String in a String array.
    */
-  public static int maxLength(final String[] o) throws FitsException {
+  public static int maxLength(final String[] strings) throws FitsException {
     int max = 0;
-    for (int i = 0, len = o.length; i < len; i++) {
-      if (o[i] != null && o[i].length() > max) {
-        max = o[i].length();
+    for (int i = 0, len = strings.length; i < len; i++) {
+      if (strings[i] != null && strings[i].length() > max) {
+        max = strings[i].length();
       }
     }
     return max;
+  }
+
+  /**
+   * Validate the given string against FITS supported ASCII characters (0x20-0x7E)
+   * @param input input string
+   * @return true only if all characters are ASCII text characters
+   */
+  public static boolean validateFitsString(final String input) {
+    if (input == null) {
+      return true;
+    }
+    for (char c : input.toCharArray()) {
+      if (c < 32 || c >= 127) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Encodes this {@code String} into a sequence of bytes using the US-ASCII charset,
+   * storing the result into a new byte array.
+   *
+   * Checks also that bytes are valid ASCII text chars (32 -> 126)
+   *
+   * @param value string to encode
+   * @return byte array
+   */
+  public static byte[] getAsciiBytes(final String value) {
+    if (value != null) {
+      try {
+        final byte[] res = value.getBytes("US-ASCII");
+
+        if (checkAsciiText) {
+          // check FITS invalid characters (0x20-0x7E) :
+          for (int i = 0, len = res.length; i < len; i++) {
+            if (res[i] < 32 || res[i] >= 127) {
+              res[i] = 32;
+            }
+          }
+        }
+
+        return res;
+
+      } catch (UnsupportedEncodingException uee) {
+        System.err.println("Unsupported encoding : US-ASCII");
+      }
+    }
+    return new byte[0];
+  }
+
+  /**
+   * Constructs a new {@code String} by decoding the specified subarray of
+   * bytes using the US-ASCII charset.  The length of the new {@code String}
+   * is a function of the charset, and hence may not be equal to the length
+   * of the subarray.
+   *
+   * @param  bytes The bytes to be decoded into characters
+   *
+   * @param  offset The index of the first byte to decode
+   *
+   * @param  length The number of bytes to decode
+   * @return new String
+   */
+  public static String getAsciiString(final byte[] bytes, final int offset, final int length) {
+    if (length > 0) {
+      try {
+        return new String(bytes, offset, length, "US-ASCII");
+      } catch (UnsupportedEncodingException uee) {
+        System.err.println("Unsupported encoding : US-ASCII");
+      }
+    }
+    return "";
   }
 
   /** 
@@ -144,22 +227,18 @@ public final class FitsUtil {
    * if the string length is higher than maxLen, a substring is done with maxLen chars;
    * else the byte array is filled with 0x20 (space char) up to maxLen.
    */
-  public static byte[] stringsToByteArray(final String[] o, final int maxLen) {
-    final int len = o.length;
+  public static byte[] stringsToByteArray(final String[] strings, final int maxLen) {
+    final int len = strings.length;
     final byte[] res = new byte[len * maxLen];
     byte[] bstr;
     for (int i = 0, cnt, j; i < len; i++) {
-      if (o[i] == null) {
-        bstr = new byte[0];
-      } else {
-        bstr = o[i].getBytes();
-      }
+      // check that bytes are valid ASCII text chars
+      bstr = getAsciiBytes(strings[i]);
+
       cnt = bstr.length;
       if (cnt > maxLen) {
         cnt = maxLen;
       }
-
-      // TODO : check that bytes are valid ASCII text chars : see byteArrayToStrings
 
       System.arraycopy(bstr, 0, res, i * maxLen, cnt);
       for (j = cnt; j < maxLen; j++) {
@@ -183,12 +262,12 @@ public final class FitsUtil {
    * A string with the number of characters specified by the repeat count is not NULL terminated.
    * Null strings are defined by the presence of an ASCII NULL as the first character.
    * 
-   * @param o byte array to convert to strings
+   * @param bytes byte array to convert to strings
    * @param maxLen maximum length for strings
    * @return String array
    */
-  public static String[] byteArrayToStrings(final byte[] o, final int maxLen) {
-    final String[] res = new String[o.length / maxLen];
+  public static String[] byteArrayToStrings(final byte[] bytes, final int maxLen) {
+    final String[] res = new String[bytes.length / maxLen];
 
     byte b;
     for (int i = 0, j = 0, len = res.length, start, end, slen; i < len; i++) {
@@ -198,7 +277,7 @@ public final class FitsUtil {
 
       // First pass to fix invalid characters (including ASCII NULL) :
       for (j = start; j < end; j++) {
-        b = o[j];
+        b = bytes[j];
         if (b == 0) {
           // ASCII NULL : string termination char
 
@@ -206,10 +285,10 @@ public final class FitsUtil {
           end = j;
           break;
 
-        } else if (b < 32 || b >= 127) {
+        } else if (checkAsciiText && (b < 32 || b >= 127)) {
           // Not ascii text : convert to space char (32) :
           // note : as it is not valid against the specification, throw an exception ?
-          o[j] = 32;
+          bytes[j] = 32;
         }
       }
 
@@ -218,45 +297,40 @@ public final class FitsUtil {
 
       // trim spaces from left to right :
       for (; start < end; start++) {
-        if (o[start] != 32) {
+        if (bytes[start] != 32) {
           break; // Skip only spaces.
         }
       }
 
       // trim spaces from right to left :
       for (; end > start; end--) {
-        if (o[end - 1] != 32) {
+        if (bytes[end - 1] != 32) {
           break;
         }
       }
 
-      slen = end - start;
-      if (slen == 0) {
-        res[i] = "";
-      } else {
-        res[i] = new String(o, start, end - start);
-      }
+      res[i] = getAsciiString(bytes, start, end - start);
     }
     return res;
   }
 
   /** Convert an array of booleans to bytes */
-  static byte[] booleanToByte(final boolean[] bool) {
-    final int len = bool.length;
+  static byte[] booleanToByte(final boolean[] booleans) {
+    final int len = booleans.length;
     final byte[] byt = new byte[len];
     for (int i = 0; i < len; i++) {
-      byt[i] = bool[i] ? (byte) 'T' : (byte) 'F';
+      byt[i] = booleans[i] ? (byte) 'T' : (byte) 'F';
     }
     return byt;
   }
 
   /** Convert an array of bytes to booleans */
-  static boolean[] byteToBoolean(final byte[] byt) {
-    final int len = byt.length;
+  static boolean[] byteToBoolean(final byte[] bytes) {
+    final int len = bytes.length;
     final boolean[] bool = new boolean[len];
 
     for (int i = 0; i < len; i++) {
-      bool[i] = (byt[i] == 'T');
+      bool[i] = (bytes[i] == 'T');
     }
     return bool;
   }
@@ -300,6 +374,10 @@ public final class FitsUtil {
     return conn.getInputStream();
   }
 
+  /**
+   * Utility class
+   */
   private FitsUtil() {
+    // no-op
   }
 }
