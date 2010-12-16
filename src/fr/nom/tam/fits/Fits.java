@@ -1038,6 +1038,8 @@ public final class Fits {
     }
 
     // shift the bytes 1 to the right circularly.
+
+    // LAURENT : TODO : use new String(byte[], int offset, int length, String charsetName) with charsetName = 'US_ASCII'
     String resul = new String(asc, 15, 1);
     return resul.concat(new String(asc, 0, 15));
   }

@@ -587,6 +587,7 @@ public final class Header implements FitsElement {
           throw new TruncatedFileException(e.getMessage());
         }
 
+        // LAURENT : TODO : use new String(byte[], String charsetName) with charsetName = 'US_ASCII'
         String cbuf = new String(buffer);
         HeaderCard fcard = new HeaderCard(cbuf);
 
@@ -705,6 +706,7 @@ public final class Header implements FitsElement {
       while (iter.hasNext()) {
         HeaderCard card = (HeaderCard) iter.next();
 
+        // LAURENT : TODO : use String.getBytes(String charsetName) with charsetName = 'US_ASCII'
         byte[] b = card.toString().getBytes();
         dos.write(b);
       }

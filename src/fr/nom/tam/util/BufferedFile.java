@@ -909,6 +909,7 @@ public final class BufferedFile
    * @param s   The string to be written.
    */
   public void writeBytes(final String s) throws IOException {
+    // LAURENT : TODO : use String.getBytes(String charsetName) with charsetName = 'US_ASCII'
     write(s.getBytes(), 0, s.length());
   }
 

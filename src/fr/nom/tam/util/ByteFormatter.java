@@ -357,6 +357,7 @@ public final class ByteFormatter {
       off = alignFill(array, off, len - slen);
     }
 
+    // LAURENT : TODO : use String.getBytes(String charsetName) with charsetName = 'US_ASCII'
     System.arraycopy(val.getBytes(), 0, array, off, slen);
     return off + slen;
   }

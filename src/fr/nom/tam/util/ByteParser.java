@@ -348,6 +348,7 @@ public class ByteParser {
    */
   public String getString(int length) {
 
+    // LAURENT : TODO : use new String(byte[], int offset, int length, String charsetName) with charsetName = 'US_ASCII'
     String s = new String(input, offset, length);
     offset += length;
     numberLength = length;
