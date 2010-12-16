@@ -104,6 +104,7 @@ public class PaddingTester {
 	int cnt = 0;
 	// Write the header
 	while (curs.hasNext()) {
+      // LAURENT : TODO : use String.getBytes(String charsetName) with charsetName = 'US_ASCII'
 	    bf.write( ((HeaderCard)curs.next()).toString().getBytes());
 	    cnt += 1;
 	}

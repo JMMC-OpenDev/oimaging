@@ -106,6 +106,7 @@ public class ByteFormatParseTester {
       }
     }
 
+    // LAURENT : TODO : use new String(byte[], int offset, int length, String charsetName) with charsetName = 'US_ASCII'
     String myStr = new String(buffer, 0, offset);
     assertEquals("No spaces", -1, myStr.indexOf(" "));
 
@@ -120,6 +121,7 @@ public class ByteFormatParseTester {
       offset = bf.format(" ", buffer, offset, 1);
       cnt += 1;
     }
+    // LAURENT : TODO : use new String(byte[], int offset, int length, String charsetName) with charsetName = 'US_ASCII'
     myStr = new String(buffer, 0, offset);
     String[] array = myStr.split(" ");
 

@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: TamFitsUtilsTest.java,v 1.1 2010-12-15 17:17:04 bourgesl Exp $"
+ * "@(#) $Id: TamFitsUtilsTest.java,v 1.2 2010-12-16 15:13:59 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2010/12/15 17:17:04  bourgesl
+ * updated test cases for invalid characters
+ *
  */
 package fr.jmmc.oitools.test.fits;
 
@@ -22,6 +25,10 @@ public class TamFitsUtilsTest {
 
   // --- TEST CODE -------------------------------------------------------------
   public static void main(String[] args) {
+
+    String in = "\t\n\rABCDEFGH\u0394\u03BB\u003f";
+    byte[] out = FitsUtil.getAsciiBytes(in);
+    System.out.println("getAsciiBytes('"+in+"') = " + dumpBytes(out));
 
     byte[] input;
     String[] output;
@@ -86,5 +93,16 @@ public class TamFitsUtilsTest {
       }
     }
     return true;
+  }
+
+  private static String dumpBytes(final byte[] bytes) {
+    if (bytes == null || bytes.length == 0) {
+      return "";
+    }
+    final StringBuilder sb = new StringBuilder(4 * bytes.length);
+    for (byte b : bytes) {
+      sb.append("0x").append(Integer.toHexString(b)).append(' ');
+    }
+    return sb.toString();
   }
 }
