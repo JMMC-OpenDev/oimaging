@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <ApplicationData link="http://www.jmmc.fr/oitools">
-  <program name="OITools" version="0.2.0"/>
+  <program name="OITools" version="0.2.1"/>
   <compilation date="16/12/2010" compiler="JDK 1.5.0_16"/>
   <text>
     <![CDATA[OITools module is a Java library dedicated to OIFits manipulation (load, save and validation)]]>
@@ -21,6 +21,9 @@
 
   <releasenotes>
     <release version="0.2">
+      <prerelease version="0.2.1">
+        <change>Fix bug loading data tables with only one wavelength and using TDIM keywords (1)</change>
+      </prerelease>
       <prerelease version="0.2.0">
         <change>Several bug fixed related to ASCII character encoding / decoding and ASCII_NULL support</change>
       </prerelease>

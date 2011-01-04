@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsLoader.java,v 1.9 2010-10-22 13:35:22 mella Exp $"
+ * "@(#) $Id: OIFitsLoader.java,v 1.10 2011-01-04 15:31:23 mella Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.9  2010/10/22 13:35:22  mella
+ * Prefix  nom.tam packages by fr to avoid conflict with topcat (this will be required until LITpro embeds and uses topcat as fitsviewer)
+ *
  * Revision 1.8  2010/08/18 12:45:10  bourgesl
  * for remote files, store the URL instead of the temporary file path
  *
@@ -575,10 +578,18 @@ public class OIFitsLoader {
     }
 
     if (column instanceof WaveColumnMeta && columnRepeat == 1) {
-      // Special case : NWave = 1 means that Fits gives 1D arrays instead of 2D arrays :
-      // Applies to Complex / Double and Logical types :
-      final int[] dims = {Array.getLength(columnValue), 1};
-      value = ArrayFuncs.curl(value, dims);
+      // Note : If TDIM keyword is present, the value is already a 2D array.
+
+      final int[] dims = ArrayFuncs.getDimensions(value);
+
+      // Check the dimensions of the converted value :
+      if (dims != null && dims.length == 1) {
+
+          // Special case : NWave = 1 means that Fits gives 1D arrays instead of 2D arrays :
+          // Applies to Complex / Double and Logical types :
+          final int[] newDims = {Array.getLength(columnValue), 1};
+          value = ArrayFuncs.curl(value, newDims);
+      }
     }
 
     return value;
