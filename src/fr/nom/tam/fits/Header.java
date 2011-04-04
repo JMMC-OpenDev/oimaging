@@ -1324,7 +1324,7 @@ public final class Header implements FitsElement {
    *  prefix to a keyword that is guaranteed to be present.
    */
   Cursor positionAfterIndex(String prefix, int col) {
-    String colnum = "" + col;
+    final String colnum = Integer.toString(col);
 
     iter.setKey(prefix + colnum);
 

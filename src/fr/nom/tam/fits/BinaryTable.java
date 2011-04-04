@@ -535,7 +535,7 @@ public final class BinaryTable extends Data implements TableData {
       }
 
     } else {
-      tform = "" + sizes[col];
+      tform = Integer.toString(sizes[col]);
     }
 
     if (bases[col] == int.class) {

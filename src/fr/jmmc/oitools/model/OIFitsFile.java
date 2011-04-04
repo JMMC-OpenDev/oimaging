@@ -1,11 +1,14 @@
 /*******************************************************************************
  * JMMC project
  *
- * "@(#) $Id: OIFitsFile.java,v 1.10 2010-09-02 15:48:49 bourgesl Exp $"
+ * "@(#) $Id: OIFitsFile.java,v 1.11 2011-04-04 15:28:09 bourgesl Exp $"
  *
  * History
  * -------
  * $Log: not supported by cvs2svn $
+ * Revision 1.10  2010/09/02 15:48:49  bourgesl
+ * added removeTable (oiData table)
+ *
  * Revision 1.9  2010/08/18 14:29:33  bourgesl
  * use the visitor pattern to refactor the XML serialization
  *
@@ -365,7 +368,7 @@ public class OIFitsFile extends OIFits {
     if (checker.isFineEnabled()) {
       if (getOiTarget() != null) {
         checker.fine("NBTARGETS");
-        checker.fine("" + getOiTarget().getNbTargets());
+        checker.fine(Integer.toString(getOiTarget().getNbTargets()));
       }
 
       for (OITable oiTable : getOITableList()) {
@@ -384,10 +387,10 @@ public class OIFitsFile extends OIFits {
       }
 
       checker.fine("WARNINGS");
-      checker.fine("" + checker.getCheckHandler().getNbWarnings());
+      checker.fine(Integer.toString(checker.getCheckHandler().getNbWarnings()));
 
       checker.fine("SEVERES");
-      checker.fine("" + checker.getCheckHandler().getNbSeveres());
+      checker.fine(Integer.toString(checker.getCheckHandler().getNbSeveres()));
     }
   }
 

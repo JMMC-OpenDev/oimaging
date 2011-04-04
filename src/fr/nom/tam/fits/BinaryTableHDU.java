@@ -303,7 +303,7 @@ public final class BinaryTableHDU
           if (nDim == 2) {
             final int nRows = dims[0];
 
-            final String tform = "" + nRows + cType;
+            final String tform = Integer.toString(nRows) + Character.toString(cType);
 
             // replace previous TFORM keyword value 'aF' by 'bC' :
             myHeader.addValue("TFORM" + (index + 1), tform, "data format of field " + (index + 1));

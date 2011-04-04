@@ -775,7 +775,6 @@ public final class Fits {
         hh = (BasicHDU) hduList.elementAt(i);
         hh.write(obs);
       } catch (ArrayIndexOutOfBoundsException e) {
-        e.printStackTrace();
         throw new FitsException("Internal Error: Vector Inconsistency" + e);
       }
     }
