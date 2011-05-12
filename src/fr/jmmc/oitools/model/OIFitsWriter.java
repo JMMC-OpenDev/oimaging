@@ -1,25 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIFitsWriter.java,v 1.5 2010-10-22 13:35:22 mella Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.4  2010/06/29 11:54:26  bourgesl
- * update oiFitsFile path when the file is written
- *
- * Revision 1.3  2010/06/02 15:29:29  bourgesl
- * added complex type support ('C' instead of 'E') and optional columns (complex again)
- * the modified string (string length fix for Fits Header) are restored after the HDU creation
- *
- * Revision 1.2  2010/05/31 15:56:17  bourgesl
- * fixed ordering of column keywords (TFORM, TTYPE, TUNIT)
- * removed TDIM keywords
- *
- * Revision 1.1  2010/05/28 14:57:45  bourgesl
- * first attempt to write OIFits from a loaded OIFitsFile structure
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.model;
 

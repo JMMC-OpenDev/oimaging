@@ -1,32 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIFitsViewer.java,v 1.6 2010-08-18 14:29:34 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.5  2010/08/18 09:39:56  bourgesl
- * added command line arguments (-format -verbose -help)
- *
- * Revision 1.4  2010/08/18 08:37:10  mella
- * Change default output format
- *
- * Revision 1.3  2010/08/17 14:17:53  mella
- * Output data in extended mode
- *
- * Revision 1.2  2010/05/18 07:19:17  mella
- * remove import of one old Class
- *
- * Revision 1.1  2010/04/29 14:14:39  bourgesl
- * refactored OIFitsViewer to use the OITools implementation
- *
- * Revision 1.2  2009/09/08 16:10:42  mella
- * add same block for all oitable after optionnal specific data
- *
- * Revision 1.1  2009/01/19 22:16:45  mella
- * *** empty log message ***
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools;
 

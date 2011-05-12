@@ -1,20 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: Units.java,v 1.4 2010-05-28 14:56:46 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.3  2010/05/27 14:44:07  bourgesl
- * javadoc
- *
- * Revision 1.2  2010/05/03 14:26:20  bourgesl
- * fixed parseUnit method
- *
- * Revision 1.1  2010/04/28 14:45:44  bourgesl
- * meta data package with Column and Keyword descriptors, Types and Units enumeration
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.meta;
 

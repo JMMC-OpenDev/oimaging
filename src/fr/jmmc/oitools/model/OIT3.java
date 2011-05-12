@@ -1,53 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIT3.java,v 1.6 2010-06-18 15:42:36 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.5  2010/06/17 15:01:56  bourgesl
- * classes made final
- *
- * Revision 1.4  2010/05/28 14:55:54  bourgesl
- * fixed bug in getSpacial()
- *
- * Revision 1.3  2010/05/28 07:53:07  bourgesl
- * unified code to compute spacial coords
- *
- * Revision 1.2  2010/05/27 16:13:29  bourgesl
- * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
- *
- * Revision 1.1  2010/04/28 14:47:38  bourgesl
- * refactored OIValidator classes to represent the OIFits data model
- *
- * Revision 1.9  2009/03/09 10:27:24  mella
- * Add spacialFreq and spacialCoord getter
- *
- * Revision 1.8  2008/10/28 08:21:43  mella
- * Add javadoc
- *
- * Revision 1.7  2008/04/08 14:22:16  mella
- * Include Evelyne comments
- *
- * Revision 1.6  2008/03/28 09:02:38  mella
- * Add AcceptedStaIndex for further checks
- *
- * Revision 1.5  2008/03/20 14:25:06  mella
- * First semantic step
- *
- * Revision 1.4  2008/03/18 13:23:04  mella
- * suppress common descs and inherit from oiData
- *
- * Revision 1.3  2008/03/13 07:25:48  mella
- * General commit after first keywords and columns definitions
- *
- * Revision 1.2  2008/03/11 14:48:52  mella
- * commit when evening is comming
- *
- * Revision 1.1  2008/02/28 08:10:40  mella
- * First revision
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.model;
 

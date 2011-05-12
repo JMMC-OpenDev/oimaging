@@ -1,23 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: FitsViewerTest.java,v 1.5 2010-09-06 14:04:17 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.4  2010/08/18 09:39:56  bourgesl
- * added command line arguments (-format -verbose -help)
- *
- * Revision 1.3  2010/06/02 11:52:27  bourgesl
- * use logger instead of System.out
- *
- * Revision 1.2  2010/04/29 14:16:24  bourgesl
- * added a flag to choose between OIValidator or OITools viewer
- *
- * Revision 1.1  2010/04/28 14:39:19  bourgesl
- * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.test;
 

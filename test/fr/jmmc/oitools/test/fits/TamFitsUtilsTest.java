@@ -1,14 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: TamFitsUtilsTest.java,v 1.2 2010-12-16 15:13:59 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.1  2010/12/15 17:17:04  bourgesl
- * updated test cases for invalid characters
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.test.fits;
 

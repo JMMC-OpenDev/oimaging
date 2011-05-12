@@ -1,14 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIFitsChecker.java,v 1.2 2010-05-27 16:13:29 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.1  2010/04/29 15:47:02  bourgesl
- * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.model;
 

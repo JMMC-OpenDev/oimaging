@@ -1,30 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: CheckHandler.java,v 1.1 2010-04-28 14:46:28 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.6  2009/01/06 13:30:51  mella
- * GuiValidator clear report before analysis display
- *
- * Revision 1.5  2008/10/28 07:45:56  mella
- * Add javadoc
- *
- * Revision 1.4  2008/04/08 14:22:16  mella
- * Include Evelyne comments
- *
- * Revision 1.3  2008/04/07 07:28:07  mella
- * Add getter method to get number of errors
- *
- * Revision 1.2  2008/04/01 07:37:18  mella
- * Set default logLevel to INFO
- *
- * Revision 1.1  2008/03/31 14:14:33  mella
- * First revision
- *
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.validator;
 

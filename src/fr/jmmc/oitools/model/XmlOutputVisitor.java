@@ -1,11 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: XmlOutputVisitor.java,v 1.1 2010-08-18 14:29:34 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.model;
 

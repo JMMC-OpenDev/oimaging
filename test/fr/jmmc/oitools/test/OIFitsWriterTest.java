@@ -1,26 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIFitsWriterTest.java,v 1.6 2010-09-06 13:49:50 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.5  2010/06/21 10:03:14  bourgesl
- * updated creation code to produce a valid OIFits file
- *
- * Revision 1.4  2010/06/18 15:43:07  bourgesl
- * new test case : create an OIFits file from scratch
- *
- * Revision 1.3  2010/06/02 15:23:53  bourgesl
- * added a test case which copy all OIFits files from oidata/ to oidata/copy and compare files
- *
- * Revision 1.2  2010/06/02 11:52:27  bourgesl
- * use logger instead of System.out
- *
- * Revision 1.1  2010/05/28 14:57:45  bourgesl
- * first attempt to write OIFits from a loaded OIFitsFile structure
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.test;
 

@@ -1,20 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: FileUtils.java,v 1.4 2010-08-18 12:45:10 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.3  2010/05/27 14:43:43  bourgesl
- * javadoc
- *
- * Revision 1.2  2010/05/03 14:25:46  bourgesl
- * removed comment
- *
- * Revision 1.1  2010/04/28 14:46:13  bourgesl
- * Simple FileUtils to wget remote files
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.util;
 

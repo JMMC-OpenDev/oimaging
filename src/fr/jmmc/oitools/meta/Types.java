@@ -1,26 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: Types.java,v 1.6 2010-06-18 15:41:39 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.5  2010/06/01 15:56:03  bourgesl
- * added Complex type
- *
- * Revision 1.4  2010/05/27 14:44:07  bourgesl
- * javadoc
- *
- * Revision 1.3  2010/05/03 14:26:51  bourgesl
- * getDataType(Class) supports both Object and primitive types
- *
- * Revision 1.2  2010/04/29 15:46:18  bourgesl
- * added getDataType(Object)
- *
- * Revision 1.1  2010/04/28 14:45:44  bourgesl
- * meta data package with Column and Keyword descriptors, Types and Units enumeration
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.meta;
 

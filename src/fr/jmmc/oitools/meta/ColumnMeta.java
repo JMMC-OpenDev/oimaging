@@ -1,24 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: ColumnMeta.java,v 1.5 2010-10-22 13:35:23 mella Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.4  2010/06/01 15:57:56  bourgesl
- * added optional flag
- * fixed complex type support in check()
- *
- * Revision 1.3  2010/05/03 14:28:46  bourgesl
- * refactored checks (type, repeat, int or string values) to analyse Object value instead of FitsColumn
- *
- * Revision 1.2  2010/04/29 15:46:02  bourgesl
- * keyword checks refactored
- *
- * Revision 1.1  2010/04/28 14:45:44  bourgesl
- * meta data package with Column and Keyword descriptors, Types and Units enumeration
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.meta;
 

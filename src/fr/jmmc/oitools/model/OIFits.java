@@ -1,23 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIFits.java,v 1.5 2010-09-02 15:48:49 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.4  2010/08/18 14:29:33  bourgesl
- * use the visitor pattern to refactor the XML serialization
- *
- * Revision 1.3  2010/06/21 15:43:54  bourgesl
- * properly set extNb and extVer for added tables
- *
- * Revision 1.2  2010/05/27 16:13:29  bourgesl
- * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
- *
- * Revision 1.1  2010/04/28 14:47:37  bourgesl
- * refactored OIValidator classes to represent the OIFits data model
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.model;
 

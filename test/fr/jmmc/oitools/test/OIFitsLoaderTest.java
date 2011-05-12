@@ -1,20 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIFitsLoaderTest.java,v 1.4 2010-09-06 13:49:50 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.3  2010/06/02 11:52:27  bourgesl
- * use logger instead of System.out
- *
- * Revision 1.2  2010/06/01 16:03:55  bourgesl
- * added specific test cases
- *
- * Revision 1.1  2010/04/28 14:39:20  bourgesl
- * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.test;
 

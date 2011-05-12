@@ -1,14 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: WaveColumnMeta.java,v 1.2 2010-06-01 15:57:56 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.1  2010/04/28 14:45:44  bourgesl
- * meta data package with Column and Keyword descriptors, Types and Units enumeration
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.meta;
 

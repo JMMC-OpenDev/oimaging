@@ -1,27 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: TamFitsTest.java,v 1.6 2010-12-15 17:17:04 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.5  2010/11/18 13:18:31  bourgesl
- * fixed wrong imports due to nom.tam package refactoring
- *
- * Revision 1.4  2010/09/06 13:49:50  bourgesl
- * update tests
- *
- * Revision 1.3  2010/06/02 15:24:40  bourgesl
- * minor fixes to return correct error flag when comparing files
- *
- * Revision 1.2  2010/06/02 11:52:50  bourgesl
- * use logger instead of System.out
- * several fixes in compareFile(source, copy)
- *
- * Revision 1.1  2010/04/28 14:41:13  bourgesl
- * Test cases for nom.tam fits 1.04 + patchs (complex, header utility methods) to load many OI fits files (oidata folder)
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.test.fits;
 

@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 ********************************************************************************
- JMMC project
-
- "@(#) $Id: moduleDescription.xml,v 1.1 2010-04-14 08:34:33 ccmgr Exp $"
-
- History
- ~~~~~~~
- $Log: not supported by cvs2svn $
- Revision 1.10  2008/04/23 15:01:37  rdautric
- *** empty log message ***
-
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
 ********************************************************************************
  NAME
  moduleDescription.xml - Give module informations

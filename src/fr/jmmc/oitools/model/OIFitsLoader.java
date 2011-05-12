@@ -1,42 +1,5 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: OIFitsLoader.java,v 1.10 2011-01-04 15:31:23 mella Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.9  2010/10/22 13:35:22  mella
- * Prefix  nom.tam packages by fr to avoid conflict with topcat (this will be required until LITpro embeds and uses topcat as fitsviewer)
- *
- * Revision 1.8  2010/08/18 12:45:10  bourgesl
- * for remote files, store the URL instead of the temporary file path
- *
- * Revision 1.7  2010/06/18 15:42:05  bourgesl
- * code formatting
- *
- * Revision 1.6  2010/06/01 16:02:25  bourgesl
- * check if the given file does not exist
- * check if a column is optional
- * added complex type support
- * added numeric type cross-conversions
- * fixed bug on array dimensions if NWAVE = 1 i.e. 1D instead of 2D
- *
- * Revision 1.5  2010/05/28 14:57:22  bourgesl
- * javadoc + minor refactoring
- *
- * Revision 1.4  2010/05/27 16:13:29  bourgesl
- * javadoc + small refactoring to expose getters/setters for keywords and getters for columns
- *
- * Revision 1.3  2010/05/03 14:29:14  bourgesl
- * added column checks (type, repeat, units)
- *
- * Revision 1.2  2010/04/29 15:47:02  bourgesl
- * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
- *
- * Revision 1.1  2010/04/28 14:47:38  bourgesl
- * refactored OIValidator classes to represent the OIFits data model
- *
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
 package fr.jmmc.oitools.model;
 
