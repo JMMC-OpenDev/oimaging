@@ -15,7 +15,7 @@
  * Revision 1.1  2010/04/28 14:45:44  bourgesl
  * meta data package with Column and Keyword descriptors, Types and Units enumeration
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.meta;
 
 /**

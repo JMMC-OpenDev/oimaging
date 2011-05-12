@@ -37,7 +37,7 @@
  * Revision 1.1  2010/04/28 14:47:38  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.model;
 
 import fr.jmmc.oitools.OIFitsConstants;

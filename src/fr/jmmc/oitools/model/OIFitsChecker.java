@@ -9,7 +9,7 @@
  * Revision 1.1  2010/04/29 15:47:02  bourgesl
  * use OIFitsChecker instead of CheckLogger / Handler to make OIFits validation
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.model;
 
 import fr.jmmc.oitools.validator.CheckHandler;

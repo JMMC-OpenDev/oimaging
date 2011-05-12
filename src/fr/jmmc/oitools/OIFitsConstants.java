@@ -9,7 +9,7 @@
  * Revision 1.1  2010/04/28 14:45:00  bourgesl
  * String constants for OI Fits standard rev 1.0
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools;
 
 /**

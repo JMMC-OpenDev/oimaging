@@ -18,7 +18,7 @@
  * Revision 1.1  2010/04/28 14:47:37  bourgesl
  * refactored OIValidator classes to represent the OIFits data model
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.model;
 
 import java.util.LinkedList;

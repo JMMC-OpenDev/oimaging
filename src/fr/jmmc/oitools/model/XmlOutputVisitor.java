@@ -6,7 +6,7 @@
  * History
  * -------
  * $Log: not supported by cvs2svn $
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.model;
 
 import fr.jmmc.oitools.meta.ColumnMeta;

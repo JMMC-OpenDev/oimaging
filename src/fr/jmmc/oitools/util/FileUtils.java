@@ -15,7 +15,7 @@
  * Revision 1.1  2010/04/28 14:46:13  bourgesl
  * Simple FileUtils to wget remote files
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.util;
 
 import java.io.File;
