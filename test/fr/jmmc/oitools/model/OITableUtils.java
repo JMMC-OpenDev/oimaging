@@ -9,7 +9,7 @@
  * Revision 1.1  2010/06/02 15:23:53  bourgesl
  * added a test case which copy all OIFits files from oidata/ to oidata/copy and compare files
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.model;
 
 import fr.jmmc.oitools.meta.ColumnMeta;

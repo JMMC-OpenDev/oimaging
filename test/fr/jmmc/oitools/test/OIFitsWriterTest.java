@@ -21,7 +21,7 @@
  * Revision 1.1  2010/05/28 14:57:45  bourgesl
  * first attempt to write OIFits from a loaded OIFitsFile structure
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.test;
 
 import fr.jmmc.oitools.OIFitsConstants;

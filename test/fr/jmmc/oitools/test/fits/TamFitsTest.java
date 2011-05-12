@@ -22,7 +22,7 @@
  * Revision 1.1  2010/04/28 14:41:13  bourgesl
  * Test cases for nom.tam fits 1.04 + patchs (complex, header utility methods) to load many OI fits files (oidata folder)
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.test.fits;
 
 import fr.jmmc.oitools.test.TestEnv;

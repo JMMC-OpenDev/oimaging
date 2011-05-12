@@ -9,7 +9,7 @@
  * Revision 1.1  2010/12/15 17:17:04  bourgesl
  * updated test cases for invalid characters
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.test.fits;
 
 import fr.nom.tam.fits.FitsUtil;

@@ -18,7 +18,7 @@
  * Revision 1.1  2010/04/28 14:39:19  bourgesl
  * basic test cases for OIValidator Viewer/Validator and new OIFitsLoader
  *
- */
+ ******************************************************************************/
 package fr.jmmc.oitools.test;
 
 import fr.jmmc.oitools.OIFitsViewer;
