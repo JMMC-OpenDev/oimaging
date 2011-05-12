@@ -1,4 +1,0 @@
-
-performance :
-- avoid repeated cast
-- replace array.length in loops : matches '.length; i++'
