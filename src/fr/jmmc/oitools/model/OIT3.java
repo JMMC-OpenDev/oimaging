@@ -153,31 +153,34 @@ public final class OIT3 extends OIData {
 
   /* --- Alternate data representation methods --- */
   /**
-   * Return the spacial frequencies column. The computation is based
+   * Return the spatial frequencies column. The computation is based
    * on the maximum distance of u1,v1 (AB), u2,v2 (BC) and -(u1+u2), - (v1+v2) (CA) vectors.
    *
-   * @return the computed spacial frequencies.
+   * @return the computed spatial frequencies.
    */
-  public double[][] getSpacial() {
-    final double[][] r = new double[getNbRows()][getNWave()];
+  public double[][] getSpatial() {
+    final int nRows  = getNbRows();
+    final int nWaves = getNWave();
+    
+    final double[][] r = new double[nRows][nWaves];
     final float[] effWaves = getOiWavelength().getEffWave();
     final double[] u1coord = getU1Coord();
     final double[] v1coord = getV1Coord();
     final double[] u2coord = getU2Coord();
     final double[] v2coord = getV2Coord();
 
-    for (int i = 0, sizeU = u1coord.length; i < sizeU; i++) {
-      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
+    for (int i = 0, j = 0; i < nRows; i++) {
+      for (j = 0; j < nWaves; j++) {
 
         // mimic OIlib/yorick/oidata.i cridx3
-        double dist1 = Math.sqrt((u1coord[i] * u1coord[i]) + (v1coord[i] * v1coord[i]));
-        double dist2 = Math.sqrt((u2coord[i] * u2coord[i]) + (v2coord[i] * v2coord[i]));
+        final double dist1 = Math.sqrt((u1coord[i] * u1coord[i]) + (v1coord[i] * v1coord[i]));
+        final double dist2 = Math.sqrt((u2coord[i] * u2coord[i]) + (v2coord[i] * v2coord[i]));
 
-        double u3 = -(u1coord[i] + u2coord[i]);
-        double v3 = -(v1coord[i] + v2coord[i]);
-        double dist3 = Math.sqrt((u3 * u3) + (v3 * v3));
+        final double u3 = u1coord[i] + u2coord[i];
+        final double v3 = v1coord[i] + v2coord[i];
+        final double dist3 = Math.sqrt((u3 * u3) + (v3 * v3));
 
-        double dist = Math.max(Math.max(dist1, dist2), dist3);
+        final double dist = Math.max(Math.max(dist1, dist2), dist3);
         r[i][j] = dist / effWaves[j];
       }
     }
@@ -186,43 +189,43 @@ public final class OIT3 extends OIData {
   }
 
   /**
-   * Return the spacial ucoord.
+   * Return the spatial u1coord.
    * u1coord/effWave
    *
-   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spatial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
-  public double[][] getSpacialU1Coord() {
-    return getSpacialCoord(getU1Coord());
+  public double[][] getSpatialU1Coord() {
+    return getSpatialCoord(getU1Coord());
   }
 
   /**
-   * Return the spacial ucoord.
+   * Return the spatial u2coord.
    * u2coord/effWave
    *
-   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spatial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
-  public double[][] getSpacialU2Coord() {
-    return getSpacialCoord(getU2Coord());
+  public double[][] getSpatialU2Coord() {
+    return getSpatialCoord(getU2Coord());
   }
 
   /**
-   * Return the spacial vcoord.
+   * Return the spatial v1coord.
    * v1coord/effWave
    *
-   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spatial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
-  public double[][] getSpacialV1Coord() {
-    return getSpacialCoord(getV1Coord());
+  public double[][] getSpatialV1Coord() {
+    return getSpatialCoord(getV1Coord());
   }
 
   /**
-   * Return the spacial vcoord.
+   * Return the spatial v2coord.
    * v2coord/effWave
    *
-   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spatial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
-  public double[][] getSpacialV2Coord() {
-    return getSpacialCoord(getV2Coord());
+  public double[][] getSpatialV2Coord() {
+    return getSpatialCoord(getV2Coord());
   }
 }
 /*___oOo___*/

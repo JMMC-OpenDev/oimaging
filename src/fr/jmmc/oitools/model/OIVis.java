@@ -140,20 +140,23 @@ public final class OIVis extends OIData {
 
   /* --- Alternate data representation methods --- */
   /**
-   * Return the spacial frequencies column.  The computation is based
+   * Return the spatial frequencies column.  The computation is based
    * on ucoord and vcoord.
    * sqrt(ucoord^2+vcoord^2)/effWave
    *
-   * @return the computed spacial frequencies r[x][y] (x,y for coordIndex,effWaveIndex)
+   * @return the computed spatial frequencies r[x][y] (x,y for coordIndex,effWaveIndex)
    */
-  public double[][] getSpacialFreq() {
-    final double[][] r = new double[getNbRows()][getNWave()];
+  public double[][] getSpatialFreq() {
+    final int nRows  = getNbRows();
+    final int nWaves = getNWave();
+    
+    final double[][] r = new double[nRows][nWaves];
     final float[] effWaves = getOiWavelength().getEffWave();
     final double[] ucoord = getUCoord();
     final double[] vcoord = getVCoord();
 
-    for (int i = 0, sizeU = ucoord.length; i < sizeU; i++) {
-      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
+    for (int i = 0, j = 0; i < nRows; i++) {
+      for (j = 0; j < nWaves; j++) {
         r[i][j] = (Math.sqrt((ucoord[i] * ucoord[i]) + (vcoord[i] * vcoord[i]))) / effWaves[j];
       }
     }
@@ -162,23 +165,23 @@ public final class OIVis extends OIData {
   }
 
   /**
-   * Return the spacial ucoord.
+   * Return the spatial ucoord.
    * ucoord/effWave
    *
-   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spatial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
-  public double[][] getSpacialUCoord() {
-    return getSpacialCoord(getUCoord());
+  public double[][] getSpatialUCoord() {
+    return getSpatialCoord(getUCoord());
   }
 
   /**
-   * Return the spacial vcoord.
+   * Return the spatial vcoord.
    * vcoord/effWave
    *
-   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spatial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
-  public double[][] getSpacialVCoord() {
-    return getSpacialCoord(getVCoord());
+  public double[][] getSpatialVCoord() {
+    return getSpatialCoord(getVCoord());
   }
 }
 /*___oOo___*/

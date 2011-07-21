@@ -204,16 +204,19 @@ public class OIData extends OITable {
 
   /* --- Alternate data representation methods --- */
   /**
-   * Return the spacial coord given the coord array = coord / effWave
+   * Return the spatial coord given the coord array = coord / effWave
    * @param coord coord array
-   * @return the computed spacial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
+   * @return the computed spatial coords r[x][y] (x,y for coordIndex,effWaveIndex) .
    */
-  protected double[][] getSpacialCoord(final double[] coord) {
-    final double[][] r = new double[getNbRows()][getNWave()];
+  protected double[][] getSpatialCoord(final double[] coord) {
+    final int nRows  = getNbRows();
+    final int nWaves = getNWave();
+    
+    final double[][] r = new double[nRows][nWaves];
     final float[] effWaves = getOiWavelength().getEffWave();
 
-    for (int i = 0, size = coord.length; i < size; i++) {
-      for (int j = 0, sizeW = effWaves.length; j < sizeW; j++) {
+    for (int i = 0, j = 0; i < nRows; i++) {
+      for (j = 0; j < nWaves; j++) {
         r[i][j] = coord[i] / effWaves[j];
       }
     }
