@@ -23,8 +23,7 @@ public abstract class ModelBase {
   /* constants */
 
   /** Logger associated to model classes */
-  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
-          "fr.jmmc.oitools.model");
+  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger("fr.jmmc.oitools.model");
 
   /** empty int array */
   protected final static short[] EMPTY_SHORT_ARRAY = new short[0];

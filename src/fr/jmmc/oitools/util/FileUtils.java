@@ -22,8 +22,7 @@ public class FileUtils {
   /* constants */
 
   /** Logger associated to meta model classes */
-  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
-          "fr.jmmc.oitools.util.FileUtils");
+  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FileUtils.class.getName());
 
   /**
    * Forbidden constructor

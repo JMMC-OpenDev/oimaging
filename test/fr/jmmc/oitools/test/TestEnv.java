@@ -16,6 +16,5 @@ public interface TestEnv {
   /* constants */
 
   /** Logger associated to test classes */
-  public final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
-          "fr.jmmc.oitools.test");
+  public final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TestEnv.class.getName());
 }

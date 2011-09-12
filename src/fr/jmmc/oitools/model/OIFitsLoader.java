@@ -31,8 +31,7 @@ public class OIFitsLoader {
   /* constants */
 
   /** Logger associated to meta model classes */
-  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
-          "fr.jmmc.oitools.model.OIFitsLoader");
+  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(OIFitsLoader.class.getName());
 
   /* members */
   /** checker */

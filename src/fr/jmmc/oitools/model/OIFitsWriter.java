@@ -33,8 +33,7 @@ public class OIFitsWriter {
   /* constants */
 
   /** Logger associated to meta model classes */
-  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
-          "fr.jmmc.oitools.model.OIFitsWriter");
+  protected final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(OIFitsWriter.class.getName());
 
   /* members */
   /** OIFits data model */
