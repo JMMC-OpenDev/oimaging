@@ -83,8 +83,8 @@ public class OIFitsLoaderTest implements TestEnv {
       logger.info("load : toString : \n" + oiFitsFile.toString());
 
       if (false) {
-        final boolean detailled = true;
-        logger.info("load : XML DESC : \n" + XmlOutputVisitor.getXmlDesc(oiFitsFile, detailled));
+        final boolean detailed = true;
+        logger.info("load : XML DESC : \n" + XmlOutputVisitor.getXmlDesc(oiFitsFile, detailed));
       }
 
       logger.info("load : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
