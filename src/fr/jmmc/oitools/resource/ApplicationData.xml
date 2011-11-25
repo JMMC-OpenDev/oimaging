@@ -1,30 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ApplicationData link="http://www.jmmc.fr/oitools">
+<ApplicationData link="http://www.jmmc.fr/oitools/">
+    
   <program name="OITools" version="0.2.1"/>
   <compilation date="25/02/2011" compiler="JDK 1.5.0_16"/>
 
-  <text>
-      OITools is a JMMC library dedicated to OIFits manipulation (load, save and validation)
-  </text>
+  <text>OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)</text>
 
   <dependences>
-      
-    <!-- OITools dependencies -->
 
-    <!-- Science / VO libraries (always on top for better visibility) -->
+        <!-- JMMC -->
 
-    <package name="nom.tam.fits"
-        description="The Java FITS library (nom.tam.fits) has been developed which provides efficient I/O for FITS images and binary tables. Made by Dr Thomas A. McGlynn, HEASARC"
-        link="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/"
-        license="Copyright: Thomas McGlynn 1997-1999." />
-        <!--
-          Copyright: Thomas McGlynn 1997-1999.
-          This code may be used for any purpose, non-commercial
-          or commercial so long as this copyright notice is retained
-          in the source code or included in or referred to in any
-          derived software.
-        -->
+        <!-- Java Mariotti OITools -->
+        <package name="OITools"
+            description="OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)"
+            link="https://www.jmmc.fr/dev/oitools/"
+            jars="oitools.jar"
+            license="CECILL-B ???"/>     
+
+
+        <!-- 1. Science / VO libraries (always on top for better visibility) -->
+
+        <!-- OITools dependencies -->
+
+        <package name="nom.tam.fits"
+            description="The Java FITS library (nom.tam.fits) has been developed which provides efficient I/O for FITS images and binary tables. Made by Dr Thomas A. McGlynn, HEASARC"
+            link="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/"
+            license="Copyright: Thomas McGlynn 1997-1999." />
+            <!--
+              Copyright: Thomas McGlynn 1997-1999.
+              This code may be used for any purpose, non-commercial
+              or commercial so long as this copyright notice is retained
+              in the source code or included in or referred to in any
+              derived software.
+            -->
 
   </dependences>
 
@@ -43,6 +52,7 @@
       </prerelease>
     </release>
   </releasenotes>
+
   <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center]]>
   </acknowledgment>
 </ApplicationData>
