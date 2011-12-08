@@ -1,18 +1,6 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: ModelBase.java,v 1.3 2010-08-18 14:29:33 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.2  2010/06/18 15:41:26  bourgesl
- * fixed correct logger class-path
- *
- * Revision 1.1  2010/04/28 14:47:37  bourgesl
- * refactored OIValidator classes to represent the OIFits data model
- *
-  ******************************************************************************/
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+ ******************************************************************************/
 package fr.jmmc.oitools.model;
 
 /**

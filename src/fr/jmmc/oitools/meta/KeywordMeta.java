@@ -1,24 +1,6 @@
 /*******************************************************************************
- * JMMC project
- *
- * "@(#) $Id: KeywordMeta.java,v 1.5 2010-05-31 15:51:19 bourgesl Exp $"
- *
- * History
- * -------
- * $Log: not supported by cvs2svn $
- * Revision 1.4  2010/05/28 14:56:29  bourgesl
- * javadoc
- *
- * Revision 1.3  2010/05/03 14:27:02  bourgesl
- * use getDataType(Class)
- *
- * Revision 1.2  2010/04/29 15:46:01  bourgesl
- * keyword checks refactored
- *
- * Revision 1.1  2010/04/28 14:45:44  bourgesl
- * meta data package with Column and Keyword descriptors, Types and Units enumeration
- *
-  ******************************************************************************/
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+ ******************************************************************************/
 package fr.jmmc.oitools.meta;
 
 import fr.jmmc.oitools.model.OIFitsChecker;
