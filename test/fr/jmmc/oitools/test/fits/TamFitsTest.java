@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.logging.Level;
 
 /**
@@ -45,6 +46,10 @@ public class TamFitsTest implements TestEnv {
     }
 
     public static void main(String[] args) {
+
+        // Set the default locale to en-US locale (for Numerical Fields "." ",")
+        Locale.setDefault(Locale.US);
+
         int errors = 0;
 
         // enable / disable HIERARCH keyword support :
@@ -52,14 +57,14 @@ public class TamFitsTest implements TestEnv {
 
         if (true) {
             String refFile, testFile;
-            
+
             // Compare Reference & Test file (Aspro 0.8.1 / 0.8.2 beta):
             // OIFits files for AMBER:
-            
+
             // Aspro2_FUN3.asprox
 
             // HIP_1234: Elongated disk model
-            
+
             // Noise = false:
             refFile = TEST_DIR + "/Aspro2/Aspro2_HIP1234_AMBER_A1-G1-I1_2011-10-16_PROD.fits";
             testFile = TEST_DIR + "/Aspro2/Aspro2_HIP1234_AMBER_A1-G1-I1_2011-10-16_LATEST.fits";
@@ -67,9 +72,9 @@ public class TamFitsTest implements TestEnv {
             if (!compareFile(refFile, testFile)) {
                 errors++;
             }
-            
+
             // ETA TAU: Punct model
-            
+
             // Noise = true:
             refFile = TEST_DIR + "/Aspro2/Aspro2_ETA_TAU_AMBER_A1-G1-I1_2011-10-16_PROD.fits";
             testFile = TEST_DIR + "/Aspro2/Aspro2_ETA_TAU_AMBER_A1-G1-I1_2011-10-16_LATEST.fits";
@@ -79,7 +84,7 @@ public class TamFitsTest implements TestEnv {
             }
 
             // HD_1234: Complex model (3 components):
-            
+
             // Noise = true:
             refFile = TEST_DIR + "/Aspro2/Aspro2_HD_1234_AMBER_A1-G1-I1_2011-10-16_PROD.fits";
             testFile = TEST_DIR + "/Aspro2/Aspro2_HD_1234_AMBER_A1-G1-I1_2011-10-16_LATEST.fits";
@@ -87,7 +92,7 @@ public class TamFitsTest implements TestEnv {
             if (!compareFile(refFile, testFile)) {
                 errors++;
             }
-            
+
             // Medium resolution + Noise = true:
             refFile = TEST_DIR + "/Aspro2/Aspro2_HD_1234_AMBER_A1-G1-I1_2011-10-16_MED_PROD.fits";
             testFile = TEST_DIR + "/Aspro2/Aspro2_HD_1234_AMBER_A1-G1-I1_2011-10-16_MED_LATEST.fits";
@@ -95,7 +100,7 @@ public class TamFitsTest implements TestEnv {
             if (!compareFile(refFile, testFile)) {
                 errors++;
             }
-            
+
         }
 
         if (false) {
@@ -130,11 +135,11 @@ public class TamFitsTest implements TestEnv {
 
         if (false) {
             final String src = TEST_DIR + "ASPRO-STAR_1-AMBER-08-OCT-2009T08:17:39.fits";
-            final String dest = TEST_DIR + "copy-ASPRO-STAR_1-AMBER.fits";
+            final String dst = TEST_DIR + "copy-ASPRO-STAR_1-AMBER.fits";
 
-            copyFile(src, dest);
+            copyFile(src, dst);
 
-            if (!compareFile(src, dest)) {
+            if (!compareFile(src, dst)) {
                 errors++;
             }
         }
@@ -244,21 +249,17 @@ public class TamFitsTest implements TestEnv {
 
             final Fits s = new Fits(absFilePath);
 
-            final BasicHDU[] sHdu = s.read();
+            final BasicHDU[] hdus = s.read();
 
-            final int len = sHdu.length;
+            final int len = hdus.length;
             sb.append("HDUs = ").append(len).append("\n");
 
-            BasicHDU sH;
+            BasicHDU hdu;
             for (int i = 0; i < len; i++) {
-                sH = sHdu[i];
+                hdu = hdus[i];
 
-                // compare binary HDU only :
-                if (sH instanceof BinaryTableHDU) {
-                    dumpHDU(sb, (BinaryTableHDU) sH);
-                } else {
-                    dumpHDU(sb, sH);
-                }
+                // dump HDU:
+                dumpHDU(sb, hdu);
             }
 
         } catch (Throwable th) {
@@ -277,85 +278,86 @@ public class TamFitsTest implements TestEnv {
 
     private static void dumpHDU(final StringBuilder sb, final BasicHDU hdu) throws FitsException {
         dumpHeader(sb, hdu.getHeader());
+
+        // dump binary HDU only :
+        if (hdu instanceof BinaryTableHDU) {
+            dumpData(sb, (BinaryTableHDU) hdu);
+        } else {
+            logger.warning("Unsupported HDU: " + hdu.getClass());
+        }
     }
 
-    private static void dumpHDU(final StringBuilder sb, final BinaryTableHDU sH) throws FitsException {
-        dumpHeader(sb, sH.getHeader());
+    private static void dumpHeader(final StringBuilder sb, final Header header) {
 
-        dumpData(sb, sH);
-    }
-
-    private static void dumpHeader(final StringBuilder sb, final Header sHeader) {
-
-        final String sExtName = sHeader.getTrimmedStringValue("EXTNAME");
+        final String extName = header.getTrimmedStringValue("EXTNAME");
 
         sb.append("--------------------------------------------------------------------------------\n");
-        if (sExtName != null) {
-            sb.append("EXTNAME = ").append(sExtName).append("\n");
+        if (extName != null) {
+            sb.append("EXTNAME = ").append(extName).append("\n");
         }
 
-        final int sCard = sHeader.getNumberOfCards();
+        final int nCards = header.getNumberOfCards();
 
-        sb.append("KEYWORDS = ").append(sCard).append("\n");
+        sb.append("KEYWORDS = ").append(nCards).append("\n");
 
-        HeaderCard sHc;
+        HeaderCard card;
         String key;
-        for (Iterator<?> it = sHeader.iterator(); it.hasNext();) {
-            sHc = (HeaderCard) it.next();
+        for (Iterator<?> it = header.iterator(); it.hasNext();) {
+            card = (HeaderCard) it.next();
 
-            key = sHc.getKey();
+            key = card.getKey();
 
             if ("END".equals(key)) {
                 break;
             }
 
             sb.append("KEYWORD ").append(key).append(" = ");
-            if (sHc.getValue() != null) {
-                sb.append("'").append(sHc.getValue()).append("'");
+            if (card.getValue() != null) {
+                sb.append("'").append(card.getValue()).append("'");
             }
             sb.append("\t// ");
-            if (sHc.getComment() != null) {
-                sb.append(sHc.getComment());
+            if (card.getComment() != null) {
+                sb.append(card.getComment());
             }
             sb.append("\n");
         }
     }
 
-    private static void dumpData(final StringBuilder sb, final BinaryTableHDU sH) throws FitsException {
+    private static void dumpData(final StringBuilder sb, final BinaryTableHDU hdu) throws FitsException {
 
-        final BinaryTable sData = (BinaryTable) sH.getData();
+        final BinaryTable data = (BinaryTable) hdu.getData();
 
-        final int sCol = sData.getNCols();
+        final int nCols = data.getNCols();
 
         sb.append("--------------------------------------------------------------------------------\n");
-        sb.append("NCOLS = ").append(sCol).append("\n");
+        sb.append("NCOLS = ").append(nCols).append("\n");
 
-        final int sRow = sData.getNRows();
+        final int nRows = data.getNRows();
 
-        sb.append("NROWS = ").append(sRow).append("\n");
+        sb.append("NROWS = ").append(nRows).append("\n");
 
         String unit;
-        Object sArray;
-        for (int i = 0; i < sCol; i++) {
+        Object array;
+        for (int i = 0; i < nCols; i++) {
             // read all data and convert them to arrays[][] :
-            sArray = sData.getColumn(i);
+            array = data.getColumn(i);
             /*
-             sArray = sData.getFlattenedColumn(i);
+             array = data.getFlattenedColumn(i);
              */
 
-            sb.append("COLUMN ").append(sH.getColumnName(i)).append(" [");
-            sb.append(sH.getColumnLength(i));
+            sb.append("COLUMN ").append(hdu.getColumnName(i)).append(" [");
+            sb.append(hdu.getColumnLength(i));
             sb.append(" ");
-            sb.append(sH.getColumnType(i));
+            sb.append(hdu.getColumnType(i));
             sb.append("] (");
-            unit = sH.getColumnUnit(i);
+            unit = hdu.getColumnUnit(i);
             if (unit != null) {
                 sb.append(unit);
             }
-            sb.append(")\t").append(ArrayFuncs.arrayDescription(sArray));
+            sb.append(")\t").append(ArrayFuncs.arrayDescription(array));
 
             if (PRINT_COL) {
-                sb.append("\n").append(arrayToString(sArray));
+                sb.append("\n").append(arrayToString(array));
             }
             sb.append("\n");
         }
@@ -408,28 +410,24 @@ public class TamFitsTest implements TestEnv {
             final Fits s = new Fits(absSrcPath);
             final Fits d = new Fits(absDestPath);
 
-            final BasicHDU[] sHdu = s.read();
-            final BasicHDU[] dHdu = d.read();
+            final BasicHDU[] srcHdus = s.read();
+            final BasicHDU[] dstHdus = d.read();
 
-            if (sHdu.length != dHdu.length) {
-                logger.info("ERROR:  different number of hdu " + sHdu.length + " <> " + dHdu.length);
+            if (srcHdus.length != dstHdus.length) {
+                logger.info("ERROR:  different number of hdu " + srcHdus.length + " <> " + dstHdus.length);
             } else {
-                final int len = sHdu.length;
+                final int len = srcHdus.length;
                 logger.info("HDUs = " + len);
 
-                BasicHDU sH, dH;
+                BasicHDU srcHdu, dstHdu;
                 for (int i = 0; i < len; i++) {
-                    sH = sHdu[i];
-                    dH = dHdu[i];
+                    srcHdu = srcHdus[i];
+                    dstHdu = dstHdus[i];
 
-                    if (sH.getClass() != dH.getClass()) {
-                        logger.info("ERROR:  different type of hdu " + sH.getClass() + " <> " + dH.getClass());
+                    if (srcHdu.getClass() != dstHdu.getClass()) {
+                        logger.info("ERROR:  different type of hdu " + srcHdu.getClass() + " <> " + dstHdu.getClass());
                     } else {
-                        if (sH instanceof BinaryTableHDU) {
-                            res &= compareHDU((BinaryTableHDU) sH, (BinaryTableHDU) dH);
-                        } else {
-                            res &= compareHDU(sH, dH);
-                        }
+                        res &= compareHDU(srcHdu, dstHdu);
                     }
                 }
             }
@@ -442,25 +440,26 @@ public class TamFitsTest implements TestEnv {
         return res;
     }
 
-    private static boolean compareHDU(final BasicHDU sH, final BasicHDU dH) throws FitsException {
-        return compareHeader(sH.getHeader(), dH.getHeader());
-    }
+    private static boolean compareHDU(final BasicHDU srcHdu, final BasicHDU dstHdu) throws FitsException {
 
-    private static boolean compareHDU(final BinaryTableHDU sH, final BinaryTableHDU dH) throws FitsException {
+        // Headers:
+        boolean res = compareHeader(srcHdu.getHeader(), dstHdu.getHeader());
 
-        // Headers :
-        boolean res = compareHeader(sH.getHeader(), dH.getHeader());
-
-        res &= compareData(sH, dH);
+        // Datas:
+        if (srcHdu instanceof BinaryTableHDU && dstHdu instanceof BinaryTableHDU) {
+            res &= compareData((BinaryTableHDU) srcHdu, (BinaryTableHDU) dstHdu);
+        } else {
+            logger.warning("Unsupported HDU: " + srcHdu.getClass());
+        }
 
         return res;
     }
 
-    private static boolean compareHeader(final Header sHeader, final Header dHeader) {
+    private static boolean compareHeader(final Header srcHeader, final Header dstHeader) {
         boolean res = true;
 
-        final String sExtName = sHeader.getTrimmedStringValue("EXTNAME");
-        final String dExtName = dHeader.getTrimmedStringValue("EXTNAME");
+        final String sExtName = srcHeader.getTrimmedStringValue("EXTNAME");
+        final String dExtName = dstHeader.getTrimmedStringValue("EXTNAME");
 
         if (sExtName != null && !sExtName.equals(dExtName)) {
             logger.info("ERROR:  different extension name " + sExtName + " <> " + dExtName);
@@ -469,8 +468,8 @@ public class TamFitsTest implements TestEnv {
             logger.info("--------------------------------------------------------------------------------");
             logger.info("EXTNAME = " + sExtName);
 
-            final int sCard = sHeader.getNumberOfCards();
-            final int dCard = dHeader.getNumberOfCards();
+            final int sCard = srcHeader.getNumberOfCards();
+            final int dCard = dstHeader.getNumberOfCards();
 
             if (sCard != dCard) {
                 logger.info("ERROR:  different number of header card " + sCard + " <> " + dCard);
@@ -478,37 +477,37 @@ public class TamFitsTest implements TestEnv {
             }
             logger.info("KEYWORDS = " + sCard);
 
-            HeaderCard sHc, dHc;
+            HeaderCard srcCard, dstCard;
             String key;
-            for (Iterator<?> it = sHeader.iterator(); it.hasNext();) {
-                sHc = (HeaderCard) it.next();
+            for (Iterator<?> it = srcHeader.iterator(); it.hasNext();) {
+                srcCard = (HeaderCard) it.next();
 
-                key = sHc.getKey();
+                key = srcCard.getKey();
 
                 if ("END".equals(key)) {
                     break;
                 }
 
-                dHc = dHeader.findCard(key);
+                dstCard = dstHeader.findCard(key);
 
-                if (dHc == null) {
+                if (dstCard == null) {
                     logger.info("ERROR:  Missing header card " + key);
                     res = false;
                 } else {
-                    logger.info("KEYWORD " + key + " = " + (sHc.getValue() != null ? "'" + sHc.getValue() + "'" : "") + "\t// " + sHc.getComment());
+                    logger.info("KEYWORD " + key + " = " + (srcCard.getValue() != null ? "'" + srcCard.getValue() + "'" : "") + "\t// " + srcCard.getComment());
 
-                    if (!sHc.getValue().equals(dHc.getValue())) {
+                    if (!srcCard.getValue().equals(dstCard.getValue())) {
 
                         if (key.startsWith("TUNIT")) {
-                            logger.info("WARNING:  different value   of header card[" + key + "] '" + sHc.getValue() + "' <> '" + dHc.getValue() + "'");
-                        } else if (key.startsWith("TFORM") && ("1" + sHc.getValue()).equals(dHc.getValue())) {
-                            logger.info("INFO:  different value   of header card[" + key + "] '" + sHc.getValue() + "' <> '" + dHc.getValue() + "'");
+                            logger.info("WARNING:  different value   of header card[" + key + "] '" + srcCard.getValue() + "' <> '" + dstCard.getValue() + "'");
+                        } else if (key.startsWith("TFORM") && ("1" + srcCard.getValue()).equals(dstCard.getValue())) {
+                            logger.info("INFO:  different value   of header card[" + key + "] '" + srcCard.getValue() + "' <> '" + dstCard.getValue() + "'");
                         } else {
-                            logger.info("ERROR:  different value   of header card[" + key + "] '" + sHc.getValue() + "' <> '" + dHc.getValue() + "'");
+                            logger.info("ERROR:  different value   of header card[" + key + "] '" + srcCard.getValue() + "' <> '" + dstCard.getValue() + "'");
                             res = false;
                         }
-                    } else if (COMPARE_KEYWORD_COMMENTS && isChanged(sHc.getComment(), dHc.getComment())) {
-                        logger.info("ERROR:  different comment of header card[" + key + "] '" + sHc.getComment() + "' <> '" + dHc.getComment() + "'");
+                    } else if (COMPARE_KEYWORD_COMMENTS && isChanged(srcCard.getComment(), dstCard.getComment())) {
+                        logger.info("ERROR:  different comment of header card[" + key + "] '" + srcCard.getComment() + "' <> '" + dstCard.getComment() + "'");
                         res = false;
                     }
                 }
@@ -522,10 +521,10 @@ public class TamFitsTest implements TestEnv {
         return (value1 == null && value2 != null) || (value1 != null && value2 == null) || (value1 != null && value2 != null && !value1.trim().equalsIgnoreCase(value2.trim()));
     }
 
-    private static boolean compareData(final BinaryTableHDU sH, final BinaryTableHDU dH) throws FitsException {
+    private static boolean compareData(final BinaryTableHDU srcHdu, final BinaryTableHDU dstHdu) throws FitsException {
 
-        final BinaryTable sData = (BinaryTable) sH.getData();
-        final BinaryTable dData = (BinaryTable) dH.getData();
+        final BinaryTable sData = (BinaryTable) srcHdu.getData();
+        final BinaryTable dData = (BinaryTable) dstHdu.getData();
 
         boolean res = true;
 
@@ -557,13 +556,13 @@ public class TamFitsTest implements TestEnv {
                      dArray = dData.getFlattenedColumn(i);
                      */
                     if (!ArrayFuncs.arrayEquals(sArray, dArray)) {
-                        logger.info("ERROR:  different values for column[" + sH.getColumnName(i) + "]\nSRC=" + arrayToString(sArray) + "\nDST=" + arrayToString(dArray));
+                        logger.info("ERROR:  different values for column[" + srcHdu.getColumnName(i) + "]\nSRC=" + arrayToString(sArray) + "\nDST=" + arrayToString(dArray));
                         res = false;
                     } else {
                         if (PRINT_COL) {
-                            logger.info("COLUMN " + sH.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray) + "\n" + arrayToString(sArray));
+                            logger.info("COLUMN " + srcHdu.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray) + "\n" + arrayToString(sArray));
                         } else {
-                            logger.info("COLUMN " + sH.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray));
+                            logger.info("COLUMN " + srcHdu.getColumnName(i) + "\t" + ArrayFuncs.arrayDescription(sArray));
                         }
                     }
                 }
