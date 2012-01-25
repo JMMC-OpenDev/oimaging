@@ -13,12 +13,12 @@ public interface OIFitsConstants {
   public final static String UNKNOWN_VALUE = "UNKNOWN";
 
   /* Fits standard */
-  /** NAXIS2 keyword = number of rows in a binary table */
-  public final static String KEYWORD_NAXIS2 = "NAXIS2";
-  /** EXTNAME keyword = Extension name */
-  public final static String KEYWORD_EXT_NAME = "EXTNAME";
   /** EXTVER keyword = Extension version */
   public final static String KEYWORD_EXT_VER = "EXTVER";
+  /** EXTNAME keyword = Extension name */
+  public final static String KEYWORD_EXT_NAME = "EXTNAME";
+  /** NAXIS2 keyword = number of rows in a binary table */
+  public final static String KEYWORD_NAXIS2 = "NAXIS2";
 
   /* OIFits standard */
   /** Table OI_ARRAY */
