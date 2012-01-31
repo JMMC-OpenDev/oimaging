@@ -480,10 +480,7 @@ public final class Fits {
       throw new FitsException("Null FITS Identifier String");
     }
 
-    int len = filename.length();
-    String lc = filename.toLowerCase();
     try {
-      URL test = new URL(filename);
       InputStream is = FitsUtil.getURLStream(new URL(filename), 0);
       streamInit(is, false);
       return;
