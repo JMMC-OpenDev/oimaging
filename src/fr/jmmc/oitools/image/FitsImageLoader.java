@@ -20,6 +20,65 @@ import java.util.logging.Level;
 /**
  * This stateless class loads is an Fits image and cube into the FitsImageFile structure
  * 
+ * From Aspro1:
+ *  -------About the FITS file Format ------------------------------
+ * First, the FITS file should describe a flux distribution on
+ * sky, so the 2 first axes are in offset in RADIANS on the sky. The
+ * following is an example of a typical header:
+ * 
+ * NAXIS   =                    2 /2 minimum!
+ * NAXIS1  =                  512 /size 1st axis (for example)
+ * NAXIS2  =                  512 /size 2nd axis
+ * CRVAL1  =  0.0000000000000E+00 / center is at 0
+ * CRPIX1  =  0.2560000000000E+03 / reference pixel is 256 in Alpha
+ * CDELT1  = -0.4848136811095E-10 / increment is 0.1 millisec (radians), 
+ * / and 'astronomy oriented' (i.e. 
+ * / RA decreases with pixel number)
+ * CRVAL2  =  0.0000000000000E+00 / center is at 0
+ * CRPIX2  =  0.2560000000000E+03 / reference pixel is 256 in Delta
+ * CDELT2  =  0.4848136811095E-10 / increment is 0.1 millisec.
+ * 
+ * The position of the "keyword = value / comment" fields is FIXED by
+ * the fits norm. In doubt, see http://www.cv.nrao.edu/fits/aah2901.pdf
+ * 
+ * Axes increments map pixel images to RA and DEC sky coordinates, which
+ * are positive to the West and North (and position angles are counted
+ * West of North).
+ * 
+ * For single (monochromatic) images (NAXIS = 2), ASPRO assume that this
+ * image is observed at the current observing wavelength, usually the
+ * mean wavelength of the current instrument setup. Aspro has a support
+ * for polychromatic images, as FITS cubes, with a few more keywords
+ * (see below), in which case the used wavelengths will be those defined
+ * in the FITS file, not those of the current instrument/interferometer.
+ * 
+ * The file may be a datacube (N images at different wavelengths) in
+ * which case the 3rd axis must be sampled evenly. In the absence of
+ * further keywords (see below), it will be assumed that th 3rd axis
+ * is in MICRONS as in:
+ * 
+ * NAXIS   =                    3 /datacube
+ * NAXIS1  =                  512 /size 1st axis (for example)
+ * NAXIS2  =                  512 /size 2nd axis
+ * NAXIS3  =                   32 /size 2nd axis
+ * CRVAL1  =  0                   / center is at 0 RA offset on sky
+ * CRPIX1  =  256                 / reference pixel is 256 in Alpha
+ * CDELT1  = -0.4848136811095E-10 / increment is -0.1 millisec (radians), 
+ * CRVAL2  =  0                   / center is at 0 DEC offset on sky
+ * CRPIX2  =  256                 / reference pixel is 256 in Delta
+ * CDELT2  =  0.4848136811095E-10 / increment is 0.1 millisec.
+ * CRPIX3  =  1                   / reference pixel(channel) is 1 on 3rd axis
+ * CRVAL3  =  2.2                 / 2.2 microns for this pix/channel
+ * CDELT3  =  0.01                / microns channel width
+ * 
+ * However, the additional presence of CTYPE3 can affect
+ * the 3rd axis definition:
+ * CTYPE3  = 'FREQUENCY'          / means that Cxxxx3 are in Hz
+ * or
+ * CTYPE3  = 'WAVELENGTH'         / means that Cxxxx3 are in Microns
+ * 
+ * TODO: add support for FITS cube (NAXIS3) and then adjust FitsImage structure
+ * 
  * @author bourgesl
  */
 public final class FitsImageLoader {
@@ -27,7 +86,7 @@ public final class FitsImageLoader {
 
     /** Logger associated to meta model classes */
     private final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FitsImageLoader.class.getName());
-
+    
     static {
         FitsFactory.setUseHierarch(true);
     }
@@ -56,11 +115,11 @@ public final class FitsImageLoader {
         if (!new File(absFilePath).exists()) {
             throw new IOException("File not found : " + absFilePath);
         }
-
+        
         try {
             // create new Fits image structure:
             final FitsImageFile imgFitsFile = new FitsImageFile(absFilePath);
-
+            
             final long start = System.nanoTime();
 
             // open the fits file :
@@ -73,13 +132,13 @@ public final class FitsImageLoader {
             if (hdus != null) {
                 processHDUnits(imgFitsFile, hdus);
             }
-
+            
             if (logger.isLoggable(Level.INFO)) {
                 logger.info("load : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
             }
-
+            
             return imgFitsFile;
-
+            
         } catch (FitsException fe) {
             logger.log(Level.SEVERE, "Unable to load the file : " + absFilePath, fe);
             throw fe;
@@ -93,14 +152,14 @@ public final class FitsImageLoader {
      * @throws FitsException if any FITS error occured
      */
     private static void processHDUnits(final FitsImageFile imgFitsFile, final BasicHDU[] hdus) throws FitsException {
-
+        
         final int nbHDU = hdus.length;
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("processHDUnits : number of HDU = " + nbHDU);
         }
-
+        
         final List<FitsImage> fitsImages = imgFitsFile.getFitsImages();
-
+        
         FitsImage image;
         BasicHDU hdu;
         ImageHDU ih;
@@ -108,11 +167,14 @@ public final class FitsImageLoader {
         // start from Primary HDU
         for (int i = 0; i < nbHDU; i++) {
             hdu = hdus[i];
-
+            
             if (hdu instanceof ImageHDU) {
                 ih = (ImageHDU) hdu;
-
+                
                 image = new FitsImage();
+
+                // define the fits image file:
+                image.setFitsImageFile(imgFitsFile);
 
                 // define the extension number :
                 image.setExtNb(i);
@@ -139,7 +201,7 @@ public final class FitsImageLoader {
 
         // get Fits header :
         processKeywords(hdu.getHeader(), image);
-
+        
         processData(hdu, image);
     }
 
@@ -196,8 +258,8 @@ public final class FitsImageLoader {
         KEYWORD CDELT1 = '-1.2E-10'	// Coord. incr. per pixel (original value)
         KEYWORD CDELT2 = '1.2E-10'	// Coord. incr. per pixel (original value)
          */
-        image.setIncCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT1, Double.NaN));
-        image.setIncRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT2, Double.NaN));
+        image.setSignedIncCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT1, 1d));
+        image.setSignedIncRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT2, 1d));
 
         // Process data min/max:
         /*
@@ -210,18 +272,18 @@ public final class FitsImageLoader {
 
         // Copy all header cards:
         final List<FitsHeaderCard> imgHeaderCards = image.getHeaderCards(header.getNumberOfCards());
-
+        
         HeaderCard card;
         String key;
         for (Iterator<?> it = header.iterator(); it.hasNext();) {
             card = (HeaderCard) it.next();
-
+            
             key = card.getKey();
-
+            
             if ("END".equals(key)) {
                 break;
             }
-
+            
             imgHeaderCards.add(new FitsHeaderCard(key, card.getValue(), card.getComment()));
         }
     }
@@ -241,7 +303,7 @@ public final class FitsImageLoader {
         final int bitPix = hdu.getBitPix();
         final double bZero = hdu.getBZero();
         final double bScale = hdu.getBScale();
-
+        
         final int nbCols = image.getNbCols();
         final int nbRows = image.getNbRows();
 
@@ -250,7 +312,7 @@ public final class FitsImageLoader {
         // look at     Object o = ArrayFuncs.newInstance(base, dims);
 
         final float[][] imgData = getImageData(nbRows, nbCols, bitPix, fitsData.getData(), bZero, bScale);
-
+        
         image.setData(imgData);
     }
 
@@ -266,23 +328,23 @@ public final class FitsImageLoader {
      */
     private static float[][] getImageData(final int rows, final int cols, final int bitpix, final Object array2D,
                                           final double bZero, final double bScale) {
-
+        
         if (array2D == null) {
             return null;
         }
-
+        
         logger.info("bitPix    = " + bitpix);
-
+        
         final boolean doZero = (bZero != 0d);
         final boolean doScaling = (bScale != 1d);
-
+        
         logger.info("doZero    = " + doZero);
         logger.info("doScaling = " + doScaling);
-
+        
         if (bitpix == BasicHDU.BITPIX_FLOAT && !(doZero || doScaling)) {
             return (float[][]) array2D;
         }
-
+        
         final float[][] output = new float[rows][cols];
 
         // 1 - convert data to float[][]
@@ -346,7 +408,7 @@ public final class FitsImageLoader {
                     }
                 }
                 break;
-
+            
             default:
         }
 

@@ -113,6 +113,10 @@ public final class FitsImageWriter {
      */
     private static void createHDUnits(final FitsImageFile imgFitsFile, final Fits fitsFile) throws FitsException, IOException {
         for (FitsImage image : imgFitsFile.getFitsImages()) {
+
+            // define the fits image file:
+            image.setFitsImageFile(imgFitsFile);
+
             // add HDU to the fits file :
             fitsFile.addHDU(createImage(image));
         }
@@ -183,20 +187,16 @@ public final class FitsImageWriter {
         KEYWORD CTYPE1 = ''	//  Units of coordinate
         KEYWORD CTYPE2 = ''	//  Units of coordinate
          */
-        header.addValue(FitsImageConstants.KEYWORD_CRVAL1, image.getValRefCol(), "Coordinate at reference pixel");
-        header.addValue(FitsImageConstants.KEYWORD_CRVAL2, image.getValRefRow(), "Coordinate at reference pixel");
+        header.addValue(FitsImageConstants.KEYWORD_CRVAL1, image.getValRefCol(), "Coordinate at reference pixel (rad)");
+        header.addValue(FitsImageConstants.KEYWORD_CRVAL2, image.getValRefRow(), "Coordinate at reference pixel (rad)");
 
         // Process increments along axes:
         /*
         KEYWORD CDELT1 = '-1.2E-10'	// Coord. incr. per pixel (original value)
         KEYWORD CDELT2 = '1.2E-10'	// Coord. incr. per pixel (original value)
          */
-        if (!Double.isNaN(image.getIncCol())) {
-            header.addValue(FitsImageConstants.KEYWORD_CDELT1, image.getIncCol(), "Coord. incr. per pixel");
-        }
-        if (!Double.isNaN(image.getIncRow())) {
-            header.addValue(FitsImageConstants.KEYWORD_CDELT2, image.getIncRow(), "Coord. incr. per pixel");
-        }
+        header.addValue(FitsImageConstants.KEYWORD_CDELT1, image.getSignedIncCol(), "Coord. incr. per pixel (rad)");
+        header.addValue(FitsImageConstants.KEYWORD_CDELT2, image.getSignedIncRow(), "Coord. incr. per pixel (rad)");
 
         // Process data min/max:
         /*

@@ -3,11 +3,13 @@
  ******************************************************************************/
 package fr.jmmc.oitools.image;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This class describes an astronomical image (2D) with its coordinates, orientation, scale ...
+ * 
  * @author bourgesl
  */
 public final class FitsImage {
@@ -15,6 +17,8 @@ public final class FitsImage {
     /** Logger associated to image classes */
     private final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FitsImage.class.getName());
     /* members */
+    /** reference to the image fits file */
+    private FitsImageFile imagefitsFile = null;
     /** Fits extension number (0 means primary) */
     private int extNb;
     /** number of columns */
@@ -25,14 +29,20 @@ public final class FitsImage {
     private double pixRefCol = 1d;
     /** row position of the reference pixel (real starting from 1.0) */
     private double pixRefRow = 1d;
-    /** coordinate value at the reference pixel column */
+    /** coordinate value at the reference pixel column (radians) */
     private double valRefCol = 0d;
-    /** coordinate value at the reference pixel row */
+    /** coordinate value at the reference pixel row (radians) */
     private double valRefRow = 0d;
-    /** coordinate increment along the column axis (degrees per pixel) */
-    private double incCol = Double.NaN;
-    /** coordinate increment along the row axis (degrees per pixel) */
-    private double incRow = Double.NaN;
+    /** sign flag of the coordinate increment along the column axis (true means positive or false negative) */
+    private boolean incColPositive = true;
+    /** absolute coordinate increment along the column axis (radians per pixel) */
+    private double incCol = 1d;
+    /** sign flag of the coordinate increment along the row axis (true means positive or false negative) */
+    private boolean incRowPositive = true;
+    /** absolute coordinate increment along the row axis (radians per pixel) */
+    private double incRow = 1d;
+    /** image area coordinates (radians) */
+    private Rectangle2D.Double area = null;
     /** optional list of header cards */
     private List<FitsHeaderCard> headerCards = null;
     /** image data as float[nbRows][nbCols] ie [Y][X] */
@@ -49,6 +59,22 @@ public final class FitsImage {
      */
     public FitsImage() {
         super();
+    }
+
+    /**
+     * Define the main fits image file
+     * @param imagefitsFile main fits image file
+     */
+    void setFitsImageFile(final FitsImageFile imagefitsFile) {
+        this.imagefitsFile = imagefitsFile;
+    }
+
+    /**
+     * Return the main fits image file
+     * @return fits image file
+     */
+    public final FitsImageFile getFitsImageFile() {
+        return this.imagefitsFile;
     }
 
     /**
@@ -113,6 +139,7 @@ public final class FitsImage {
      */
     public void setPixRefCol(final double pixRefCol) {
         this.pixRefCol = pixRefCol;
+        this.area = null; // reset area
     }
 
     /**
@@ -129,70 +156,120 @@ public final class FitsImage {
      */
     public void setPixRefRow(final double pixRefRow) {
         this.pixRefRow = pixRefRow;
+        this.area = null; // reset area
     }
 
     /**
-     * Return the coordinate value at the reference pixel column
-     * @return coordinate value at the reference pixel column
+     * Return the coordinate value at the reference pixel column in radians
+     * @return coordinate value at the reference pixel column in radians
      */
     public double getValRefCol() {
         return valRefCol;
     }
 
     /**
-     * Define the coordinate value at the reference pixel column
-     * @param valRefCol coordinate value at the reference pixel column
+     * Define the coordinate value at the reference pixel column in radians
+     * @param valRefCol coordinate value at the reference pixel column in radians
      */
     public void setValRefCol(final double valRefCol) {
         this.valRefCol = valRefCol;
+        this.area = null; // reset area
     }
 
     /**
-     * Return the coordinate value at the reference pixel row
-     * @return coordinate value at the reference pixel row
+     * Return the coordinate value at the reference pixel row in radians
+     * @return coordinate value at the reference pixel row in radians
      */
     public double getValRefRow() {
         return valRefRow;
     }
 
     /**
-     * Define the coordinate value at the reference pixel row
-     * @param valRefRow coordinate value at the reference pixel row
+     * Define the coordinate value at the reference pixel row in radians
+     * @param valRefRow coordinate value at the reference pixel row in radians
      */
     public void setValRefRow(final double valRefRow) {
         this.valRefRow = valRefRow;
+        this.area = null; // reset area
     }
 
     /**
-     * Return the coordinate increment along the column axis
-     * @return coordinate increment along the column axis
+     * Return the sign flag of the coordinate increment along the column axis (true means positive or false negative)
+     * @return sign flag of the coordinate increment along the column axis (true means positive or false negative)
+     */
+    public boolean isIncColPositive() {
+        return incColPositive;
+    }
+
+    /**
+     * Return the signed coordinate increment along the column axis in radians
+     * @return signed coordinate increment along the column axis in radians
+     */
+    public double getSignedIncCol() {
+        return (incColPositive) ? incCol : -incCol;
+    }
+
+    /**
+     * Define the absolute and sign flag of the coordinate increment along the column axis
+     * @param incCol signed coordinate increment along the column axis in radians
+     */
+    public void setSignedIncCol(final double incCol) {
+        this.incColPositive = (incCol >= 0d);
+        this.incCol = (incColPositive) ? incCol : -incCol;
+        this.area = null; // reset area
+    }
+
+    /**
+     * Return the absolute coordinate increment along the column axis in radians
+     * @return absolute coordinate increment along the column axis in radians
      */
     public double getIncCol() {
         return incCol;
     }
 
     /**
-     * Define the coordinate increment along the column axis
-     * @param incCol coordinate increment along the column axis
+     * Return the sign flag of the coordinate increment along the row axis (true means positive or false negative)
+     * @return sign flag of the coordinate increment along the row axis (true means positive or false negative)
      */
-    public void setIncCol(final double incCol) {
-        this.incCol = incCol;
+    public boolean isIncRowPositive() {
+        return incRowPositive;
     }
 
     /**
-     * Return the coordinate increment along the row axis
-     * @return coordinate increment along the row axis
+     * Return the signed coordinate increment along the row axis
+     * @return signed coordinate increment along the row axis in radians
+     */
+    public double getSignedIncRow() {
+        return (incRowPositive) ? incRow : -incRow;
+    }
+
+    /**
+     * Define the absolute and sign flag of the coordinate increment along the row axis
+     * @param incRow signed coordinate increment along the row axis in radians
+     */
+    public void setSignedIncRow(final double incRow) {
+        this.incRowPositive = (incRow >= 0d);
+        this.incRow = (incRowPositive) ? incRow : -incRow;
+        this.area = null; // reset area
+    }
+
+    /**
+     * Return the absolute coordinate increment along the row axis in radians
+     * @return absolute coordinate increment along the row axis in radians
      */
     public double getIncRow() {
         return incRow;
     }
 
     /**
-     * Define the coordinate increment along the row axis
-     * @param incRow coordinate increment along the row axis
+     * Return the image area coordinates in radians
+     * @return image area coordinates in radians
      */
-    public void setIncRow(final double incRow) {
-        this.incRow = incRow;
+    public Rectangle2D.Double getArea() {
+        if (area == null) {
+            updateArea();
+        }
+        return area;
     }
 
     /**
@@ -292,35 +369,49 @@ public final class FitsImage {
 
     // utility methods:
     /**
-     * Return the viewed angle along column axis in degrees
-     * @return viewed angle along column axis in degrees
+     * Return the viewed angle along column axis in radians
+     * @return viewed angle along column axis in radians
      */
     public double getAngleCol() {
         return nbCols * incCol;
     }
 
     /**
-     * Return the viewed angle along row axis in degrees
-     * @return viewed angle along row axis in degrees
+     * Return the viewed angle along row axis in radians
+     * @return viewed angle along row axis in radians
      */
     public double getAngleRow() {
         return nbRows * incRow;
     }
 
     /**
-     * Return the minimum view angle in degrees
-     * @return minimum view angle in degrees
+     * Return the minimum view angle in radians
+     * @return minimum view angle in radians
      */
     public double getMinAngle() {
-        return Math.min(Math.abs(getAngleCol()), Math.abs(getAngleRow()));
+        return Math.min(getAngleCol(), getAngleRow());
     }
 
     /**
-     * Return the maximum view angle in degrees
-     * @return maximum view angle in degrees
+     * Return the maximum view angle in radians
+     * @return maximum view angle in radians
      */
     public double getMaxAngle() {
-        return Math.max(Math.abs(getAngleCol()), Math.abs(getAngleRow()));
+        return Math.max(getAngleCol(), getAngleRow());
+    }
+
+    /**
+     * Update image area coordinates in radians
+     */
+    private void updateArea() {
+        area = new Rectangle2D.Double(
+                valRefCol - (pixRefCol - 1d) * incCol,
+                valRefRow - (pixRefRow - 1d) * incRow,
+                nbCols * incCol,
+                nbRows * incRow);
+        logger.info("updateArea: " + area);
+        logger.info("updateArea: (" + getAngleAsString(area.getX()) + ", " + getAngleAsString(area.getY()) + ") ["
+                + getAngleAsString(area.getWidth()) + ", " + getAngleAsString(area.getHeight()) + "]");
     }
 
     /**
@@ -363,14 +454,14 @@ public final class FitsImage {
     // toString helpers:
     /**
      * Return a string representation of the given angle in degrees using appropriate unit (deg/arcmin/arcsec/milli arcsec)
-     * @param angle angle in degrees
+     * @param angle angle in radians
      * @return string representation of the given angle
      */
     public String getAngleAsString(final double angle) {
         if (Double.isNaN(angle)) {
             return "NaN";
         }
-        double tmp = Math.abs(angle);
+        double tmp = Math.toDegrees(angle);
         if (angle > 1e-1d) {
             return tmp + " deg";
         }
@@ -412,8 +503,9 @@ public final class FitsImage {
         return "FitsImage#" + getExtNb() + "[" + getNbCols() + " x " + getNbRows() + "]"
                 + " RefPix (" + getPixRefCol() + ", " + getPixRefRow() + ")"
                 + " RefVal (" + getValRefCol() + ", " + getValRefRow() + ")"
-                + " Increments (" + getIncCol() + ", " + getIncRow() + ")"
+                + " Increments (" + getSignedIncCol() + ", " + getSignedIncRow() + ")"
                 + " Max view angle (" + getAngleAsString(getMaxAngle()) + ")"
+                + " Area " + getArea()
                 + "{\n" + getHeaderCardsAsString("\n") + "}";
     }
 }
