@@ -6,6 +6,7 @@ package fr.jmmc.oitools.image;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * This class describes an astronomical image (2D) with its coordinates, orientation, scale ...
@@ -47,8 +48,6 @@ public final class FitsImage {
     private List<FitsHeaderCard> headerCards = null;
     /** image data as float[nbRows][nbCols] ie [Y][X] */
     private float[][] data = null;
-    /** flag to indicate that data contains NaN values */
-    private boolean hasNaN = false;
     /** minimum value in data */
     private double dataMin = Double.NaN;
     /** maximum value in data */
@@ -107,6 +106,7 @@ public final class FitsImage {
      */
     void setNbCols(final int nbCols) {
         this.nbCols = nbCols;
+        this.area = null; // reset area
     }
 
     /**
@@ -123,6 +123,7 @@ public final class FitsImage {
      */
     void setNbRows(final int nbRows) {
         this.nbRows = nbRows;
+        this.area = null; // reset area
     }
 
     /**
@@ -295,13 +296,16 @@ public final class FitsImage {
             setNbRows(length);
             setNbCols((length > 0) ? data[0].length : 0);
 
+            // reset data min/max:
+            setDataMin(Double.NaN);
+            setDataMax(Double.NaN);
             analyzeData();
         }
     }
 
     /**
      * Return the minimum value in data
-     * @return minimum value in data
+     * @return minimum value in data or Double.NaN if undefined
      */
     public double getDataMin() {
         return dataMin;
@@ -311,13 +315,13 @@ public final class FitsImage {
      * Define the minimum value in data
      * @param dataMin minimum value in data
      */
-    void setDataMin(final double dataMin) {
+    public void setDataMin(final double dataMin) {
         this.dataMin = dataMin;
     }
 
     /**
      * Return the maximum value in data
-     * @return maximum value in data
+     * @return maximum value in data or Double.NaN if undefined
      */
     public double getDataMax() {
         return dataMax;
@@ -327,24 +331,8 @@ public final class FitsImage {
      * Define the maximum value in data
      * @param dataMax maximum value in data
      */
-    void setDataMax(final double dataMax) {
+    public void setDataMax(final double dataMax) {
         this.dataMax = dataMax;
-    }
-
-    /**
-     * Return the flag to indicate that data contains NaN values
-     * @return flag to indicate that data contains NaN values
-     */
-    public boolean isHasNaN() {
-        return hasNaN;
-    }
-
-    /**
-     * Define the flag to indicate that data contains NaN values
-     * @param hasNaN flag to indicate that data contains NaN values
-     */
-    void setHasNaN(final boolean hasNaN) {
-        this.hasNaN = hasNaN;
     }
 
     /**
@@ -409,18 +397,20 @@ public final class FitsImage {
                 valRefRow - (pixRefRow - 1d) * incRow,
                 nbCols * incCol,
                 nbRows * incRow);
-        logger.info("updateArea: " + area);
-        logger.info("updateArea: (" + getAngleAsString(area.getX()) + ", " + getAngleAsString(area.getY()) + ") ["
-                + getAngleAsString(area.getWidth()) + ", " + getAngleAsString(area.getHeight()) + "]");
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("updateArea: " + area);
+            logger.fine("updateArea: (" + getAngleAsString(area.getX()) + ", " + getAngleAsString(area.getY()) + ") ["
+                    + getAngleAsString(area.getWidth()) + ", " + getAngleAsString(area.getHeight()) + "]");
+        }
     }
 
     /**
      * Analyze data i.e. update min/max values and hasNaN flag
+     * 
+     * TODO: externalize data analysis: use ImageMinMaxJob elsewhere
      */
     private void analyzeData() {
-        logger.info("analyzeData - start");
-
-        boolean isNaN = false;
+        logger.fine("analyzeData - start");
 
         float min = Float.POSITIVE_INFINITY;
         float max = Float.NEGATIVE_INFINITY;
@@ -431,9 +421,8 @@ public final class FitsImage {
             row = data[j];
             for (i = 0; i < cols; i++) {
                 val = row[i];
-                if (Float.isNaN(val)) {
-                    isNaN = true;
-                } else {
+                // check NaN: see Float.isNaN(value):
+                if (!(val != val)) {
                     if (val < min) {
                         min = val;
                     }
@@ -444,11 +433,12 @@ public final class FitsImage {
                 }
             }
         }
-        setHasNaN(isNaN);
         setDataMin(min);
         setDataMax(max);
 
-        logger.info("analyzeData - end: min = " + min + ", max = " + max + " - hasNaN = " + isNaN);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("analyzeData - end: min = " + min + ", max = " + max);
+        }
     }
 
     // toString helpers:

@@ -204,8 +204,12 @@ public final class FitsImageWriter {
         KEYWORD DATAMIN = '0.0'	// Minimum data value
          */
         // note: data min/max are later recomputed (missing / invalid values or bad precision)
-        header.addValue(FitsImageConstants.KEYWORD_DATAMIN, image.getDataMin(), "Minimum data value");
-        header.addValue(FitsImageConstants.KEYWORD_DATAMAX, image.getDataMax(), "Maximum data value");
+        if (!Double.isNaN(image.getDataMin())) {
+            header.addValue(FitsImageConstants.KEYWORD_DATAMIN, image.getDataMin(), "Minimum data value");
+        }
+        if (!Double.isNaN(image.getDataMax())) {
+            header.addValue(FitsImageConstants.KEYWORD_DATAMAX, image.getDataMax(), "Maximum data value");
+        }
 
         // Copy all header cards:
         final List<FitsHeaderCard> imgHeaderCards = image.getHeaderCards();
