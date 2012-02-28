@@ -18,10 +18,8 @@ public final class FitsImage {
     /** Logger associated to image classes */
     private final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FitsImage.class.getName());
     /* members */
-    /** reference to the image fits file */
-    private FitsImageFile imagefitsFile = null;
-    /** Fits extension number (0 means primary) */
-    private int extNb;
+    /** image identifier */
+    private String imageIdentifier = null;
     /** number of columns */
     private int nbCols;
     /** number of rows */
@@ -61,35 +59,19 @@ public final class FitsImage {
     }
 
     /**
-     * Define the main fits image file
-     * @param imagefitsFile main fits image file
+     * Define the fits image identifier = 'FileName#ExtNb'
+     * @param imageIdentifier image identifier 
      */
-    void setFitsImageFile(final FitsImageFile imagefitsFile) {
-        this.imagefitsFile = imagefitsFile;
+    public void setFitsImageIdentifier(final String imageIdentifier) {
+        this.imageIdentifier = imageIdentifier;
     }
 
     /**
-     * Return the main fits image file
-     * @return fits image file
+     * Return the fits image identifier = 'FileName#ExtNb'
+     * @return fits image identifier or null if undefined
      */
-    public final FitsImageFile getFitsImageFile() {
-        return this.imagefitsFile;
-    }
-
-    /**
-     * Get the extension number
-     * @return the extension number
-     */
-    public int getExtNb() {
-        return extNb;
-    }
-
-    /**
-     * Define the extension number
-     * @param extNb extension number
-     */
-    void setExtNb(final int extNb) {
-        this.extNb = extNb;
+    public String getFitsImageIdentifier() {
+        return this.imageIdentifier;
     }
 
     /**
@@ -299,8 +281,15 @@ public final class FitsImage {
             // reset data min/max:
             setDataMin(Double.NaN);
             setDataMax(Double.NaN);
-            analyzeData();
         }
+    }
+
+    /**
+     * Return true if the minimum and maximum value in data are defined
+     * @return true if the minimum and maximum value in data are defined 
+     */
+    public boolean isDataRangeDefined() {
+        return (!Double.isNaN(dataMin) && Double.isNaN(dataMax));
     }
 
     /**
@@ -404,43 +393,6 @@ public final class FitsImage {
         }
     }
 
-    /**
-     * Analyze data i.e. update min/max values and hasNaN flag
-     * 
-     * TODO: externalize data analysis: use ImageMinMaxJob elsewhere
-     */
-    private void analyzeData() {
-        logger.fine("analyzeData - start");
-
-        float min = Float.POSITIVE_INFINITY;
-        float max = Float.NEGATIVE_INFINITY;
-
-        float val;
-        float[] row;
-        for (int i, j = 0, rows = getNbRows(), cols = getNbCols(); j < rows; j++) {
-            row = data[j];
-            for (i = 0; i < cols; i++) {
-                val = row[i];
-                // check NaN: see Float.isNaN(value):
-                if (!(val != val)) {
-                    if (val < min) {
-                        min = val;
-                    }
-
-                    if (val > max) {
-                        max = val;
-                    }
-                }
-            }
-        }
-        setDataMin(min);
-        setDataMax(max);
-
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("analyzeData - end: min = " + min + ", max = " + max);
-        }
-    }
-
     // toString helpers:
     /**
      * Return a string representation of the given angle in degrees using appropriate unit (deg/arcmin/arcsec/milli arcsec)
@@ -490,12 +442,21 @@ public final class FitsImage {
      */
     @Override
     public String toString() {
-        return "FitsImage#" + getExtNb() + "[" + getNbCols() + " x " + getNbRows() + "]"
+        return toString(true);
+    }
+
+    /**
+     * Returns a string representation of this Fits image
+     * @param dumpHeaderCards true to dump also header cards
+     * @return a string representation of this Fits image
+     */
+    public String toString(final boolean dumpHeaderCards) {
+        return "FitsImage[" + getFitsImageIdentifier() + "][" + getNbCols() + " x " + getNbRows() + "]"
                 + " RefPix (" + getPixRefCol() + ", " + getPixRefRow() + ")"
                 + " RefVal (" + getValRefCol() + ", " + getValRefRow() + ")"
                 + " Increments (" + getSignedIncCol() + ", " + getSignedIncRow() + ")"
                 + " Max view angle (" + getAngleAsString(getMaxAngle()) + ")"
                 + " Area " + getArea()
-                + "{\n" + getHeaderCardsAsString("\n") + "}";
+                + ((dumpHeaderCards) ? "{\n" + getHeaderCardsAsString("\n") + "}" : "");
     }
 }

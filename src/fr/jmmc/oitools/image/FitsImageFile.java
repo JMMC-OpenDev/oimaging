@@ -3,6 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oitools.image;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,6 +18,8 @@ public final class FitsImageFile {
     private final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FitsImageFile.class.getName());
 
     /* members */
+    /** file name */
+    private String fileName = null;
     /** absolute file path */
     private String absoluteFilePath = null;
     /** Storage of fits image references */
@@ -39,6 +42,14 @@ public final class FitsImageFile {
     }
 
     /**
+     * Return the number of Fits images present in this FitsImageFile structure
+     * @return number of Fits images
+     */
+    public int getImageCount() {
+        return this.fitsImages.size();
+    }
+
+    /**
      * Return the list of Fits images
      * @return list of Fits images
      */
@@ -47,11 +58,14 @@ public final class FitsImageFile {
     }
 
     /**
-     * Return the number of Fits images present in this FitsImageFile structure
-     * @return number of Fits images
+     * Return the first Fits image
+     * @return Fits image or null
      */
-    public int getImageCount() {
-        return this.fitsImages.size();
+    public FitsImage getFirstFitsImage() {
+        if (this.fitsImages.isEmpty()) {
+            return null;
+        }
+        return this.fitsImages.get(0);
     }
 
     /** 
@@ -70,8 +84,8 @@ public final class FitsImageFile {
      * Get the name of this FitsImageFile file.
      *  @return a string containing the name of the FitsImageFile file.
      */
-    public String getName() {
-        return getAbsoluteFilePath();
+    public String getFileName() {
+        return fileName;
     }
 
     /**
@@ -88,5 +102,11 @@ public final class FitsImageFile {
      */
     public void setAbsoluteFilePath(final String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;
+        if (absoluteFilePath != null && absoluteFilePath.length() > 0) {
+            final int pos = absoluteFilePath.lastIndexOf(File.separatorChar);
+            if (pos != -1) {
+                this.fileName = absoluteFilePath.substring(pos + 1);
+            }
+        }
     }
 }

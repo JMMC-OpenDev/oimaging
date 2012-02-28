@@ -86,7 +86,7 @@ public final class FitsImageLoader {
 
     /** Logger associated to meta model classes */
     private final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FitsImageLoader.class.getName());
-    
+
     static {
         FitsFactory.setUseHierarch(true);
     }
@@ -115,11 +115,11 @@ public final class FitsImageLoader {
         if (!new File(absFilePath).exists()) {
             throw new IOException("File not found : " + absFilePath);
         }
-        
+
         try {
             // create new Fits image structure:
             final FitsImageFile imgFitsFile = new FitsImageFile(absFilePath);
-            
+
             final long start = System.nanoTime();
 
             // open the fits file :
@@ -132,13 +132,13 @@ public final class FitsImageLoader {
             if (hdus != null) {
                 processHDUnits(imgFitsFile, hdus);
             }
-            
+
             if (logger.isLoggable(Level.INFO)) {
                 logger.info("load : duration = " + 1e-6d * (System.nanoTime() - start) + " ms.");
             }
-            
+
             return imgFitsFile;
-            
+
         } catch (FitsException fe) {
             logger.log(Level.SEVERE, "Unable to load the file : " + absFilePath, fe);
             throw fe;
@@ -152,14 +152,14 @@ public final class FitsImageLoader {
      * @throws FitsException if any FITS error occured
      */
     private static void processHDUnits(final FitsImageFile imgFitsFile, final BasicHDU[] hdus) throws FitsException {
-        
+
         final int nbHDU = hdus.length;
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("processHDUnits : number of HDU = " + nbHDU);
         }
-        
+
         final List<FitsImage> fitsImages = imgFitsFile.getFitsImages();
-        
+
         FitsImage image;
         BasicHDU hdu;
         ImageHDU ih;
@@ -167,17 +167,14 @@ public final class FitsImageLoader {
         // start from Primary HDU
         for (int i = 0; i < nbHDU; i++) {
             hdu = hdus[i];
-            
+
             if (hdu instanceof ImageHDU) {
                 ih = (ImageHDU) hdu;
-                
+
                 image = new FitsImage();
 
-                // define the fits image file:
-                image.setFitsImageFile(imgFitsFile);
-
-                // define the extension number :
-                image.setExtNb(i);
+                // define the fits image identifier:
+                image.setFitsImageIdentifier(imgFitsFile.getFileName() + "#" + i);
 
                 // load table :
                 processImage(ih, image);
@@ -201,7 +198,7 @@ public final class FitsImageLoader {
 
         // get Fits header :
         processKeywords(hdu.getHeader(), image);
-        
+
         processData(hdu, image);
     }
 
@@ -272,18 +269,18 @@ public final class FitsImageLoader {
 
         // Copy all header cards:
         final List<FitsHeaderCard> imgHeaderCards = image.getHeaderCards(header.getNumberOfCards());
-        
+
         HeaderCard card;
         String key;
         for (Iterator<?> it = header.iterator(); it.hasNext();) {
             card = (HeaderCard) it.next();
-            
+
             key = card.getKey();
-            
+
             if ("END".equals(key)) {
                 break;
             }
-            
+
             imgHeaderCards.add(new FitsHeaderCard(key, card.getValue(), card.getComment()));
         }
     }
@@ -303,7 +300,7 @@ public final class FitsImageLoader {
         final int bitPix = hdu.getBitPix();
         final double bZero = hdu.getBZero();
         final double bScale = hdu.getBScale();
-        
+
         final int nbCols = image.getNbCols();
         final int nbRows = image.getNbRows();
 
@@ -312,7 +309,7 @@ public final class FitsImageLoader {
         // look at     Object o = ArrayFuncs.newInstance(base, dims);
 
         final float[][] imgData = getImageData(nbRows, nbCols, bitPix, fitsData.getData(), bZero, bScale);
-        
+
         image.setData(imgData);
     }
 
@@ -328,23 +325,23 @@ public final class FitsImageLoader {
      */
     private static float[][] getImageData(final int rows, final int cols, final int bitpix, final Object array2D,
                                           final double bZero, final double bScale) {
-        
+
         if (array2D == null) {
             return null;
         }
-        
+
         logger.info("bitPix    = " + bitpix);
-        
+
         final boolean doZero = (bZero != 0d);
         final boolean doScaling = (bScale != 1d);
-        
+
         logger.info("doZero    = " + doZero);
         logger.info("doScaling = " + doScaling);
-        
+
         if (bitpix == BasicHDU.BITPIX_FLOAT && !(doZero || doScaling)) {
             return (float[][]) array2D;
         }
-        
+
         final float[][] output = new float[rows][cols];
 
         // 1 - convert data to float[][]
@@ -408,7 +405,7 @@ public final class FitsImageLoader {
                     }
                 }
                 break;
-            
+
             default:
         }
 
