@@ -399,7 +399,7 @@ public final class FitsImage {
      * @param angle angle in radians
      * @return string representation of the given angle
      */
-    public String getAngleAsString(final double angle) {
+    public static String getAngleAsString(final double angle) {
         if (Double.isNaN(angle)) {
             return "NaN";
         }
