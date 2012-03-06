@@ -905,7 +905,6 @@ public final class Fits {
      * the correct implementation is in the write() interface.
      */
     ByteArrayOutputStream hduByteImage = new ByteArrayOutputStream();
-    System.err.flush();
     hdu.write(new BufferedDataOutputStream(hduByteImage));
     final byte[] data = hduByteImage.toByteArray();
     final long csu = checksum(data);
