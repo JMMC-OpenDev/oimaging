@@ -2,10 +2,10 @@
 
 <ApplicationData link="http://www.jmmc.fr/oitools/">
     
-  <program name="OITools" version="0.2.1"/>
-  <compilation date="25/02/2011" compiler="JDK 1.5.0_16"/>
+  <program name="OITools" version="0.3.0"/>
+  <compilation date="06/03/2012" compiler="JDK 1.5.0_16"/>
 
-  <text>OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)</text>
+  <text>OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation) and FITS images</text>
 
   <dependences>
 
@@ -38,6 +38,11 @@
   </dependences>
 
   <releasenotes>
+    <release version="0.3">
+      <prerelease version="0.3.0">
+        <change>Added Fits Image support (load, write, convert data to float[rows][columns] and related keywords)</change>
+      </prerelease>
+    </release>
     <release version="0.2">
       <prerelease version="0.2.1">
         <change>Fix bug loading data tables with only one wavelength and using TDIM keywords (1)</change>
