@@ -145,6 +145,91 @@ public final class FitsImageLoader {
         }
     }
 
+    /** Read to the end of the associated input stream */
+    /*    
+    private void readToEnd() throws FitsException {
+    
+    while (dataStr != null && !atEOF) {
+    try {
+    if (readHDU() == null) {
+    break;
+    }
+    } catch (IOException e) {
+    throw new FitsException("IO error: " + e);
+    }
+    }
+    }
+     */
+    /**
+     * Return all image HDUs read from the given Fits object
+     * @param fitsFile Fits object to read
+     * @return list of ImageHDU
+     * @throws FitsException 
+     */
+    /*    
+    private static List<ImageHDU> read(final Fits fitsFile) throws FitsException {
+    
+    }
+     */
+    /** Return all HDUs for the Fits object.   If the
+     * FITS file is associated with an external stream make
+     * sure that we have exhausted the stream.
+     * @return an array of all HDUs in the Fits object.  Returns
+     * null if there are no HDUs associated with this object.
+     */
+    /*    
+    public BasicHDU[] read() throws FitsException {
+    
+    readToEnd();
+    
+    int size = getNumberOfHDUs();
+    
+    if (size == 0) {
+    return null;
+    }
+    
+    BasicHDU[] hdus = new BasicHDU[size];
+    hduList.copyInto(hdus);
+    return hdus;
+    }
+     */
+    /** Read the next HDU on the default input stream.
+     * @return The HDU read, or null if an EOF was detected.
+     * Note that null is only returned when the EOF is detected immediately
+     * at the beginning of reading the HDU.
+     */
+    /*    
+    public BasicHDU readHDU() throws FitsException, IOException {
+    
+    if (dataStr == null || atEOF) {
+    return null;
+    }
+    
+    if (!gzipCompress && lastFileOffset > 0) {
+    FitsUtil.reposition(dataStr, lastFileOffset);
+    }
+    
+    Header hdr = Header.readHeader(dataStr);
+    if (hdr == null) {
+    atEOF = true;
+    return null;
+    }
+    
+    Data datum = hdr.makeData();
+    try {
+    datum.read(dataStr);
+    } catch (PaddingException e) {
+    e.updateHeader(hdr);
+    throw e;
+    }
+    
+    lastFileOffset = FitsUtil.findOffset(dataStr);
+    BasicHDU nextHDU = FitsFactory.HDUFactory(hdr, datum);
+    
+    hduList.addElement(nextHDU);
+    return nextHDU;
+    }
+     */
     /**
      * Process all Fits HD units to load Fits images (skip other HDU) into the given FitsImageFile structure
      * @param imgFitsFile FitsImageFile structure to use
@@ -314,7 +399,7 @@ public final class FitsImageLoader {
         // use raw array[1D] ??
         // convert automatically:
         // look at     Object o = ArrayFuncs.newInstance(base, dims);
-
+        
         final float[][] imgData = getImageData(nbRows, nbCols, bitPix, fitsData.getData(), bZero, bScale);
 
         image.setData(imgData);
@@ -421,11 +506,11 @@ public final class FitsImageLoader {
             for (int i, j = 0; j < rows; j++) {
                 oRow = output[j];
                 for (i = 0; i < cols; i++) {
-                    if (doZero) {
-                        oRow[i] += bZero;
-                    }
                     if (doScaling) {
                         oRow[i] *= bScale;
+                    }
+                    if (doZero) {
+                        oRow[i] += bZero;
                     }
                 }
             }
