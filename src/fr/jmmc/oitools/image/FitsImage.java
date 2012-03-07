@@ -268,20 +268,23 @@ public final class FitsImage {
      * Note: no array copy is performed so do not modify the given array afterwards.
      * 
      * @param data image data as float[nbRows][nbCols] ie [Y][X]
+     * 
+     * @throws IllegalStateException if the given data is null
      */
-    public void setData(final float[][] data) {
-        if (data != null) {
-            this.data = data;
-
-            // update nbRows / nbCols:
-            final int length = data.length;
-            setNbRows(length);
-            setNbCols((length > 0) ? data[0].length : 0);
-
-            // reset data min/max:
-            setDataMin(Double.NaN);
-            setDataMax(Double.NaN);
+    public void setData(final float[][] data) throws IllegalStateException {
+        if (data == null) {
+            throw new IllegalStateException("Empty data array !");
         }
+        this.data = data;
+
+        // update nbRows / nbCols:
+        final int length = data.length;
+        setNbRows(length);
+        setNbCols((length > 0) ? data[0].length : 0);
+
+        // reset data min/max:
+        setDataMin(Double.NaN);
+        setDataMax(Double.NaN);
     }
 
     /**
