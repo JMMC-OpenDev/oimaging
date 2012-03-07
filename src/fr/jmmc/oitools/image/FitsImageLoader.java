@@ -179,8 +179,15 @@ public final class FitsImageLoader {
                 // load table :
                 processImage(ih, image);
 
-                // register the image :
-                fitsImages.add(image);
+                // skip empty images:
+
+                if (image.getNbRows() <= 0 || image.getNbCols() <= 0) {
+                    logger.info("Skip image [" + image.getFitsImageIdentifier()
+                            + "] - incorrect size = " + image.getNbCols() + " x " + image.getNbRows());
+                } else {
+                    // register the image :
+                    fitsImages.add(image);
+                }
             }
         }
     }
