@@ -329,6 +329,14 @@ public final class Fits {
     }
     throw new FitsException("Invalid Magic number for FITS file");
   }
+  
+  /**
+   * Return true if the file is gzip compressed
+   * @return true if the file is gzip compressed 
+   */
+  public boolean isGzipCompressed() {
+      return gzipCompress;
+  }
 
   /** Do the stream initialization.
    *
@@ -800,8 +808,6 @@ public final class Fits {
    */
   public void read(InputStream is) throws FitsException, IOException {
 
-    boolean newIS = false;
-
     if (is instanceof ArrayDataInput) {
       dataStr = (ArrayDataInput) is;
     } else {
@@ -809,12 +815,6 @@ public final class Fits {
     }
 
     read();
-
-    if (newIS) {
-      dataStr.close();
-      dataStr = null;
-    }
-
   }
 
   /** Get the current number of HDUs in the Fits object.
@@ -1038,4 +1038,22 @@ public final class Fits {
     String resul = new String(asc, 15, 1);
     return resul.concat(new String(asc, 0, 15));
   }
+
+    public boolean isAtEOF() {
+        return atEOF;
+    }
+
+    public void setAtEOF(final boolean atEOF) {
+        this.atEOF = atEOF;
+    }
+
+    public long getLastFileOffset() {
+        return lastFileOffset;
+    }
+
+    public void setLastFileOffset(final long lastFileOffset) {
+        this.lastFileOffset = lastFileOffset;
+    }
+  
+  
 }
