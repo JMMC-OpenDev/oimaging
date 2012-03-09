@@ -46,4 +46,16 @@ public interface FitsImageConstants {
     public final static String KEYWORD_CDELT1 = "CDELT1";
     /** CDELT2 keyword = Coordinate increment per pixel along the rows */
     public final static String KEYWORD_CDELT2 = "CDELT2";
+
+    /* default values for missing keywords */
+    /** default value (1.0) for CRPIXn keywords */
+    public final static double DEFAULT_CRPIX = 1d;
+    /** default value (0.0) for CRVALn keywords */
+    public final static double DEFAULT_CRVAL = 0d;
+    /** default value (1.0 rad) for CDELTn keywords */
+    public final static double DEFAULT_CDELT = 1d;
+    /** default value (Double.NaN) for DATAMIN keywords */
+    public final static double DEFAULT_DATA_MIN = Double.NaN;
+    /** default value (Double.NaN) for DATAMAX keywords */
+    public final static double DEFAULT_DATA_MAX = Double.NaN;
 }
