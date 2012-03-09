@@ -50,6 +50,10 @@ public final class FitsImage {
     private double dataMin = Double.NaN;
     /** maximum value in data */
     private double dataMax = Double.NaN;
+    /** number of data */
+    private int nData = 0;
+    /** sum of data values */
+    private double sum = 0d;
 
     /** 
      * Public FitsImage class constructor
@@ -177,6 +181,14 @@ public final class FitsImage {
     }
 
     /**
+     * Return true if the coordinate increment along the column axis is defined
+     * @return true if the coordinate increment along the column axis is defined
+     */
+    public boolean isIncColDefined() {
+        return (incCol != FitsImageConstants.DEFAULT_CDELT);
+    }
+
+    /**
      * Return the sign flag of the coordinate increment along the column axis (true means positive or false negative)
      * @return sign flag of the coordinate increment along the column axis (true means positive or false negative)
      */
@@ -208,6 +220,14 @@ public final class FitsImage {
      */
     public double getIncCol() {
         return incCol;
+    }
+
+    /**
+     * Return true if the coordinate increment along the row axis is defined
+     * @return true if the coordinate increment along the row axis is defined
+     */
+    public boolean isIncRowDefined() {
+        return (incRow != FitsImageConstants.DEFAULT_CDELT);
     }
 
     /**
@@ -292,7 +312,7 @@ public final class FitsImage {
      * @return true if the minimum and maximum value in data are defined 
      */
     public boolean isDataRangeDefined() {
-        return (!Double.isNaN(dataMin) && Double.isNaN(dataMax));
+        return (!Double.isNaN(dataMin) && !Double.isNaN(dataMax));
     }
 
     /**
@@ -325,6 +345,38 @@ public final class FitsImage {
      */
     public void setDataMax(final double dataMax) {
         this.dataMax = dataMax;
+    }
+
+    /**
+     * Return the number of data
+     * @return number of data
+     */
+    public int getNData() {
+        return nData;
+    }
+
+    /**
+     * Define the number of data
+     * @param nData number of data
+     */
+    public void setNData(final int nData) {
+        this.nData = nData;
+    }
+
+    /**
+     * Return the sum of data values
+     * @return sum of data values
+     */
+    public double getSum() {
+        return sum;
+    }
+
+    /**
+     * Define the sum of data values
+     * @param sum sum of data values
+     */
+    public void setSum(final double sum) {
+        this.sum = sum;
     }
 
     /**
