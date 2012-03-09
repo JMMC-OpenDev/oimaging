@@ -4,16 +4,21 @@
 package fr.jmmc.oitools.image;
 
 import fr.nom.tam.fits.BasicHDU;
+import fr.nom.tam.fits.Data;
 import fr.nom.tam.fits.Fits;
 import fr.nom.tam.fits.FitsException;
 import fr.nom.tam.fits.FitsFactory;
+import fr.nom.tam.fits.FitsUtil;
 import fr.nom.tam.fits.Header;
 import fr.nom.tam.fits.HeaderCard;
 import fr.nom.tam.fits.ImageData;
 import fr.nom.tam.fits.ImageHDU;
+import fr.nom.tam.fits.PaddingException;
+import fr.nom.tam.util.ArrayDataInput;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -116,6 +121,7 @@ public final class FitsImageLoader {
             throw new IOException("File not found : " + absFilePath);
         }
 
+        Fits fitsFile = null;
         try {
             // create new Fits image structure:
             final FitsImageFile imgFitsFile = new FitsImageFile(absFilePath);
@@ -123,14 +129,14 @@ public final class FitsImageLoader {
             final long start = System.nanoTime();
 
             // open the fits file :
-            final Fits fitsFile = new Fits(absFilePath);
+            fitsFile = new Fits(absFilePath);
 
             // read the complete file structure :
-            final BasicHDU[] hdus = fitsFile.read();
+            final List<BasicHDU> hduList = read(fitsFile);
 
             // process all HD units :
-            if (hdus != null) {
-                processHDUnits(imgFitsFile, hdus);
+            if (!hduList.isEmpty()) {
+                processHDUnits(imgFitsFile, hduList);
             }
 
             if (logger.isLoggable(Level.INFO)) {
@@ -142,103 +148,141 @@ public final class FitsImageLoader {
         } catch (FitsException fe) {
             logger.log(Level.SEVERE, "Unable to load the file : " + absFilePath, fe);
             throw fe;
+        } finally {
+            if (fitsFile != null && fitsFile.getStream() != null) {
+                try {
+                    fitsFile.getStream().close();
+                } catch (IOException ioe) {
+                    logger.log(Level.FINE, "Closing Fits file", ioe);
+                }
+            }
         }
     }
 
-    /** Read to the end of the associated input stream */
-    /*    
-    private void readToEnd() throws FitsException {
-    
-    while (dataStr != null && !atEOF) {
-    try {
-    if (readHDU() == null) {
-    break;
-    }
-    } catch (IOException e) {
-    throw new FitsException("IO error: " + e);
-    }
-    }
-    }
-     */
     /**
      * Return all image HDUs read from the given Fits object
      * @param fitsFile Fits object to read
      * @return list of ImageHDU
-     * @throws FitsException 
+     * @throws FitsException if any fits or IO exception occurs
      */
-    /*    
-    private static List<ImageHDU> read(final Fits fitsFile) throws FitsException {
-    
+    private static List<BasicHDU> read(final Fits fitsFile) throws FitsException {
+        final List<BasicHDU> hduList = new LinkedList<BasicHDU>();
+
+        try {
+            while (fitsFile.getStream() != null) {
+                final BasicHDU hdu = readHDU(fitsFile);
+                if (hdu == null) {
+                    break;
+                }
+                hduList.add(hdu);
+            }
+        } catch (IOException e) {
+            throw new FitsException("IO error: " + e);
+        }
+        return hduList;
     }
-     */
-    /** Return all HDUs for the Fits object.   If the
-     * FITS file is associated with an external stream make
-     * sure that we have exhausted the stream.
-     * @return an array of all HDUs in the Fits object.  Returns
-     * null if there are no HDUs associated with this object.
-     */
-    /*    
-    public BasicHDU[] read() throws FitsException {
-    
-    readToEnd();
-    
-    int size = getNumberOfHDUs();
-    
-    if (size == 0) {
-    return null;
-    }
-    
-    BasicHDU[] hdus = new BasicHDU[size];
-    hduList.copyInto(hdus);
-    return hdus;
-    }
-     */
-    /** Read the next HDU on the default input stream.
+
+    /** 
+     * Read the next HDU on the default input stream.
+     * Note: it skips truncated HDU
+     * 
+     * @param fitsFile Fits object to read
      * @return The HDU read, or null if an EOF was detected.
      * Note that null is only returned when the EOF is detected immediately
      * at the beginning of reading the HDU.
+     * 
+     * @throws FitsException if any FITS error occured
+     * @throws IOException IO failure
      */
-    /*    
-    public BasicHDU readHDU() throws FitsException, IOException {
-    
-    if (dataStr == null || atEOF) {
-    return null;
+    private static BasicHDU readHDU(final Fits fitsFile) throws FitsException, IOException {
+
+        final ArrayDataInput dataStr = fitsFile.getStream();
+        if (dataStr == null || fitsFile.isAtEOF()) {
+            return null;
+        }
+
+        if (!fitsFile.isGzipCompressed() && fitsFile.getLastFileOffset() > 0) {
+            FitsUtil.reposition(dataStr, fitsFile.getLastFileOffset());
+        }
+
+        final Header hdr = Header.readHeader(dataStr);
+        if (hdr == null) {
+            fitsFile.setAtEOF(true);
+            return null;
+        }
+
+        // Hack for ImageHDU having NAXIS > 2 and NAXISn=1
+        fixAxesInHeader(hdr);
+
+        final Data datum = hdr.makeData();
+        try {
+            datum.read(dataStr);
+        } catch (PaddingException pe) {
+            // ignore truncated HDU ...
+            fitsFile.setAtEOF(true);
+            return null;
+        }
+
+        fitsFile.setLastFileOffset(FitsUtil.findOffset(dataStr));
+
+        return FitsFactory.HDUFactory(hdr, datum);
     }
-    
-    if (!gzipCompress && lastFileOffset > 0) {
-    FitsUtil.reposition(dataStr, lastFileOffset);
-    }
-    
-    Header hdr = Header.readHeader(dataStr);
-    if (hdr == null) {
-    atEOF = true;
-    return null;
-    }
-    
-    Data datum = hdr.makeData();
-    try {
-    datum.read(dataStr);
-    } catch (PaddingException e) {
-    e.updateHeader(hdr);
-    throw e;
-    }
-    
-    lastFileOffset = FitsUtil.findOffset(dataStr);
-    BasicHDU nextHDU = FitsFactory.HDUFactory(hdr, datum);
-    
-    hduList.addElement(nextHDU);
-    return nextHDU;
-    }
+
+    /**
+     * Fix header for degenerated AXES (ie NAXISn = 1) ie remove such axes 
+     * to get data arrays having less dimensions
+     * @param hdr fits header
+     * @throws FitsException if any IO / Fits exception occurs
      */
+    private static void fixAxesInHeader(final Header hdr) throws FitsException {
+        final int nAxis = hdr.getIntValue("NAXIS", 0);
+        if (nAxis < 0) {
+            throw new FitsException("Negative NAXIS value " + nAxis);
+        }
+        if (nAxis > 999) {
+            throw new FitsException("NAXIS value " + nAxis + " too large");
+        }
+
+        if (nAxis == 0) {
+            return;
+        }
+
+        final int[] axes = new int[nAxis];
+        for (int i = 1; i <= nAxis; i++) {
+            axes[i - 1] = hdr.getIntValue("NAXIS" + i, 0);
+        }
+
+        for (int i = 1; i <= nAxis; i++) {
+            logger.warning("NAXIS" + i + " = " + axes[i - 1]);
+        }
+
+        int newNAxis = 0;
+        // Find axes with NAxisn != 1
+        for (int i = nAxis - 1; i >= 0; i--) {
+            if (axes[i] <= 1) {
+                logger.warning("remove NAXIS" + (i + 1));
+                hdr.removeCard("NAXIS" + (i + 1));
+            } else {
+                newNAxis++;
+            }
+        }
+
+        // Update NAXIS:
+        if (newNAxis != nAxis) {
+            logger.warning("updated NAXIS = " + newNAxis);
+            hdr.setNaxes(newNAxis);
+        }
+    }
+
     /**
      * Process all Fits HD units to load Fits images (skip other HDU) into the given FitsImageFile structure
      * @param imgFitsFile FitsImageFile structure to use
-     * @param hdus array of hd unit
+     * @param hdus list of HD units 
      * @throws FitsException if any FITS error occured
      */
-    private static void processHDUnits(final FitsImageFile imgFitsFile, final BasicHDU[] hdus) throws FitsException {
+    private static void processHDUnits(final FitsImageFile imgFitsFile, final List<BasicHDU> hdus) throws FitsException {
 
-        final int nbHDU = hdus.length;
+        final int nbHDU = hdus.size();
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("processHDUnits : number of HDU = " + nbHDU);
         }
@@ -246,35 +290,63 @@ public final class FitsImageLoader {
         final List<FitsImage> fitsImages = imgFitsFile.getFitsImages();
 
         FitsImage image;
-        BasicHDU hdu;
-        ImageHDU ih;
+        ImageHDU imgHdu;
 
         // start from Primary HDU
-        for (int i = 0; i < nbHDU; i++) {
-            hdu = hdus[i];
+        int i = 0;
+        int nAxis;
+        for (BasicHDU hdu : hdus) {
 
             if (hdu instanceof ImageHDU) {
-                ih = (ImageHDU) hdu;
+                imgHdu = (ImageHDU) hdu;
 
-                image = new FitsImage();
+                nAxis = getNAxis(imgHdu);
 
-                // define the fits image identifier:
-                image.setFitsImageIdentifier(imgFitsFile.getFileName() + "#" + i);
-
-                // load table :
-                processImage(ih, image);
-
-                // skip empty images:
-
-                if (image.getNbRows() <= 0 || image.getNbCols() <= 0) {
-                    logger.info("Skip image [" + image.getFitsImageIdentifier()
-                            + "] - incorrect size = " + image.getNbCols() + " x " + image.getNbRows());
+                if (nAxis > 2) {
+                    logger.info("Skipped ImageHDU#" + i + " [" + imgFitsFile.getFileName()
+                            + "] - Unsupported NAXIS = " + nAxis);
                 } else {
-                    // register the image :
-                    fitsImages.add(image);
+                    image = new FitsImage();
+
+                    // define the fits image identifier:
+                    image.setFitsImageIdentifier(imgFitsFile.getFileName() + "#" + i);
+
+                    // load table :
+                    processImage(imgHdu, image);
+
+                    // skip empty images:
+                    if (image.getNbRows() <= 0 || image.getNbCols() <= 0) {
+                        logger.info("Skipped ImageHDU#" + i + " [" + imgFitsFile.getFileName()
+                                + "] - Incorrect size = " + image.getNbCols() + " x " + image.getNbRows());
+                    } else {
+                        // register the image :
+                        fitsImages.add(image);
+                    }
                 }
+            } else {
+                logger.info("Skipped " + hdu.getClass().getSimpleName() + "#" + i + " [" + imgFitsFile.getFileName() + "]");
             }
+
+            // increment i:
+            i++;
         }
+    }
+
+    /**
+     * Return the NAXIS keyword value
+     * @param hdu image HDU
+     * @return NAXIS keyword value
+     * @throws FitsException if NAXIS < 0 or > 999
+     */
+    private static int getNAxis(final ImageHDU hdu) throws FitsException {
+        final int nAxis = hdu.getHeader().getIntValue(FitsImageConstants.KEYWORD_NAXIS, 0);
+        if (nAxis < 0) {
+            throw new FitsException("Negative NAXIS value " + nAxis);
+        }
+        if (nAxis > 999) {
+            throw new FitsException("NAXIS value " + nAxis + " too large");
+        }
+        return nAxis;
     }
 
     /**
@@ -309,14 +381,6 @@ public final class FitsImageLoader {
         KEYWORD NAXIS1 = '512'	// Axis length
         KEYWORD NAXIS2 = '512'	// Axis length
          */
-        final int nAxis = header.getIntValue(FitsImageConstants.KEYWORD_NAXIS, 0);
-        if (nAxis < 0) {
-            throw new FitsException("Negative NAXIS value " + nAxis);
-        }
-        if (nAxis > 999) {
-            throw new FitsException("NAXIS value " + nAxis + " too large");
-        }
-
         // note: x axis has keyword index 1:
         image.setNbCols(header.getIntValue(FitsImageConstants.KEYWORD_NAXIS1, 0));
         // note: y axis has keyword index 2:
@@ -327,8 +391,8 @@ public final class FitsImageLoader {
         KEYWORD CRPIX1 = '256.'	// Reference pixel
         KEYWORD CRPIX2 = '256.'	// Reference pixel
          */
-        image.setPixRefCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CRPIX1, 1d));
-        image.setPixRefRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CRPIX2, 1d));
+        image.setPixRefCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CRPIX1, FitsImageConstants.DEFAULT_CRPIX));
+        image.setPixRefRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CRPIX2, FitsImageConstants.DEFAULT_CRPIX));
 
         // Process coordinates at the reference pixel:
         // note: units are ignored
@@ -339,16 +403,16 @@ public final class FitsImageLoader {
         KEYWORD CTYPE1 = ''	//  Units of coordinate
         KEYWORD CTYPE2 = ''	//  Units of coordinate
          */
-        image.setValRefCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CRVAL1, 0d));
-        image.setValRefRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CRVAL2, 0d));
+        image.setValRefCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CRVAL1, FitsImageConstants.DEFAULT_CRVAL));
+        image.setValRefRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CRVAL2, FitsImageConstants.DEFAULT_CRVAL));
 
         // Process increments along axes:
         /*
         KEYWORD CDELT1 = '-1.2E-10'	// Coord. incr. per pixel (original value)
         KEYWORD CDELT2 = '1.2E-10'	// Coord. incr. per pixel (original value)
          */
-        image.setSignedIncCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT1, 1d));
-        image.setSignedIncRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT2, 1d));
+        image.setSignedIncCol(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT1, FitsImageConstants.DEFAULT_CDELT));
+        image.setSignedIncRow(header.getDoubleValue(FitsImageConstants.KEYWORD_CDELT2, FitsImageConstants.DEFAULT_CDELT));
 
         // Process data min/max:
         /*
@@ -356,8 +420,8 @@ public final class FitsImageLoader {
         KEYWORD DATAMIN = '0.0'	// Minimum data value
          */
         // note: data min/max are later recomputed (missing / invalid values or bad precision)
-        image.setDataMin(header.getDoubleValue(FitsImageConstants.KEYWORD_DATAMIN, Double.NaN));
-        image.setDataMax(header.getDoubleValue(FitsImageConstants.KEYWORD_DATAMAX, Double.NaN));
+        image.setDataMin(header.getDoubleValue(FitsImageConstants.KEYWORD_DATAMIN, FitsImageConstants.DEFAULT_DATA_MIN));
+        image.setDataMax(header.getDoubleValue(FitsImageConstants.KEYWORD_DATAMAX, FitsImageConstants.DEFAULT_DATA_MAX));
 
         // Copy all header cards:
         final List<FitsHeaderCard> imgHeaderCards = image.getHeaderCards(header.getNumberOfCards());
@@ -399,7 +463,7 @@ public final class FitsImageLoader {
         // use raw array[1D] ??
         // convert automatically:
         // look at     Object o = ArrayFuncs.newInstance(base, dims);
-        
+
         final float[][] imgData = getImageData(nbRows, nbCols, bitPix, fitsData.getData(), bZero, bScale);
 
         image.setData(imgData);
