@@ -4,6 +4,7 @@
 package fr.jmmc.oitools.image;
 
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -473,23 +474,33 @@ public final class FitsImage {
      * @return string representation of the given angle
      */
     public static String getAngleAsString(final double angle) {
+        return getAngleAsString(angle, null);
+    }
+
+    /**
+     * Return a string representation of the given angle in degrees using appropriate unit (deg/arcmin/arcsec/milli arcsec)
+     * @param angle angle in radians
+     * @param df optional decimal formatter
+     * @return string representation of the given angle
+     */
+    public static String getAngleAsString(final double angle, final DecimalFormat df) {
         if (Double.isNaN(angle)) {
             return "NaN";
         }
         double tmp = Math.toDegrees(angle);
-        if (angle > 1e-1d) {
-            return tmp + " deg";
+        if (tmp > 1e-1d) {
+            return ((df != null) ? df.format(tmp) : tmp) + " deg";
         }
         tmp *= 60d;
-        if (angle > 1e-1d) {
-            return tmp + " arcmin";
+        if (tmp > 1e-1d) {
+            return ((df != null) ? df.format(tmp) : tmp) + " arcmin";
         }
         tmp *= 60d;
-        if (angle > 1e-1d) {
-            return tmp + " arcsec";
+        if (tmp > 1e-1d) {
+            return ((df != null) ? df.format(tmp) : tmp) + " arcsec";
         }
         tmp *= 1000d;
-        return tmp + " milliarcsec";
+        return ((df != null) ? df.format(tmp) : tmp) + " milliarcsec";
     }
 
     /**
