@@ -11,6 +11,7 @@ import fr.nom.tam.fits.FitsFactory;
 import fr.nom.tam.fits.FitsUtil;
 import fr.nom.tam.fits.Header;
 import fr.nom.tam.fits.HeaderCard;
+import fr.nom.tam.fits.HeaderCardException;
 import fr.nom.tam.fits.ImageData;
 import fr.nom.tam.fits.ImageHDU;
 import fr.nom.tam.fits.PaddingException;
@@ -160,6 +161,18 @@ public final class FitsImageLoader {
     }
 
     /**
+     * Update the checksum keyword for the given HDU
+     * @param hdu hdu to process
+     * @return checksum value
+     * @throws FitsException if any FITS error occured
+     * @throws IOException IO failure
+     */
+    public static long updateChecksum(final BasicHDU hdu) throws FitsException, IOException {
+        // compute and add checksum into HDU (header):
+        return Fits.setChecksum(hdu);
+    }
+
+    /**
      * Return all image HDUs read from the given Fits object
      * @param fitsFile Fits object to read
      * @return list of ImageHDU
@@ -250,17 +263,19 @@ public final class FitsImageLoader {
         final int[] axes = new int[nAxis];
         for (int i = 1; i <= nAxis; i++) {
             axes[i - 1] = hdr.getIntValue("NAXIS" + i, 0);
-        }
 
-        for (int i = 1; i <= nAxis; i++) {
-            logger.warning("NAXIS" + i + " = " + axes[i - 1]);
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("NAXIS" + i + " = " + axes[i - 1]);
+            }
         }
 
         int newNAxis = 0;
         // Find axes with NAxisn != 1
         for (int i = nAxis - 1; i >= 0; i--) {
             if (axes[i] <= 1) {
-                logger.warning("remove NAXIS" + (i + 1));
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("remove NAXIS" + (i + 1));
+                }
                 hdr.removeCard("NAXIS" + (i + 1));
             } else {
                 newNAxis++;
@@ -269,7 +284,9 @@ public final class FitsImageLoader {
 
         // Update NAXIS:
         if (newNAxis != nAxis) {
-            logger.warning("updated NAXIS = " + newNAxis);
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("updated NAXIS = " + newNAxis);
+            }
             hdr.setNaxes(newNAxis);
         }
     }
@@ -279,8 +296,9 @@ public final class FitsImageLoader {
      * @param imgFitsFile FitsImageFile structure to use
      * @param hdus list of HD units 
      * @throws FitsException if any FITS error occured
+     * @throws IOException IO failure
      */
-    private static void processHDUnits(final FitsImageFile imgFitsFile, final List<BasicHDU> hdus) throws FitsException {
+    private static void processHDUnits(final FitsImageFile imgFitsFile, final List<BasicHDU> hdus) throws FitsException, IOException {
 
         final int nbHDU = hdus.size();
         if (logger.isLoggable(Level.FINE)) {
@@ -313,6 +331,9 @@ public final class FitsImageLoader {
 
                     // load table :
                     processImage(imgHdu, image);
+
+                    // update checksum:
+                    image.setChecksum(updateChecksum(imgHdu));
 
                     // skip empty images:
                     if (image.getNbRows() <= 0 || image.getNbCols() <= 0) {
@@ -486,13 +507,14 @@ public final class FitsImageLoader {
             return null;
         }
 
-        logger.info("bitPix    = " + bitpix);
-
         final boolean doZero = (bZero != 0d);
         final boolean doScaling = (bScale != 1d);
 
-        logger.info("doZero    = " + doZero);
-        logger.info("doScaling = " + doScaling);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("bitPix    = " + bitpix);
+            logger.fine("doZero    = " + doZero);
+            logger.fine("doScaling = " + doScaling);
+        }
 
         if (bitpix == BasicHDU.BITPIX_FLOAT && !(doZero || doScaling)) {
             return (float[][]) array2D;

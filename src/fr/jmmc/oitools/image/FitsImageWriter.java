@@ -113,13 +113,19 @@ public final class FitsImageWriter {
      */
     private static void createHDUnits(final FitsImageFile imgFitsFile, final Fits fitsFile) throws FitsException, IOException {
         int i = 0;
+        BasicHDU hdu;
         for (FitsImage image : imgFitsFile.getFitsImages()) {
 
             // update the fits image identifier:
             image.setFitsImageIdentifier(imgFitsFile.getFileName() + "#" + i);
-
+            
             // add HDU to the fits file :
-            fitsFile.addHDU(createImage(image));
+            hdu = createImage(image);
+            
+            // update checksum:
+            image.setChecksum(FitsImageLoader.updateChecksum(hdu));
+            
+            fitsFile.addHDU(hdu);
             
             i++;
         }

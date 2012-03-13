@@ -20,6 +20,8 @@ public final class FitsImage {
     /* members */
     /** image identifier */
     private String imageIdentifier = null;
+    /** CRC checksum */
+    private long checksum = 0l;
     /** number of columns */
     private int nbCols;
     /** number of rows */
@@ -76,6 +78,22 @@ public final class FitsImage {
      */
     public String getFitsImageIdentifier() {
         return this.imageIdentifier;
+    }
+
+    /**
+     * Return the CRC checksum
+     * @return CRC checksum
+     */
+    public long getChecksum() {
+        return checksum;
+    }
+
+    /**
+     * Define the CRC checksum
+     * @param checksum CRC checksum
+     */
+    public void setChecksum(final long checksum) {
+        this.checksum = checksum;
     }
 
     /**
