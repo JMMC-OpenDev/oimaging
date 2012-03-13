@@ -878,11 +878,12 @@ public final class Fits {
   /**
    * Add or update the CHECKSUM keyword.
    * @param hdr the primary or other header to get the current DATE
+   * @return checksum value
    * @throws nom.tam.fits.HeaderCardException
    * @author R J Mathar
    * @since 2005-10-05
    */
-  public static void setChecksum(BasicHDU hdu)
+  public static long setChecksum(BasicHDU hdu)
           throws fr.nom.tam.fits.HeaderCardException, fr.nom.tam.fits.FitsException, java.io.IOException {
     /* the next line with the delete is needed to avoid some unexpected
      *  problems with non.tam.fits.Header.checkCard() which otherwise says
@@ -904,7 +905,10 @@ public final class Fits {
      * about the particular byte order on machines (Linux/VAX/MIPS vs Hp-UX, Sparc...) supposed that
      * the correct implementation is in the write() interface.
      */
-    ByteArrayOutputStream hduByteImage = new ByteArrayOutputStream();
+    // LAURENT: prepapre buffer capacity
+    final int capacity = (int) (hdr.headerSize() + hdu.getData().getSize() + 2880);
+    
+    final ByteArrayOutputStream hduByteImage = new ByteArrayOutputStream(capacity);
     hdu.write(new BufferedDataOutputStream(hduByteImage));
     final byte[] data = hduByteImage.toByteArray();
     final long csu = checksum(data);
@@ -914,6 +918,8 @@ public final class Fits {
      * 80-byte records within the header.
      */
     hdr.addValue("CHECKSUM", checksumEnc(csu, true), doneAt);
+    
+    return csu;
   }
 
   /**
