@@ -536,9 +536,9 @@ public class OIFitsLoader {
                     value = ArrayFuncs.convertArray(value, float.class, true);
                     break;
 
-                case TYPE_LOGICAL:
-                    // unsupported conversion : return arrays with false values
-                    value = ArrayFuncs.mimicArray(value, boolean.class);
+                case TYPE_LOGICAL:             
+                    // Try to convert what is convertible else false are returned
+                    value = ArrayFuncs.convertArray(value, boolean.class, true);                                                           
                     break;
 
                 case TYPE_CHAR:
