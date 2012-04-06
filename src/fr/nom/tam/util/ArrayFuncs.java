@@ -750,10 +750,11 @@ public final class ArrayFuncs implements PrimitiveInfo {
       long[] xlarr;
       float[] xfarr;
       double[] xdarr;
+      boolean[] xboolarr;
 
-      Class<?> base = getBaseClass(array);
+      Class<?> base = getBaseClass(array);        
       Class<?> newType = getBaseClass(mimic);
-
+      
       if (base == byte.class) {
         byte[] barr = (byte[]) array;
 
@@ -794,6 +795,11 @@ public final class ArrayFuncs implements PrimitiveInfo {
           xdarr = (double[]) mimic;
           for (int i = 0; i < barr.length; i++) {
             xdarr[i] = barr[i];
+          }
+        } else if (newType == boolean.class) {
+          xboolarr = (boolean[]) mimic;
+          for (int i = 0; i < barr.length; i++) {
+            xboolarr[i] = (barr[i] != 0);
           }
         }
 
@@ -838,6 +844,11 @@ public final class ArrayFuncs implements PrimitiveInfo {
           for (int i = 0; i < sarr.length; i++) {
             xdarr[i] = sarr[i];
           }
+        } else if (newType == boolean.class) {
+          xboolarr = (boolean[]) mimic;
+          for (int i = 0; i < sarr.length; i++) {
+            xboolarr[i] = (sarr[i] != 0);
+          }
         }
 
       } else if (base == char.class) {
@@ -880,6 +891,11 @@ public final class ArrayFuncs implements PrimitiveInfo {
           xdarr = (double[]) mimic;
           for (int i = 0; i < carr.length; i++) {
             xdarr[i] = carr[i];
+          }
+        } else if (newType == boolean.class) {
+          xboolarr = (boolean[]) mimic;
+          for (int i = 0; i < carr.length; i++) {
+            xboolarr[i] = (carr[i] != 0);
           }
         }
 
@@ -924,6 +940,11 @@ public final class ArrayFuncs implements PrimitiveInfo {
           for (int i = 0; i < iarr.length; i++) {
             xdarr[i] = iarr[i];
           }
+        } else if (newType == boolean.class) {
+          xboolarr = (boolean[]) mimic;
+          for (int i = 0; i < iarr.length; i++) {
+            xboolarr[i] = (iarr[i] != 0);
+          }
         }
 
 
@@ -967,6 +988,11 @@ public final class ArrayFuncs implements PrimitiveInfo {
           xdarr = (double[]) mimic;
           for (int i = 0; i < larr.length; i++) {
             xdarr[i] = (double) larr[i];
+          }
+        } else if (newType == boolean.class) {
+          xboolarr = (boolean[]) mimic;
+          for (int i = 0; i < larr.length; i++) {
+            xboolarr[i] = (larr[i] != 0);
           }
         }
 
