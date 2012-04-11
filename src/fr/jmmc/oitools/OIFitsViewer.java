@@ -51,6 +51,9 @@ public final class OIFitsViewer {
       final OIFitsFile oiFitsFile = OIFitsLoader.loadOIFits(this.checker, filename);
 
       oiFitsFile.accept(this.xmlSerializer);
+      
+      // clean the checker before processing any other files
+      this.checker.clearCheckReport();
 
       System.out.println(this.xmlSerializer.toString());
 
