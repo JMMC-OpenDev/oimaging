@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * This command line program loads OIFits files given as arguments
  * and print their XML description in the system out stream
+ * @author bourgesl, mella
  */
 public final class OIFitsViewer {
 
@@ -35,9 +36,9 @@ public final class OIFitsViewer {
    * @param format flag to represent data with less accuracy but a better string representation
    * @param verbose if true the result will contain the table content
    */
-  public OIFitsViewer(final boolean format, final boolean verbose) {
-    this.xmlSerializer = new XmlOutputVisitor(format, verbose);
+  public OIFitsViewer(final boolean format, final boolean verbose) {    
     this.checker = new OIFitsChecker();
+    this.xmlSerializer = new XmlOutputVisitor(format, verbose, this.checker);
   }
 
   /**

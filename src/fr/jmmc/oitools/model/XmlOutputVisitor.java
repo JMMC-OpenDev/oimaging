@@ -13,7 +13,7 @@ import java.util.Locale;
 
 /**
  * This visitor implementation produces an XML output of the OIFits file structure
- * @author bourgesl
+ * @author bourgesl, mella
  */
 public final class XmlOutputVisitor implements ModelVisitor {
 
@@ -32,6 +32,9 @@ public final class XmlOutputVisitor implements ModelVisitor {
   private boolean verbose;
   /** internal buffer */
   private StringBuilder buffer;
+  /** checker used to store checking messages */
+  private final OIFitsChecker checker;
+  
 
   /**
    * Return one xml string with file information
@@ -55,7 +58,7 @@ public final class XmlOutputVisitor implements ModelVisitor {
     oiFitsFile.accept(xmlSerializer);
     return xmlSerializer.toString();
   }
-
+    
   /**
    * Create a new XmlOutputVisitor using default options (not verbose and no formatter used)
    */
@@ -77,9 +80,19 @@ public final class XmlOutputVisitor implements ModelVisitor {
    * @param verbose if true the result will contain the table content
    */
   public XmlOutputVisitor(final boolean format, final boolean verbose) {
+    this(format, verbose, null);
+  }
+  
+  /**
+   * Create a new XmlOutputVisitor with verbose output i.e. with table data (no formatter used)
+   * @param format flag to represent data with less accuracy but a better string representation
+   * @param verbose if true the result will contain the table content
+   */
+  public XmlOutputVisitor(final boolean format, final boolean verbose, final OIFitsChecker checker) {
     this.format = format;
     this.verbose = verbose;
-
+    this.checker = checker;
+    
     this.buffer = new StringBuilder(16384);
   }
 
@@ -153,6 +166,11 @@ public final class XmlOutputVisitor implements ModelVisitor {
       }
     }
 
+    // report check message if one checker was given
+    if(checker != null){
+        this.buffer.append("<checkReport>").append(checker.getCheckReport()).append("</checkReport>");
+    }
+    
     this.buffer.append("</oifits>\n");
   }
 
