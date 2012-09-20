@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+
+<!--
+  This file describes a set of plotdefinition to be used has plot configuration presets 
+-->
+<p:plotDefinitions
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns:p='http://www.jmmc.fr/oiexplorer-core-plot-definition/0.1'
+    xsi:schemaLocation='http://www.jmmc.fr/oiexplorer-core-plot-definition/0.1 ../model/PlotDefinition.xsd'>
+    
+   
+    <!-- Changes to this file should get ATTENTION                                        -->           
+    <!-- first OIfitsExplorer versions may store plotDefinition with the historical names -->
+    <!-- Ids should be added to replace name (and accept whole characters...)             -->
+    
+    <!-- plot (Vis2 - T3) vs spatial freq  -->    
+    <plotDefinition>
+        <name>VIS2DATA_T3PHI/SPATIAL_FREQ</name>
+        <skipFlaggedData>false</skipFlaggedData>
+        <drawLine>false</drawLine>
+        <xAxis>
+            <name>SPATIAL_FREQ</name>
+            <logScale>false</logScale>
+            <includeZero>true</includeZero>
+            <converter>MEGA_LAMBDA</converter>
+        </xAxis>
+        <yAxes>
+            <name>VIS2DATA</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes>
+        <yAxes>
+            <name>T3PHI</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes> 
+    </plotDefinition>
+    
+    <!-- plot(Vis2 - T3) vs wavelength     -->    
+    <plotDefinition>
+        <name>VIS2DATA_T3PHI/EFF_WAVE</name>
+        <skipFlaggedData>false</skipFlaggedData>
+        <drawLine>false</drawLine>
+        <xAxis>
+            <name>EFF_WAVE</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+            <converter>MICRO_METER</converter>
+        </xAxis>
+        <yAxes>
+            <name>VIS2DATA</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes>
+        <yAxes>
+            <name>T3PHI</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes> 
+    </plotDefinition>
+    
+    <!-- plot(Vis2 - T3) vs mjd            -->
+    <plotDefinition>
+        <name>VIS2DATA_T3PHI/MJD</name>
+        <skipFlaggedData>false</skipFlaggedData>
+        <drawLine>false</drawLine>
+        <xAxis>
+            <name>MJD</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </xAxis>
+        <yAxes>
+            <name>VIS2DATA</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes>
+        <yAxes>
+            <name>T3PHI</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes> 
+    </plotDefinition>
+    
+    <!-- plot (VisAmp - VisPhi) vs spatial freq  -->    
+    <plotDefinition>
+        <name>VISAMP_VISPHI/SPATIAL_FREQ</name>
+        <skipFlaggedData>false</skipFlaggedData>
+        <drawLine>false</drawLine>
+        <xAxis>
+            <name>SPATIAL_FREQ</name>
+            <logScale>false</logScale>
+            <includeZero>true</includeZero>
+            <converter>MEGA_LAMBDA</converter>
+        </xAxis>
+        <yAxes>
+            <name>VISAMP</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes>
+        <yAxes>
+            <name>VISPHI</name>
+            <logScale>false</logScale>
+            <includeZero>false</includeZero>
+        </yAxes> 
+    </plotDefinition>
+
+    <!-- plot log(VisAmp - Vis2) vs spatial freq  -->    
+    <plotDefinition>
+        <name>LOG_VISAMP_VIS2DATA/SPATIAL_FREQ</name>
+        <skipFlaggedData>false</skipFlaggedData>
+        <drawLine>false</drawLine>
+        <xAxis>
+            <name>SPATIAL_FREQ</name>
+            <logScale>false</logScale>
+            <includeZero>true</includeZero>
+            <converter>MEGA_LAMBDA</converter>
+        </xAxis>
+        <yAxes>
+            <name>VISAMP</name>
+            <logScale>true</logScale>
+            <includeZero>false</includeZero>
+        </yAxes>
+        <yAxes>
+            <name>VIS2DATA</name>
+            <logScale>true</logScale>
+            <includeZero>false</includeZero>
+        </yAxes> 
+    </plotDefinition>
+        
+</p:plotDefinitions>
