@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://www.jmmc.fr/oiexplorer-base/0.1"
+            targetNamespace="http://www.jmmc.fr/oiexplorer-base/0.1"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+            jaxb:version="2.1" jaxb:extensionBindingPrefixes="xjc">
+
+    <xsd:annotation>
+        <xsd:documentation>
+            This xml schema describes base types
+        </xsd:documentation>
+        <xsd:appinfo>
+            <jaxb:schemaBindings>
+                <jaxb:package name="fr.jmmc.oiexplorer.core.model.oi"/>
+            </jaxb:schemaBindings>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+     
+     
+    <!-- Class Types -->
+    <xsd:complexType name="Identifiable">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a common identifiable object (id, name)
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+        
+            <xsd:element name="name" type="xsd:ID">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        unique identifier
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="description" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        User information related to this object
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        
+        </xsd:sequence>
+    </xsd:complexType>    
+
+    
+</xsd:schema>

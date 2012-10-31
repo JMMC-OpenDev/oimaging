@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<jnlp spec="1.0+" codebase="@GENERATED@" href="@GENERATED@">
+  <information>
+    <title>OIExplorer Framework</title>
+    <vendor>JMMC</vendor>
+    <homepage href="http://www.jmmc.fr/dev/"/>
+    <description>OIExplorer common libs</description>
+    <offline-allowed/>
+  </information>
+  <security>
+    <all-permissions/>
+  </security>
+  <resources>
+  
+  <!-- JFreeChart -->
+  <jar href="@SHARED@/jfreechart-1.0.13.jar" />
+  <!-- jfreechart requires jcommon -->
+  <jar href="@SHARED@/jcommon-1.0.16.jar" />
+
+  <!-- PDF -->
+  <jar href="@SHARED@/iText-2.1.5.jar" />
+
+  </resources>
+  <component-desc/>
+</jnlp>
