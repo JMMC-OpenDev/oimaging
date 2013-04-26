@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<jnlp spec="1.0+" codebase="@GENERATED@" href="@GENERATED@">
+  <information>
+    <title>OIFits Explorer</title>
+    <vendor>JMMC</vendor>
+    <homepage href="http://www.jmmc.fr/oifitsexplorer"/>
+    <description>Explore your interferometric observations data files (OIFits)</description>
+    <icon href="OIFitsExplorer.jpg"/>
+    <offline-allowed/>    
+    <shortcut>
+      <desktop/>
+    </shortcut>
+  </information>
+  <security>
+    <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.6+" initial-heap-size="256m" max-heap-size="512m"/>
+
+    <!-- Application module first (main class) -->
+    <jar href="jar/oiexplorer.jar" />
+
+    <!-- JMMC modules -->
+    <jar href="jar/jmcs.jar" />
+    <jar href="jar/jmal.jar" />
+    <jar href="jar/oitools.jar" />
+    <jar href="jar/oiexplorer_core.jar" />
+
+    <!-- JMMC libs -->
+    <extension href="../JmcsLibs/JmcsLibs.jnlp"/>
+    <extension href="../JmalLibs/JmalLibs.jnlp"/>
+    <extension href="../OIExplorerCoreLibs/OIExplorerCoreLibs.jnlp"/>
+    
+  </resources>
+  <application-desc main-class="fr.jmmc.oiexplorer.OIFitsExplorer"/>
+</jnlp>
