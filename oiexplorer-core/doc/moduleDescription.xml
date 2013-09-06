@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+********************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+********************************************************************************
+ NAME
+ moduleDescription.xml - Give module informations
+ 
+ DESCRIPTION
+ moduleDescription.xml gives informations about: 
+ - the module description
+ - the module responsible
+ - the responsible's institute
+ - the package whom belongs to this module
+
+ EXAMPLES
+    <module name="dummymod">
+        <desc>Dummy module description</desc>
+        <resp>FirstName LastName</resp>
+        <institute>Institute</institute>
+        <package>PackageName</package>
+    </module>
+
+-->
+
+<module name="oiexplorer-core">
+    <desc>description</desc>
+    <resp>responsible</resp>
+    <institute>JMMC</institute>
+    <package>package</package>
+</module>
