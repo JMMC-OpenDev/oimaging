@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.jmmc</groupId>
+        <artifactId>jmmc</artifactId>
+        <version>TRUNK</version>
+        <!--  please install first parent pom from jMCS/parent-pom directory -->
+    </parent>
+    
+    <groupId>fr.jmmc.oitools</groupId>
+    <artifactId>oitools</artifactId>
+
+    <packaging>jar</packaging>
+    <name>OITools</name>
+
+    <properties>
+        <!-- OITools is an open source project ASAP -->
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+        <source.skip>false</source.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython</artifactId>
+            <version>2.7.0</version>
+            <!-- disabled (too large ~ 30Mb) -->
+            <scope>provided</scope>
+        </dependency>
+    
+        <dependency>
+            <groupId>org.gnu.jel</groupId>
+            <artifactId>JEL</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+                    
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <!-- Requires you to install manually the artifact:
+                       mvn install:install-file -Dfile=lib/jel-2.0.2.jar -DgroupId=org.gnu.jel -DartifactId=JEL -Dversion=2.0.2 -Dpackaging=jar
+                        -->
+                        <id>JEL</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <phase>process-resources</phase> <!-- just before compilation -->
+                        <configuration>
+                            <file>lib/jel-2.0.2.jar</file>
+                            <groupId>org.gnu.jel</groupId>
+                            <artifactId>JEL</artifactId>
+                            <version>2.0.2</version>
+                            <packaging>jar</packaging>
+                            <sources>lib/jel-2.0.2-sources.jar</sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
