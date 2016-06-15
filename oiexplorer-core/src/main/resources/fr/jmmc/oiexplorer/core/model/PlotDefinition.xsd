@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://www.jmmc.fr/oiexplorer-core-plot-definition/0.1"
+            targetNamespace="http://www.jmmc.fr/oiexplorer-core-plot-definition/0.1"
+            xmlns:b="http://www.jmmc.fr/oiexplorer-base/0.1"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+            jaxb:version="2.1" jaxb:extensionBindingPrefixes="xjc">
+
+    <xsd:annotation>
+        <xsd:documentation>
+            This xml schema describes the plot definitions for oiexplorer-core plots.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <!--
+                Comment the jaxb:globalBindings element in embedded xml schema used with XJC
+            -->
+            <!--
+            <jaxb:globalBindings>
+                <xjc:simple />
+            </jaxb:globalBindings>
+            -->
+            <jaxb:schemaBindings>
+                <jaxb:package name="fr.jmmc.oiexplorer.core.model.plot"/>
+            </jaxb:schemaBindings>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+
+    <xsd:import namespace="http://www.jmmc.fr/oiexplorer-base/0.1" schemaLocation="./OIBase.xsd"/>
+
+
+    <!-- Elements -->
+    <xsd:element name="plotDefinitions" type="PlotDefinitions">
+        <xsd:annotation>
+            <xsd:documentation>
+                this element contains a list of plot definition.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+
+
+    <!-- Class Types -->
+    <xsd:complexType name="PlotDefinitions">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a list plot definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="plotDefinition" type="PlotDefinition" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+
+
+    <xsd:complexType name="PlotDefinition">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a plot definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="b:Identifiable">
+                <xsd:sequence>
+
+                    <xsd:element name="skipFlaggedData" type="xsd:boolean">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Indicates that flagged data are not plotted.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <xsd:element name="drawLine" type="xsd:boolean">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Indicates to draw line between data point of the same serie.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <!-- use a specialized colorAxis ?? to use custom value to encode color (linear / log) ... -->
+                    <xsd:element name="colorMapping" type="ColorMapping" minOccurs="1" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Color mapping (enumerated value)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <!-- TODO: group by or split by baseline, configuration, dateObs -->
+
+                    <xsd:element name="xAxis" type="Axis" minOccurs="1" maxOccurs="1"/>
+
+                    <xsd:element name="yAxes" type="Axis" minOccurs="1" maxOccurs="unbounded"/>
+
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+
+    <xsd:complexType name="Axis">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a plot axis.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Column associated to this axis
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="logScale" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Use logarithm scale on this axis
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="includeZero" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Include the zero value on this axis
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="rangeMode" type="AxisRangeMode">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Define the axis range mode among (Auto, Default, Custom) to determine the axis bounds
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+
+            <xsd:element name="range" type="Range" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Custom range used in plots.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <!-- TODO enum fonction -->
+            <!-- TODO unit conversion -->
+            <xsd:element name="converter" type="xsd:string" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Converter key associated to this axis
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+
+
+    <xsd:complexType name="Range">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes an axis range.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="min" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="max" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+
+
+    <!-- enumerations -->
+    <!-- TODO: ViewType (table, plot ...) -->
+
+    <!-- ColorMapping -->
+    <xsd:simpleType name="ColorMapping">
+        <xsd:annotation>
+            <xsd:documentation>
+                Possible values for the color mapping :
+                - WavelengthRange (EFF_WAVE)
+                - StationIndex (STA_INDEX) (baseline or triplet)
+                - Configuration (STA_CONF)
+                - ObservationDate (DATE_OBS)
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="WavelengthRange">
+                <xsd:annotation>
+                    <xsd:documentation>'WavelengthRange' indicates to use the effective wave length (EFF_WAVE)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="StationIndex">
+                <xsd:annotation>
+                    <xsd:documentation>'StationIndex' indicates to use the station index array (STA_INDEX) (baseline or triplet)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="Configuration">
+                <xsd:annotation>
+                    <xsd:documentation>'Configuration' indicates to use the station configuration (STA_CONF)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ObservationDate">
+                <xsd:annotation>
+                    <xsd:documentation>'ObservationDate' indicates to use the observation date (DATE_OBS)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+
+
+
+    <!-- AxisRangeMode -->
+    <xsd:simpleType name="AxisRangeMode">
+        <xsd:annotation>
+            <xsd:documentation>
+                Possible values for the axis range mode :
+                - Auto
+                - Default
+                - Range
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Auto">
+                <xsd:annotation>
+                    <xsd:documentation>'Auto' indicates to determine automatically the axis bounds according to the data range</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="Default">
+                <xsd:annotation>
+                    <xsd:documentation>'Default' indicates to use the default column range if defined else the 'Auto' mode</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="Range">
+                <xsd:annotation>
+                    <xsd:documentation>'Range' indicates to use the custom range if valid else the 'Default' mode</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+
+</xsd:schema>
