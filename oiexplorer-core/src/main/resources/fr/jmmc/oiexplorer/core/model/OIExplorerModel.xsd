@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://www.jmmc.fr/oiexplorer-data-collection/0.1"
+            targetNamespace="http://www.jmmc.fr/oiexplorer-data-collection/0.1"
+            xmlns:b="http://www.jmmc.fr/oiexplorer-base/0.1"
+            xmlns:p="http://www.jmmc.fr/oiexplorer-core-plot-definition/0.1"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+            jaxb:version="2.1" jaxb:extensionBindingPrefixes="xjc">
+
+    <xsd:annotation>
+        <xsd:documentation>
+            This xml schema describes a list of oidata files and user plot definitions.
+        </xsd:documentation>
+        <xsd:appinfo>
+            
+            <jaxb:globalBindings>
+                <xjc:superClass name="fr.jmmc.oiexplorer.core.model.OIBase"/>                
+                <xjc:simple />
+            </jaxb:globalBindings>            
+            <jaxb:schemaBindings>
+                <jaxb:package name="fr.jmmc.oiexplorer.core.model.oi"/>
+            </jaxb:schemaBindings>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+
+    <xsd:import namespace="http://www.jmmc.fr/oiexplorer-base/0.1" schemaLocation="./OIBase.xsd"/>
+    <xsd:import namespace="http://www.jmmc.fr/oiexplorer-core-plot-definition/0.1" schemaLocation="./PlotDefinition.xsd"/>
+     
+     
+    <!-- Elements -->
+   
+    <xsd:element name="oiDataCollection" type="OIDataCollection">
+        <xsd:annotation>
+            <xsd:documentation>
+                this element contains a collection of oidata ressources.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+            
+    
+    
+    
+    <!-- Class Types -->
+    <xsd:complexType name="OIDataCollection">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a collection of oidata ressources.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>        
+            <xsd:element name="schemaVersion" type="xsd:float">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Schema version for this oidata collection
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>                    
+            <xsd:element name="file" type="OIDataFile" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        File collection.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>  
+            
+            <xsd:element name="subsetDefinition" type="SubsetDefinition" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        User subset definition collection.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>              
+            
+            <xsd:element name="plotDefinition" type="p:PlotDefinition" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        User plot definition collection (custom).
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>  
+                        
+            <!-- view list instead ? -->
+            <xsd:element name="plot" type="Plot" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        User plot collection (instances).
+                    </xsd:documentation>
+                </xsd:annotation>                
+            </xsd:element>  
+                                                               
+        </xsd:sequence>
+    </xsd:complexType>
+
+                    
+    
+    
+    <xsd:complexType name="OIDataFile">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes an oidata file.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="b:Identifiable">
+                <xsd:sequence>                            
+
+                    <xsd:element name="file" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                File reference of this oidata file
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <xsd:element name="checksum" type="xsd:long">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                CRC-32 checksum of the file
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    
+    
+    <xsd:complexType name="SubsetDefinition">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a subset definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="b:Identifiable">
+                <xsd:sequence>
+
+                    <xsd:element name="target" type="TargetUID">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                selected target
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <xsd:element name="table" type="TableUID" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                selected table identifier or all if undefined
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <xsd:element name="filter" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                optional filter(s)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    
+    
+    
+    
+    <xsd:complexType name="View">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a generic view instance of a subset.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="b:Identifiable">
+                <xsd:sequence>
+
+                    <xsd:element name="type" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                view type (should use an enum instead: plot, table ...)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <xsd:element name="subsetDefinition" type="xsd:IDREF">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The subset definition identifier used by this plot
+                            </xsd:documentation>
+                            <xsd:appinfo>
+                                <jaxb:property>
+                                    <jaxb:baseType name="SubsetDefinition" />
+                                </jaxb:property>
+                            </xsd:appinfo>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+
+
+    <xsd:complexType name="Plot">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a plot instance.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="View">
+                <xsd:sequence>
+
+                    <xsd:element name="plotDefinition" type="xsd:IDREF">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The plot definition identifier used by this plot
+                            </xsd:documentation>
+                            <xsd:appinfo>
+                                <jaxb:property>
+                                    <jaxb:baseType name="fr.jmmc.oiexplorer.core.model.plot.PlotDefinition" />
+                                </jaxb:property>
+                            </xsd:appinfo>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    
+    
+    
+    <xsd:complexType name="TargetUID">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes a target unique identifier among the OIDataCollection
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+        
+            <xsd:element name="target" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        target name
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        
+        </xsd:sequence>
+    </xsd:complexType>    
+
+
+
+
+    <xsd:complexType name="TableUID">
+        <xsd:annotation>
+            <xsd:documentation>
+                This type describes an OIData table unique identifier among the OIDataCollection
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+        
+            <xsd:element name="file" type="xsd:IDREF">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        oidata file Identifier
+                    </xsd:documentation>
+                    <xsd:appinfo>
+                        <jaxb:property>
+                            <jaxb:baseType name="OIDataFile" />
+                        </jaxb:property>
+                    </xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="extName" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        oidata table name or all if undefined
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        
+            <xsd:element name="extNb" type="xsd:int" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        oidata table number or all if undefined
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        
+        </xsd:sequence>
+    </xsd:complexType>    
+
+    
+</xsd:schema>
