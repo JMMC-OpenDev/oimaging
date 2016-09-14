@@ -1,13 +1,13 @@
 /*******************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
-package fr.jmmc.ir;
+package fr.jmmc.oimaging;
 
-import fr.jmmc.ir.gui.MainPanel;
-import fr.jmmc.ir.gui.action.LoadFitsImageAction;
-import fr.jmmc.ir.gui.action.LoadOIFitsAction;
-import fr.jmmc.ir.gui.action.RunAction;
-import fr.jmmc.ir.model.IRModelManager;
+import fr.jmmc.oimaging.gui.MainPanel;
+import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
+import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
+import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.app.ApplicationDescription;
@@ -49,14 +49,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class represents the IRGui application
+ * This class represents the OImaging application
  *
  * @author mella, bourgesl
  */
-public final class IRGui extends App {
+public final class OImaging extends App {
 
     /** Class logger */
-    private static final Logger logger = LoggerFactory.getLogger(IRGui.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OImaging.class.getName());
 
     /* Minimal size of main component */
     private static final Dimension INITIAL_DIMENSION = new java.awt.Dimension(1200, 700);
@@ -71,15 +71,15 @@ public final class IRGui extends App {
      */
     public static void main(final String[] args) {
         // Start application with the command line arguments
-        Bootstrapper.launchApp(new IRGui(args));
+        Bootstrapper.launchApp(new OImaging(args));
     }
 
     /**
-     * Return the IRGui singleton
-     * @return IRGui singleton
+     * Return the OImaging singleton
+     * @return OImaging singleton
      */
-    public static IRGui getInstance() {
-        return (IRGui) App.getInstance();
+    public static OImaging getInstance() {
+        return (OImaging) App.getInstance();
     }
 
     /**
@@ -87,7 +87,7 @@ public final class IRGui extends App {
      *
      * @param args command line arguments
      */
-    public IRGui(final String[] args) {
+    public OImaging(final String[] args) {
         super(args);
     }
 

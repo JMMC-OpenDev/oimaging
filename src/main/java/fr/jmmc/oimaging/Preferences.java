@@ -1,11 +1,10 @@
 /*******************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
-package fr.jmmc.ir;
+package fr.jmmc.oimaging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * TBD class
@@ -48,10 +47,9 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         return _singleton;
     }
 
-
     @Override
     protected String getPreferenceFilename() {
-        return "fr.jmmc.irgui.properties";
+        return "fr.jmmc.oimaging.properties";
     }
 
     @Override
