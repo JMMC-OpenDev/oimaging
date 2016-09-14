@@ -3,11 +3,6 @@
  ******************************************************************************/
 package fr.jmmc.oimaging;
 
-import fr.jmmc.oimaging.gui.MainPanel;
-import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
-import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
-import fr.jmmc.oimaging.gui.action.RunAction;
-import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.app.ApplicationDescription;
@@ -25,6 +20,11 @@ import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.ResourceUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
+import fr.jmmc.oimaging.gui.MainPanel;
+import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
+import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
+import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.model.IRModelManager;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -130,7 +130,7 @@ public final class OImaging extends App {
              */
             @Override
             public void run() {
-                logger.debug("IRGui.execute() handler called.");
+                logger.debug("OImaging.execute() handler called.");
 
                 // reset IRModelManager to fire an IRMODEL changed event to all registered listeners:
                 IRModelManager.getInstance().start();
