@@ -3,10 +3,10 @@
     <information>
         <title>IRGui</title>
         <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
-        <homepage href="http://www.jmmc.fr/irgui"/>
+        <homepage href="http://www.jmmc.fr/oimaging"/>
         <description>User-Friendly imaging algorithms for interferometry</description>
         <description kind="tooltip">Image reconstruction algorithms</description>
-        <icon href="@GENERATED@/IRGui.jpg"/>
+        <icon href="@GENERATED@/OImaging.jpg"/>
         <offline-allowed/>
         <shortcut>
             <desktop/>
@@ -21,11 +21,11 @@
         <!-- MANUALLY EDITED - Should be generated with maven ASAP ! -->
 
         <!-- Application module first (main class) -->
-        <jar href="jar/irgui-TRUNK.jar" />
+        <jar href="jar/oimaging-TRUNK.jar" />
 
 
         <!-- doc module -->
-        <!-- TODO <jar href="jar/irgui-doc.jar" /> -->
+        <!-- TODO <jar href="jar/oimaging-doc.jar" /> -->
 
 
         <!-- JMMC modules -->
@@ -34,5 +34,5 @@
         <extension href="../oiexplorer-core/OIExplorerCore.jnlp"/>
 
     </resources>
-    <application-desc main-class="fr.jmmc.ir.IRGui"/>
+    <application-desc main-class="fr.jmmc.oimaging.OImaging"/>
 </jnlp>
