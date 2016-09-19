@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <jnlp spec="1.0+" codebase="@GENERATED@" href="IRGui.jnlp">
     <information>
-        <title>IRGui</title>
+        <title>OImaging</title>
         <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
         <homepage href="http://www.jmmc.fr/oimaging"/>
         <description>User-Friendly imaging algorithms for interferometry</description>
