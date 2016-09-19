@@ -5,6 +5,14 @@
  */
 package fr.jmmc.oimaging.gui;
 
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
+import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.gui.component.StatusBar;
+import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
+import fr.jmmc.jmcs.util.ObjectUtils;
+import fr.jmmc.jmcs.util.SpecialChars;
+import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
+import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
@@ -14,14 +22,6 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
-import fr.jmmc.jmcs.gui.action.ActionRegistrar;
-import fr.jmmc.jmcs.gui.component.GenericListModel;
-import fr.jmmc.jmcs.gui.component.StatusBar;
-import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
-import fr.jmmc.jmcs.util.ObjectUtils;
-import fr.jmmc.jmcs.util.SpecialChars;
-import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
-import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiInputParam;
@@ -63,8 +63,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     private final List<String> hduNameList = new ArrayList<String>(5);
     /** Image HDU list model */
-    GenericListModel<String> hduNameListModel = new GenericListModel<String>(hduNameList);     /* members */
+    GenericListModel<String> hduNameListModel = new GenericListModel<String>(hduNameList);
 
+    /* members */
     /** Fits image panel */
     private FitsImagePanel fitsImagePanel;
 
@@ -147,7 +148,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // TODO release child resource if any
     }
 
-    private JList<String> createImageHduList() {
+    private JList createImageHduList() {
         final JList list = new JList() {
             /** default serial UID for Serializable interface */
             private static final long serialVersionUID = 1;
@@ -1017,10 +1018,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jLabelOifitsFile.setText(oifitsFile == null ? "" : oifitsFile.getName());
         if (oifitsFile == null) {
             failures.add("Missing OIFits");
-        } else {
-            if (inputParam.getWaveMax() < inputParam.getWaveMin()) {
-                failures.add("Min wavelength is higher than the max one");
-            }
+        } else if (inputParam.getWaveMax() < inputParam.getWaveMin()) {
+            failures.add("Min wavelength is higher than the max one");
         }
 
         FitsImageHDU selectedFitsImageHDU = irModel.getSelectedInputImageHDU();
