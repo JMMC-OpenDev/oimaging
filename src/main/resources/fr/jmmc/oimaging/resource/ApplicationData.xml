@@ -107,7 +107,7 @@
         <!-- OifitsExplorer dependencies -->
 
         <package name="JFreeChart"
-                 description="JFreeChart is a free 100% Java chart library that makes it easy for developers to display professional quality charts in theoimaging applications"
+                 description="JFreeChart is a free 100% Java chart library that makes it easy for developers to display professional quality charts in their applications"
                  link="http://www.jfree.org/jfreechart/"
                  jars="jfreechart-1.0.13.jar jcommon-1.0.16.jar"
                  license="LGPL" />
@@ -154,7 +154,7 @@
         <release version="0.1">
             <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
             <prerelease version="0.1 beta 1">
-                <change type="FEATURE">Foimagingst release with minimal (working) features : take one oifits + fits images and export an input file (behind "Run" Button)</change>
+                <change type="FEATURE">First release with minimal (working) features : take one oifits + fits images and export an input file (behind "Run" Button)</change>
             </prerelease>
         </release>
     </releasenotes>
