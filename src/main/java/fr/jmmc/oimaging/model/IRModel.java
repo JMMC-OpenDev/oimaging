@@ -105,16 +105,21 @@ public class IRModel {
         // Reset + add all target of given OIFits
         targetListModel.clear();
 
-        String[] targets = oifitsFile.getOiTarget().getTarget();
-        for (String target : targets) {
-            targetListModel.add(target);
+        String[] targets = null;
+        if (oifitsFile.hasOiTarget()) {
+            targets = oifitsFile.getOiTarget().getTarget();
+            for (String target : targets) {
+                targetListModel.add(target);
+            }
         }
 
         // Fix input param according content:
         ImageOiInputParam inputParam = imageOiData.getInputParam();
         // Select first target by default
         // assume we have one
-        inputParam.setTarget(targets[0]);
+        if (targets != null) {
+            inputParam.setTarget(targets[0]);
+        }
 
         // Define observable use according available tables
         inputParam.useVis(oifitsFile.hasOiVis());
