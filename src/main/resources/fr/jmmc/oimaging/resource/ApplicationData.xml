@@ -15,19 +15,19 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="IRGui" version="0.2 alpha 2"/>
+    <program name="OImaging" version="0.2 alpha 2"/>
     <compilation date="14/09/2016" compiler="JDK 1.6.0_24"/>
 
     <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
     <authors>the JMMC Technical Group</authors>
-    <!--<jnlp>http://apps.jmmc.fr/~swmgr/OifitsExplorer/OifitsExplorer.jnlp</jnlp>-->
+    <!--<jnlp>http://apps.jmmc.fr/~swmgr/OImaging/OImaging.jnlp</jnlp>-->
     <sampdescription>Perform image reconstruction from your interferometric observation data file (OIFits)</sampdescription>
 
     <distribution>
         <application_data_file>ApplicationRelease.xml</application_data_file>
-        <!--        <public_url>http://apps.jmmc.fr/~swmgr/IRGui/</public_url> -->
-        <!--        <beta_url>http://apps.jmmc.fr/~betaswmgr/IRGui/</beta_url> -->
+        <!--        <public_url>http://apps.jmmc.fr/~swmgr/OImaging/</public_url> -->
+        <!--        <beta_url>http://apps.jmmc.fr/~betaswmgr/OImaging/</beta_url> -->
         <beta_url>http://apps.jmmc.fr/~betaswmgr/OImaging/</beta_url>
         <alpha_url>http://apps.jmmc.fr/~mellag/OImaging/</alpha_url>
     </distribution>
@@ -159,7 +159,7 @@
         </release>
     </releasenotes>
 
-    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center \texttt{IRGui}
+    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center \texttt{OImaging}
 service \footnote{Available at http://www.jmmc.fr/oimaging} part of the European Commission's FP7 Capacities programme ( Grant Agreement Number 312430 )]]>
     </acknowledgment>
 

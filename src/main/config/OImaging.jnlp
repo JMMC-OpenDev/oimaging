@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<jnlp spec="1.0+" codebase="@GENERATED@" href="IRGui.jnlp">
+<jnlp spec="1.0+" codebase="@GENERATED@" href="OImaging.jnlp">
     <information>
         <title>OImaging</title>
         <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
