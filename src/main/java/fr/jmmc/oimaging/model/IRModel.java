@@ -64,6 +64,9 @@ public class IRModel {
     /** status flag : set by RunAction */
     private boolean running = false;
 
+    /** export counter */
+    private int exportCount = 0;
+
     public IRModel() {
         reset();
     }
@@ -324,7 +327,7 @@ public class IRModel {
     }
 
     public File prepareTempFile() throws FitsException, IOException {
-        File tmpFile = FileUtils.getTempFile("tmpInputOiFits", ".fits");
+        File tmpFile = FileUtils.getTempFile("export-" + exportCount + "-" + oifitsFile.getName());
         prepareOIFits(tmpFile);
         return tmpFile;
     }

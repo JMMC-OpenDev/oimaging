@@ -285,10 +285,8 @@
         </Component>
         <Component class="javax.swing.JComboBox" name="jComboBoxSoftware">
           <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="1">
-                <StringItem index="0" value="BSMEM"/>
-              </StringArray>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="ServiceList.getAvailableServices()" type="code"/>
             </Property>
           </Properties>
           <Events>

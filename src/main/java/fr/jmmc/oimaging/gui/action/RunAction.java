@@ -3,14 +3,16 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui.action;
 
-import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.gui.task.Task;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorker;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
+import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.ImageUtils;
+import fr.jmmc.oimaging.model.IRModel;
+import fr.jmmc.oimaging.services.LocalService;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
@@ -107,11 +109,11 @@ public class RunAction extends RegisteredAction {
 
         private static int i = 0;
 
-        public RunFitActionWorker(Task task, java.io.File inputFile, String methodArg, IRModel sm, RunAction runAction) {
+        public RunFitActionWorker(Task task, java.io.File inputFile, String methodArg, IRModel irm, RunAction runAction) {
             super(task);
             this.inputFile = inputFile;
             this.methodArg = methodArg;
-            this.parent = sm; // only for callback
+            this.parent = irm; // only for callback
             this.parentAction = runAction;
         }
 
@@ -120,12 +122,14 @@ public class RunAction extends RegisteredAction {
 
             // change model state to lock it and extract its snapshot
             parentAction.setRunningState(true);
+            final String selectedSoftware = parent.getSelectedSoftware();
 
-            if (true) {
+            if (selectedSoftware.equals("Dummy")) {
                 logger.info("skip remote call for testing purpose. Just loop for pause");
                 try {
                     int max = 10;
                     for (int i = 1; i <= max; i++) {
+
                         Thread.sleep(500);
                         StatusBar.show("Fake process - " + i + "/" + max);
                     }
@@ -149,8 +153,11 @@ public class RunAction extends RegisteredAction {
                 } catch (FitsException ex) {
                     throw new RuntimeException(ex);
                 }
-
                 return inputFile;
+            } else if (selectedSoftware.equals("BSMEM")) {
+                File outputFile = FileUtils.getTempFile("output-" + inputFile.getName());
+                LocalService.launch("bsmem-ci", inputFile.getAbsolutePath(), outputFile.getAbsolutePath());
+                return outputFile;
             }
 
             return null;

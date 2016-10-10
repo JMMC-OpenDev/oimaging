@@ -22,6 +22,7 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiInputParam;
@@ -462,7 +463,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.weighty = 0.1;
         jPanelAlgorithmSettings.add(jLabelRglPrio, gridBagConstraints);
 
-        jComboBoxSoftware.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "BSMEM" }));
+        jComboBoxSoftware.setModel(ServiceList.getAvailableServices());
         jComboBoxSoftware.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSoftwareActionPerformed(evt);
@@ -694,8 +695,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBoxSoftwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSoftwareActionPerformed
-        // update Selected Algorithm
-        IRModelManager.getInstance().getIRModel().setSelectedSoftware((String) jComboBoxSoftware.getSelectedItem());
+        updateModel();
     }//GEN-LAST:event_jComboBoxSoftwareActionPerformed
 
     private void jComboBoxImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxImageActionPerformed
@@ -891,12 +891,21 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             changed = true;
         }
 
+        // Selected software
+        final String guiSoftware = (String) jComboBoxSoftware.getSelectedItem();
+        final String modelSoftware = irModel.getSelectedSoftware();
+        if (guiSoftware != null && !guiSoftware.equals(modelSoftware)) {
+            irModel.setSelectedSoftware(guiSoftware);
+            changed = true;
+        }
+
         // Init Image
-        FitsImageHDU mFitsImageHDU = irModel.getSelectedInputImageHDU();
-        FitsImageHDUDecorator fihd = (FitsImageHDUDecorator) this.jComboBoxImage.getSelectedItem();
-        FitsImageHDU sFitsImageHDU = fihd == null ? null : fihd.getFitsImageHDU();
+        final FitsImageHDU mFitsImageHDU = irModel.getSelectedInputImageHDU();
+        final FitsImageHDUDecorator fihd = (FitsImageHDUDecorator) this.jComboBoxImage.getSelectedItem();
+        final FitsImageHDU sFitsImageHDU = fihd == null ? null : fihd.getFitsImageHDU();
         if (sFitsImageHDU != null && !(sFitsImageHDU == mFitsImageHDU)) {
             irModel.setSelectedInputImageHDU(fihd.getFitsImageHDU());
+            changed = true;
         }
 
         // max iter
@@ -1013,6 +1022,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // perform analysis:
         List<String> failures = new LinkedList<String>();
         failures.clear();
+
+        if (irModel.getSelectedSoftware() == null) {
+            failures.add("Please select the algorithm you want to run");
+        }
 
         OIFitsFile oifitsFile = irModel.getOifitsFile();
         jLabelOifitsFile.setText(oifitsFile == null ? "" : oifitsFile.getName());
