@@ -9,14 +9,10 @@ import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.gui.task.Task;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorker;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
-import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.ImageUtils;
 import fr.jmmc.oimaging.model.IRModel;
-import fr.jmmc.oimaging.services.LocalService;
-import fr.jmmc.oitools.image.FitsImageHDU;
-import fr.jmmc.oitools.model.OIFitsFile;
-import fr.jmmc.oitools.model.OIFitsLoader;
-import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.jmmc.oimaging.services.Service;
+import fr.jmmc.oimaging.services.ServiceResult;
 import fr.nom.tam.fits.FitsException;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -44,13 +40,13 @@ public class RunAction extends RegisteredAction {
     ButtonModel skipPlotDocument = null;
 
     //boolean running = false;
-    private Task task;
+    private final Task task;
 
     private IRModel irModel = null;
 
     public RunAction() {
         super(className, actionName);
-        task = new Task(actionName + "_" + this.hashCode());
+        task = new Task("MakeImage");
     }
 
     public void setConstraints(ButtonModel iTMaxButtonModel, Document iTMaxDocument, ButtonModel skipPlotDocument) {
@@ -78,9 +74,9 @@ public class RunAction extends RegisteredAction {
         } else {
 
             StringBuffer args = new StringBuffer();
-            File tmpFile = null;
+            File inputFile = null;
             try {
-                tmpFile = irModel.prepareTempFile();
+                inputFile = irModel.prepareTempFile();
             } catch (FitsException ex) {
                 logger.error("Can't prepare temporary file before running process", ex);
                 setRunningState(false);
@@ -89,8 +85,10 @@ public class RunAction extends RegisteredAction {
                 setRunningState(false);
             }
 
-            StatusBar.show("Spawn " + irModel.getSelectedSoftware() + " process");
-            new RunFitActionWorker(getTask(), tmpFile, args.toString(), irModel, this).executeTask();
+            StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
+            // change model state to lock it and extract its snapshot
+            setRunningState(true);
+            new RunFitActionWorker(getTask(), inputFile, args.toString(), irModel, this).executeTask();
             return;
 
         }
@@ -100,11 +98,11 @@ public class RunAction extends RegisteredAction {
         return task;
     }
 
-    static class RunFitActionWorker extends TaskSwingWorker<File> {
+    static class RunFitActionWorker extends TaskSwingWorker<ServiceResult> {
 
         private final java.io.File inputFile;
         private final String methodArg;
-        private final IRModel parent;
+        private final IRModel irModel;
         private final RunAction parentAction;
 
         private static int i = 0;
@@ -113,78 +111,41 @@ public class RunAction extends RegisteredAction {
             super(task);
             this.inputFile = inputFile;
             this.methodArg = methodArg;
-            this.parent = irm; // only for callback
+            // TODO snapshot required information from model
+            this.irModel = irm; // only for callback
             this.parentAction = runAction;
         }
 
         @Override
-        public File computeInBackground() {
-
-            // change model state to lock it and extract its snapshot
-            parentAction.setRunningState(true);
-            final String selectedSoftware = parent.getSelectedSoftware();
-
-            if (selectedSoftware.equals("Dummy")) {
-                logger.info("skip remote call for testing purpose. Just loop for pause");
-                try {
-                    int max = 10;
-                    for (int i = 1; i <= max; i++) {
-
-                        Thread.sleep(500);
-                        StatusBar.show("Fake process - " + i + "/" + max);
-                    }
-                } catch (InterruptedException ex) {
-                    logger.info("interruped during loop", ex);
-                }
-                // TODO perform something more elaborated here
-                try {
-                    OIFitsFile outputOIFitsFile = OIFitsLoader.loadOIFits(inputFile.getAbsolutePath());
-
-                    // TODO change hdu names for images
-                    for (FitsImageHDU imageHdu : outputOIFitsFile.getImageOiData().getFitsImageHDUs()) {
-                        imageHdu.setHduName(imageHdu.getHduName() + i);
-                        i++;
-                    }
-
-                    OIFitsWriter.writeOIFits(outputOIFitsFile.getAbsoluteFilePath(), outputOIFitsFile);
-
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (FitsException ex) {
-                    throw new RuntimeException(ex);
-                }
-                return inputFile;
-            } else if (selectedSoftware.equals("BSMEM")) {
-                File outputFile = FileUtils.getTempFile("output-" + inputFile.getName());
-                LocalService.launch("bsmem-ci", inputFile.getAbsolutePath(), outputFile.getAbsolutePath());
-                return outputFile;
-            }
-
-            return null;
-            // TODO here real code
-//            try {
-//                return LITpro.execMethod(actionName, inputFile, methodArg);
-//            } catch (IOException ex) {
-//                // should only come from http io execption
-//                throw new RuntimeException(ex);
-//            }
+        public ServiceResult computeInBackground() {
+            final Service service = irModel.getSelectedService();
+            return service.getExecMode().reconstructsImage(service.getProgram(), inputFile);
         }
 
         @Override
-        public void refreshUI(File f) {
+        public void refreshUI(ServiceResult serviceResult) {
             // action finished, we can change state and update model just after.
             parentAction.setRunningState(false);
 
-            this.parent.updateWithNewModel(f);
+            this.irModel.updateWithNewModel(serviceResult);
+        }
+
+        /**
+         * Refresh GUI when no data (null returned or cancelled) invoked by the Swing Event Dispatcher Thread (Swing EDT)
+         * @param cancelled true if task cancelled; false if null returned by computeInBackground()
+         */
+        public void refreshNoData(final boolean cancelled) {
+            // action finished, we can change state.
+            parentAction.setRunningState(false);
         }
 
         @Override
         public void handleException(ExecutionException ee) {
-            // notify that process is finished
-            this.parent.setRunning(false);
+            // action finished, we can change state.
+            parentAction.setRunningState(false);
 
             // filter some exceptions to avoid feedback report
-            if (filter(ee)) {
+            if (filterNetworkException(ee)) {
                 MessagePane.showErrorMessage("Please check your network setup", ee);
             } else {
                 super.handleException(ee);
@@ -193,7 +154,7 @@ public class RunAction extends RegisteredAction {
             StatusBar.show("Error occured during process");
         }
 
-        public boolean filter(Exception e) {
+        public boolean filterNetworkException(Exception e) {
             Throwable c = e.getCause();
             return c != null
                     && (c instanceof UnknownHostException
