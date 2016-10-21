@@ -22,6 +22,7 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageHDU;
@@ -892,10 +893,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // Selected software
-        final String guiSoftware = (String) jComboBoxSoftware.getSelectedItem();
-        final String modelSoftware = irModel.getSelectedSoftware();
-        if (guiSoftware != null && !guiSoftware.equals(modelSoftware)) {
-            irModel.setSelectedSoftware(guiSoftware);
+        final Service guiService = (Service) jComboBoxSoftware.getSelectedItem();
+        final Service modelSoftware = irModel.getSelectedService();
+        if (guiService != null && !guiService.equals(modelSoftware)) {
+            irModel.setSelectedSoftware(guiService);
             changed = true;
         }
 
@@ -1023,7 +1024,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         List<String> failures = new LinkedList<String>();
         failures.clear();
 
-        if (irModel.getSelectedSoftware() == null) {
+        if (irModel.getSelectedService() == null) {
             failures.add("Please select the algorithm you want to run");
         }
 
