@@ -3,7 +3,6 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui.action;
 
-import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.data.preference.SessionSettingsPreferences;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
@@ -11,6 +10,7 @@ import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
+import fr.jmmc.oimaging.model.IRModelManager;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
