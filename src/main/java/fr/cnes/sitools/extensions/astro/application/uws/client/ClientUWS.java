@@ -79,6 +79,11 @@ public class ClientUWS {
         this.jobsUWS = new Reference(serviceName);
     }
 
+    private static void initClient(final ClientResource client, final boolean followRedirect) {
+        client.setRetryOnError(false);
+        client.setFollowingRedirects(followRedirect);
+    }
+
     /**
      * Create a list of new jobs from forms
      * @param forms list of parameters to send.
@@ -90,7 +95,6 @@ public class ClientUWS {
         if (forms.isEmpty()) {
             throw new IllegalArgumentException("Process: Forms cannot be empty");
         }
-
         final HashMap<Object, String> jobs = new HashMap<Object, String>();
 
         Iterator<Form> iterObject = forms.iterator();
@@ -99,7 +103,7 @@ public class ClientUWS {
             ClientResource client = null;
             try {
                 client = new ClientResource(Method.POST, this.jobsUWS);
-                client.setFollowingRedirects(false);
+                initClient(client, false);
                 client.post(object);
                 if (client.getStatus().isRedirection()) {
                     Reference locationJob = client.getResponse().getLocationRef();
@@ -133,7 +137,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.POST, this.jobsUWS);
-            client.setFollowingRedirects(false);
+            initClient(client, false);
             client.post(form);
             if (client.getStatus().isRedirection()) {
                 Reference locationJob = client.getResponse().getLocationRef();
@@ -166,7 +170,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.POST, this.jobsUWS);
-            client.setFollowingRedirects(false);
+            initClient(client, false);
             client.post(formDataSet);
             if (client.getStatus().isRedirection()) {
                 Reference locationJob = client.getResponse().getLocationRef();
@@ -226,6 +230,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
                 JAXBElement<JobSummary> response = (JAXBElement<JobSummary>) um.unmarshal(new StringReader(client.get().getText()));
@@ -260,7 +265,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.DELETE, this.jobsUWS + "/" + jobId);
-            client.setFollowingRedirects(false);
+            initClient(client, false);
             client.delete();
             if (!client.getStatus().isRedirection()) {
                 throw new ClientUWSException(client.getStatus(), "deleteJobInfo: No redirect is done after deleting " + jobId);
@@ -288,20 +293,7 @@ public class ClientUWS {
         }
         JobSummary jobSummary = this.getJobInfo(jobId);
         if (mustBeDeleted) {
-            ClientResource client = null;
-            try {
-                client = new ClientResource(Method.DELETE, this.jobsUWS);
-                client.delete();
-                if (!client.getStatus().isRedirection()) {
-                    throw new ClientUWSException(client.getStatus(), "deleteJobInfo: Cannot delete " + jobId);
-                }
-            } catch (ResourceException re) {
-                throw new ClientUWSException(re);
-            } finally {
-                if (client != null) {
-                    client.release();
-                }
-            }
+            deleteJobInfo(jobId);
         }
         return jobSummary;
     }
@@ -317,6 +309,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS);
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
                 jobsResponse = (Jobs) um.unmarshal(new StringReader(client.get().getText()));
@@ -352,7 +345,7 @@ public class ClientUWS {
         try {
             XMLGregorianCalendar calendar = Util.convertIntoXMLGregorian(inputDate);
             client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/destruction");
-            client.setFollowingRedirects(false);
+            initClient(client, false);
             Form form = new Form();
             form.add("DESTRUCTION", calendar.toString());
             client.post(form);
@@ -384,7 +377,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/executionduration");
-            client.setFollowingRedirects(false);
+            initClient(client, false);
             Form form = new Form();
             form.add("EXECUTIONDURATION", String.valueOf(timeInSeconds));
             client.post(form);
@@ -413,7 +406,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
-            client.setFollowingRedirects(false);
+            initClient(client, false);
             Form form = new Form();
             form.add("PHASE", "RUN");
             client.post(form);
@@ -442,7 +435,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
-            client.setFollowingRedirects(false);
+            initClient(client, false);
             Form form = new Form();
             form.add("PHASE", "ABORT");
             client.post(form);
@@ -473,6 +466,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/error");
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
                 JAXBElement<ErrorSummary> response = (JAXBElement<ErrorSummary>) um.unmarshal(new StringReader(client.get().getText()));
@@ -509,6 +503,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
                 JAXBElement<JobSummary> response = (JAXBElement<JobSummary>) um.unmarshal(new StringReader(client.get().getText()));
@@ -545,6 +540,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/results");
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
                 Results response = (Results) um.unmarshal(new StringReader(client.get().getText()));
@@ -581,6 +577,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/parameters");
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
                 Parameters response = (Parameters) um.unmarshal(new StringReader(client.get().getText()));
@@ -617,6 +614,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/owner");
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 ownerResponse = client.get().getText();
             } else {
@@ -649,6 +647,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/phase");
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 phaseResponse = ExecutionPhase.valueOf(client.get().getText());
             } else {
@@ -673,6 +672,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.PUT, this.jobsUWS + "/" + jobId + "/parameters/" + key);
+            initClient(client, true);
             if (!client.getStatus().isSuccess()) {
                 throw new ClientUWSException(client.getStatus(), "setOwner: Cannot get owner about " + jobId);
             }
@@ -700,6 +700,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/executionduration");
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 edResponse = client.get().getText();
             } else {
@@ -732,6 +733,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/destruction");
+            initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 edResponse = client.get().getText();
             } else {
