@@ -5,7 +5,6 @@ package fr.jmmc.oimaging.services;
 
 import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWS;
 import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWSException;
-import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.network.http.Http;
 import fr.jmmc.jmcs.util.StringUtils;
 import java.io.File;
@@ -32,52 +31,56 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
 
-    /** UWS client to execute IR on a remote server */
-    static ClientUWS uwsClient = null;
+    public static final String[] SERVICE_URLS = new String[]{
+        "http://jmmc-fe-1.jmmc.fr/uws/oimaging/oimaging",
+        "http://127.0.0.1:8080/uws/oimaging/oimaging",
+        "http://localhost:8800/uws/oimaging/oimaging",
+        "http://localhost:8888/uws/oimaging/oimaging"
+    };
 
-    public RemoteExecutionMode() {
+    private static final ClientFactory FACTORY = new ClientFactory();
 
+    private final static class ClientFactory {
+
+        /** UWS client to execute IR on a remote server */
+        private ClientUWS uwsClient = null;
+
+        ClientFactory() {
+        }
+
+        /**
+         * try to connect to the first server of the hardcoded list.
+         * // TODO move this method in a factory
+         */
+        public ClientUWS getClient() {
+            if (uwsClient == null) {
+                // Move it in a property file ( or constant at least)
+                for (String url : SERVICE_URLS) {
+                    try {
+                        final ClientUWS c = new ClientUWS(url);
+
+                        if (c.getJobs() != null) {
+                            uwsClient = c;
+                            _logger.info("UWS service endpoint : '{}'", url);
+                            break;
+                        }
+                    } catch (ClientUWSException ex) {
+                        _logger.info("UWS service endpoint unreachable: '{}'", url);
+                    } catch (Exception e) {
+                        // we should avoid to catch Exception, please catch e just before
+                        _logger.info("UWS service endpoint unreachable: '{}'", url);
+                        _logger.info("Exception:", e);
+                    }
+                }
+                if (uwsClient == null) {
+                    throw new IllegalStateException("Can't reach a working uws server !");
+                }
+            }
+            return uwsClient;
+        }
     }
 
-    /**
-     * try to connect to the first server of the hardcoded list.
-     * // TODO move this method in a factory
-     */
-    private static void searchService() {
-
-        if (uwsClient != null) {
-            return;
-        }
-
-        // Move it in a property file ( or constant at least)
-        String urls[] = new String[]{
-            "http://jmmc-fe-1.jmmc.fr/uws/oimaging/oimaging",
-            "http://127.0.0.1:8080/uws/oimaging/oimaging",
-            "http://localhost:8800/uws/oimaging/oimaging",
-            "http://localhost:8888/uws/oimaging/oimaging",};
-        ClientUWS c;
-        for (String url : urls) {
-            try {
-                c = new ClientUWS(url);
-
-                if (c.getJobs() != null) {
-                    uwsClient = c;
-                    _logger.info("UWS service endpoint : '{}'", url);
-                    break;
-                }
-            } catch (ClientUWSException ex) {
-                _logger.info("UWS service endpoint unreachable: '{}'", url);
-            } catch (org.restlet.resource.ResourceException ex) {
-                _logger.info("UWS service endpoint unreachable: '{}'", url);
-            } catch (Exception e) {
-                // we should avoid to catch Exception, please catch e just before
-                _logger.info("UWS service endpoint unreachable: '{}'", url);
-                _logger.info("Exception:", e);
-            }
-        }
-        if (uwsClient == null) {
-            MessagePane.showErrorMessage("Can't reach a working uws server");
-        }
+    public RemoteExecutionMode() {
     }
 
     /**
@@ -86,10 +89,9 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
      * @param software software to run
      * @param inputFilename input filename
      * @param result the service result pointing result file to write data into.
-     * @return the error command code
      * @throws IllegalStateException if the job can not be submitted to the job queue
      */
-    public static int exec(final String software, final String inputFilename, ServiceResult result) throws IllegalStateException, ClientUWSException, InterruptedException, URISyntaxException, IOException {
+    public static void exec(final String software, final String inputFilename, ServiceResult result) throws IllegalStateException, ClientUWSException, URISyntaxException, IOException {
 
         if (StringUtils.isEmpty(software)) {
             throw new IllegalArgumentException("empty application name !");
@@ -97,18 +99,15 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         if (StringUtils.isEmpty(inputFilename)) {
             throw new IllegalArgumentException("empty input filename !");
         }
-        if (StringUtils.isEmpty(result.oifits.getAbsolutePath())) {
+        if (StringUtils.isEmpty(result.getOifits().getAbsolutePath())) {
             throw new IllegalArgumentException("empty output filename !");
         }
-        if (StringUtils.isEmpty(result.executionLog.getAbsolutePath())) {
+        if (StringUtils.isEmpty(result.getExecutionLog().getAbsolutePath())) {
             throw new IllegalArgumentException("empty log filename !");
         }
 
-        searchService();
-        if (uwsClient == null) {
-            // TODO put information into logFile so that GUI can report a generic message
-            return 254;
-        }
+        // may throw IllegalStateException if no running service available:
+        final ClientUWS client = FACTORY.getClient();
 
         _logger.info("exec: {} {}", software, inputFilename);
 
@@ -128,15 +127,23 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         fds.add("PHASE", "RUN");
 
         // create job
-        final String jobId = uwsClient.createJob(fds);
+        final String jobId = client.createJob(fds);
 
         // Assume that first state is executing
         ExecutionPhase phase = ExecutionPhase.EXECUTING;
 
         // loop and query return status
         while (phase == ExecutionPhase.EXECUTING) {
-            Thread.sleep(2000);
-            phase = uwsClient.getJobPhase(jobId);
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ie) {
+                _logger.info("Interrupted.");
+
+                result.setErrorMessage("Cancelled job.");
+                client.setAbortJob(jobId);
+                return;
+            }
+            phase = client.getJobPhase(jobId);
             // TODO timeout ? or just wait 'Cancel' button
         }
         _logger.info("End of execution for job '{}' in phase '{}'", jobId, phase);
@@ -144,52 +151,51 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         if (phase == ExecutionPhase.COMPLETED) {
             prepareResult(jobId, result);
         } else {
-            JobSummary jobInfo = uwsClient.getJobInfo(jobId, true);
+            JobSummary jobInfo = client.getJobInfo(jobId, true);
             _logger.error("Error in execution for job '{}': {} ", jobId, jobInfo.getErrorSummary());
-        }
 
-        // return failure or result file if everything succeeded
-        return 254;
+            result.setErrorMessage("Execution error: " + jobInfo.getErrorSummary());
+        }
     }
 
     private static void prepareResult(String jobId, ServiceResult result) throws ClientUWSException, URISyntaxException, IOException {
-        Results results = uwsClient.getJobResults(jobId);
+        final ClientUWS client = FACTORY.getClient();
+
+        Results results = client.getJobResults(jobId);
 
         for (ResultReference resultRef : results.getResult()) {
             String id = resultRef.getId();
             URI uri = new URI(resultRef.getHref());
             if (id.equals("logfile")) {
                 // get logfile
-                Http.download(uri, result.executionLog, false);
+                Http.download(uri, result.getExecutionLog(), false);
             } else if (id.equals("outputfile")) {
                 // get result file
-                Http.download(uri, result.oifits, false);
+                Http.download(uri, result.getOifits(), false);
             } else {
                 // store additional information
                 throw new IllegalStateException("uws service return more info than required : " + id);
             }
         }
-
+        result.setValid(true);
     }
 
     @Override
     public ServiceResult reconstructsImage(final String software, final File inputFile) {
-        ServiceResult result = new ServiceResult(inputFile);
+        final ServiceResult result = new ServiceResult(inputFile);
 
         Exception e = null;
         try {
             // TODO add log output retrieval
             RemoteExecutionMode.exec(software, inputFile.getAbsolutePath(), result);
-        } catch (IllegalStateException ex) {
-            e = ex;
-        } catch (ClientUWSException ex) {
-            e = ex;
-        } catch (InterruptedException ex) {
-            e = ex;
-        } catch (URISyntaxException ex) {
-            e = ex;
-        } catch (IOException ex) {
-            e = ex;
+        } catch (IllegalStateException ise) {
+            throw ise;
+        } catch (ClientUWSException ce) {
+            e = ce;
+        } catch (URISyntaxException use) {
+            e = use;
+        } catch (IOException ioe) {
+            e = ioe;
         }
         if (e != null) {
             throw new IllegalStateException(e);
