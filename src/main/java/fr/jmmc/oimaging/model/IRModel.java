@@ -9,6 +9,8 @@ import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.oimaging.services.Service;
+import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
@@ -44,7 +46,7 @@ public class IRModel {
     /** List of loaded imageHUDs */
     private List<FitsImageHDU> fitsImageHDUs;
     /** Selected algorithm */
-    private String selectedSoftware;
+    private Service selectedService;
 
     /** Selected input image */
     private FitsImageHDU selectedInputImageHDU;
@@ -74,7 +76,7 @@ public class IRModel {
     private void reset() {
         this.oifitsFile = null;
         this.fitsImageHDUs = new LinkedList<FitsImageHDU>();
-        this.selectedSoftware = null;
+        this.selectedService = null;
         this.selectedInputImageHDU = null;
         this.fitsImageHdu2Filename.clear();
         imageOiData = new ImageOiData();
@@ -154,10 +156,10 @@ public class IRModel {
 
     private void addFitsImageHDUs(List<FitsImageHDU> hdus, String filename) {
         for (FitsImageHDU hdu : hdus) {
-            final String defaultHduName = filename + "#" + hdu.getHduIndex();
+            final String defaultHduName = hdu.getHduName() + "-" + exportCount;
             // TODO check length because of fits keyword limitation
             if (hdu.getHduName() == null) {
-                hdu.setHduName(defaultHduName);
+                hdu.setHduName(filename + "#" + hdu.getHduIndex());
             }
             for (FitsImageHDU loadedHDU : getFitsImageHDUs()) {
                 if (loadedHDU.getHduName().equals(hdu.getHduName())) {
@@ -257,16 +259,16 @@ public class IRModel {
         return fitsImageHdu2Filename.get(hdu);
     }
 
-    public String getSelectedSoftware() {
-        return selectedSoftware;
+    public Service getSelectedService() {
+        return selectedService;
     }
 
-    public void setSelectedSoftware(String selectedSoftware) {
-        this.selectedSoftware = selectedSoftware;
+    public void setSelectedSoftware(Service selectedService) {
+        this.selectedService = selectedService;
     }
 
     public String toString() {
-        return "IRModel [" + oifitsFile + ", " + fitsImageHDUs + ", " + selectedSoftware + "]";
+        return "IRModel [" + oifitsFile + ", " + fitsImageHDUs + ", " + selectedService + "]";
     }
 
     public void exportOIFits() {
@@ -288,6 +290,7 @@ public class IRModel {
         } catch (FitsException fe) {
             MessagePane.showErrorMessage("Can't write oifits", "Can't store OIFits into " + file, fe);
         }
+
     }
 
     private void prepareOIFits(File file) throws FitsException, IOException {
@@ -327,16 +330,17 @@ public class IRModel {
     }
 
     public File prepareTempFile() throws FitsException, IOException {
-        File tmpFile = FileUtils.getTempFile("export-" + exportCount + "-" + oifitsFile.getName());
+        File tmpFile = FileUtils.getTempFile("export-" + exportCount + "-" + oifitsFile.getName(), ".fits");
         prepareOIFits(tmpFile);
         return tmpFile;
     }
 
-    public void updateWithNewModel(File resultFile) {
-
+    public void updateWithNewModel(ServiceResult serviceResult) {
+        File resultFile = serviceResult.getOifits();
         if (resultFile == null) {
             StatusBar.show("GUI updated with null results ???");
         } else {
+            Exception e = null;
             try {
                 OIFitsFile result = OIFitsLoader.loadOIFits(resultFile.getAbsolutePath());
 
@@ -346,10 +350,21 @@ public class IRModel {
                 IRModelManager.getInstance().fireIRModelChanged(this, null);
 
             } catch (IOException ex) {
-                MessagePane.showErrorMessage("Can't recover result data", ex);
+                e = ex;
             } catch (FitsException ex) {
-                MessagePane.showErrorMessage("Can't recover result data", ex);
+                e = ex;
             }
+            // TODO enhance user messages with details... button e.g.
+            if (e != null) {
+                String executionLog = "";
+                try {
+                    executionLog = FileUtils.readFile(serviceResult.getExecutionLog());
+                } catch (IOException ex) {
+                    logger.error("Can't read content of executionLog file ", ex);
+                }
+                MessagePane.showErrorMessage("Can't recover result data\n\n" + executionLog, e);
+            }
+
             StatusBar.show("GUI updated with results ");
         }
     }
