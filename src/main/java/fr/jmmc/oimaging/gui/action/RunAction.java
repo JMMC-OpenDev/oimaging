@@ -126,8 +126,12 @@ public class RunAction extends RegisteredAction {
         public void refreshUI(ServiceResult serviceResult) {
             // action finished, we can change state and update model just after.
             parentAction.setRunningState(false);
-
-            this.irModel.updateWithNewModel(serviceResult);
+            
+            if (serviceResult.isValid()) {
+                this.irModel.updateWithNewModel(serviceResult);
+            } else {
+                MessagePane.showWarning(serviceResult.getErrorMessage());
+            }
         }
 
         /**

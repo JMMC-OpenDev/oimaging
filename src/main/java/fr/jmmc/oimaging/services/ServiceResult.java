@@ -12,8 +12,11 @@ import java.io.File;
  */
 public class ServiceResult {
 
-    File oifits;
-    File executionLog;
+    private final File oifits;
+    private final File executionLog;
+
+    private boolean valid = false;
+    private String errorMessage = null;
 
     // TODO int errorCode;
     public ServiceResult(final File oifits, final File executionLog) {
@@ -39,6 +42,22 @@ public class ServiceResult {
 
     public File getExecutionLog() {
         return executionLog;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
 }
