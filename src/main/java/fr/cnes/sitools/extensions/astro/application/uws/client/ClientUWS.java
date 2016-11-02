@@ -55,11 +55,10 @@ import org.restlet.resource.ResourceException;
  * // Comes from https://github.com/SITools2/Astronomy-Extension-Server
  * // with new public String createJob(FormDataSet formDataSet) method to
  * // support upload.
- *
+ * // TODO : cleanup moving client release in proper try/finally
  */
 public class ClientUWS {
 
-    private HashMap<Object, String> jobs = new HashMap<Object, String>();
     private final Reference jobsUWS;
 
     /**
@@ -81,6 +80,9 @@ public class ClientUWS {
         if (forms.isEmpty()) {
             throw new IllegalArgumentException("Process: Forms cannot be empty");
         }
+
+        HashMap<Object, String> jobs = new HashMap<Object, String>();
+
         Iterator<Form> iterObject = forms.iterator();
         while (iterObject.hasNext()) {
             Form object = iterObject.next();
@@ -89,14 +91,14 @@ public class ClientUWS {
             client.post(object);
             if (client.getStatus().isRedirection()) {
                 Reference locationJob = client.getResponse().getLocationRef();
-                this.jobs.put(object, locationJob.getLastSegment());
+                jobs.put(object, locationJob.getLastSegment());
             } else {
                 client.release();
                 throw new ClientUWSException(client.getStatus(), "Process: Cannot create a new Job");
             }
             client.release();
         }
-        return this.jobs;
+        return jobs;
     }
 
     /**
