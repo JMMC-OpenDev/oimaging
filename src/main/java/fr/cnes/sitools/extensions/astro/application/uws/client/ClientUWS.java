@@ -19,13 +19,12 @@
 package fr.cnes.sitools.extensions.astro.application.uws.client;
 
 import fr.cnes.sitools.extensions.astro.application.uws.common.Util;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -42,7 +41,6 @@ import net.ivoa.xml.uws.v1.ShortJobDescription;
 import org.restlet.data.Form;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
-import org.restlet.engine.Engine;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -55,9 +53,21 @@ import org.restlet.resource.ResourceException;
  * // Comes from https://github.com/SITools2/Astronomy-Extension-Server
  * // with new public String createJob(FormDataSet formDataSet) method to
  * // support upload.
- * // TODO : cleanup moving client release in proper try/finally
  */
 public class ClientUWS {
+
+    /** Package name for JAXB generated code */
+    private static final String UWS_JAXB_PATH = "net.ivoa.xml.uws.v1";
+
+    /* reused JAXB Context to unmarshall UWS v1 elements */
+    private static JAXBContext jaxbContext = null;
+
+    private JAXBContext getJAXBContext() throws JAXBException {
+        if (jaxbContext == null) {
+            jaxbContext = JAXBContext.newInstance(UWS_JAXB_PATH);
+        }
+        return jaxbContext;
+    }
 
     private final Reference jobsUWS;
 
@@ -71,7 +81,7 @@ public class ClientUWS {
 
     /**
      * Create a list of new jobs from forms
-     * @param form parameters to send.
+     * @param forms list of parameters to send.
      * @return Returns the form object from the input and its job ID.
      * @exception ClientUWSException
      * @exception IllegalArgumentException
@@ -81,22 +91,29 @@ public class ClientUWS {
             throw new IllegalArgumentException("Process: Forms cannot be empty");
         }
 
-        HashMap<Object, String> jobs = new HashMap<Object, String>();
+        final HashMap<Object, String> jobs = new HashMap<Object, String>();
 
         Iterator<Form> iterObject = forms.iterator();
         while (iterObject.hasNext()) {
             Form object = iterObject.next();
-            ClientResource client = new ClientResource(Method.POST, this.jobsUWS);
-            client.setFollowingRedirects(false);
-            client.post(object);
-            if (client.getStatus().isRedirection()) {
-                Reference locationJob = client.getResponse().getLocationRef();
-                jobs.put(object, locationJob.getLastSegment());
-            } else {
-                client.release();
-                throw new ClientUWSException(client.getStatus(), "Process: Cannot create a new Job");
+            ClientResource client = null;
+            try {
+                client = new ClientResource(Method.POST, this.jobsUWS);
+                client.setFollowingRedirects(false);
+                client.post(object);
+                if (client.getStatus().isRedirection()) {
+                    Reference locationJob = client.getResponse().getLocationRef();
+                    jobs.put(object, locationJob.getLastSegment());
+                } else {
+                    throw new ClientUWSException(client.getStatus(), "Process: Cannot create a new Job");
+                }
+            } catch (ResourceException re) {
+                throw new ClientUWSException(re);
+            } finally {
+                if (client != null) {
+                    client.release();
+                }
             }
-            client.release();
         }
         return jobs;
     }
@@ -113,17 +130,24 @@ public class ClientUWS {
             throw new IllegalArgumentException("Process: form cannot be null");
         }
         String jobId = null;
-        ClientResource client = new ClientResource(Method.POST, this.jobsUWS);
-        client.setFollowingRedirects(false);
-        client.post(form);
-        if (client.getStatus().isRedirection()) {
-            Reference locationJob = client.getResponse().getLocationRef();
-            jobId = locationJob.getLastSegment();
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "Process: Cannot create a new Job");
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.POST, this.jobsUWS);
+            client.setFollowingRedirects(false);
+            client.post(form);
+            if (client.getStatus().isRedirection()) {
+                Reference locationJob = client.getResponse().getLocationRef();
+                jobId = locationJob.getLastSegment();
+            } else {
+                throw new ClientUWSException(client.getStatus(), "Process: Cannot create a new Job");
+            }
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
-        client.release();
         return jobId;
     }
 
@@ -139,17 +163,24 @@ public class ClientUWS {
             throw new IllegalArgumentException("Process: form cannot be null");
         }
         String jobId = null;
-        ClientResource client = new ClientResource(Method.POST, this.jobsUWS);
-        client.setFollowingRedirects(false);
-        client.post(formDataSet);
-        if (client.getStatus().isRedirection()) {
-            Reference locationJob = client.getResponse().getLocationRef();
-            jobId = locationJob.getLastSegment();
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "Process: Cannot create a new Job");
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.POST, this.jobsUWS);
+            client.setFollowingRedirects(false);
+            client.post(formDataSet);
+            if (client.getStatus().isRedirection()) {
+                Reference locationJob = client.getResponse().getLocationRef();
+                jobId = locationJob.getLastSegment();
+            } else {
+                throw new ClientUWSException(client.getStatus(), "Process: Cannot create a new Job");
+            }
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
-        client.release();
         return jobId;
     }
 
@@ -172,7 +203,8 @@ public class ClientUWS {
             ShortJobDescription job = shortJobsDescription.get(i);
             String ID = job.getId();
             ExecutionPhase phase = job.getPhase();
-            if (phase.equals(phase.EXECUTING) || phase.equals(phase.QUEUED) || phase.equals(phase.PENDING) || phase.equals(phase.HELD)) {
+            if (phase.equals(ExecutionPhase.EXECUTING) || phase.equals(ExecutionPhase.QUEUED)
+                    || phase.equals(ExecutionPhase.PENDING) || phase.equals(ExecutionPhase.HELD)) {
                 remainingTasks.put(ID, phase.value());
             }
         }
@@ -191,27 +223,26 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetJobInfo: jobId is required");
         }
         JobSummary jobSummaryResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
-        if (client.getStatus().isSuccess()) {
-            try {
-                JAXBContext ctx = JAXBContext.newInstance(new Class[]{net.ivoa.xml.uws.v1.JobSummary.class});
-                Unmarshaller um = ctx.createUnmarshaller();
-                JAXBElement<JobSummary> response = (JAXBElement<JobSummary>) um.unmarshal(new ByteArrayInputStream(client.get().getText().getBytes()));
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
+            if (client.getStatus().isSuccess()) {
+                Unmarshaller um = getJAXBContext().createUnmarshaller();
+                JAXBElement<JobSummary> response = (JAXBElement<JobSummary>) um.unmarshal(new StringReader(client.get().getText()));
                 jobSummaryResponse = response.getValue();
-            } catch (IOException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } catch (JAXBException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } catch (ResourceException ex) {
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetJobInfo: Cannot get information about " + jobId);
+            }
+        } catch (IOException ioe) {
+            throw new ClientUWSException(ioe);
+        } catch (JAXBException je) {
+            throw new ClientUWSException(je);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetJobInfo: Cannot get information about " + jobId);
         }
         return jobSummaryResponse;
     }
@@ -226,22 +257,21 @@ public class ClientUWS {
         if (!Util.isSet(jobId)) {
             throw new IllegalArgumentException("GetJobInfo: jobId is required");
         }
-        ClientResource client = new ClientResource(Method.DELETE, this.jobsUWS + "/" + jobId);
-        client.setFollowingRedirects(false);
+        ClientResource client = null;
         try {
+            client = new ClientResource(Method.DELETE, this.jobsUWS + "/" + jobId);
+            client.setFollowingRedirects(false);
             client.delete();
-        } catch (ResourceException ex) {
-            client.release();
-            throw new ClientUWSException(ex.getStatus(), "deleteJobInfo: Cannot delete " + jobId);
+            if (!client.getStatus().isRedirection()) {
+                throw new ClientUWSException(client.getStatus(), "deleteJobInfo: No redirect is done after deleting " + jobId);
+            }
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re.getStatus(), "deleteJobInfo: Cannot delete " + jobId);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
-        if (client.getStatus().isRedirection()) {
-            // do nothing
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "deleteJobInfo: No redirect is done after deleting " + jobId);
-        }
-        client.release();
-
     }
 
     /**
@@ -256,18 +286,22 @@ public class ClientUWS {
         if (!Util.isSet(jobId)) {
             throw new IllegalArgumentException("GetJobInfo: jobId is required");
         }
-
         JobSummary jobSummary = this.getJobInfo(jobId);
         if (mustBeDeleted) {
-            ClientResource client = new ClientResource(Method.DELETE, this.jobsUWS);
-            client.delete();
-            if (client.getStatus().isRedirection()) {
-                // do nothing
-            } else {
-                client.release();
-                throw new ClientUWSException(client.getStatus(), "deleteJobInfo: Cannot delete " + jobId);
+            ClientResource client = null;
+            try {
+                client = new ClientResource(Method.DELETE, this.jobsUWS);
+                client.delete();
+                if (!client.getStatus().isRedirection()) {
+                    throw new ClientUWSException(client.getStatus(), "deleteJobInfo: Cannot delete " + jobId);
+                }
+            } catch (ResourceException re) {
+                throw new ClientUWSException(re);
+            } finally {
+                if (client != null) {
+                    client.release();
+                }
             }
-            client.release();
         }
         return jobSummary;
     }
@@ -280,24 +314,25 @@ public class ClientUWS {
      */
     public Jobs getJobs() throws ClientUWSException {
         Jobs jobsResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS);
-        if (client.getStatus().isSuccess()) {
-            try {
-                JAXBContext ctx = JAXBContext.newInstance(new Class[]{Jobs.class});
-                Unmarshaller um = ctx.createUnmarshaller();
-                jobsResponse = (Jobs) um.unmarshal(new ByteArrayInputStream(client.get().getText().getBytes()));
-            } catch (IOException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } catch (JAXBException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } finally {
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS);
+            if (client.getStatus().isSuccess()) {
+                Unmarshaller um = getJAXBContext().createUnmarshaller();
+                jobsResponse = (Jobs) um.unmarshal(new StringReader(client.get().getText()));
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetJobs: Cannot retrieve the list of jobs");
+            }
+        } catch (IOException ioe) {
+            throw new ClientUWSException(ioe);
+        } catch (JAXBException je) {
+            throw new ClientUWSException(je);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetJobs: Cannot retrieve the list of jobs");
         }
         return jobsResponse;
     }
@@ -313,22 +348,25 @@ public class ClientUWS {
         if (!Util.isSet(jobId)) {
             throw new IllegalArgumentException("setDestructionTimeJob: jobId is required");
         }
+        ClientResource client = null;
         try {
             XMLGregorianCalendar calendar = Util.convertIntoXMLGregorian(inputDate);
-            ClientResource client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/destruction");
+            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/destruction");
             client.setFollowingRedirects(false);
             Form form = new Form();
             form.add("DESTRUCTION", calendar.toString());
             client.post(form);
-            if (client.getStatus().isRedirection()) {
-                // do nothing
-            } else {
-                client.release();
+            if (!client.getStatus().isRedirection()) {
                 throw new ClientUWSException(client.getStatus(), "SetDestructionTimeJob: Unable to set DESTRUCTION=" + calendar.toString());
             }
-            client.release();
         } catch (DatatypeConfigurationException ex) {
             throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
     }
 
@@ -343,18 +381,23 @@ public class ClientUWS {
         if (!Util.isSet(jobId)) {
             throw new IllegalArgumentException("setExecutionDurationJob: jobId is required");
         }
-        ClientResource client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/executionduration");
-        client.setFollowingRedirects(false);
-        Form form = new Form();
-        form.add("EXECUTIONDURATION", String.valueOf(timeInSeconds));
-        client.post(form);
-        if (client.getStatus().isRedirection()) {
-            // do nothing
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "SetExecutionDurationJob: Unable to set EXECUTIONDURATION=" + timeInSeconds);
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/executionduration");
+            client.setFollowingRedirects(false);
+            Form form = new Form();
+            form.add("EXECUTIONDURATION", String.valueOf(timeInSeconds));
+            client.post(form);
+            if (!client.getStatus().isRedirection()) {
+                throw new ClientUWSException(client.getStatus(), "SetExecutionDurationJob: Unable to set EXECUTIONDURATION=" + timeInSeconds);
+            }
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
-        client.release();
     }
 
     /**
@@ -367,18 +410,23 @@ public class ClientUWS {
         if (!Util.isSet(jobId)) {
             throw new IllegalArgumentException("setStartJob: jobId is required");
         }
-        ClientResource client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
-        client.setFollowingRedirects(false);
-        Form form = new Form();
-        form.add("PHASE", "RUN");
-        client.post(form);
-        if (client.getStatus().isRedirection()) {
-            // do nothing
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "SetStartJob: Unable to start the " + jobId);
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
+            client.setFollowingRedirects(false);
+            Form form = new Form();
+            form.add("PHASE", "RUN");
+            client.post(form);
+            if (!client.getStatus().isRedirection()) {
+                throw new ClientUWSException(client.getStatus(), "SetStartJob: Unable to start the " + jobId);
+            }
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
-        client.release();
     }
 
     /**
@@ -391,18 +439,23 @@ public class ClientUWS {
         if (!Util.isSet(jobId)) {
             throw new IllegalArgumentException("setAbortJob: jobId is required");
         }
-        ClientResource client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
-        client.setFollowingRedirects(false);
-        Form form = new Form();
-        form.add("PHASE", "ABORT");
-        client.post(form);
-        if (client.getStatus().isRedirection()) {
-            // do nothing
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "SetAbortJob: Unable to abort the " + jobId);
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
+            client.setFollowingRedirects(false);
+            Form form = new Form();
+            form.add("PHASE", "ABORT");
+            client.post(form);
+            if (!client.getStatus().isRedirection()) {
+                throw new ClientUWSException(client.getStatus(), "SetAbortJob: Unable to abort the " + jobId);
+            }
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
-        client.release();
     }
 
     /**
@@ -417,25 +470,26 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetJobError: jobId is required");
         }
         ErrorSummary errorSummaryResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/error");
-        if (client.getStatus().isSuccess()) {
-            try {
-                JAXBContext ctx = JAXBContext.newInstance(new Class[]{net.ivoa.xml.uws.v1.ErrorSummary.class});
-                Unmarshaller um = ctx.createUnmarshaller();
-                JAXBElement<ErrorSummary> response = (JAXBElement<ErrorSummary>) um.unmarshal(new ByteArrayInputStream(client.get().getText().getBytes()));
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/error");
+            if (client.getStatus().isSuccess()) {
+                Unmarshaller um = getJAXBContext().createUnmarshaller();
+                JAXBElement<ErrorSummary> response = (JAXBElement<ErrorSummary>) um.unmarshal(new StringReader(client.get().getText()));
                 errorSummaryResponse = response.getValue();
-            } catch (IOException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } catch (JAXBException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetJobError: Cannot get error about " + jobId);
+            }
+        } catch (IOException ex) {
+            throw new ClientUWSException(ex);
+        } catch (JAXBException ex) {
+            throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetJobError: Cannot get error about " + jobId);
         }
         return errorSummaryResponse;
     }
@@ -452,25 +506,26 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetJobQuote: jobId is required");
         }
         JobSummary jobSummaryResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
-        if (client.getStatus().isSuccess()) {
-            try {
-                JAXBContext ctx = JAXBContext.newInstance(new Class[]{net.ivoa.xml.uws.v1.JobSummary.class});
-                Unmarshaller um = ctx.createUnmarshaller();
-                JAXBElement<JobSummary> response = (JAXBElement<JobSummary>) um.unmarshal(new ByteArrayInputStream(client.get().getText().getBytes()));
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
+            if (client.getStatus().isSuccess()) {
+                Unmarshaller um = getJAXBContext().createUnmarshaller();
+                JAXBElement<JobSummary> response = (JAXBElement<JobSummary>) um.unmarshal(new StringReader(client.get().getText()));
                 jobSummaryResponse = response.getValue();
-            } catch (IOException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } catch (JAXBException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetJobInfo: Cannot get information about " + jobId);
+            }
+        } catch (IOException ex) {
+            throw new ClientUWSException(ex);
+        } catch (JAXBException ex) {
+            throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetJobInfo: Cannot get information about " + jobId);
         }
         return jobSummaryResponse.getQuote().toString();
     }
@@ -487,25 +542,26 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetJobResults: jobId is required");
         }
         Results resultsResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/results");
-        if (client.getStatus().isSuccess()) {
-            try {
-                JAXBContext ctx = JAXBContext.newInstance(new Class[]{net.ivoa.xml.uws.v1.Results.class});
-                Unmarshaller um = ctx.createUnmarshaller();
-                Results response = (Results) um.unmarshal(new ByteArrayInputStream(client.get().getText().getBytes()));
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/results");
+            if (client.getStatus().isSuccess()) {
+                Unmarshaller um = getJAXBContext().createUnmarshaller();
+                Results response = (Results) um.unmarshal(new StringReader(client.get().getText()));
                 resultsResponse = response;
-            } catch (IOException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } catch (JAXBException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetJobResults: Cannot get results about " + jobId);
+            }
+        } catch (IOException ex) {
+            throw new ClientUWSException(ex);
+        } catch (JAXBException ex) {
+            throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetJobResults: Cannot get results about " + jobId);
         }
         return resultsResponse;
     }
@@ -522,25 +578,26 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetJobParameters: jobId is required");
         }
         Parameters parametersResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/parameters");
-        if (client.getStatus().isSuccess()) {
-            try {
-                JAXBContext ctx = JAXBContext.newInstance(new Class[]{net.ivoa.xml.uws.v1.Parameters.class});
-                Unmarshaller um = ctx.createUnmarshaller();
-                Parameters response = (Parameters) um.unmarshal(new ByteArrayInputStream(client.get().getText().getBytes()));
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/parameters");
+            if (client.getStatus().isSuccess()) {
+                Unmarshaller um = getJAXBContext().createUnmarshaller();
+                Parameters response = (Parameters) um.unmarshal(new StringReader(client.get().getText()));
                 parametersResponse = response;
-            } catch (IOException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } catch (JAXBException ex) {
-                Engine.getLogger(ClientUWS.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetJobParameters: Cannot get parameters about " + jobId);
+            }
+        } catch (IOException ex) {
+            throw new ClientUWSException(ex);
+        } catch (JAXBException ex) {
+            throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetJobParameters: Cannot get parameters about " + jobId);
         }
         return parametersResponse;
     }
@@ -557,18 +614,22 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetJobOwner: jobId is required");
         }
         String ownerResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/owner");
-        if (client.getStatus().isSuccess()) {
-            try {
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/owner");
+            if (client.getStatus().isSuccess()) {
                 ownerResponse = client.get().getText();
-            } catch (IOException ex) {
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetOwner: Cannot get owner about " + jobId);
+            }
+        } catch (IOException ex) {
+            throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetOwner: Cannot get owner about " + jobId);
         }
         return ownerResponse;
     }
@@ -585,18 +646,22 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetJobPhase: jobId is required");
         }
         ExecutionPhase phaseResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/phase");
-        if (client.getStatus().isSuccess()) {
-            try {
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/phase");
+            if (client.getStatus().isSuccess()) {
                 phaseResponse = ExecutionPhase.valueOf(client.get().getText());
-            } catch (IOException ex) {
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetPhase: Cannot get phase about " + jobId);
+            }
+        } catch (IOException ioe) {
+            throw new ClientUWSException(ioe);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetPhase: Cannot get phase about " + jobId);
         }
         return phaseResponse;
     }
@@ -605,13 +670,19 @@ public class ClientUWS {
         if (!Util.isSet(jobId) || !Util.isSet(key)) {
             throw new IllegalArgumentException("setParameter: jobId and key are required");
         }
-        ClientResource client = new ClientResource(Method.PUT, this.jobsUWS + "/" + jobId + "/parameters/" + key);
-        if (client.getStatus().isSuccess()) {
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "setOwner: Cannot get owner about " + jobId);
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.PUT, this.jobsUWS + "/" + jobId + "/parameters/" + key);
+            if (!client.getStatus().isSuccess()) {
+                throw new ClientUWSException(client.getStatus(), "setOwner: Cannot get owner about " + jobId);
+            }
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
-        client.release();
     }
 
     /**
@@ -626,18 +697,22 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetExecutionDuration: jobId is required");
         }
         String edResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/executionduration");
-        if (client.getStatus().isSuccess()) {
-            try {
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/executionduration");
+            if (client.getStatus().isSuccess()) {
                 edResponse = client.get().getText();
-            } catch (IOException ex) {
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetExecutionDuration: Cannot get information about " + jobId);
+            }
+        } catch (IOException ex) {
+            throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetExecutionDuration: Cannot get information about " + jobId);
         }
         return edResponse;
     }
@@ -654,18 +729,22 @@ public class ClientUWS {
             throw new IllegalArgumentException("GetDestructionTime: jobId is required");
         }
         String edResponse = null;
-        ClientResource client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/destruction");
-        if (client.getStatus().isSuccess()) {
-            try {
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/destruction");
+            if (client.getStatus().isSuccess()) {
                 edResponse = client.get().getText();
-            } catch (IOException ex) {
-                throw new ClientUWSException(ex);
-            } finally {
+            } else {
+                throw new ClientUWSException(client.getStatus(), "GetDestructionTime: Cannot get information about " + jobId);
+            }
+        } catch (IOException ex) {
+            throw new ClientUWSException(ex);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
                 client.release();
             }
-        } else {
-            client.release();
-            throw new ClientUWSException(client.getStatus(), "GetDestructionTime: Cannot get information about " + jobId);
         }
         return edResponse;
     }
