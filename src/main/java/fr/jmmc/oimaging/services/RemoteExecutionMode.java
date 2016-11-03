@@ -32,10 +32,10 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
 
     public static final String[] SERVICE_URLS = new String[]{
-        "http://jmmc-fe-1.jmmc.fr/uws/oimaging/oimaging",
-        "http://127.0.0.1:8080/uws/oimaging/oimaging",
-        "http://localhost:8800/uws/oimaging/oimaging",
-        "http://localhost:8888/uws/oimaging/oimaging"
+        "http://jmmc-fe-1.jmmc.fr/OImaging-uws/oimaging/oimaging",
+        "http://127.0.0.1:8080/OImaging-uws/oimaging/oimaging",
+        "http://localhost:8800/OImaging-uws/oimaging/oimaging",
+        "http://localhost:8888/OImaging-uws/oimaging/oimaging"
     };
 
     private static final ClientFactory FACTORY = new ClientFactory();
