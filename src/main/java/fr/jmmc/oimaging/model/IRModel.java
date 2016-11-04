@@ -338,7 +338,7 @@ public class IRModel {
     public void updateWithNewModel(final ServiceResult serviceResult) {
         final File resultFile = serviceResult.getOifits();
 
-        // file exists:
+        // the file does exist (checked previously):
         Exception e = null;
         try {
             OIFitsFile result = OIFitsLoader.loadOIFits(resultFile.getAbsolutePath());
@@ -362,12 +362,16 @@ public class IRModel {
     }
 
     public void showLog(final String prefixMessage, final ServiceResult serviceResult, final Exception e) {
-        String executionLog = "";
-        try {
-            executionLog = FileUtils.readFile(serviceResult.getExecutionLog());
-        } catch (IOException ex) {
-            logger.error("Can't read content of executionLog file ", ex);
+        String executionLog = null;
+        
+        final File logFile = serviceResult.getExecutionLog();
+        if (logFile != null && logFile.exists()) {
+            try {
+                executionLog = FileUtils.readFile(serviceResult.getExecutionLog());
+            } catch (IOException ioe) {
+                logger.error("Can't read content of executionLog file ", ioe);
+            }
         }
-        MessagePane.showErrorMessage(prefixMessage + "\n\n" + executionLog, e);
+        MessagePane.showErrorMessage((executionLog != null) ? (prefixMessage + "\n\n" + executionLog) : prefixMessage, e);
     }
 }
