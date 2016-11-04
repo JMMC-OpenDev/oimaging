@@ -106,7 +106,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             throw new IllegalArgumentException("empty log filename !");
         }
 
-        _logger.info("exec: {} {}", software, inputFilename);
+        _logger.info("callUwsOimagingService: {} {}", software, inputFilename);
 
         // prepare input of next uws call
         FormDataSet fds = new FormDataSet();
@@ -135,7 +135,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         // loop and query return status
         while (phase == ExecutionPhase.EXECUTING) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException ie) {
                 _logger.info("Interrupted.");
 
