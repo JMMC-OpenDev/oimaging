@@ -164,20 +164,30 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         Results results = client.getJobResults(jobId);
 
         for (ResultReference resultRef : results.getResult()) {
-            String id = resultRef.getId();
+            final String id = resultRef.getId();
             URI uri = new URI(resultRef.getHref());
-            if (id.equals("logfile")) {
+            if ("logfile".equals(id)) {
                 // get logfile
-                Http.download(uri, result.getExecutionLog(), false);
-            } else if (id.equals("outputfile")) {
+                if (Http.download(uri, result.getExecutionLog(), false)) {
+                    _logger.info("logfile downloaded at : {}", result.getExecutionLog());
+                }
+            } else if ("outputfile".equals(id)) {
                 // get result file
-                Http.download(uri, result.getOifits(), false);
+                if (Http.download(uri, result.getOifits(), false)) {
+                    _logger.info("outputfile downloaded at : {}", result.getOifits());
+                }
             } else {
+                // TODO: FIX such error
                 // store additional information
-                throw new IllegalStateException("uws service return more info than required : " + id);
+                throw new IllegalStateException("UWS service return more info than required : " + id);
             }
         }
-        result.setValid(true);
+        // Result is valid only if the OIFITS file was downloaded successfully:
+        final boolean exist = result.getOifits().exists();
+        result.setValid(exist);
+        if (!exist) {
+            result.setErrorMessage("No OIFits ouput (probably a server error occured) !");
+        }
     }
 
     @Override

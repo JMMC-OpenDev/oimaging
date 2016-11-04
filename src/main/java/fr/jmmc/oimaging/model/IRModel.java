@@ -335,38 +335,39 @@ public class IRModel {
         return tmpFile;
     }
 
-    public void updateWithNewModel(ServiceResult serviceResult) {
-        File resultFile = serviceResult.getOifits();
-        if (resultFile == null) {
-            StatusBar.show("GUI updated with null results ???");
-        } else {
-            Exception e = null;
-            try {
-                OIFitsFile result = OIFitsLoader.loadOIFits(resultFile.getAbsolutePath());
+    public void updateWithNewModel(final ServiceResult serviceResult) {
+        final File resultFile = serviceResult.getOifits();
 
-                // TODO 1 - show plot for oidata part
-                // 2 - show result images
-                addFitsImageHDUs(result.getImageOiData().getFitsImageHDUs(), result.getAbsoluteFilePath());
-                IRModelManager.getInstance().fireIRModelChanged(this, null);
+        // file exists:
+        Exception e = null;
+        try {
+            OIFitsFile result = OIFitsLoader.loadOIFits(resultFile.getAbsolutePath());
 
-            } catch (IOException ex) {
-                e = ex;
-            } catch (FitsException ex) {
-                e = ex;
-            }
-            // TODO enhance user messages with details... button e.g.
-            if (e != null) {
-                String executionLog = "";
-                try {
-                    executionLog = FileUtils.readFile(serviceResult.getExecutionLog());
-                } catch (IOException ex) {
-                    logger.error("Can't read content of executionLog file ", ex);
-                }
-                MessagePane.showErrorMessage("Can't recover result data\n\n" + executionLog, e);
-            }
+            // TODO 1 - show plot for oidata part
+            // 2 - show result images
+            addFitsImageHDUs(result.getImageOiData().getFitsImageHDUs(), result.getAbsoluteFilePath());
+            IRModelManager.getInstance().fireIRModelChanged(this, null);
 
             StatusBar.show("GUI updated with results ");
+
+        } catch (IOException ioe) {
+            e = ioe;
+        } catch (FitsException fe) {
+            e = fe;
+        }
+        // TODO enhance user messages with details... button e.g.
+        if (e != null) {
+            showLog("Can't recover result data", serviceResult, e);
         }
     }
 
+    public void showLog(final String prefixMessage, final ServiceResult serviceResult, final Exception e) {
+        String executionLog = "";
+        try {
+            executionLog = FileUtils.readFile(serviceResult.getExecutionLog());
+        } catch (IOException ex) {
+            logger.error("Can't read content of executionLog file ", ex);
+        }
+        MessagePane.showErrorMessage(prefixMessage + "\n\n" + executionLog, e);
+    }
 }

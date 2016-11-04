@@ -126,11 +126,11 @@ public class RunAction extends RegisteredAction {
         public void refreshUI(ServiceResult serviceResult) {
             // action finished, we can change state and update model just after.
             parentAction.setRunningState(false);
-            
+
             if (serviceResult.isValid()) {
                 this.irModel.updateWithNewModel(serviceResult);
             } else {
-                MessagePane.showWarning(serviceResult.getErrorMessage());
+                this.irModel.showLog(serviceResult.getErrorMessage(), serviceResult, null);
             }
         }
 
@@ -138,6 +138,7 @@ public class RunAction extends RegisteredAction {
          * Refresh GUI when no data (null returned or cancelled) invoked by the Swing Event Dispatcher Thread (Swing EDT)
          * @param cancelled true if task cancelled; false if null returned by computeInBackground()
          */
+        @Override
         public void refreshNoData(final boolean cancelled) {
             // action finished, we can change state.
             parentAction.setRunningState(false);
