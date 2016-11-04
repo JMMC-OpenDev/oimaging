@@ -9,6 +9,7 @@ import fr.jmmc.jmcs.network.http.Http;
 import fr.jmmc.jmcs.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.ivoa.xml.uws.v1.ExecutionPhase;
@@ -31,11 +32,13 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
 
-    public static final String[] SERVICE_URLS = new String[]{
-        "http://jmmc-fe-1.jmmc.fr/OImaging-uws/oimaging/oimaging",
-        "http://127.0.0.1:8080/OImaging-uws/oimaging/oimaging",
-        "http://localhost:8800/OImaging-uws/oimaging/oimaging",
-        "http://localhost:8888/OImaging-uws/oimaging/oimaging"
+    public static final String SERVICE_PATH = "oimaging/oimaging";
+
+    public static final String[] SERVER_URLS = new String[]{
+        "http://jmmc-fe-1.jmmc.fr/OImaging-uws/",
+        "http://127.0.0.1:8080/OImaging-uws/",
+        "http://localhost:8800/OImaging-uws/",
+        "http://localhost:8888/OImaging-uws/"
     };
 
     private static final ClientFactory FACTORY = new ClientFactory();
@@ -55,11 +58,12 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         public ClientUWS getClient() {
             if (uwsClient == null) {
                 // Move it in a property file ( or constant at least)
-                for (String url : SERVICE_URLS) {
+                for (String url : SERVER_URLS) {
                     try {
-                        final ClientUWS c = new ClientUWS(url);
+                        final ClientUWS c = new ClientUWS(url, SERVICE_PATH);
 
-                        if (c.getJobs() != null) {
+                        // Get home page as an isAlive request:
+                        if (c.getHomePage() != null) {
                             uwsClient = c;
                             _logger.info("UWS service endpoint : '{}'", url);
                             break;
@@ -77,6 +81,10 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                 }
             }
             return uwsClient;
+        }
+
+        public void reset() {
+            this.uwsClient = null;
         }
     }
 
@@ -114,7 +122,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
         //Disposition disposition = new Disposition(Disposition.TYPE_INLINE, fileForm);
         File f = new File(inputFilename);
-        FileRepresentation entity = new FileRepresentation(f, MediaType.IMAGE_PNG);
+        FileRepresentation entity = new FileRepresentation(f, MediaType.IMAGE_PNG); // TODO: FIX MediaType
         //entity.setDisposition(disposition);
 
         FormData fdFile = new FormData("inputfile", entity);
@@ -123,11 +131,32 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         // start task in autostart mode
         fds.add("PHASE", "RUN");
 
-        // may throw IllegalStateException if no running service available:
-        final ClientUWS client = FACTORY.getClient();
         // create job
-        // TODO retry if connect exception
-        final String jobId = client.createJob(fds);
+        ClientUWS client = null;
+        String jobId = null;
+
+        boolean retry = true;
+        while (client == null) {
+            // may throw IllegalStateException if no running service available:
+            client = FACTORY.getClient();
+
+            try {
+                jobId = client.createJob(fds);
+            } catch (ClientUWSException cue) {
+                final Throwable rootCause = getRootCause(cue);
+                if (retry && rootCause instanceof ConnectException) {
+                    _logger.debug("ConnectException caught: ", rootCause);
+                    // retry once if connect exception:
+                    retry = false;
+                    // reset to be sure:
+                    FACTORY.reset();
+                    client = null;
+                    jobId = null;
+                } else {
+                    throw cue;
+                }
+            }
+        }
 
         // Assume that first state is executing
         ExecutionPhase phase = ExecutionPhase.EXECUTING;
@@ -135,7 +164,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         // loop and query return status
         while (phase == ExecutionPhase.EXECUTING) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(1000L);
             } catch (InterruptedException ie) {
                 _logger.info("Interrupted.");
 
@@ -144,6 +173,8 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                 return;
             }
             phase = client.getJobPhase(jobId);
+            _logger.info("getJobPhase[{}] : {}", jobId, phase);
+
             // TODO timeout ? or just wait 'Cancel' button
         }
         _logger.info("End of execution for job '{}' in phase '{}'", jobId, phase);
@@ -211,5 +242,13 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             throw new IllegalStateException(e);
         }
         return result;
+    }
+
+    private static Throwable getRootCause(final Throwable th) {
+        Throwable parent = th;
+        while (parent.getCause() != null) {
+            parent = parent.getCause();
+        }
+        return parent;
     }
 }
