@@ -63,6 +63,13 @@
             <artifactId>org.restlet.ext.html</artifactId>
             <version>2.3.7</version>
         </dependency>
+        <!--
+                <dependency>
+                    <groupId>org.restlet.jse</groupId>
+                    <artifactId>org.restlet.ext.httpclient</artifactId>
+                    <version>2.3.7</version>
+                </dependency>
+        -->
         <dependency>
             <artifactId>junit</artifactId>
             <groupId>junit</groupId>
