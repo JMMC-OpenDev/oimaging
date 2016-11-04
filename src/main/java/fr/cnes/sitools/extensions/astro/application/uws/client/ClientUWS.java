@@ -38,8 +38,11 @@ import net.ivoa.xml.uws.v1.Jobs;
 import net.ivoa.xml.uws.v1.Parameters;
 import net.ivoa.xml.uws.v1.Results;
 import net.ivoa.xml.uws.v1.ShortJobDescription;
+import org.restlet.Client;
+import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Method;
+import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.resource.ClientResource;
@@ -62,6 +65,9 @@ public class ClientUWS {
     /* reused JAXB Context to unmarshall UWS v1 elements */
     private static JAXBContext jaxbContext = null;
 
+    /* reused restlet Http Client (thread-safe) */
+    private static Client httpClient = null;
+
     private JAXBContext getJAXBContext() throws JAXBException {
         if (jaxbContext == null) {
             jaxbContext = JAXBContext.newInstance(UWS_JAXB_PATH);
@@ -69,19 +75,67 @@ public class ClientUWS {
         return jaxbContext;
     }
 
+    private static Client getClient() {
+        if (httpClient == null) {
+            final Context ctx = new Context();
+            // TODO: use NetworkingService settings:
+            ctx.getParameters().set("maxTotalConnections", "10"); 
+            ctx.getParameters().set("maxConnectionsPerHost", "4");
+            Context.setCurrent(ctx);
+            httpClient = new Client(ctx, Protocol.HTTP); 
+        }
+        return httpClient;
+    }
+    
+    private final Reference serverUWS;
     private final Reference jobsUWS;
-
+    
     /**
      * Constructor having the UWS service name as parameter.
-     * @param serviceName Name of the UWS service
+     * @param uwsServerURL URL of the UWS server
+     * @param jobsPath path to the {jobs} service
      */
-    public ClientUWS(String serviceName) {
-        this.jobsUWS = new Reference(serviceName);
+    public ClientUWS(final String uwsServerURL, final String jobsPath) {
+        this.serverUWS = new Reference(uwsServerURL);
+        this.jobsUWS = new Reference(uwsServerURL + jobsPath);
+        
+        // initialize the http client early:
+        getClient();
     }
 
     private static void initClient(final ClientResource client, final boolean followRedirect) {
         client.setRetryOnError(false);
         client.setFollowingRedirects(followRedirect);
+        // reuse shared Http client:
+        client.setNext(getClient());
+    }
+
+    /**
+     * Get the home page
+     * @return Returns the home page
+     * @exception ClientUWSException
+     */
+    public String getHomePage() throws ClientUWSException {
+        String homePage = null;
+        ClientResource client = null;
+        try {
+            client = new ClientResource(Method.GET, this.serverUWS);
+            initClient(client, true);
+            if (client.getStatus().isSuccess()) {
+                homePage = client.get().getText();
+            } else {
+                throw new ClientUWSException(client.getStatus(), "getHomePage: Cannot retrieve the home page");
+            }
+        } catch (IOException ioe) {
+            throw new ClientUWSException(ioe);
+        } catch (ResourceException re) {
+            throw new ClientUWSException(re);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
+        }
+        return homePage;
     }
 
     /**
@@ -89,7 +143,6 @@ public class ClientUWS {
      * @param forms list of parameters to send.
      * @return Returns the form object from the input and its job ID.
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public HashMap<Object, String> createJob(List<Form> forms) throws ClientUWSException {
         if (forms.isEmpty()) {
@@ -127,7 +180,6 @@ public class ClientUWS {
      * @param form parameter to send.
      * @return Returns its job ID.
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public String createJob(Form form) throws ClientUWSException {
         if (!Util.isSet(form)) {
@@ -160,7 +212,6 @@ public class ClientUWS {
      * @param formDataSet parameter to send.
      * @return Returns its job ID.
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public String createJob(FormDataSet formDataSet) throws ClientUWSException {
         if (!Util.isSet(formDataSet)) {
@@ -194,7 +245,6 @@ public class ClientUWS {
      * @param jobsId List of job ID to test
      * @return Returns the remaining tasks with the following structure {taskID, phase name}
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public HashMap<String, String> getRemainingTasks(List<String> jobsId) throws ClientUWSException {
         if (jobsId.isEmpty()) {
@@ -220,7 +270,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns information about the job ID
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public JobSummary getJobInfo(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -229,7 +278,7 @@ public class ClientUWS {
         JobSummary jobSummaryResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId);
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
@@ -255,7 +304,6 @@ public class ClientUWS {
     /**
      * Delete a job
      * @param jobId JobId
-     * @exception IllegalArgumentException
      * @exception ClientUWSException
      */
     public void deleteJobInfo(String jobId) throws ClientUWSException {
@@ -264,7 +312,7 @@ public class ClientUWS {
         }
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.DELETE, this.jobsUWS + "/" + jobId);
+            client = new ClientResource(Method.DELETE, this.jobsUWS.toString() + '/' + jobId);
             initClient(client, false);
             client.delete();
             if (!client.getStatus().isRedirection()) {
@@ -285,7 +333,6 @@ public class ClientUWS {
      * @param mustBeDeleted Set to true to delete the job after getting job information
      * @return Returns information about the job ID
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public JobSummary getJobInfo(String jobId, boolean mustBeDeleted) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -302,7 +349,6 @@ public class ClientUWS {
      * Get list of jobs
      * @return Returns list of jobs
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public Jobs getJobs() throws ClientUWSException {
         Jobs jobsResponse = null;
@@ -335,7 +381,6 @@ public class ClientUWS {
      * @param jobId JobID
      * @param inputDate Date
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public void setDestructionTimeJob(String jobId, Date inputDate) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -344,7 +389,7 @@ public class ClientUWS {
         ClientResource client = null;
         try {
             XMLGregorianCalendar calendar = Util.convertIntoXMLGregorian(inputDate);
-            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/destruction");
+            client = new ClientResource(Method.POST, this.jobsUWS.toString() + '/' + jobId + "/destruction");
             initClient(client, false);
             Form form = new Form();
             form.add("DESTRUCTION", calendar.toString());
@@ -368,7 +413,6 @@ public class ClientUWS {
      * @param jobId JobID
      * @param timeInSeconds Execution time in seconds
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public void setExecutionDurationJob(String jobId, int timeInSeconds) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -376,7 +420,7 @@ public class ClientUWS {
         }
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/executionduration");
+            client = new ClientResource(Method.POST, this.jobsUWS.toString() + '/' + jobId + "/executionduration");
             initClient(client, false);
             Form form = new Form();
             form.add("EXECUTIONDURATION", String.valueOf(timeInSeconds));
@@ -397,7 +441,6 @@ public class ClientUWS {
      * Start a job
      * @param jobId JobID
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public void setStartJob(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -405,7 +448,7 @@ public class ClientUWS {
         }
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
+            client = new ClientResource(Method.POST, this.jobsUWS.toString() + '/' + jobId + "/phase");
             initClient(client, false);
             Form form = new Form();
             form.add("PHASE", "RUN");
@@ -426,7 +469,6 @@ public class ClientUWS {
      * Stop a job
      * @param jobId
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public void setAbortJob(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -434,7 +476,7 @@ public class ClientUWS {
         }
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.POST, this.jobsUWS + "/" + jobId + "/phase");
+            client = new ClientResource(Method.POST, this.jobsUWS.toString() + '/' + jobId + "/phase");
             initClient(client, false);
             Form form = new Form();
             form.add("PHASE", "ABORT");
@@ -456,7 +498,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns ErrorSummary
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public ErrorSummary getJobError(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -465,7 +506,7 @@ public class ClientUWS {
         ErrorSummary errorSummaryResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/error");
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId + "/error");
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
@@ -493,7 +534,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns quote as a string
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public String getJobQuote(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -502,7 +542,7 @@ public class ClientUWS {
         JobSummary jobSummaryResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId);
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId);
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
@@ -530,7 +570,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns Results
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public Results getJobResults(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -539,7 +578,7 @@ public class ClientUWS {
         Results resultsResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/results");
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId + "/results");
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
@@ -567,7 +606,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns Parameters
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public Parameters getJobParameters(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -576,7 +614,7 @@ public class ClientUWS {
         Parameters parametersResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/parameters");
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId + "/parameters");
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 Unmarshaller um = getJAXBContext().createUnmarshaller();
@@ -604,7 +642,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns owner as string
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public String getJobOwner(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -613,7 +650,7 @@ public class ClientUWS {
         String ownerResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/owner");
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId + "/owner");
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 ownerResponse = client.get().getText();
@@ -637,7 +674,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns ExecutionPhase
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public ExecutionPhase getJobPhase(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -646,7 +682,7 @@ public class ClientUWS {
         ExecutionPhase phaseResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/phase");
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId + "/phase");
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 phaseResponse = ExecutionPhase.valueOf(client.get().getText());
@@ -671,7 +707,7 @@ public class ClientUWS {
         }
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.PUT, this.jobsUWS + "/" + jobId + "/parameters/" + key);
+            client = new ClientResource(Method.PUT, this.jobsUWS.toString() + '/' + jobId + "/parameters/" + key);
             initClient(client, true);
             if (!client.getStatus().isSuccess()) {
                 throw new ClientUWSException(client.getStatus(), "setOwner: Cannot get owner about " + jobId);
@@ -690,7 +726,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns executionduration as a string
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public String getExecutionDuration(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -699,7 +734,7 @@ public class ClientUWS {
         String edResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/executionduration");
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId + "/executionduration");
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 edResponse = client.get().getText();
@@ -723,7 +758,6 @@ public class ClientUWS {
      * @param jobId Job ID
      * @return Returns destructionTime as ISO8601 format
      * @exception ClientUWSException
-     * @exception IllegalArgumentException
      */
     public String getDestructionTime(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
@@ -732,7 +766,7 @@ public class ClientUWS {
         String edResponse = null;
         ClientResource client = null;
         try {
-            client = new ClientResource(Method.GET, this.jobsUWS + "/" + jobId + "/destruction");
+            client = new ClientResource(Method.GET, this.jobsUWS.toString() + '/' + jobId + "/destruction");
             initClient(client, true);
             if (client.getStatus().isSuccess()) {
                 edResponse = client.get().getText();
