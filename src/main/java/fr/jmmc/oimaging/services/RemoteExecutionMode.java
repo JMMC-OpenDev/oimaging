@@ -91,7 +91,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
      * @param result the service result pointing result file to write data into.
      * @throws IllegalStateException if the job can not be submitted to the job queue
      */
-    public static void exec(final String software, final String inputFilename, ServiceResult result) throws IllegalStateException, ClientUWSException, URISyntaxException, IOException {
+    public void callUwsOimagingService(final String software, final String inputFilename, ServiceResult result) throws IllegalStateException, ClientUWSException, URISyntaxException, IOException {
 
         if (StringUtils.isEmpty(software)) {
             throw new IllegalArgumentException("empty application name !");
@@ -105,9 +105,6 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         if (StringUtils.isEmpty(result.getExecutionLog().getAbsolutePath())) {
             throw new IllegalArgumentException("empty log filename !");
         }
-
-        // may throw IllegalStateException if no running service available:
-        final ClientUWS client = FACTORY.getClient();
 
         _logger.info("exec: {} {}", software, inputFilename);
 
@@ -126,7 +123,10 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         // start task in autostart mode
         fds.add("PHASE", "RUN");
 
+        // may throw IllegalStateException if no running service available:
+        final ClientUWS client = FACTORY.getClient();
         // create job
+        // TODO retry if connect exception
         final String jobId = client.createJob(fds);
 
         // Assume that first state is executing
@@ -197,7 +197,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         Exception e = null;
         try {
             // TODO add log output retrieval
-            RemoteExecutionMode.exec(software, inputFile.getAbsolutePath(), result);
+            callUwsOimagingService(software, inputFile.getAbsolutePath(), result);
         } catch (IllegalStateException ise) {
             throw ise;
         } catch (ClientUWSException ce) {
