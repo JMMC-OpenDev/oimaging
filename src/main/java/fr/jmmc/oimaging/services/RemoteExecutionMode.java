@@ -55,8 +55,9 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
          * try to connect to the first server of the hardcoded list.
          * // TODO move this method in a factory
          */
-        public ClientUWS getClient() {
+        public ClientUWS getClient() throws ClientUWSException {
             if (uwsClient == null) {
+                ClientUWSException cue = null;
                 // Move it in a property file ( or constant at least)
                 for (String url : SERVER_URLS) {
                     try {
@@ -68,16 +69,19 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                             _logger.info("UWS service endpoint : '{}'", url);
                             break;
                         }
-                    } catch (ClientUWSException ex) {
+                    } catch (ClientUWSException ce) {
                         _logger.info("UWS service endpoint unreachable: '{}'", url);
+                        if (cue == null) {
+                            cue = ce;
+                        }
                     } catch (Exception e) {
                         // we should avoid to catch Exception, please catch e just before
                         _logger.info("UWS service endpoint unreachable: '{}'", url);
-                        _logger.info("Exception:", e);
+                        throw new IllegalStateException("UWS service endpoint unreachable: '" + url + "'", e);
                     }
                 }
                 if (uwsClient == null) {
-                    throw new IllegalStateException("Can't reach a working uws server !");
+                    throw cue;
                 }
             }
             return uwsClient;
@@ -144,14 +148,19 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                 jobId = client.createJob(fds);
             } catch (ClientUWSException cue) {
                 final Throwable rootCause = getRootCause(cue);
-                if (retry && rootCause instanceof ConnectException) {
-                    _logger.debug("ConnectException caught: ", rootCause);
-                    // retry once if connect exception:
-                    retry = false;
-                    // reset to be sure:
-                    FACTORY.reset();
-                    client = null;
-                    jobId = null;
+                if (rootCause instanceof ConnectException) {
+                    if (retry) {
+                        _logger.debug("ConnectException caught: ", rootCause);
+                        // retry once if connect exception:
+                        retry = false;
+                        // reset to be sure:
+                        FACTORY.reset();
+                        client = null;
+                        jobId = null;
+                    } else {
+                        // throw ConnectException
+                        throw (ConnectException) rootCause;
+                    }
                 } else {
                     throw cue;
                 }
@@ -232,9 +241,16 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         } catch (IllegalStateException ise) {
             throw ise;
         } catch (ClientUWSException ce) {
-            e = ce;
+            final Throwable rootCause = getRootCause(ce);
+            if (rootCause instanceof ConnectException) {
+                e = (ConnectException) rootCause;
+            } else {
+                e = ce;
+            }
         } catch (URISyntaxException use) {
             e = use;
+        } catch (ConnectException ce) {
+            e = ce;
         } catch (IOException ioe) {
             e = ioe;
         }
