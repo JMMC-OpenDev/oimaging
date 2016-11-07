@@ -5,9 +5,11 @@
  */
 package fr.jmmc.oimaging.gui;
 
+import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.component.StatusBar;
+import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.jmcs.util.SpecialChars;
@@ -28,6 +30,9 @@ import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -35,8 +40,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.swing.Action;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListModel;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -58,6 +65,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
      * default serial UID for Serializable interface
      */
     private static final long serialVersionUID = 1;
+    /** default mouse cursor refresh period = 100 ms */
+    private static final int REFRESH_PERIOD = 100;
 
     // if multi page activated the export file will containt global view + each plot on a page/image
     /** Logger */
@@ -71,6 +80,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     /** Fits image panel */
     private FitsImagePanel fitsImagePanel;
 
+    /** OIFits viewer panel */
+    private OIFitsViewPanel fitsViewPanel;
+    
     /** Load fits image action */
     private Action loadFitsImageAction;
 
@@ -82,6 +94,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     FieldSliderAdapter fieldSliderAdapterWaveMin;
     FieldSliderAdapter fieldSliderAdapterWaveMax;
+    /** timeline refresh Swing timer */
+    private final Timer timerMouseCursorRefresh;
 
     /**
      * Creates new form MainPanel
@@ -91,9 +105,50 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // Build GUI
         initComponents();
 
+        // Create the timeline refresh timer:
+        this.timerMouseCursorRefresh = new Timer(REFRESH_PERIOD, new ActionListener() {
+            /**
+             * Invoked when the timer action occurs.
+             */
+            @Override
+            public void actionPerformed(final ActionEvent ae) {
+                final JFrame appFrame = App.getFrame();
+                final Cursor currentCursor = appFrame.getCursor();
+
+                final Cursor newCursor = (TaskSwingWorkerExecutor.isTaskRunning()) ? Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
+                        : Cursor.getDefaultCursor();
+
+                if (newCursor != currentCursor) {
+                    appFrame.setCursor(newCursor);
+                }
+            }
+        });
+
         // Finish init
         postInit();
 
+        // anyway enable mouse cursor timer:
+        enableMouseCursorRefreshTimer(true);
+    }
+
+    /**
+     * Start/Stop the internal mouse cursor Refresh timer
+     * @param enable true to enable it, false otherwise
+     */
+    private void enableMouseCursorRefreshTimer(final boolean enable) {
+        if (enable) {
+            if (!this.timerMouseCursorRefresh.isRunning()) {
+                logger.debug("Starting timer: {}", this.timerMouseCursorRefresh);
+
+                this.timerMouseCursorRefresh.start();
+            }
+        } else {
+            if (this.timerMouseCursorRefresh.isRunning()) {
+                logger.debug("Stopping timer: {}", this.timerMouseCursorRefresh);
+
+                this.timerMouseCursorRefresh.stop();
+            }
+        }
     }
 
     /**
@@ -110,6 +165,17 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         fitsImagePanel = new FitsImagePanel(Preferences.getInstance(), true, true, null);
         jPanelImage.add(fitsImagePanel);
+        
+        fitsViewPanel = new OIFitsViewPanel();
+        
+        java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.weighty = 1.0;
+        jPanelOIFitsViewer.add(fitsViewPanel, gridBagConstraints);
 
         // become widget listener
         jListImageHDUs.addListSelectionListener((ListSelectionListener) this);
@@ -244,7 +310,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jComboBoxRglPrio = new javax.swing.JComboBox();
         jPanelImageParameters = new javax.swing.JPanel();
         jTabbedPaneVizualizations = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
+        jPanelOIFitsViewer = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanelImage = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
@@ -572,7 +638,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelImageParameters.setBorder(javax.swing.BorderFactory.createTitledBorder("Data vizualisation"));
         jPanelImageParameters.setLayout(new java.awt.GridBagLayout());
 
-        jTabbedPaneVizualizations.addTab("OIFits data", jPanel2);
+        jPanelOIFitsViewer.setLayout(new java.awt.GridBagLayout());
+        jTabbedPaneVizualizations.addTab("OIFits data", jPanelOIFitsViewer);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
@@ -638,7 +705,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.1;
         add(jPanelImageParameters, gridBagConstraints);
 
@@ -789,12 +857,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JLabel jLabelWaveMin;
     private javax.swing.JList jListImageHDUs;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelAlgorithmSettings;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
     private javax.swing.JPanel jPanelImage;
     private javax.swing.JPanel jPanelImageParameters;
+    private javax.swing.JPanel jPanelOIFitsViewer;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSlider jSliderWaveMax;
@@ -976,6 +1044,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jComboBoxTarget.setSelectedItem(sel);
 
         boolean hasOiFits = irModel.getOifitsFile() != null;
+        
+        // Update OIFitsViewer:
+        fitsViewPanel.update(irModel);
 
         // arrange target
         jComboBoxTarget.setEnabled(hasOiFits);
@@ -1052,7 +1123,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // if nothing is wrong allow related actions
         final boolean modelOk = failures.size() == 0;
         runAction.setEnabled(modelOk);
-        runAction.setIrModel(irModel);
         jButtonExport.setEnabled(modelOk);
 
         StringBuffer sb = new StringBuffer(200);
