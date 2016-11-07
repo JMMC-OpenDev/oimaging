@@ -100,7 +100,7 @@ public final class OImaging extends App {
     @Override
     protected void initServices() throws IllegalStateException, IllegalArgumentException {
         // Initialize tasks and the task executor :
-        TaskSwingWorkerExecutor.start();
+        TaskSwingWorkerExecutor.start(2); // 2 threads (1 compute reconstruction and 1 image viewer)
 
         // Initialize the parallel job executor:
         ParallelJobExecutor.getInstance();
