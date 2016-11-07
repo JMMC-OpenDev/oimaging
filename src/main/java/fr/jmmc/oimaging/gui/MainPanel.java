@@ -308,6 +308,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jFormattedTextFieldRglAlph = new javax.swing.JFormattedTextField();
         jFormattedTextFieldRglBeta = new javax.swing.JFormattedTextField();
         jComboBoxRglPrio = new javax.swing.JComboBox();
+        jPanelExecutionLog = new javax.swing.JPanel();
+        jButtonRun = new javax.swing.JButton();
+        jButtonExport = new javax.swing.JButton();
+        jButtonStop = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jEditorPane = new javax.swing.JEditorPane();
         jPanelImageParameters = new javax.swing.JPanel();
         jTabbedPaneVizualizations = new javax.swing.JTabbedPane();
         jPanelOIFitsViewer = new javax.swing.JPanel();
@@ -317,12 +323,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jScrollPane2 = new javax.swing.JScrollPane();
         jListImageHDUs = createImageHduList();
         jButtonLoadFitsImage = new javax.swing.JButton();
-        jPanelExecutionLog = new javax.swing.JPanel();
-        jButtonRun = new javax.swing.JButton();
-        jButtonExport = new javax.swing.JButton();
-        jButtonStop = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jEditorPane = new javax.swing.JEditorPane();
 
         setMaximumSize(new java.awt.Dimension(100, 100));
         setLayout(new java.awt.GridBagLayout());
@@ -345,6 +345,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelDataSelection.add(jComboBoxTarget, gridBagConstraints);
 
         jButtonLoadData.setText("load oifits");
@@ -421,6 +422,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
         jPanelDataSelection.add(jSliderWaveMin, gridBagConstraints);
 
         jSliderWaveMax.setPaintTicks(true);
@@ -444,6 +446,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelDataSelection.add(jFormattedTextFieldWaveMin, gridBagConstraints);
 
         jFormattedTextFieldWaveMax.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
@@ -461,13 +464,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelDataSelection.add(jFormattedTextFieldWaveMax, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
         add(jPanelDataSelection, gridBagConstraints);
 
         jPanelAlgorithmSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Algorithm settings"));
@@ -526,7 +529,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
         gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.weighty = 0.1;
         jPanelAlgorithmSettings.add(jLabelRglPrio, gridBagConstraints);
 
@@ -541,6 +544,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxSoftware, gridBagConstraints);
 
         jComboBoxImage.setMinimumSize(new java.awt.Dimension(140, 28));
@@ -554,6 +558,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxImage, gridBagConstraints);
 
         jSpinnerMaxIter.setModel(new javax.swing.SpinnerNumberModel(0, -1, null, 5));
@@ -561,6 +566,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jSpinnerMaxIter, gridBagConstraints);
 
         jComboBoxRglName.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "mem_prior" }));
@@ -568,6 +574,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxRglName, gridBagConstraints);
 
         jFormattedTextFieldRglWgt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
@@ -585,6 +592,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglWgt, gridBagConstraints);
 
         jFormattedTextFieldRglAlph.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
@@ -602,6 +610,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglAlph, gridBagConstraints);
 
         jFormattedTextFieldRglBeta.addActionListener(new java.awt.event.ActionListener() {
@@ -618,6 +627,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglBeta, gridBagConstraints);
 
         jComboBoxRglPrio.setEnabled(false);
@@ -626,17 +636,73 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxRglPrio, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        add(jPanelAlgorithmSettings, gridBagConstraints);
+
+        jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Execution log"));
+        jPanelExecutionLog.setLayout(new java.awt.GridBagLayout());
+
+        jButtonRun.setText("Run");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
+
+        jButtonExport.setText("Export");
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonExportActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelExecutionLog.add(jButtonExport, gridBagConstraints);
+
+        jButtonStop.setText("Stop");
+        jButtonStop.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelExecutionLog.add(jButtonStop, gridBagConstraints);
+
+        jEditorPane.setContentType("text/html"); // NOI18N
+        jScrollPane1.setViewportView(jEditorPane);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelExecutionLog.add(jScrollPane1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        add(jPanelAlgorithmSettings, gridBagConstraints);
+        gridBagConstraints.weighty = 1.0;
+        add(jPanelExecutionLog, gridBagConstraints);
 
-        jPanelImageParameters.setBorder(javax.swing.BorderFactory.createTitledBorder("Data vizualisation"));
-        jPanelImageParameters.setLayout(new java.awt.GridBagLayout());
+        jPanelImageParameters.setBorder(javax.swing.BorderFactory.createTitledBorder("Data visualisation"));
+        jPanelImageParameters.setLayout(new java.awt.BorderLayout());
 
         jPanelOIFitsViewer.setLayout(new java.awt.GridBagLayout());
         jTabbedPaneVizualizations.addTab("OIFits data", jPanelOIFitsViewer);
@@ -694,73 +760,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jTabbedPaneVizualizations.setSelectedIndex(1);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jPanelImageParameters.add(jTabbedPaneVizualizations, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.weighty = 0.1;
-        add(jPanelImageParameters, gridBagConstraints);
-
-        jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Execution log"));
-        jPanelExecutionLog.setLayout(new java.awt.GridBagLayout());
-
-        jButtonRun.setText("Run");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
-        jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
-
-        jButtonExport.setText("Export");
-        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonExportActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
-        jPanelExecutionLog.add(jButtonExport, gridBagConstraints);
-
-        jButtonStop.setText("Stop");
-        jButtonStop.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
-        jPanelExecutionLog.add(jButtonStop, gridBagConstraints);
-
-        jEditorPane.setContentType("text/html"); // NOI18N
-        jScrollPane1.setViewportView(jEditorPane);
+        jPanelImageParameters.add(jTabbedPaneVizualizations, java.awt.BorderLayout.CENTER);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.1;
-        jPanelExecutionLog.add(jScrollPane1, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 1.0;
-        add(jPanelExecutionLog, gridBagConstraints);
+        add(jPanelImageParameters, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBoxSoftwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSoftwareActionPerformed
