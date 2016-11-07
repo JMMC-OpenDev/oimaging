@@ -91,7 +91,7 @@ public final class IRModelManager implements IRModelEventListener {
         }
 
         // listen for IRMODEL_CHANGED event to analyze collection and fire initial events:
-        getirModelChangedEventNotifier().register(this);
+        getIRModelChangedEventNotifier().register(this);
 
         // reset anyway:
         reset();
@@ -346,7 +346,7 @@ public final class IRModelManager implements IRModelEventListener {
      * Return the current OIFits explorer collection file
      * @return the current OIFits explorer collection file or null if undefined
      */
-    public File getirModelFile() {
+    public File getIRModelFile() {
         return this.irModelFile;
     }
 
@@ -414,7 +414,7 @@ public final class IRModelManager implements IRModelEventListener {
      * @param listener listener to bind
      */
     public void bindIRModelChangedEvent(final IRModelEventListener listener) {
-        getirModelChangedEventNotifier().register(listener);
+        getIRModelChangedEventNotifier().register(listener);
 
         // Note: no fire IRMODEL_CHANGED event because first call to reset() fires it (at the right time i.e. not too early):
         // force fire IRMODEL_CHANGED event to initialize the listener ASAP:
@@ -425,7 +425,7 @@ public final class IRModelManager implements IRModelEventListener {
      * Return the IRMODEL_CHANGED event notifier
      * @return IRMODEL_CHANGED event notifier
      */
-    private EventNotifier<IRModelEvent, IRModelEventType, Object> getirModelChangedEventNotifier() {
+    private EventNotifier<IRModelEvent, IRModelEventType, Object> getIRModelChangedEventNotifier() {
         return this.irModelManagerEventNotifierMap.get(IRModelEventType.IRMODEL_CHANGED);
     }
 
@@ -450,7 +450,7 @@ public final class IRModelManager implements IRModelEventListener {
             if (logger.isDebugEnabled()) {
                 logger.debug("fireOIFitsCollectionChanged TO {}", (destination != null) ? destination : "ALL");
             }
-            getirModelChangedEventNotifier().queueEvent((source != null) ? source : this,
+            getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
                     new IRModelEvent(IRModelEventType.IRMODEL_CHANGED, null, getIRModel()), destination);
         }
     }
