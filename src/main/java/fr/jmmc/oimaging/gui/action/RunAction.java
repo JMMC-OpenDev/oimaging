@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.task.TaskSwingWorker;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.util.ImageUtils;
 import fr.jmmc.oimaging.model.IRModel;
+import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.nom.tam.fits.FitsException;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class RunAction extends RegisteredAction {
 
+    private static final long serialVersionUID = 1L;
     /** Main logger */
     static final Logger logger = LoggerFactory.getLogger(RunAction.class.getName());
     /** Class name. This name is used to register to the ActionRegistrar */
@@ -35,18 +37,19 @@ public class RunAction extends RegisteredAction {
     /** Action name. This name is used to register to the ActionRegistrar */
     public static final String actionName = "run";
 
-    ButtonModel iTMaxButtonModel = null;
-    Document iTMaxDocument = null;
-    ButtonModel skipPlotDocument = null;
+    private ButtonModel iTMaxButtonModel = null;
+    private Document iTMaxDocument = null;
+    private ButtonModel skipPlotDocument = null;
 
-    //boolean running = false;
     private final Task task;
-
-    private IRModel irModel = null;
 
     public RunAction() {
         super(className, actionName);
         task = new Task("MakeImage");
+    }
+
+    private IRModel getCurrentIRModel() {
+        return IRModelManager.getInstance().getIRModel();
     }
 
     public void setConstraints(ButtonModel iTMaxButtonModel, Document iTMaxDocument, ButtonModel skipPlotDocument) {
@@ -55,42 +58,37 @@ public class RunAction extends RegisteredAction {
         this.skipPlotDocument = skipPlotDocument;
     }
 
-    public void setIrModel(IRModel m) {
-        irModel = m;
-    }
-
-    private void setRunningState(boolean running) {
+    private void setRunningState(final IRModel irModel, boolean running) {
         irModel.setRunning(running);
         putValue(Action.NAME, (running) ? "Cancel" : "Run");
         putValue(Action.LARGE_ICON_KEY, running ? ImageUtils.loadResourceIcon("fr/jmmc/jmcs/resource/image/spinner.gif") : null);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
-
+        // TODO: make a snapshot of the required information from model
+        final IRModel irModel = getCurrentIRModel();
         if (irModel.isRunning()) {
             // cancel job
             TaskSwingWorkerExecutor.cancelTask(getTask());
-            setRunningState(false);
+            setRunningState(irModel, false);
         } else {
 
-            StringBuffer args = new StringBuffer();
             File inputFile = null;
             try {
                 inputFile = irModel.prepareTempFile();
             } catch (FitsException ex) {
                 logger.error("Can't prepare temporary file before running process", ex);
-                setRunningState(false);
+                setRunningState(irModel, false);
             } catch (IOException ex) {
                 logger.error("Can't prepare temporary file before running process", ex);
-                setRunningState(false);
+                setRunningState(irModel, false);
             }
 
             StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
             // change model state to lock it and extract its snapshot
-            setRunningState(true);
-            new RunFitActionWorker(getTask(), inputFile, args.toString(), irModel, this).executeTask();
-            return;
-
+            setRunningState(irModel, true);
+            new RunFitActionWorker(getTask(), inputFile, irModel, this).executeTask();
         }
     }
 
@@ -100,19 +98,14 @@ public class RunAction extends RegisteredAction {
 
     static class RunFitActionWorker extends TaskSwingWorker<ServiceResult> {
 
-        private final java.io.File inputFile;
-        private final String methodArg;
+        private final File inputFile;
         private final IRModel irModel;
         private final RunAction parentAction;
 
-        private static int i = 0;
-
-        public RunFitActionWorker(Task task, java.io.File inputFile, String methodArg, IRModel irm, RunAction runAction) {
+        RunFitActionWorker(Task task, File inputFile, IRModel irModel, RunAction runAction) {
             super(task);
             this.inputFile = inputFile;
-            this.methodArg = methodArg;
-            // TODO snapshot required information from model
-            this.irModel = irm; // only for callback
+            this.irModel = irModel; // only for callback
             this.parentAction = runAction;
         }
 
@@ -125,7 +118,7 @@ public class RunAction extends RegisteredAction {
         @Override
         public void refreshUI(ServiceResult serviceResult) {
             // action finished, we can change state and update model just after.
-            parentAction.setRunningState(false);
+            parentAction.setRunningState(irModel, false);
 
             if (serviceResult.isValid()) {
                 this.irModel.updateWithNewModel(serviceResult);
@@ -141,13 +134,13 @@ public class RunAction extends RegisteredAction {
         @Override
         public void refreshNoData(final boolean cancelled) {
             // action finished, we can change state.
-            parentAction.setRunningState(false);
+            parentAction.setRunningState(irModel, false);
         }
 
         @Override
         public void handleException(ExecutionException ee) {
             // action finished, we can change state.
-            parentAction.setRunningState(false);
+            parentAction.setRunningState(irModel, false);
 
             // filter some exceptions to avoid feedback report
             if (filterNetworkException(ee)) {
@@ -160,10 +153,18 @@ public class RunAction extends RegisteredAction {
         }
 
         public boolean filterNetworkException(Exception e) {
-            Throwable c = e.getCause();
+            Throwable c = getRootCause(e);
             return c != null
                     && (c instanceof UnknownHostException
                     || c instanceof ConnectTimeoutException);
+        }
+
+        private static Throwable getRootCause(final Throwable th) {
+            Throwable parent = th;
+            while (parent.getCause() != null) {
+                parent = parent.getCause();
+            }
+            return parent;
         }
     }
 }
