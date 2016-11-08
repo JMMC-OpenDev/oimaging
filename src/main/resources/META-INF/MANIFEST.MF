@@ -6,7 +6,7 @@ Implementation-Vendor: www.jmmc.fr
 Implementation-URL: http://www.jmmc.fr/oimaging
 Application-Name: OImaging
 Permissions: all-permissions
-Codebase: http://apps.jmmc.fr
-Application-Library-Allowable-Codebase: http://apps.jmmc.fr
+Codebase: *.jmmc.fr
+Application-Library-Allowable-Codebase: *.jmmc.fr
 Main-Class: fr.jmmc.oimaging.OImaging
 
