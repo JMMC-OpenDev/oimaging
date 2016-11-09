@@ -182,7 +182,8 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                 return;
             }
             phase = client.getJobPhase(jobId);
-            _logger.info("getJobPhase[{}] : {}", jobId, phase);
+
+            _logger.debug("getJobPhase[{}] : {}", jobId, phase);
 
             // TODO timeout ? or just wait 'Cancel' button
         }
