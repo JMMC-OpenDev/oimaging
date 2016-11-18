@@ -154,38 +154,65 @@ public class IRModel {
 
     }
 
-    private void addFitsImageHDUs(List<FitsImageHDU> hdus, String filename) {
+    /**
+     * Add HDU to present ones.
+     * @param hdus new hdus
+     * @param filename filename of given hdu
+     * @return true if some hdu have been added
+     */
+    private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
+        // Start with all hdus
+        final List<FitsImageHDU> hdusToAdd = new LinkedList<FitsImageHDU>();
+        hdusToAdd.addAll(hdus);
+
+        // Remove duplicates
         for (FitsImageHDU hdu : hdus) {
-            final String defaultHduName = hdu.getHduName() + "-" + exportCount;
+            for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
+                if (currentHDU.getChecksum() == hdu.getChecksum()) {
+                    hdusToAdd.remove(hdu);
+                }
+            }
+        }
+
+        // And continue with remaining ones
+        for (FitsImageHDU hdu : hdusToAdd) {
             // TODO check length because of fits keyword limitation
             if (hdu.getHduName() == null) {
-                hdu.setHduName(filename + "#" + hdu.getHduIndex());
-            }
-            for (FitsImageHDU loadedHDU : getFitsImageHDUs()) {
-                if (loadedHDU.getHduName().equals(hdu.getHduName())) {
+                hdu.setHduName(filename);
+            } else {
+                for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
+                    if (currentHDU.getHduName().equals(hdu.getHduName())) {
 
-                    if (hdu.getHduName().equals(defaultHduName)) {
-                        MessagePane.showErrorMessage("HDU already loaded with hduname='" + hdu.getHduName() + "'");
-                        //TODO propose here to replace the previous loaded HDU
-                        return;
-                    } else {
-                        String confMsg = "'" + hdu.getHduName() + "' HDU already exists.\n Do you agree to rename it '" + defaultHduName + "' ?";
-                        boolean okToRename = MessagePane.showConfirmMessage(confMsg);
-                        if (okToRename) {
-                            hdu.setHduName(defaultHduName);
+                        final String defaultHduName = hdu.getHduName() + "-" + exportCount;
+                        if (hdu.getHduName().equals(defaultHduName)) {
+                            // TODO cheh if thie branch can be reached
+                            MessagePane.showErrorMessage("HDU already loaded with hduname='" + hdu.getHduName() + "'");
+                            //TODO propose here to replace the previous loaded HDU
+                            hdusToAdd.remove(hdu);
+                            break;
                         } else {
-                            return;
+                            String confMsg = "'" + hdu.getHduName() + "' HDU already exists.\n Do you agree to rename it '" + defaultHduName + "' ? \nElse it will be ignored. ";
+                            boolean okToRename = MessagePane.showConfirmMessage(confMsg);
+                            if (okToRename) {
+                                hdu.setHduName(defaultHduName);
+                                break;
+                            } else {
+                                hdusToAdd.remove(hdu);
+                            }
                         }
                     }
+
                 }
             }
 
         }
 
-        this.fitsImageHDUs.addAll(hdus);
-        for (FitsImageHDU hdu : hdus) {
+        this.fitsImageHDUs.addAll(hdusToAdd);
+        for (FitsImageHDU hdu : hdusToAdd) {
             this.fitsImageHdu2Filename.put(hdu, filename);
         }
+
+        return !hdusToAdd.isEmpty();
     }
 
     public GenericListModel<String> getTargetListModel() {
@@ -335,7 +362,10 @@ public class IRModel {
         return tmpFile;
     }
 
-    public void updateWithNewModel(final ServiceResult serviceResult) {
+    public boolean updateWithNewModel(final ServiceResult serviceResult) {
+
+        boolean dataAdded = false;
+
         final File resultFile = serviceResult.getOifits();
 
         // the file does exist (checked previously):
@@ -345,10 +375,8 @@ public class IRModel {
 
             // TODO 1 - show plot for oidata part
             // 2 - show result images
-            addFitsImageHDUs(result.getImageOiData().getFitsImageHDUs(), result.getAbsoluteFilePath());
+            dataAdded = addFitsImageHDUs(result.getImageOiData().getFitsImageHDUs(), result.getAbsoluteFilePath());
             IRModelManager.getInstance().fireIRModelChanged(this, null);
-
-            StatusBar.show("GUI updated with results ");
 
         } catch (IOException ioe) {
             e = ioe;
@@ -359,11 +387,19 @@ public class IRModel {
         if (e != null) {
             showLog("Can't recover result data", serviceResult, e);
         }
+
+        // TODO put this off using high level object for results
+        if (dataAdded) {
+            StatusBar.show("GUI updated with results ");
+        } else {
+            StatusBar.show("Image result unchanged");
+        }
+        return dataAdded;
     }
 
     public void showLog(final String prefixMessage, final ServiceResult serviceResult, final Exception e) {
         String executionLog = null;
-        
+
         final File logFile = serviceResult.getExecutionLog();
         if (logFile != null && logFile.exists()) {
             try {
