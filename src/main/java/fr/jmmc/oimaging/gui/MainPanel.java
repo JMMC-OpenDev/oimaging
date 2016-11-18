@@ -82,7 +82,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     /** OIFits viewer panel */
     private OIFitsViewPanel fitsViewPanel;
-    
+
     /** Load fits image action */
     private Action loadFitsImageAction;
 
@@ -142,12 +142,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
                 this.timerMouseCursorRefresh.start();
             }
-        } else {
-            if (this.timerMouseCursorRefresh.isRunning()) {
-                logger.debug("Stopping timer: {}", this.timerMouseCursorRefresh);
+        } else if (this.timerMouseCursorRefresh.isRunning()) {
+            logger.debug("Stopping timer: {}", this.timerMouseCursorRefresh);
 
-                this.timerMouseCursorRefresh.stop();
-            }
+            this.timerMouseCursorRefresh.stop();
         }
     }
 
@@ -165,9 +163,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         fitsImagePanel = new FitsImagePanel(Preferences.getInstance(), true, true, null);
         jPanelImage.add(fitsImagePanel);
-        
+
         fitsViewPanel = new OIFitsViewPanel();
-        
+
         java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -319,7 +317,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelOIFitsViewer = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanelImage = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        jButtonRemoveFitsImage = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jListImageHDUs = createImageHduList();
         jButtonLoadFitsImage = new javax.swing.JButton();
@@ -720,13 +718,18 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.weighty = 1.0;
         jPanel1.add(jPanelImage, gridBagConstraints);
 
-        jButton1.setText("-");
-        jButton1.setEnabled(false);
+        jButtonRemoveFitsImage.setText("-");
+        jButtonRemoveFitsImage.setEnabled(false);
+        jButtonRemoveFitsImage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoveFitsImageActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        jPanel1.add(jButton1, gridBagConstraints);
+        jPanel1.add(jButtonRemoveFitsImage, gridBagConstraints);
 
         jScrollPane2.setPreferredSize(new java.awt.Dimension(25, 100));
 
@@ -803,6 +806,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         IRModelManager.getInstance().getIRModel().exportOIFits();
     }//GEN-LAST:event_jButtonExportActionPerformed
 
+    private void jButtonRemoveFitsImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveFitsImageActionPerformed
+
+    }//GEN-LAST:event_jButtonRemoveFitsImageActionPerformed
+
     /**
      * Listen for list selection changes
      *
@@ -833,10 +840,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonExport;
     private javax.swing.JButton jButtonLoadData;
     private javax.swing.JButton jButtonLoadFitsImage;
+    private javax.swing.JButton jButtonRemoveFitsImage;
     private javax.swing.JButton jButtonRun;
     private javax.swing.JButton jButtonStop;
     private javax.swing.JCheckBox jCheckBoxUseT3;
@@ -893,6 +900,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 syncUI(event.getIrModel());
                 break;
             default:
+                logger.info("event not handled : {}", event);
         }
         logger.debug("onProcess {} - done", event);
     }
@@ -1033,9 +1041,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (changed) {
             // notify to other listener - if any in the future
 
-            StatusBar.show("model updated");
+            StatusBar.show("GUI updated");
             IRModelManager.getInstance().fireIRModelChanged(this, null);
         }
+
     }
 
     /**
@@ -1053,7 +1062,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jComboBoxTarget.setSelectedItem(sel);
 
         boolean hasOiFits = irModel.getOifitsFile() != null;
-        
+
         // Update OIFitsViewer:
         fitsViewPanel.update(irModel);
 
@@ -1105,7 +1114,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         failures.clear();
 
         if (irModel.getSelectedService() == null) {
-            failures.add("Please select the algorithm you want to run");
+            jComboBoxSoftware.setSelectedItem(ServiceList.getPreferedService());
+            irModel.setSelectedSoftware(ServiceList.getPreferedService());
+            //failures.add("Please select the algorithm you want to run");
         }
 
         OIFitsFile oifitsFile = irModel.getOifitsFile();
@@ -1113,8 +1124,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (oifitsFile == null) {
             failures.add("Missing OIFits");
         } else if (inputParam.getWaveMax() < inputParam.getWaveMin()) {
-            failures.add("Min wavelength is higher than the max one");
+            failures.add("WAVE_MIN is higher than WAVE_MAX");
         }
+        /* Not sure
+            for (OIData table : oifitsFile.getOiDataList()) {
+                if (table.getOiRevn() > 1) {
+                    failures.add("OIFits V2 tables not yet supported (" + table.getExtName() + "#" + table.getExtNb() + ")");
+                }
+            }
+         */
 
         FitsImageHDU selectedFitsImageHDU = irModel.getSelectedInputImageHDU();
         if (selectedFitsImageHDU != null) {
@@ -1142,6 +1160,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (failures.size() == 0) {
             sb.append("<li><font color=green>Ready to spawn process</font></li>");
         }
+
+        // Add TODO:
+        sb.append("</ul><br>TODO:<ul>");
+        sb.append("<li>Handle IMAGE-OI OUPUT PARAM result table</li>");
+        sb.append("<li>Provide a button to display execution logs not only for bad cases</li>");
 
         jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
