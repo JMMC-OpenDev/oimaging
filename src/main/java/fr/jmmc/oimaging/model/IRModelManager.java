@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 // TODO: remove StatusBar / MessagePane (UI)
 /**
- * Handle the oifits files collection.
+ * Handle the model for image reconstruction orchestration.
  * @author mella, bourgesl
  */
 public final class IRModelManager implements IRModelEventListener {
@@ -38,7 +38,7 @@ public final class IRModelManager implements IRModelEventListener {
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(IRModelManager.class);
     /** package name for JAXB generated code */
-    private final static String IRMODEL_JAXB_PATH = IRModel.class.getPackage().getName();
+    //private final static String IRMODEL_JAXB_PATH = IRModel.class.getPackage().getName();
     /** Singleton pattern */
     private final static IRModelManager instance = new IRModelManager();
     /* members */
@@ -47,7 +47,7 @@ public final class IRModelManager implements IRModelEventListener {
     /** flag to enable/disable firing events during startup (before calling start) */
     private boolean enableEvents = false;
 
-    /** associated file to the OIFits explorer collection */
+    /** associated file to the model */
     private File irModelFile = null;
     /** IR Model (session)*/
     private IRModel irModel = null;
@@ -90,7 +90,7 @@ public final class IRModelManager implements IRModelEventListener {
             priority += 10;
         }
 
-        // listen for IRMODEL_CHANGED event to analyze collection and fire initial events:
+        // listen for IRMODEL_CHANGED event to analyze model and fire initial events:
         getIRModelChangedEventNotifier().register(this);
 
         // reset anyway:
@@ -110,10 +110,10 @@ public final class IRModelManager implements IRModelEventListener {
         throw new IllegalStateException("Using IRModelManager.dispose() is invalid !");
     }
 
-    /* --- OIFits file collection handling ------------------------------------- */
+    /* --- data of model handling ------------------------------------- */
     /**
      * Load the IR Model at given URL
-     * @param file OIFits explorer collection file file to load
+     * @param file model file to load
      * @param checker optional OIFits checker instance (may be null)
      * @param listener progress listener
      * @throws IOException if an I/O exception occurred
@@ -138,14 +138,15 @@ public final class IRModelManager implements IRModelEventListener {
     public void loadIRModel(final File file, final OIFitsChecker checker,
             final LoadIRModelListener listener, final boolean appendOIFitsFilesOnly) throws IOException, IllegalStateException, XmlBindException {
 
-        final IRModel loadedUserCollection = (IRModel) JAXBUtils.loadObject(file.toURI().toURL(), this.jf);
+        final IRModel loadedModel = (IRModel) JAXBUtils.loadObject(file.toURI().toURL(), this.jf);
 
-//        OIDataCollectionFileProcessor.onLoad(loadedUserCollection);
+        // TODO
+        // OIDataCollectionFileProcessor.onLoad(loadedUserCollection);
     }
 
-    private void postLoadIRModel(final File file, final IRModel oiDataCollection, final OIFitsChecker checker) {
+    private void postLoadIRModel(final File file, final IRModel irModel, final OIFitsChecker checker) {
 
-        // after loadOIDataCollection as it calls reset():
+        // after loadIRModel as it calls reset():
         setIRModelFile(file);
 
         // add given file to Open recent menu
@@ -156,7 +157,7 @@ public final class IRModelManager implements IRModelEventListener {
 
     /**
      * Load the IR Model at given URL
-     * @param file OIFits explorer collection file file to load
+     * @param file model file to load
      * @throws IOException if an I/O exception occurred
      * @throws IllegalStateException if an unexpected exception occurred
      */
@@ -343,16 +344,16 @@ public final class IRModelManager implements IRModelEventListener {
     }
 
     /**
-     * Return the current OIFits explorer collection file
-     * @return the current OIFits explorer collection file or null if undefined
+     * Return the current model file
+     * @return the current model file or null if undefined
      */
     public File getIRModelFile() {
         return this.irModelFile;
     }
 
     /**
-     * Private : define the current OIFits explorer collection file
-     * @param file new OIFits explorer collection file to use
+     * Private : define the current model file
+     * @param file new model file to use
      */
     private void setIRModelFile(final File file) {
         this.irModelFile = file;
@@ -360,7 +361,7 @@ public final class IRModelManager implements IRModelEventListener {
 
     // TODO: save / merge ... (elsewhere)
     /**
-     * Reset the OIFits file collection and start firing events
+     * Reset the reference model and start firing events
      */
     public void start() {
         enableEvents = true;
@@ -368,7 +369,7 @@ public final class IRModelManager implements IRModelEventListener {
     }
 
     /**
-     * Reset the OIFits file collection
+     * Reset the reference model.
      */
     public void reset() {
 
@@ -438,7 +439,7 @@ public final class IRModelManager implements IRModelEventListener {
     }
 
     /**
-     * This fires an COLLECTION_CHANGED event to given registered listener ASYNCHRONOUSLY !
+     * This fires an IRMODEL_CHANGED event to given registered listener ASYNCHRONOUSLY !
      *
      * Note: this is ONLY useful to initialize new registered listeners properly !
      *
@@ -448,7 +449,7 @@ public final class IRModelManager implements IRModelEventListener {
     public void fireIRModelChanged(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
-                logger.debug("fireOIFitsCollectionChanged TO {}", (destination != null) ? destination : "ALL");
+                logger.debug("fireIRModelChanged TO {}", (destination != null) ? destination : "ALL");
             }
             getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
                     new IRModelEvent(IRModelEventType.IRMODEL_CHANGED, null, getIRModel()), destination);
@@ -456,7 +457,7 @@ public final class IRModelManager implements IRModelEventListener {
     }
 
     /**
-     * This fires an COLLECTION_CHANGED event to given registered listeners ASYNCHRONOUSLY !
+     * This fires an IRMODEL_CHANGED event to given registered listeners ASYNCHRONOUSLY !
      */
     private void fireIRModelChanged() {
         fireIRModelChanged(this, null);
@@ -470,7 +471,7 @@ public final class IRModelManager implements IRModelEventListener {
     public void fireReady(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
-                logger.debug("fireReadyChanged TO {}", (destination != null) ? destination : "ALL");
+                logger.debug("fireReady TO {}", (destination != null) ? destination : "ALL");
             }
             getReadyEventNotifier().queueEvent((source != null) ? source : this,
                     new IRModelEvent(IRModelEventType.READY, null, getIRModel()), destination);
@@ -502,7 +503,7 @@ public final class IRModelManager implements IRModelEventListener {
 //        switch (event.getType()) {
 //            case IRMODEL_CHANGED:
 //                // perform analysis:
-//                irModel.analyzeCollection();
+//                irModel.analyze();
 //                break;
 //            default:
 //        }
