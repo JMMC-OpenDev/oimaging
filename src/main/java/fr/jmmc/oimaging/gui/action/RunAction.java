@@ -144,7 +144,7 @@ public class RunAction extends RegisteredAction {
 
             // filter some exceptions to avoid feedback report
             if (filterNetworkException(ee)) {
-                MessagePane.showErrorMessage("Please check your network setup", ee);
+                MessagePane.showErrorMessage("Please check your network setup", "Please check your network setup", ee);
             } else {
                 super.handleException(ee);
             }
