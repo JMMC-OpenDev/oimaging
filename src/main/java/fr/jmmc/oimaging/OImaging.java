@@ -25,6 +25,7 @@ import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oitools.model.DataModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -104,6 +105,9 @@ public final class OImaging extends App {
 
         // Initialize the parallel job executor:
         ParallelJobExecutor.getInstance();
+
+        // Enable OI columns for OIFits datamodel
+        DataModel.setOiModelColumnsSupport(true);
     }
 
     /**
