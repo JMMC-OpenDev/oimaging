@@ -321,6 +321,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jScrollPane2 = new javax.swing.JScrollPane();
         jListImageHDUs = createImageHduList();
         jButtonLoadFitsImage = new javax.swing.JButton();
+        jPanelResults = new javax.swing.JPanel();
 
         setMaximumSize(new java.awt.Dimension(100, 100));
         setLayout(new java.awt.GridBagLayout());
@@ -560,6 +561,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelAlgorithmSettings.add(jComboBoxImage, gridBagConstraints);
 
         jSpinnerMaxIter.setModel(new javax.swing.SpinnerNumberModel(0, -1, null, 5));
+        jSpinnerMaxIter.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinnerMaxIterStateChanged(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -568,6 +574,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelAlgorithmSettings.add(jSpinnerMaxIter, gridBagConstraints);
 
         jComboBoxRglName.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "mem_prior" }));
+        jComboBoxRglName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxRglNameActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
@@ -773,6 +784,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.1;
         add(jPanelImageParameters, gridBagConstraints);
+        add(jPanelResults, new java.awt.GridBagConstraints());
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBoxSoftwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSoftwareActionPerformed
@@ -807,8 +819,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }//GEN-LAST:event_jButtonExportActionPerformed
 
     private void jButtonRemoveFitsImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveFitsImageActionPerformed
-
+        // TODO
     }//GEN-LAST:event_jButtonRemoveFitsImageActionPerformed
+
+    private void jComboBoxRglNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxRglNameActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jComboBoxRglNameActionPerformed
+
+    private void jSpinnerMaxIterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerMaxIterStateChanged
+        updateModel();
+    }//GEN-LAST:event_jSpinnerMaxIterStateChanged
 
     /**
      * Listen for list selection changes
@@ -879,6 +899,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JPanel jPanelImage;
     private javax.swing.JPanel jPanelImageParameters;
     private javax.swing.JPanel jPanelOIFitsViewer;
+    private javax.swing.JPanel jPanelResults;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSlider jSliderWaveMax;
@@ -906,7 +927,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }
 
     /**
-     * Update model attributes following swing updates if changes occures.
+     * Update model attributes following swing events.
      *
      */
     private void updateModel() {
@@ -954,7 +975,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         }
 
-        //TODO
         // observables
         mFlag = params.useVis();
         wFlag = jCheckBoxUseVis.isSelected();
@@ -1009,6 +1029,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // regularization
+        mString = params.getRglName();
+        if (jComboBoxRglName.getSelectedItem() != null) {
+            wString = (String) jComboBoxRglName.getSelectedItem();
+            if (!wString.equals(mString)) {
+                params.setRglName(wString);
+                changed = true;
+            }
+        }
+
         mDouble = params.getRglWgt();
         if (jFormattedTextFieldRglWgt.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldRglWgt.getValue()).doubleValue();
@@ -1035,8 +1064,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 changed = true;
             }
         }
-        //TODO prior
 
+        mString = params.getRglPrio();
+        if (jComboBoxRglPrio.getSelectedItem() != null) {
+            wString = (String) jComboBoxRglPrio.getSelectedItem();
+            if (!wString.equals(mString)) {
+                params.setRglPrio(wString);
+                changed = true;
+            }
+        }
         // some values have changed
         if (changed) {
             // notify to other listener - if any in the future
@@ -1103,11 +1139,18 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSpinnerMaxIter.setValue(new Integer(inputParam.getMaxiter()));
 
         // regulation
-        // TODO jComboBoxRglName.setSelectedItem(inputParam.getRglName());
+        String rglName = inputParam.getRglName();
+        if (rglName != null) {
+            jComboBoxRglName.setSelectedItem(rglName);
+        }
         jFormattedTextFieldRglWgt.setValue(inputParam.getRglWgt());
         jFormattedTextFieldRglAlph.setValue(inputParam.getRglAlph());
         jFormattedTextFieldRglBeta.setValue(inputParam.getRglBeta());
-        // TODO jComboBoxRglPrio.setSelectedItem(inputParam.getRglPrio());
+
+        String rglPrio = inputParam.getRglPrio();
+        if (rglPrio != null) {
+            jComboBoxRglPrio.setSelectedItem(rglPrio);
+        }
 
         // perform analysis:
         List<String> failures = new LinkedList<String>();
