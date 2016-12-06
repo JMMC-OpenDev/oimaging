@@ -82,12 +82,15 @@ public class IRModel {
         imageOiData = new ImageOiData();
 
         // Set default values
+        // TODO make it dynamic and software dependant
         ImageOiInputParam params = imageOiData.getInputParam();
         params.setWaveMin(-1);
         params.setWaveMax(-1);
         params.setMaxiter(200);
+        params.setRglWgt(0);
         params.setRglAlph(0);
         params.setRglBeta(0);
+        params.setRglName("mem_prior");
 
     }
 
