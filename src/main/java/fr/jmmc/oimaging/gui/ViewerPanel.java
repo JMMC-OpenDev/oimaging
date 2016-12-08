@@ -50,7 +50,7 @@ public class ViewerPanel extends javax.swing.JPanel {
             FitsImageUtils.updateDataRangeExcludingZero(image);
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
-            jTabbedPaneVizualizations.setSelectedComponent(jPanelImageViewer);
+            //jTabbedPaneVizualizations.setSelectedComponent(jPanelImageViewer);
         } else {
             jPanelImage.remove(fitsImagePanel);
         }
