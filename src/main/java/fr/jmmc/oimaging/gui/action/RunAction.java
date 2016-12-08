@@ -112,7 +112,14 @@ public class RunAction extends RegisteredAction {
         @Override
         public ServiceResult computeInBackground() {
             final Service service = irModel.getSelectedService();
-            return service.getExecMode().reconstructsImage(service.getProgram(), inputFile);
+            final ServiceResult result = service.getExecMode().reconstructsImage(service.getProgram(), inputFile);
+            // Result is valid only if the OIFITS file was downloaded successfully:
+            final boolean exist = result.getOifitsResultFile().exists();
+            result.setValid(exist);
+            if (!exist) {
+                result.setErrorMessage("No OIFits ouput (probably a server error occured) !");
+            }
+            return result;
         }
 
         @Override
@@ -120,11 +127,15 @@ public class RunAction extends RegisteredAction {
             // action finished, we can change state and update model just after.
             parentAction.setRunningState(irModel, false);
 
+            this.irModel.addServiceResult(serviceResult);
+
+            /*
             if (serviceResult.isValid()) {
                 this.irModel.updateWithNewModel(serviceResult);
             } else {
                 this.irModel.showLog(serviceResult.getErrorMessage(), serviceResult, null);
             }
+             */
         }
 
         /**

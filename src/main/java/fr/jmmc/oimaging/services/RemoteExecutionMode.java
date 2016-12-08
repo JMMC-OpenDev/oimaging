@@ -111,10 +111,10 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         if (StringUtils.isEmpty(inputFilename)) {
             throw new IllegalArgumentException("empty input filename !");
         }
-        if (StringUtils.isEmpty(result.getOifits().getAbsolutePath())) {
+        if (StringUtils.isEmpty(result.getOifitsResultFile().getAbsolutePath())) {
             throw new IllegalArgumentException("empty output filename !");
         }
-        if (StringUtils.isEmpty(result.getExecutionLog().getAbsolutePath())) {
+        if (StringUtils.isEmpty(result.getExecutionLogResultFile().getAbsolutePath())) {
             throw new IllegalArgumentException("empty log filename !");
         }
 
@@ -209,25 +209,19 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             URI uri = new URI(resultRef.getHref());
             if ("logfile".equals(id)) {
                 // get logfile
-                if (Http.download(uri, result.getExecutionLog(), false)) {
-                    _logger.info("logfile downloaded at : {}", result.getExecutionLog());
+                if (Http.download(uri, result.getExecutionLogResultFile(), false)) {
+                    _logger.info("logfile downloaded at : {}", result.getExecutionLogResultFile());
                 }
             } else if ("outputfile".equals(id)) {
                 // get result file
-                if (Http.download(uri, result.getOifits(), false)) {
-                    _logger.info("outputfile downloaded at : {}", result.getOifits());
+                if (Http.download(uri, result.getOifitsResultFile(), false)) {
+                    _logger.info("outputfile downloaded at : {}", result.getOifitsResultFile());
                 }
             } else {
                 // TODO: FIX such error
                 // store additional information
                 throw new IllegalStateException("UWS service return more info than required : " + id);
             }
-        }
-        // Result is valid only if the OIFITS file was downloaded successfully:
-        final boolean exist = result.getOifits().exists();
-        result.setValid(exist);
-        if (!exist) {
-            result.setErrorMessage("No OIFits ouput (probably a server error occured) !");
         }
     }
 

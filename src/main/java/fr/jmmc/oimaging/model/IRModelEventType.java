@@ -11,5 +11,7 @@ public enum IRModelEventType {
     /** IRModel changed */
     IRMODEL_CHANGED,
     /** last event type = ready */
-    READY
+    READY,
+    /** IRModel get a new service result */
+    IRMODEL_UPDATED
 }

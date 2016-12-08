@@ -15,7 +15,6 @@ import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
 import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
-import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.BorderLayout;
 import org.jfree.chart.ChartColor;
@@ -64,10 +63,10 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
     /**
      * Free any ressource or reference to this instance:
-     * remove the plot chart panel from OIFitsCollectionManager event notifiers 
+     * remove the plot chart panel from OIFitsCollectionManager event notifiers
      * and this instance from ObservationManager listeners
-     * 
-     * @see PlotChartPanel#dispose() 
+     *
+     * @see PlotChartPanel#dispose()
      */
     @Override
     public void dispose() {
@@ -167,13 +166,6 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     }
 
     /**
-     * Handle the changed event to plot the new OIFits synchronously.
-     */
-    public void update(final IRModel irModel) {
-        this.plot(irModel);
-    }
-
-    /**
      * Return the OIFits data
      * @return OIFits data
      */
@@ -194,11 +186,8 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
      * This code must be executed by the Swing Event Dispatcher thread (EDT)
      * @param oiFitsData OIFits data
      */
-    private void plot(final IRModel irModel) {
-        logger.debug("plot : {}", irModel);
-
-        final OIFitsFile oiFitsFile = irModel.getOifitsFile();
-        final String targetName = irModel.getImageOiData().getInputParam().getTarget();
+    public void plot(OIFitsFile oiFitsFile, String targetName) {
+        logger.debug("plot : {} for target {}", oiFitsFile, targetName);
 
         // memorize chart data (used by export PDF):
         setOIFitsData(oiFitsFile);

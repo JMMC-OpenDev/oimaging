@@ -457,6 +457,22 @@ public final class IRModelManager implements IRModelEventListener {
     }
 
     /**
+     * This fires an IRMODEL_UPDATED event to given registered listener ASYNCHRONOUSLY !
+     *     *
+     * @param source event source
+     * @param destination destination listener (null means all)
+     */
+    public void fireIRModelUpdated(final Object source, final IRModelEventListener destination) {
+        if (enableEvents) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("fireIRModelUpdated TO {}", (destination != null) ? destination : "ALL");
+            }
+            getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
+                    new IRModelEvent(IRModelEventType.IRMODEL_UPDATED, null, getIRModel()), destination);
+        }
+    }
+
+    /**
      * This fires an IRMODEL_CHANGED event to given registered listeners ASYNCHRONOUSLY !
      */
     private void fireIRModelChanged() {

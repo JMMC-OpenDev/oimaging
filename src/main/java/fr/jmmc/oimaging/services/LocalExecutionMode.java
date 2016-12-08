@@ -90,7 +90,7 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
     @Override
     public ServiceResult reconstructsImage(final String software, final File inputFile) {
         ServiceResult result = new ServiceResult(inputFile);
-        LocalExecutionMode.exec(software, inputFile.getAbsolutePath(), result.getOifits().getAbsolutePath(), result.getExecutionLog().getAbsolutePath());
+        LocalExecutionMode.exec(software, inputFile.getAbsolutePath(), result.getOifitsResultFile().getAbsolutePath(), result.getExecutionLogResultFile().getAbsolutePath());
         return result;
     }
 

@@ -53,7 +53,7 @@ public final class DummyExecutionMode implements OImagingExecutionMode {
                 idx++;
             }
 
-            OIFitsWriter.writeOIFits(result.getOifits().getAbsolutePath(), outputOIFitsFile);
+            OIFitsWriter.writeOIFits(result.getOifitsResultFile().getAbsolutePath(), outputOIFitsFile);
 
         } catch (IOException ex) {
             throw new RuntimeException(ex);

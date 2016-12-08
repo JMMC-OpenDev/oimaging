@@ -45,6 +45,8 @@ public class IRModel {
     private OIFitsFile oifitsFile;
     /** List of loaded imageHUDs */
     private List<FitsImageHDU> fitsImageHDUs;
+    /** List of results */
+    private List<ServiceResult> serviceResults;
     /** Selected algorithm */
     private Service selectedService;
 
@@ -76,6 +78,8 @@ public class IRModel {
     private void reset() {
         this.oifitsFile = null;
         this.fitsImageHDUs = new LinkedList<FitsImageHDU>();
+        this.serviceResults = new LinkedList<ServiceResult>();
+
         this.selectedService = null;
         this.selectedInputImageHDU = null;
         this.fitsImageHdu2Filename.clear();
@@ -264,6 +268,10 @@ public class IRModel {
         return this.fitsImageHDUs;
     }
 
+    public List<ServiceResult> getResultSets() {
+        return this.serviceResults;
+    }
+
     /**
      * Add image HDU of given file and select first imageHDU if no input image was selected before.
      * Each added HDU get HDUNAME set with original fits filename with suffixe # and extension index.
@@ -369,7 +377,7 @@ public class IRModel {
 
         boolean dataAdded = false;
 
-        final File resultFile = serviceResult.getOifits();
+        final File resultFile = serviceResult.getOifitsResultFile();
 
         // the file does exist (checked previously):
         Exception e = null;
@@ -379,7 +387,6 @@ public class IRModel {
             // TODO 1 - show plot for oidata part
             // 2 - show result images
             dataAdded = addFitsImageHDUs(result.getImageOiData().getFitsImageHDUs(), result.getAbsoluteFilePath());
-            IRModelManager.getInstance().fireIRModelChanged(this, null);
 
         } catch (IOException ioe) {
             e = ioe;
@@ -397,20 +404,31 @@ public class IRModel {
         } else {
             StatusBar.show("Image result unchanged");
         }
+
+        // notify model change
+        IRModelManager.getInstance().fireIRModelChanged(this, null);
+
         return dataAdded;
     }
 
     public void showLog(final String prefixMessage, final ServiceResult serviceResult, final Exception e) {
         String executionLog = null;
 
-        final File logFile = serviceResult.getExecutionLog();
+        final File logFile = serviceResult.getExecutionLogResultFile();
         if (logFile != null && logFile.exists()) {
             try {
-                executionLog = FileUtils.readFile(serviceResult.getExecutionLog());
+                executionLog = FileUtils.readFile(serviceResult.getExecutionLogResultFile());
             } catch (IOException ioe) {
                 logger.error("Can't read content of executionLog file ", ioe);
             }
         }
         MessagePane.showErrorMessage((executionLog != null) ? (prefixMessage + "\n\n" + executionLog) : prefixMessage, e);
+    }
+
+    public void addServiceResult(ServiceResult serviceResult) {
+        getResultSets().add(serviceResult);
+
+        // notify model change
+        IRModelManager.getInstance().fireIRModelUpdated(this, null);
     }
 }
