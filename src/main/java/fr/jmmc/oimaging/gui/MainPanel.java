@@ -831,7 +831,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         if (e.getSource() == jListResultSet) {
-            ServiceResultDecorator serviceResultDecorator = jListResultSet.getSelectedValue();
+            ServiceResultDecorator serviceResultDecorator = (ServiceResultDecorator) jListResultSet.getSelectedValue();
             if (serviceResultDecorator != null) {
                 viewerPanel.displayResult(serviceResultDecorator.getServiceResult());
             }
@@ -877,7 +877,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
     private javax.swing.JList jListImageHDUs;
-    private javax.swing.JList<ServiceResultDecorator> jListResultSet;
+    private javax.swing.JList jListResultSet;
     private javax.swing.JPanel jPanelAlgorithmSettings;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
