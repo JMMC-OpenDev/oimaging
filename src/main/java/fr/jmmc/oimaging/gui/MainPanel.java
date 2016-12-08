@@ -832,8 +832,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         if (e.getSource() == jListResultSet) {
             ServiceResultDecorator serviceResultDecorator = jListResultSet.getSelectedValue();
-
-            viewerPanel.displayResult(serviceResultDecorator.getServiceResult());
+            if (serviceResultDecorator != null) {
+                viewerPanel.displayResult(serviceResultDecorator.getServiceResult());
+            }
         }
 
     }
