@@ -95,6 +95,8 @@ public class IRModel {
         params.setRglAlph(0);
         params.setRglBeta(0);
         params.setRglName("mem_prior");
+        params.useAutoRgl(true);
+        params.setFluxErr(0.1);
 
     }
 

@@ -307,6 +307,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jComboBoxRglPrio = new javax.swing.JComboBox();
         jButtonRemoveFitsImage = new javax.swing.JButton();
         jButtonLoadFitsImage = new javax.swing.JButton();
+        jCheckBoxAutoRgl = new javax.swing.JCheckBox();
+        jLabelFluxErr = new javax.swing.JLabel();
+        jFormattedTextFieldFluxErr = new javax.swing.JFormattedTextField();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
         jButtonStop = new javax.swing.JButton();
@@ -550,7 +553,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxSoftware, gridBagConstraints);
@@ -564,6 +567,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -578,7 +582,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jSpinnerMaxIter, gridBagConstraints);
@@ -592,7 +596,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxRglName, gridBagConstraints);
@@ -611,8 +615,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglWgt, gridBagConstraints);
 
@@ -630,7 +635,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglAlph, gridBagConstraints);
@@ -648,7 +653,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglBeta, gridBagConstraints);
@@ -657,7 +662,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -671,15 +676,46 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 1;
         jPanelAlgorithmSettings.add(jButtonRemoveFitsImage, gridBagConstraints);
 
         jButtonLoadFitsImage.setText("+");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 1;
         jPanelAlgorithmSettings.add(jButtonLoadFitsImage, gridBagConstraints);
+
+        jCheckBoxAutoRgl.setText("AUTO");
+        jCheckBoxAutoRgl.setToolTipText("Automatic regularization weight");
+        jCheckBoxAutoRgl.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxAutoRglActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        jPanelAlgorithmSettings.add(jCheckBoxAutoRgl, gridBagConstraints);
+
+        jLabelFluxErr.setText("FLUXERR");
+        jLabelFluxErr.setToolTipText("Error on zero-baseline squared visibility point (used to enforce flux   normalisation)");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        jPanelAlgorithmSettings.add(jLabelFluxErr, gridBagConstraints);
+
+        jFormattedTextFieldFluxErr.setToolTipText("Error on zero-baseline squared visibility point (used to enforce flux   normalisation)");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanelAlgorithmSettings.add(jFormattedTextFieldFluxErr, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -720,7 +756,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jScrollPane1, gridBagConstraints);
 
@@ -745,7 +781,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.weighty = 0.2;
         jPanel3.add(jPanelExecutionLog, gridBagConstraints);
 
         jPanelResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Result sets"));
@@ -810,6 +846,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         updateModel();
     }//GEN-LAST:event_jSpinnerMaxIterStateChanged
 
+    private void jCheckBoxAutoRglActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxAutoRglActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jCheckBoxAutoRglActionPerformed
+
     /**
      * Listen for list selection changes
      *
@@ -840,6 +880,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JButton jButtonRemoveFitsImage;
     private javax.swing.JButton jButtonRun;
     private javax.swing.JButton jButtonStop;
+    private javax.swing.JCheckBox jCheckBoxAutoRgl;
     private javax.swing.JCheckBox jCheckBoxUseT3;
     private javax.swing.JCheckBox jCheckBoxUseVis;
     private javax.swing.JCheckBox jCheckBoxUseVis2;
@@ -849,11 +890,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JComboBox jComboBoxSoftware;
     private javax.swing.JComboBox jComboBoxTarget;
     private javax.swing.JEditorPane jEditorPane;
+    private javax.swing.JFormattedTextField jFormattedTextFieldFluxErr;
     private javax.swing.JFormattedTextField jFormattedTextFieldRglAlph;
     private javax.swing.JFormattedTextField jFormattedTextFieldRglBeta;
     private javax.swing.JFormattedTextField jFormattedTextFieldRglWgt;
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMax;
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMin;
+    private javax.swing.JLabel jLabelFluxErr;
     private javax.swing.JLabel jLabelInitImg;
     private javax.swing.JLabel jLabelMaxIter;
     private javax.swing.JLabel jLabelOifitsFile;
@@ -1026,6 +1069,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 changed = true;
             }
         }
+        mFlag = params.useAutoRgl();
+        wFlag = jCheckBoxAutoRgl.isSelected();
+        if (mFlag != wFlag) {
+            params.useAutoRgl(wFlag);
+            changed = true;
+        }
+        jFormattedTextFieldRglWgt.setEnabled(!wFlag);
+        jLabelRglWgt.setEnabled(!wFlag);
 
         mDouble = params.getRglAlph();
         if (jFormattedTextFieldRglAlph.getValue() != null) {
@@ -1053,6 +1104,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 changed = true;
             }
         }
+
+        mDouble = params.getFluxErr();
+        if (jFormattedTextFieldFluxErr.getValue() != null) {
+            wDouble = ((Number) jFormattedTextFieldFluxErr.getValue()).doubleValue();
+            if (mDouble != wDouble) {
+                params.setFluxErr(wDouble);
+                changed = true;
+            }
+        }
+
         // some values have changed
         if (changed) {
             // notify to other listener - if any in the future
@@ -1136,9 +1197,23 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jComboBoxRglPrio.setSelectedItem(rglPrio);
         }
 
+        boolean wFlag = inputParam.useAutoRgl();
+        jCheckBoxAutoRgl.setSelected(wFlag);
+        jFormattedTextFieldRglWgt.setEnabled(!wFlag);
+        jLabelRglWgt.setEnabled(!wFlag);
+
+        double fluxerr = inputParam.getFluxErr();
+        jFormattedTextFieldFluxErr.setValue(inputParam.getFluxErr());
+
         // perform analysis:
         List<String> failures = new LinkedList<String>();
         failures.clear();
+
+        if (fluxerr < 1e-5) {
+            failures.add("FluxErr must be greater than 1e-5");
+        } else if (fluxerr > 1) {
+            failures.add("FluxErr must be smaller than 1");
+        }
 
         if (irModel.getSelectedService() == null) {
             jComboBoxSoftware.setSelectedItem(ServiceList.getPreferedService());
