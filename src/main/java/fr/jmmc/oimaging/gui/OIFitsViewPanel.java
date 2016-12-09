@@ -169,7 +169,7 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
      * Return the OIFits data
      * @return OIFits data
      */
-    private OIFitsFile getOIFitsData() {
+    OIFitsFile getOIFitsData() {
         return this.oiFitsFile;
     }
 

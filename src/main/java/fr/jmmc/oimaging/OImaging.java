@@ -21,6 +21,8 @@ import fr.jmmc.jmcs.util.ResourceUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oimaging.gui.MainPanel;
+import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
+import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
@@ -273,6 +275,10 @@ public final class OImaging extends App {
         // File menu :
         new LoadOIFitsAction();
         new LoadFitsImageAction();
+
+        new ExportOIFitsAction();
+        new ExportFitsImageAction();
+
         new RunAction();
 
         // Edit menu :

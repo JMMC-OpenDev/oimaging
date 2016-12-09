@@ -3,22 +3,38 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui;
 
+import fr.jmmc.jmcs.data.MimeType;
+import fr.jmmc.jmcs.gui.FeedbackReport;
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
+import fr.jmmc.jmcs.gui.component.FileChooser;
+import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.Preferences;
+import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
+import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
+import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImage;
+import fr.jmmc.oitools.image.FitsImageFile;
+import fr.jmmc.oitools.image.FitsImageHDU;
+import fr.jmmc.oitools.image.FitsImageWriter;
 import fr.jmmc.oitools.model.OIFitsFile;
+import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Action;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author mellag
  */
-public class ViewerPanel extends javax.swing.JPanel {
+public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     /** Fits image panel */
     private FitsImagePanel fitsImagePanel;
@@ -26,9 +42,16 @@ public class ViewerPanel extends javax.swing.JPanel {
     /** OIFits viewer panel */
     private OIFitsViewPanel fitsViewPanel;
 
+    private Action exportOiFitsAction;
+    private Action exportFitsImageAction;
+
+    private FitsImageHDU fitsImageHDU = null;
+
     /** Creates new form ViewerPanel */
     public ViewerPanel() {
         initComponents();
+
+        jTabbedPaneVizualizations.addChangeListener(this);
 
         fitsImagePanel = new FitsImagePanel(Preferences.getInstance(), true, true, null);
         jPanelImage.add(fitsImagePanel);
@@ -43,13 +66,16 @@ public class ViewerPanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         jPanelOIFitsViewer.add(fitsViewPanel, gridBagConstraints);
 
+        exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
+        exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
     }
 
-    public void displayImage(FitsImage image) {
-        displayImage(image, true);
-    }
+    private void displayImage(FitsImageHDU imageHDU) {
 
-    public void displayImage(FitsImage image, boolean hideOtherTabs) {
+        FitsImage image = imageHDU.getFitsImages().get(0);
+
+        fitsImageHDU = imageHDU;
+
         if (image != null) {
             FitsImageUtils.updateDataRangeExcludingZero(image);
             fitsImagePanel.setFitsImage(image);
@@ -58,18 +84,39 @@ public class ViewerPanel extends javax.swing.JPanel {
         } else {
             jPanelImage.remove(fitsImagePanel);
         }
+    }
 
-        if ((hideOtherTabs && (jTabbedPaneVizualizations.getComponentCount() > 1))
-                || (!hideOtherTabs && (jTabbedPaneVizualizations.getComponentCount() == 1))) {
+    private void displayOiFits(OIFitsFile oifitsFile, String targetName) {
+        if (oifitsFile != null) {
+            fitsViewPanel.plot(oifitsFile, targetName);
+            if (jPanelImage.getComponentCount() == 0) {
+                jTabbedPaneVizualizations.setSelectedComponent(jPanelOIFitsViewer);
+            }
+        }
+    }
+
+    private void setTabMode(boolean modelMode) {
+        // move to
+        if ((modelMode && (jTabbedPaneVizualizations.getComponentCount() > 2))
+                || (!modelMode && (jTabbedPaneVizualizations.getComponentCount() == 2))) {
             jTabbedPaneVizualizations.removeAll();
             jTabbedPaneVizualizations.add("Image", jPanelImageViewer);
-            if (!hideOtherTabs) {
-                jTabbedPaneVizualizations.add("OIFits data", jPanelOIFitsViewer);
+            jTabbedPaneVizualizations.add("OIFits data", jPanelOIFitsViewer);
+            if (!modelMode) {
                 jTabbedPaneVizualizations.add("Output parameters", jPanelOutputParamViewer);
                 jTabbedPaneVizualizations.add("Execution log", jPanelLogViewer);
             }
-
         }
+        enableActions();
+    }
+
+    public void displayModel(IRModel currentModel) {
+        if (currentModel == null) {
+        }
+
+        //viewerPanel.displayOiFits(irModel.getOifitsFile(), (String) jComboBoxTarget.getSelectedItem());
+        //viewerPanel.displayImage(selectedFitsImageHDU.getFitsImages().get(0), currentModel.getOifitsFile());
+        setTabMode(true);
     }
 
     public void displayResult(ServiceResult result) {
@@ -82,11 +129,9 @@ public class ViewerPanel extends javax.swing.JPanel {
 
             //image
             // show first one :
-            displayImage(oifitsFile.getImageOiData().getFitsImageHDUs().get(0).getFitsImages().get(0), false);
+            displayImage(oifitsFile.getImageOiData().getFitsImageHDUs().get(0));
 
-            // oifits
-            final String targetName = oifitsFile.getImageOiData().getInputParam().getTarget();
-            fitsViewPanel.plot(oifitsFile, targetName);
+            displayOiFits(oifitsFile, oifitsFile.getImageOiData().getInputParam().getTarget());
 
             // get Output Param Table
             // TODO
@@ -96,9 +141,61 @@ public class ViewerPanel extends javax.swing.JPanel {
             Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        // displayImage();
-        // displayExecutionLog();
-        // displayOIFits();
+        setTabMode(false);
+    }
+
+    void selectImageViewer() {
+        jTabbedPaneVizualizations.setSelectedComponent(jPanelImageViewer);
+    }
+
+    public void exportOIFits() {
+        OIFitsFile oifitsFile = fitsViewPanel.getOIFitsData();
+        File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
+        String name = FileUtils.getFileNameWithoutExtension(oifitsFile.getName()) + ".image-oi." + FileUtils.getExtension(oifitsFile.getName());
+        File file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", dir, MimeType.OIFITS, name);
+
+        // Cancel
+        if (file == null) {
+            return;
+        }
+
+        try {
+            OIFitsWriter.writeOIFits(file.getAbsolutePath(), oifitsFile);
+        } catch (IOException ex) {
+            // Show the feedback report (modal) :
+            FeedbackReport.openDialog(true, ex);
+        } catch (FitsException ex) {
+            // Show the feedback report (modal) :
+            FeedbackReport.openDialog(true, ex);
+        }
+    }
+
+    public void exportFitsImage() {
+
+        FitsImageFile fits = new FitsImageFile();
+        fits.getFitsImageHDUs().add(fitsImageHDU);
+
+        File file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", null, MimeType.FITS_IMAGE, null);
+
+        // Cancel
+        if (file == null) {
+            return;
+        }
+        try {
+            FitsImageWriter.write(file.getAbsolutePath(), fits);
+        } catch (IOException ex) {
+            // Show the feedback report (modal) :
+            FeedbackReport.openDialog(true, ex);
+        } catch (FitsException ex) {
+            // Show the feedback report (modal) :
+            FeedbackReport.openDialog(true, ex);
+        }
+
+    }
+
+    private void enableActions() {
+        exportOiFitsAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelOIFitsViewer && fitsViewPanel.getOIFitsData() != null);
+        exportFitsImageAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelImageViewer);
     }
 
     /** This method is called from within the constructor to
@@ -191,4 +288,9 @@ public class ViewerPanel extends javax.swing.JPanel {
     private javax.swing.JTabbedPane jTabbedPaneVizualizations;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        enableActions();
+    }
 }

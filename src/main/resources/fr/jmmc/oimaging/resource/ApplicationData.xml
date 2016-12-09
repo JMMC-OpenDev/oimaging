@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.2 alpha 4"/>
+    <program name="OImaging" version="0.2 alpha 5"/>
     <compilation date="06/12/2016" compiler="JDK 1.6.0_24"/>
 
     <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -125,6 +125,10 @@
                   icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load an OIFits file"/>
             <menu label="Load Fits Image file" classpath="fr.jmmc.oimaging.gui.action.LoadFitsImageAction" action="loadFitsImage"
                   icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load a Fits Image file"/>
+            <!--<separator/>
+            <menu label="Save oifits" classpath="fr.jmmc.oimaging.gui.action.ExportOIfitsAction" action="exportOIFits" description="Export selected OIFits to a local file"/>
+            <menu label="Save image" classpath="fr.jmmc.oimaging.gui.action.ExportFitsImageAction" action="exportFitsImage" description="Export selected Fits image to a local file"/>
+            -->
         </menu>
 
         <menu label="Edit">
@@ -142,9 +146,13 @@
     <releasenotes>
         <release version="0.2">
             <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
-            <prerelease version="0.2 alpha 3">
-                <change type="CHANGE">New layout that offers to llok on result items.</change>
 
+            <prerelease version="0.2 alpha 5">
+                <change type="CHANGE">Optimize layout.</change>
+                <change type="CHANGE">Don't add results in input image combobox.</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 4">
+                <change type="CHANGE">New layout that offers to look on result items.</change>
                 <change type="CHANGE">Fix bug running local version of software.</change>
             </prerelease>
             <prerelease version="0.2 alpha 3">
