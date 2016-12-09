@@ -72,9 +72,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     private final List<String> hduNameList = new ArrayList<String>(5);
 
-    /** Image HDU list model */
-    GenericListModel<String> hduNameListModel = new GenericListModel<String>(hduNameList);
-
     private final List<ServiceResult> resultSetList = new ArrayList<ServiceResult>(5);
 
     /** ResultSet list model */
@@ -160,13 +157,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jLabelWaveMin.setText("WAVE_MIN [" + SpecialChars.UNIT_MICRO_METER + "]");
         jLabelWaveMax.setText("WAVE_MAX [" + SpecialChars.UNIT_MICRO_METER + "]");
 
-        // become widget listener
-        jListImageHDUs.addListSelectionListener((ListSelectionListener) this);
-
         // associate sliders and fields
         fieldSliderAdapterWaveMin = new FieldSliderAdapter(jSliderWaveMin, jFormattedTextFieldWaveMin, 0, 1, 0);
         fieldSliderAdapterWaveMax = new FieldSliderAdapter(jSliderWaveMax, jFormattedTextFieldWaveMax, 0, 1, 0);
 
+        // become widget listener
         jListResultSet.addListSelectionListener((ListSelectionListener) this);
 
         // init viewer Panel
@@ -310,6 +305,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jFormattedTextFieldRglAlph = new javax.swing.JFormattedTextField();
         jFormattedTextFieldRglBeta = new javax.swing.JFormattedTextField();
         jComboBoxRglPrio = new javax.swing.JComboBox();
+        jButtonRemoveFitsImage = new javax.swing.JButton();
+        jButtonLoadFitsImage = new javax.swing.JButton();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
         jButtonStop = new javax.swing.JButton();
@@ -320,11 +317,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelResults = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jListResultSet = createCustomList();
-        jPanelInputImages = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jListImageHDUs = createCustomList();
-        jButtonLoadFitsImage = new javax.swing.JButton();
-        jButtonRemoveFitsImage = new javax.swing.JButton();
         viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
 
         setMaximumSize(new java.awt.Dimension(100, 100));
@@ -558,7 +550,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxSoftware, gridBagConstraints);
@@ -586,6 +578,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jSpinnerMaxIter, gridBagConstraints);
@@ -599,6 +592,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxRglName, gridBagConstraints);
@@ -617,6 +611,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglWgt, gridBagConstraints);
@@ -635,6 +630,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglAlph, gridBagConstraints);
@@ -652,6 +648,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglBeta, gridBagConstraints);
@@ -660,10 +657,29 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxRglPrio, gridBagConstraints);
+
+        jButtonRemoveFitsImage.setText("-");
+        jButtonRemoveFitsImage.setEnabled(false);
+        jButtonRemoveFitsImage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoveFitsImageActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
+        jPanelAlgorithmSettings.add(jButtonRemoveFitsImage, gridBagConstraints);
+
+        jButtonLoadFitsImage.setText("+");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        jPanelAlgorithmSettings.add(jButtonLoadFitsImage, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -747,49 +763,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.weighty = 0.6;
         jPanel3.add(jPanelResults, gridBagConstraints);
 
-        jPanelInputImages.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder("Input Images")));
-        jPanelInputImages.setLayout(new java.awt.GridBagLayout());
-
-        jScrollPane2.setPreferredSize(new java.awt.Dimension(25, 100));
-
-        jListImageHDUs.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jListImageHDUs.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jListImageHDUsMouseClicked(evt);
-            }
-        });
-        jScrollPane2.setViewportView(jListImageHDUs);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        jPanelInputImages.add(jScrollPane2, gridBagConstraints);
-
-        jButtonLoadFitsImage.setText("load fits");
-        jPanelInputImages.add(jButtonLoadFitsImage, new java.awt.GridBagConstraints());
-
-        jButtonRemoveFitsImage.setText("-");
-        jButtonRemoveFitsImage.setEnabled(false);
-        jButtonRemoveFitsImage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonRemoveFitsImageActionPerformed(evt);
-            }
-        });
-        jPanelInputImages.add(jButtonRemoveFitsImage, new java.awt.GridBagConstraints());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 0.1;
-        jPanel3.add(jPanelInputImages, gridBagConstraints);
-
         jSplitPane1.setLeftComponent(jPanel3);
         jSplitPane1.setRightComponent(viewerPanel);
 
@@ -806,6 +779,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     private void jComboBoxImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxImageActionPerformed
         updateModel();
+
+        viewerPanel.displayModel(currentModel);
+        viewerPanel.selectImageViewer();
+
+        jListResultSet.clearSelection();
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
     private void jCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxActionPerformed
@@ -815,13 +793,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void jFormattedTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldActionPerformed
         updateModel();
     }//GEN-LAST:event_jFormattedTextFieldActionPerformed
-
-    private void jListImageHDUsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jListImageHDUsMouseClicked
-        // load new data if single count and empty or double click
-        if ((jListImageHDUs.getSelectedValue() == null && jListImageHDUs.getModel().getSize() == 0) || evt.getClickCount() == 2) {
-            loadFitsImageAction.actionPerformed(null);
-        }
-    }//GEN-LAST:event_jListImageHDUsMouseClicked
 
     private void jFormattedTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldPropertyChange
         updateModel();
@@ -852,15 +823,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // This action only update GUI but not the model.
-        if (e.getSource() == jListImageHDUs) {
-            viewerPanel.displayModel(currentModel);
-
-            FitsImageHDUDecorator fitsImageHDUDecorator = (FitsImageHDUDecorator) jListImageHDUs.getSelectedValue();
-            if (fitsImageHDUDecorator != null) {
-                viewerPanel.selectImageViewer();
-            }
-        }
-
         if (e.getSource() == jListResultSet) {
             ServiceResultDecorator serviceResultDecorator = (ServiceResultDecorator) jListResultSet.getSelectedValue();
             if (serviceResultDecorator != null) {
@@ -903,17 +865,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JLabel jLabelTarget;
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
-    private javax.swing.JList jListImageHDUs;
     private javax.swing.JList jListResultSet;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanelAlgorithmSettings;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
-    private javax.swing.JPanel jPanelInputImages;
     private javax.swing.JPanel jPanelResults;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
@@ -1147,13 +1106,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // image combo
         jComboBoxImage.removeAllItems();
-        hduNameListModel.clear();
         for (FitsImageHDU fitsImageHDU : irModel.getFitsImageHDUs()) {
             FitsImageHDUDecorator d = new FitsImageHDUDecorator(fitsImageHDU);
             jComboBoxImage.addItem(d);
-            hduNameListModel.addElement(d);
         }
-        jListImageHDUs.setModel(hduNameListModel);
 
         // resultSet List
         resultSetListModel.clear();
@@ -1209,10 +1165,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (selectedFitsImageHDU != null) {
             FitsImageHDUDecorator fihd = new FitsImageHDUDecorator(selectedFitsImageHDU);
             jComboBoxImage.getModel().setSelectedItem(fihd);
-            // TODO choose fits image
-            if (jListImageHDUs.getSelectedIndex() == -1) {
-                jListImageHDUs.setSelectedIndex(jComboBoxImage.getSelectedIndex());
-            }
         } else {
             failures.add(irModel.getelectedInputFitsImageError());
         }
