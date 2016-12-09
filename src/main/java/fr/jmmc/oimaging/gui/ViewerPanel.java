@@ -71,12 +71,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     private void displayImage(FitsImageHDU imageHDU) {
-
-        FitsImage image = imageHDU.getFitsImages().get(0);
-
         fitsImageHDU = imageHDU;
 
-        if (image != null) {
+        if (imageHDU != null && !imageHDU.getFitsImages().isEmpty()) {
+            FitsImage image = imageHDU.getFitsImages().get(0);
             FitsImageUtils.updateDataRangeExcludingZero(image);
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
@@ -110,12 +108,12 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         enableActions();
     }
 
-    public void displayModel(IRModel currentModel) {
-        if (currentModel == null) {
+    public void displayModel(IRModel irModel) {
+        if (irModel != null) {
+            displayOiFits(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
+            displayImage(irModel.getSelectedInputImageHDU());
         }
 
-        //viewerPanel.displayOiFits(irModel.getOifitsFile(), (String) jComboBoxTarget.getSelectedItem());
-        //viewerPanel.displayImage(selectedFitsImageHDU.getFitsImages().get(0), currentModel.getOifitsFile());
         setTabMode(true);
     }
 
