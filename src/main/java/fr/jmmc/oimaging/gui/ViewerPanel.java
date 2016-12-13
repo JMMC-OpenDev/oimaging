@@ -286,7 +286,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         jPanelOutputParamViewer.add(jLabel2, gridBagConstraints);
 
-        jTableOutpuParametersKeywords.setAutoCreateColumnsFromModel(false);
         jTableOutpuParametersKeywords.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -312,7 +311,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         jPanelOutputParamViewer.add(jLabel1, gridBagConstraints);
 
-        jTableInpuParametersKeywords.setAutoCreateColumnsFromModel(false);
         jTableInpuParametersKeywords.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
