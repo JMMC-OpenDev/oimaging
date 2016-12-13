@@ -709,7 +709,18 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelFluxErr, gridBagConstraints);
 
+        jFormattedTextFieldFluxErr.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         jFormattedTextFieldFluxErr.setToolTipText("Error on zero-baseline squared visibility point (used to enforce flux   normalisation)");
+        jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFormattedTextFieldActionPerformed(evt);
+            }
+        });
+        jFormattedTextFieldFluxErr.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextFieldPropertyChange(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
@@ -763,7 +774,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonExportOIFits.setText("Save Oifits");
         jButtonExportOIFits.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
@@ -771,7 +782,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonExportImage.setText("Save image");
         jButtonExportImage.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanelExecutionLog.add(jButtonExportImage, gridBagConstraints);
@@ -934,13 +945,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         switch (event.getType()) {
             case IRMODEL_CHANGED:
-                IRModel irModel = event.getIrModel();
-                syncUI(irModel);
+                syncUI(event.getIrModel());
                 viewerPanel.displayModel(currentModel);
                 break;
             case IRMODEL_UPDATED:
                 syncUI(event.getIrModel());
-                jListResultSet.setSelectedIndex(jListResultSet.getModel().getSize() - 1);
+                jListResultSet.setSelectedIndex(0);
                 break;
             default:
                 logger.info("event not handled : {}", event);

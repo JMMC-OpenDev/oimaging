@@ -253,9 +253,7 @@ public final class IRModelManager implements IRModelEventListener {
         if (oiFitsFile != null) {
 
             irModel.setOifitsFile(oiFitsFile);
-
-            fireIRModelChanged();
-
+            fireIRModelUpdated(this, null);
             return true;
 
         }

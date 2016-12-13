@@ -85,19 +85,6 @@ public class IRModel {
         this.fitsImageHdu2Filename.clear();
         imageOiData = new ImageOiData();
 
-        // Set default values
-        // TODO make it dynamic and software dependant
-        ImageOiInputParam params = imageOiData.getInputParam();
-        params.setWaveMin(-1);
-        params.setWaveMax(-1);
-        params.setMaxiter(200);
-        params.setRglWgt(0);
-        params.setRglAlph(0);
-        params.setRglBeta(0);
-        params.setRglName("mem_prior");
-        params.useAutoRgl(true);
-        params.setFluxErr(0.1);
-
     }
 
     public boolean isRunning() {
@@ -127,6 +114,15 @@ public class IRModel {
             }
         }
 
+        ImageOiData iod = oifitsFile.getImageOiData();
+        // use imageOi data of given oifits if any present
+        if (iod != null && !iod.getFitsImageHDUs().isEmpty()) {
+            imageOiData = iod;
+            addFitsImageHDUs(iod.getFitsImageHDUs(), oifitsFile.getName());
+        }
+        if (oifitsFile.getPrimaryImageHDU() != null) {
+            setSelectedInputImageHDU(oifitsFile.getPrimaryImageHDU());
+        }
         // Fix input param according content:
         ImageOiInputParam inputParam = imageOiData.getInputParam();
         // Select first target by default
@@ -153,14 +149,8 @@ public class IRModel {
         inputParam.setWaveMin(minWavelentghBound);
         inputParam.setWaveMax(maxWavelentghBound);
 
-        ImageOiData iod = oifitsFile.getImageOiData();
-
-        // use imageOi data of given oifits if any present
-        if (iod != null) {
-            imageOiData = iod;
-            addFitsImageHDUs(iod.getFitsImageHDUs(), oifitsFile.getName());
-        }
-
+        // TODO check every other consistency links (images ....)
+        oifitsFile.setImageOiData(imageOiData);
     }
 
     /**
@@ -190,6 +180,10 @@ public class IRModel {
                 hdu.setHduName(filename);
             } else {
                 for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
+                    if (currentHDU.getHduName() == null) {
+                        currentHDU.setHduName("undefined" + currentHDU.getChecksum());
+                        logger.warn("present hdu had no hduName {}", currentHDU);
+                    }
                     if (currentHDU.getHduName().equals(hdu.getHduName())) {
 
                         final String defaultHduName = hdu.getHduName() + "-" + exportCount;
@@ -210,10 +204,9 @@ public class IRModel {
                             }
                         }
                     }
-
                 }
-            }
 
+            }
         }
 
         this.fitsImageHDUs.addAll(hdusToAdd);
@@ -262,8 +255,12 @@ public class IRModel {
     }
 
     public void setSelectedInputImageHDU(FitsImageHDU fitsImageHDU) {
-        this.selectedInputImageHDU = fitsImageHDU;
+        selectedInputImageHDU = fitsImageHDU;
         imageOiData.getInputParam().setInitImg(selectedInputImageHDU.getHduName());
+        // ?? oifitsFile.setPrimaryImageHdu(fitsImageHDU);
+        if (!getFitsImageHDUs().contains(selectedInputImageHDU)) {
+            getFitsImageHDUs().add(selectedInputImageHDU);
+        }
     }
 
     public List<FitsImageHDU> getFitsImageHDUs() {
@@ -289,6 +286,7 @@ public class IRModel {
             if (selectedInputImageHDU == null) {
                 setSelectedInputImageHDU(hdus.get(0));
             }
+
         } else {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("Image loading", "no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
@@ -314,7 +312,11 @@ public class IRModel {
     public void exportOIFits() {
 
         File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
-        String name = FileUtils.getFileNameWithoutExtension(oifitsFile.getName()) + ".image-oi." + FileUtils.getExtension(oifitsFile.getName());
+        String name = oifitsFile.getName();
+        if (!name.contains(".image-oi")) {
+            name = FileUtils.getFileNameWithoutExtension(name) + ".image-oi." + FileUtils.getExtension(oifitsFile.getName());
+        }
+
         File file = FileChooser.showSaveFileChooser("Choose location of prepared OIFits file", dir, MimeType.OIFITS, name);
 
         // Cancel
@@ -334,13 +336,14 @@ public class IRModel {
     }
 
     private void prepareOIFits(File file) throws FitsException, IOException {
-        // Create a virtual container, associate related material
+        // Create a virtual container, associate related material (only selected Image is left!)
         OIFitsFile virtu = new OIFitsFile();
         virtu.setAbsoluteFilePath(file.getAbsolutePath());
         virtu.setImageOiData(imageOiData);
         imageOiData.getFitsImageHDUs().clear();
-        imageOiData.getFitsImageHDUs().add(selectedInputImageHDU);
-
+        if (selectedInputImageHDU != null) {
+            imageOiData.getFitsImageHDUs().add(selectedInputImageHDU);
+        }
         // Feed every oitables reference (no cloning -> reference to internal oifitsfile will not be consistent)
         for (OITable table : oifitsFile.getOiTables()) {
             virtu.addOiTable(table);
@@ -428,9 +431,9 @@ public class IRModel {
     }
 
     public void addServiceResult(ServiceResult serviceResult) {
-        getResultSets().add(serviceResult);
+        getResultSets().add(0, serviceResult);
 
-        // notify model change
+        // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
     }
 }
