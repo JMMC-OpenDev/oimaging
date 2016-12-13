@@ -13,8 +13,12 @@ import fr.jmmc.jmcs.util.jaxb.JAXBFactory;
 import fr.jmmc.jmcs.util.jaxb.JAXBUtils;
 import fr.jmmc.jmcs.util.jaxb.XmlBindException;
 import fr.jmmc.oiexplorer.core.model.event.EventNotifier;
+import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
+import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
+import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.FitsImageLoader;
+import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
@@ -24,6 +28,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.EnumMap;
+import java.util.List;
 import org.apache.commons.httpclient.auth.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +126,7 @@ public final class IRModelManager implements IRModelEventListener {
      * @throws XmlBindException if a JAXBException was caught while creating an unmarshaller
      */
     public void loadIRModel(final File file, final OIFitsChecker checker,
-            final LoadIRModelListener listener) throws IOException, IllegalStateException, XmlBindException {
+                            final LoadIRModelListener listener) throws IOException, IllegalStateException, XmlBindException {
         loadIRModel(file, checker, listener, false);
     }
 
@@ -136,7 +141,7 @@ public final class IRModelManager implements IRModelEventListener {
      * @throws XmlBindException if a JAXBException was caught while creating an unmarshaller
      */
     public void loadIRModel(final File file, final OIFitsChecker checker,
-            final LoadIRModelListener listener, final boolean appendOIFitsFilesOnly) throws IOException, IllegalStateException, XmlBindException {
+                            final LoadIRModelListener listener, final boolean appendOIFitsFilesOnly) throws IOException, IllegalStateException, XmlBindException {
 
         final IRModel loadedModel = (IRModel) JAXBUtils.loadObject(file.toURI().toURL(), this.jf);
 
@@ -241,6 +246,13 @@ public final class IRModelManager implements IRModelEventListener {
         if (oifitsFile == null) {
             throw new IOException("Could not load the file : " + fileLocation);
         }
+
+        final ImageOiData iod = oifitsFile.getImageOiData();
+        if (iod != null) {
+            // prepare images (negative values, padding, orientation):
+            FitsImageUtils.prepareAllImages(iod.getFitsImageHDUs());
+        }
+
         return oifitsFile;
     }
 
@@ -268,7 +280,6 @@ public final class IRModelManager implements IRModelEventListener {
      * Load the given OI Fits File with the given checker component
      * and add it to the IR Model
      * @param fileLocation absolute File Path or remote URL
-     * @param checker checker component
      * @throws IOException if a fits file can not be loaded
      */
     public void loadFitsImageFile(final String fileLocation) throws IOException {
@@ -278,7 +289,6 @@ public final class IRModelManager implements IRModelEventListener {
     /**
      * (Download) and load the given OI Fits File with the given checker component
      * @param fileLocation absolute File Path or remote URL
-     * @param checker checker component
      * @return loaded FitsImage File
      * @throws IOException if a fits file can not be loaded
      */
@@ -324,6 +334,10 @@ public final class IRModelManager implements IRModelEventListener {
         if (fitsImageFile == null) {
             throw new IOException("Could not load the file : " + fileLocation);
         }
+
+        // prepare images (negative values, padding, orientation):
+        FitsImageUtils.prepareAllImages(fitsImageFile.getFitsImageHDUs());
+
         return fitsImageFile;
     }
 
