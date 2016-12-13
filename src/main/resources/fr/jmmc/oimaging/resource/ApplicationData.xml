@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.2 alpha 7"/>
+    <program name="OImaging" version="0.2 alpha 8"/>
     <compilation date="06/12/2016" compiler="JDK 1.6.0_24"/>
 
     <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -146,7 +146,11 @@
     <releasenotes>
         <release version="0.2">
             <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
-
+            <prerelease version="0.2 alpha 8">
+                <change type="BUGFIX">Avoid blank INIT_IMG at startup</change>
+                <change type="CHANGE">Show execution log panel on faulty runs</change>
+                <change type="BUGFIX">Rename faulty keyword AUTO_RGL to AUTO_WGT</change>
+            </prerelease>
             <prerelease version="0.2 alpha 7">
                 <change type="CHANGE">Add WISARD as new software! Remote execution comming... </change>
                 <change type="CHANGE">'Save file' action export OIFitsFile + specific OI tables back again looking at input data. </change>

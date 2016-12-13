@@ -307,12 +307,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jComboBoxRglPrio = new javax.swing.JComboBox();
         jButtonRemoveFitsImage = new javax.swing.JButton();
         jButtonLoadFitsImage = new javax.swing.JButton();
-        jCheckBoxAutoRgl = new javax.swing.JCheckBox();
+        jCheckBoxAutoWgt = new javax.swing.JCheckBox();
         jLabelFluxErr = new javax.swing.JLabel();
         jFormattedTextFieldFluxErr = new javax.swing.JFormattedTextField();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
-        jButtonStop = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jEditorPane = new javax.swing.JEditorPane();
         jButtonExportOIFits = new javax.swing.JButton();
@@ -686,11 +685,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 1;
         jPanelAlgorithmSettings.add(jButtonLoadFitsImage, gridBagConstraints);
 
-        jCheckBoxAutoRgl.setText("AUTO");
-        jCheckBoxAutoRgl.setToolTipText("Automatic regularization weight");
-        jCheckBoxAutoRgl.addActionListener(new java.awt.event.ActionListener() {
+        jCheckBoxAutoWgt.setText("AUTO");
+        jCheckBoxAutoWgt.setToolTipText("Automatic regularization weight");
+        jCheckBoxAutoWgt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxAutoRglActionPerformed(evt);
+                jCheckBoxAutoWgtActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -698,7 +697,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        jPanelAlgorithmSettings.add(jCheckBoxAutoRgl, gridBagConstraints);
+        jPanelAlgorithmSettings.add(jCheckBoxAutoWgt, gridBagConstraints);
 
         jLabelFluxErr.setText("FLUXERR");
         jLabelFluxErr.setToolTipText("Error on zero-baseline squared visibility point (used to enforce flux   normalisation)");
@@ -742,20 +741,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
-
-        jButtonStop.setText("Stop");
-        jButtonStop.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jButtonStop, gridBagConstraints);
 
         jEditorPane.setContentType("text/html"); // NOI18N
         jScrollPane1.setViewportView(jEditorPane);
@@ -777,6 +767,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
         jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
 
         jButtonExportImage.setText("Save image");
@@ -785,6 +776,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
         jPanelExecutionLog.add(jButtonExportImage, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -857,9 +849,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         updateModel();
     }//GEN-LAST:event_jSpinnerMaxIterStateChanged
 
-    private void jCheckBoxAutoRglActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxAutoRglActionPerformed
+    private void jCheckBoxAutoWgtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxAutoWgtActionPerformed
         updateModel();
-    }//GEN-LAST:event_jCheckBoxAutoRglActionPerformed
+    }//GEN-LAST:event_jCheckBoxAutoWgtActionPerformed
 
     /**
      * Listen for list selection changes
@@ -878,6 +870,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             ServiceResultDecorator serviceResultDecorator = (ServiceResultDecorator) jListResultSet.getSelectedValue();
             if (serviceResultDecorator != null) {
                 viewerPanel.displayResult(serviceResultDecorator.getServiceResult());
+            } else {
+                viewerPanel.displayModel(null);
             }
         }
 
@@ -890,8 +884,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JButton jButtonLoadFitsImage;
     private javax.swing.JButton jButtonRemoveFitsImage;
     private javax.swing.JButton jButtonRun;
-    private javax.swing.JButton jButtonStop;
-    private javax.swing.JCheckBox jCheckBoxAutoRgl;
+    private javax.swing.JCheckBox jCheckBoxAutoWgt;
     private javax.swing.JCheckBox jCheckBoxUseT3;
     private javax.swing.JCheckBox jCheckBoxUseVis;
     private javax.swing.JCheckBox jCheckBoxUseVis2;
@@ -1079,10 +1072,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 changed = true;
             }
         }
-        mFlag = params.useAutoRgl();
-        wFlag = jCheckBoxAutoRgl.isSelected();
+        mFlag = params.useAutoWgt();
+        wFlag = jCheckBoxAutoWgt.isSelected();
         if (mFlag != wFlag) {
-            params.useAutoRgl(wFlag);
+            params.useAutoWgt(wFlag);
             changed = true;
         }
         jFormattedTextFieldRglWgt.setEnabled(!wFlag);
@@ -1207,8 +1200,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jComboBoxRglPrio.setSelectedItem(rglPrio);
         }
 
-        boolean wFlag = inputParam.useAutoRgl();
-        jCheckBoxAutoRgl.setSelected(wFlag);
+        boolean wFlag = inputParam.useAutoWgt();
+        jCheckBoxAutoWgt.setSelected(wFlag);
         jFormattedTextFieldRglWgt.setEnabled(!wFlag);
         jLabelRglWgt.setEnabled(!wFlag);
 
@@ -1305,7 +1298,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         public ServiceResultDecorator(ServiceResult serviceResult) {
             this.serviceResult = serviceResult;
-            this.label = "Run @ " + serviceResult.getStartTime();
+
+            this.label = "Run " + (serviceResult.isValid() ? "ok" : "ko") + " @ " + serviceResult.getStartTime();
         }
 
         public ServiceResult getServiceResult() {
