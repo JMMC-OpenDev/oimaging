@@ -20,6 +20,7 @@ import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.ResourceUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
+import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oimaging.gui.MainPanel;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
@@ -110,6 +111,9 @@ public final class OImaging extends App {
 
         // Enable OI columns for OIFits datamodel
         DataModel.setOiModelColumnsSupport(true);
+
+        // Early initialisation of the default Plot preset:
+        PlotDefinitionFactory.getInstance().setPlotDefault("OIMG_DATA_MODEL/SPATIAL_FREQ");
     }
 
     /**
