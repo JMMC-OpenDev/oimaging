@@ -120,31 +120,33 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void displayResult(ServiceResult result) {
-        // execution log
-        jEditorPaneExecutionLog.setText(result.getExecutionLog());
-
         FitsImageHDU imageHdu = null;
         OIFitsFile oifitsFile = null;
         String target = null;
-        try {
-            oifitsFile = result.getOifitsFile();
 
-            // TODO have a look in the ouput param to look at right image ?
-            // show first one :
-            List<FitsImageHDU> imageHdus = oifitsFile.getImageOiData().getFitsImageHDUs();
-            imageHdu = imageHdus.isEmpty() ? null : imageHdus.get(0);
-            target = oifitsFile.getImageOiData().getInputParam().getTarget();
+        if (result != null) {
+            // execution log
+            jEditorPaneExecutionLog.setText(result.getExecutionLog());
 
-            // get Output Param Table
-            jTableOutpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
-            jTableInpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
+            try {
+                oifitsFile = result.getOifitsFile();
 
-        } catch (IOException ex) {
-            Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FitsException ex) {
-            Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                // TODO have a look in the ouput param to look at right image ?
+                // show first one :
+                List<FitsImageHDU> imageHdus = oifitsFile.getImageOiData().getFitsImageHDUs();
+                imageHdu = imageHdus.isEmpty() ? null : imageHdus.get(0);
+                target = oifitsFile.getImageOiData().getInputParam().getTarget();
+
+                // get Output Param Table
+                jTableOutpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
+                jTableInpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
+
+            } catch (IOException ex) {
+                Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FitsException ex) {
+                Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-
         displayImage(imageHdu);
         displayOiFits(oifitsFile, target);
 
