@@ -11,10 +11,8 @@ import fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor;
 import fr.jmmc.oiexplorer.core.gui.PlotView;
 import fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
-import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.BorderLayout;
 import org.jfree.chart.ChartColor;
@@ -36,11 +34,6 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     static {
         // Disable the expression editor until it is ready for production:
         PlotDefinitionEditor.setEnableExpressionEditor(false);
-
-        // Hack to always show flagged data (error undefined):
-        for (PlotDefinition plotDef : PlotDefinitionFactory.getInstance().getDefaults()) {
-            plotDef.setSkipFlaggedData(false);
-        }
     }
     /* members */
     /** OIFitsCollectionManager singleton */
