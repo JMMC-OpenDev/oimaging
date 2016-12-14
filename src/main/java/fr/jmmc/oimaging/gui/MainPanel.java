@@ -29,6 +29,8 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,6 +42,8 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -153,6 +157,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         registerActions();
 
         IRModelManager.getInstance().bindIRModelChangedEvent(this);
+
+        jListResultSet.setCellRenderer(new ServiceResultCellRenderer());
 
         jLabelWaveMin.setText("WAVE_MIN [" + SpecialChars.UNIT_MICRO_METER + "]");
         jLabelWaveMax.setText("WAVE_MAX [" + SpecialChars.UNIT_MICRO_METER + "]");
@@ -600,7 +606,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxRglName, gridBagConstraints);
 
-        jFormattedTextFieldRglWgt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        jFormattedTextFieldRglWgt.setFormatterFactory(getFormatterFactory());
         jFormattedTextFieldRglWgt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldActionPerformed(evt);
@@ -620,7 +626,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglWgt, gridBagConstraints);
 
-        jFormattedTextFieldRglAlph.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        jFormattedTextFieldRglAlph.setFormatterFactory(getFormatterFactory());
         jFormattedTextFieldRglAlph.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldActionPerformed(evt);
@@ -639,6 +645,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglAlph, gridBagConstraints);
 
+        jFormattedTextFieldRglBeta.setFormatterFactory(getFormatterFactory());
         jFormattedTextFieldRglBeta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldActionPerformed(evt);
@@ -708,7 +715,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelFluxErr, gridBagConstraints);
 
-        jFormattedTextFieldFluxErr.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        jFormattedTextFieldFluxErr.setFormatterFactory(getFormatterFactory());
         jFormattedTextFieldFluxErr.setToolTipText("Error on zero-baseline squared visibility point (used to enforce flux   normalisation)");
         jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -867,12 +874,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // This action only update GUI but not the model.
         if (e.getSource() == jListResultSet) {
-            ServiceResultDecorator serviceResultDecorator = (ServiceResultDecorator) jListResultSet.getSelectedValue();
-            if (serviceResultDecorator != null) {
-                viewerPanel.displayResult(serviceResultDecorator.getServiceResult());
-            } else {
-                viewerPanel.displayModel(null);
-            }
+            viewerPanel.displayResult((ServiceResult) jListResultSet.getSelectedValue());
         }
 
     }
@@ -1177,10 +1179,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // resultSet List
         resultSetListModel.clear();
-        for (ServiceResult result : irModel.getResultSets()) {
-            ServiceResultDecorator d = new ServiceResultDecorator(result);
-            resultSetListModel.addElement(d);
-        }
+        resultSetListModel.add(irModel.getResultSets());
         jListResultSet.setModel(resultSetListModel);
 
         // max iter
@@ -1269,6 +1268,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         return viewerPanel;
     }
 
+    private JFormattedTextField.AbstractFormatterFactory getFormatterFactory() {
+        return new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.#####")));
+    }
+
     // Make it generic
     private class FitsImageHDUDecorator {
 
@@ -1290,26 +1293,21 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
     };
 
-    // Make it generic
-    private class ServiceResultDecorator {
+    public class ServiceResultCellRenderer extends DefaultListCellRenderer {
 
-        private final ServiceResult serviceResult;
-        private final String label;
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(
+                    list, value, index,
+                    isSelected, cellHasFocus);
+            ServiceResult serviceResult = (ServiceResult) value;
 
-        public ServiceResultDecorator(ServiceResult serviceResult) {
-            this.serviceResult = serviceResult;
+            setText("Run " + (serviceResult.isValid() ? "ok" : "ko") + " @ " + serviceResult.getStartTime());
 
-            this.label = "Run " + (serviceResult.isValid() ? "ok" : "ko") + " @ " + serviceResult.getStartTime();
+            if (!serviceResult.isValid()) {
+                setForeground(Color.RED);
+            }
+            return this;
         }
-
-        public ServiceResult getServiceResult() {
-            return serviceResult;
-        }
-
-        @Override
-        public String toString() {
-            return label;
-        }
-    };
+    }
 
 }
