@@ -188,7 +188,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void exportFitsImage() {
-
+        // export whole HDU (even if first image is shown) : image has been modified ( and is not the verbatim one).
         FitsImageFile fits = new FitsImageFile();
         fits.getFitsImageHDUs().add(fitsImagePanel.getFitsImage().getFitsImageHDU());
 
