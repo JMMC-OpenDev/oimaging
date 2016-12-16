@@ -188,17 +188,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void exportFitsImage() {
-        // export whole HDU (even if first image is shown) : image has been modified ( and is not the verbatim one).
-        FitsImageFile fits = new FitsImageFile();
-        fits.getFitsImageHDUs().add(fitsImagePanel.getFitsImage().getFitsImageHDU());
-
         File file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", null, MimeType.FITS_IMAGE, null);
 
         // Cancel
         if (file == null) {
             return;
         }
+
         try {
+            // export whole HDU (even if first image is shown) : image has been modified ( and is not the verbatim one).
+            FitsImageFile fits = new FitsImageFile();
+            fits.getFitsImageHDUs().add(fitsImagePanel.getFitsImage().getFitsImageHDU());
+
             FitsImageWriter.write(file.getAbsolutePath(), fits);
         } catch (IOException ex) {
             // Show the feedback report (modal) :
