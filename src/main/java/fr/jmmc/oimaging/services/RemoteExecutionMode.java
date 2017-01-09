@@ -34,6 +34,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     public static final String SERVICE_PATH = "oimaging/oimaging";
 
+    // TODO add a preference to switch or revert order between dev/prod
     public static final String[] SERVER_URLS = new String[]{
         "http://jmmc-fe-1.jmmc.fr/OImaging-uws/",
         "http://127.0.0.1:8080/OImaging-uws/",
@@ -129,8 +130,12 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         FileRepresentation entity = new FileRepresentation(f, MediaType.IMAGE_PNG); // TODO: FIX MediaType
         //entity.setDisposition(disposition);
 
-        FormData fdFile = new FormData("inputfile", entity);
-        fds.getEntries().add(fdFile);
+        // TODO declare field name as constant ( and share them with server side )
+        FormData fdInputFile = new FormData("inputfile", entity);
+        fds.getEntries().add(fdInputFile);
+
+        FormData fdSoftware = new FormData("software", software);
+        fds.getEntries().add(fdSoftware);
 
         // start task in autostart mode
         fds.add("PHASE", "RUN");
