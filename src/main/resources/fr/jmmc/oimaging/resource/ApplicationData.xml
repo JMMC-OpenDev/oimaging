@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.3 alpha 1"/>
+    <program name="OImaging" version="0.3 alpha 2"/>
     <compilation date="06/12/2016" compiler="JDK 1.6.0_24"/>
 
     <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -145,6 +145,9 @@
 
     <releasenotes>
         <release version="0.3">
+            <prerelease version="0.3 alpha 2">
+                <change type="CHANGE">Add wisard in the list of supported IR program for testing.</change>
+            </prerelease>
             <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
             <prerelease version="0.3 alpha 1">
                 <change type="CHANGE">provide a default preset with every observables present in the result oifits.</change>
