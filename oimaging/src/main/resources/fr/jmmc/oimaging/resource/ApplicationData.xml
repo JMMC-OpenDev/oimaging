@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+
+<ApplicationData link="http://www.jmmc.fr/oimaging">
+
+    <company>
+        <short_name>JMMC</short_name>
+        <legal_name>Jean-Marie Mariotti Center</legal_name>
+        <logo_resource>fr/jmmc/jmcs/resource/image/jmmc_logo.png</logo_resource>
+        <homepage_url>http://www.jmmc.fr/</homepage_url>
+        <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
+    </company>
+
+    <program name="OImaging" version="0.3 alpha 2"/>
+    <compilation date="06/12/2016" compiler="JDK 1.6.0_24"/>
+
+    <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
+
+    <authors>the JMMC Technical Group</authors>
+    <!--<jnlp>http://apps.jmmc.fr/~swmgr/OImaging/OImaging.jnlp</jnlp>-->
+    <sampdescription>Perform image reconstruction from your interferometric observation data file (OIFits)</sampdescription>
+
+    <distribution>
+        <application_data_file>ApplicationRelease.xml</application_data_file>
+        <public_url>http://apps.jmmc.fr/~swmgr/OImaging/</public_url>
+        <beta_url>http://apps.jmmc.fr/~betaswmgr/OImaging/</beta_url>
+        <alpha_url>http://apps.jmmc.fr/~mellag/OImaging/</alpha_url>
+    </distribution>
+
+    <dependences>
+
+        <!-- JMMC -->
+
+        <!-- Java Mariotti OIfitsExplorer-core -->
+        <package name="OIFits Explorer core"
+                 description="OIFits Explorer core is the JMMC library dedicated to share OIFits GUI components (plots)"
+                 link="http://www.jmmc.fr/dev/oiexplorer-core/"
+                 jars="oiexplorer-core.jar"
+                 license="CECILL-B ???"/>
+
+        <!-- Java Mariotti Astronomical library -->
+        <package name="jMAL"
+                 description="JMMC library to provide common astronomical computations (coordinate conversion, SIMBAD star resolver and analytical object models in interferometry)"
+                 link="http://www.jmmc.fr/dev/jmal/"
+                 jars="jmal.jar"
+                 license="CECILL-B ???"/>
+
+        <!-- Java Mariotti OITools -->
+        <package name="OITools"
+                 description="OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)"
+                 link="http://www.jmmc.fr/dev/oitools/"
+                 jars="oitools.jar"
+                 license="CECILL-B ???"/>
+
+
+        <!-- 1. Science / VO libraries (always on top for better visibility) -->
+
+        <!-- OifitsExplorer dependencies -->
+
+        <!-- OITools dependencies -->
+
+        <package name="nom.tam.fits"
+                 description="The Java FITS library (nom.tam.fits) has been developed which provides efficient I/O for FITS images and binary tables. Made by Dr Thomas A. McGlynn, HEASARC"
+                 link="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/"
+                 license="Copyright: Thomas McGlynn 1997-1999." />
+        <!--
+          Copyright: Thomas McGlynn 1997-1999.
+          This code may be used for any purpose, non-commercial
+          or commercial so long as this copyright notice is retained
+          in the source code or included in or referred to in any
+          derived software.
+        -->
+
+        <!-- jMCS dependencies -->
+
+        <!-- VO interoperability -->
+        <package name="JSAMP"
+                 description="JSAMP is a Java toolkit for use with the Simple Applications Messaging Protocol. Made by Mark Taylor, working in the Astrophysics Group at Bristol University."
+                 link="http://software.astrogrid.org/doc/jsamp/"
+                 jars="jsamp-1.3.jar"
+                 license="(at least) the Academic Free Licence and the BSD License."/>
+
+        <!-- jMAL dependencies -->
+
+        <!-- Model computations (bessel functions) -->
+        <package name="CERN colt"
+                 description="provides a set of Open Source Libraries for High Performance Scientific and Technical Computing in Java"
+                 link="http://acs.lbl.gov/software/colt/"
+                 jars="colt.jar"
+                 license="Copyright (c) 1999 CERN - European Organization for Nuclear Research"/>
+        <!--
+          Copyright (c) 1999 CERN - European Organization for Nuclear Research.
+          Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose is
+          hereby granted without fee, provided that the above copyright notice appear in all copies and that both that
+          copyright notice and this permission notice appear in supporting documentation. CERN makes no representations
+          about the suitability of this software for any purpose. It is provided "as is" without expressed or implied warranty.
+        -->
+
+
+        <!-- 2. Swing -->
+
+        <!-- OifitsExplorer dependencies -->
+
+        <package name="JFreeChart"
+                 description="JFreeChart is a free 100% Java chart library that makes it easy for developers to display professional quality charts in their applications"
+                 link="http://www.jfree.org/jfreechart/"
+                 jars="jfreechart-1.0.13.jar jcommon-1.0.16.jar"
+                 license="LGPL" />
+
+        <package name="iText"
+                 description="iText is a library that allows you to generate PDF files on the fly"
+                 link="http://itextpdf.com/"
+                 jars="iText-2.1.5.jar"
+                 license="AGPL (http://itextpdf.com/terms-of-use/agpl.php)" />
+
+    </dependences>
+
+    <menubar>
+        <menu label="File">
+            <menu label="Load OIFits file" classpath="fr.jmmc.oimaging.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="L"
+                  icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load an OIFits file"/>
+            <menu label="Load Fits Image file" classpath="fr.jmmc.oimaging.gui.action.LoadFitsImageAction" action="loadFitsImage"
+                  icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load a Fits Image file"/>
+            <!--<separator/>
+            <menu label="Save oifits" classpath="fr.jmmc.oimaging.gui.action.ExportOIfitsAction" action="exportOIFits" description="Export selected OIFits to a local file"/>
+            <menu label="Save image" classpath="fr.jmmc.oimaging.gui.action.ExportFitsImageAction" action="exportFitsImage" description="Export selected Fits image to a local file"/>
+            -->
+        </menu>
+
+        <menu label="Edit">
+            <menu label="Run" classpath="fr.jmmc.oimaging.gui.action.RunAction" action="run" description="Run"/>
+        </menu>
+
+        <menu label="Interop">
+            <!--
+              <menu label="Send OIFits" classpath="fr.jmmc." action=""
+                    description=""/>
+            -->
+        </menu>
+    </menubar>
+
+    <releasenotes>
+        <release version="0.3">
+            <prerelease version="0.3 alpha 2">
+                <change type="CHANGE">Add wisard in the list of supported IR program for testing.</change>
+            </prerelease>
+            <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
+            <prerelease version="0.3 alpha 1">
+                <change type="CHANGE">provide a default preset with every observables present in the result oifits.</change>
+            </prerelease>
+        </release>
+        <release version="0.2">
+            <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
+            <prerelease version="0.2 alpha 9">
+                <change type="BUGFIX">enhance format of parameter textfields.</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 8">
+                <change type="BUGFIX">Avoid blank INIT_IMG at startup.</change>
+                <change type="CHANGE">Show execution log panel on faulty runs.</change>
+                <change type="BUGFIX">Rename faulty keyword AUTO_RGL to AUTO_WGT.</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 7">
+                <change type="CHANGE">Add WISARD as new software! Remote execution comming... </change>
+                <change type="CHANGE">'Save file' action export OIFitsFile + specific OI tables back again looking at input data. </change>
+                <change type="CHANGE">Display output and input parameters informations. </change>
+            </prerelease>
+            <prerelease version="0.2 alpha 6">
+                <change type="CHANGE">Add AUTO_RGL and FLUXERR keyword</change>
+                <change type="CHANGE">Remove "Image Panel"</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 5">
+                <change type="CHANGE">Optimize layout.</change>
+                <change type="CHANGE">Don't add results in input image combobox.</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 4">
+                <change type="CHANGE">New layout that offers to look on result items.</change>
+                <change type="CHANGE">Fix bug running local version of software.</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 3">
+                <change type="CHANGE">Remove bsmem-remote mode. Waiting the licence agreement for webservice mode.</change>
+                <change type="BUGFIX">Use degree as default axis unit for images following the FITS standard.</change>
+                <change type="CHANGE">Propagate rgl_name param in image-oi input param table.</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 2">
+                <change type="CHANGE">Renamed as OImaging courtesy of Laurent Bourges</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 1">
+                <change type="CHANGE">Show units for Wavelengths</change>
+                <change type="CHANGE">Fix XTENSION type of 'IMAGE-OI INPUT PARAM' table</change>
+            </prerelease>
+        </release>
+        <release version="0.1">
+            <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
+            <prerelease version="0.1 beta 1">
+                <change type="FEATURE">First release with minimal (working) features : take one oifits + fits images and export an input file (behind "Run" Button)</change>
+            </prerelease>
+        </release>
+    </releasenotes>
+
+    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center \texttt{OImaging}
+service \footnote{Available at http://www.jmmc.fr/oimaging} part of the European Commission's FP7 Capacities programme ( Grant Agreement Number 312430 )]]>
+    </acknowledgment>
+
+</ApplicationData>
