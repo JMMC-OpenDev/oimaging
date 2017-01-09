@@ -29,12 +29,13 @@ public class ServiceList {
 
         availableServices = new GenericListModel<Service>(new ArrayList<Service>(25), true);
 
+        availableServices.add(new Service("BSMEM", "bsmem-ci", localExecutionMode, "", ""));
         availableServices.add(new Service("WISARD", "wisard-ci", localExecutionMode, "", ""));
 
         //availableServices.add(new Service("DummyOI", "dummy", dummyExecutionMode, "This is a dummy service", "by G.MELLA"));
         //availableServices.add( new Service("BSMEM (remote)", "bsmem-ci", remoteExecutionMode, "", ""));
         // TODO remove code configuration and link this it to a preference
-        preferedService = new Service("BSMEM", "bsmem-ci", localExecutionMode, "", "");
+        preferedService = new Service("WISARD (remote)", "wisard-ci", remoteExecutionMode, "", "");
         availableServices.add(preferedService);
 
     }
