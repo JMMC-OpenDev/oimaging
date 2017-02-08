@@ -23,7 +23,7 @@ public class ServiceList {
     GenericListModel<Service> availableServices = null;
 
     private ServiceList() {
-        OImagingExecutionMode dummyExecutionMode = new DummyExecutionMode();
+        //OImagingExecutionMode dummyExecutionMode = new DummyExecutionMode();
         OImagingExecutionMode remoteExecutionMode = new RemoteExecutionMode();
         OImagingExecutionMode localExecutionMode = new LocalExecutionMode();
 
@@ -33,7 +33,7 @@ public class ServiceList {
         availableServices.add(new Service("WISARD", "wisard-ci", localExecutionMode, "", ""));
 
         //availableServices.add(new Service("DummyOI", "dummy", dummyExecutionMode, "This is a dummy service", "by G.MELLA"));
-        //availableServices.add( new Service("BSMEM (remote)", "bsmem-ci", remoteExecutionMode, "", ""));
+        availableServices.add(new Service("BSMEM (remote)", "bsmem-ci", remoteExecutionMode, "", ""));
         // TODO remove code configuration and link this it to a preference
         preferedService = new Service("WISARD (remote)", "wisard-ci", remoteExecutionMode, "", "");
         availableServices.add(preferedService);
