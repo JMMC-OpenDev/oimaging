@@ -747,8 +747,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonRun.setText("Run");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -759,8 +759,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.2;
@@ -772,7 +772,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonExportOIFits.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
@@ -781,7 +781,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonExportImage.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         jPanelExecutionLog.add(jButtonExportImage, gridBagConstraints);
@@ -826,10 +826,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void jComboBoxImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxImageActionPerformed
         updateModel();
 
+        // avoid selection in the result list
+        jListResultSet.clearSelection();
+
+        // and display input data in the viewer part
         viewerPanel.displayModel(currentModel);
         viewerPanel.selectImageViewer();
-
-        jListResultSet.clearSelection();
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
     private void jCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxActionPerformed
