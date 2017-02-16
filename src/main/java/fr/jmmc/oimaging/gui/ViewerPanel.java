@@ -23,20 +23,24 @@ import fr.jmmc.oitools.image.FitsImageWriter;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author mellag
  */
 public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
+
+    /** Logger */
+    private static final Logger logger = LoggerFactory.getLogger(ViewerPanel.class);
 
     /** Fits image panel */
     private FitsImagePanel fitsImagePanel;
@@ -46,6 +50,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private Action exportOiFitsAction;
     private Action exportFitsImageAction;
+    private Component lastModelPanel;
+    private Component lastResultPanel;
+
+    /** Flag set to true while the GUI is being updated by model else false. */
+    private boolean syncingUI = false;
+
+    private enum SHOW_MODE {
+        MODEL,
+        RESULT;
+    }
+    private SHOW_MODE showMode;
 
     /** Creates new form ViewerPanel */
     public ViewerPanel() {
@@ -81,45 +96,51 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
-    private void displayOiFits(OIFitsFile oifitsFile, String targetName) {
+    // Display Oifits and Params
+    private void displayOiFitsAndParams(OIFitsFile oifitsFile, String targetName) {
         if (oifitsFile != null) {
             fitsViewPanel.plot(oifitsFile, targetName);
-            if (jPanelImage.getComponentCount() == 0) {
-                jTabbedPaneVizualizations.setSelectedComponent(jPanelOIFitsViewer);
-            }
             jPanelOIFits.add(fitsViewPanel);
+
+            // init Param Tables
+            jTableOutpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
+            jTableInpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
+
         } else {
             jPanelOIFits.remove(fitsViewPanel);
         }
     }
 
-    private void setTabMode(boolean modelMode) {
-        if ((modelMode && (jTabbedPaneVizualizations.getComponentCount() > 2))
-                || (!modelMode && (jTabbedPaneVizualizations.getComponentCount() == 2))) {
+    private void setTabMode(SHOW_MODE mode) {
+        syncingUI = true;
+        // switch tab arrangement only if we switch between model display or result display
+        if ((mode.equals(SHOW_MODE.MODEL) && (jTabbedPaneVizualizations.getComponentCount() > 3))
+                || (mode.equals(SHOW_MODE.RESULT) && (jTabbedPaneVizualizations.getComponentCount() == 3))) {
             jTabbedPaneVizualizations.removeAll();
             jTabbedPaneVizualizations.add("Image", jPanelImageViewer);
-            jTabbedPaneVizualizations.add("OIFits data", jPanelOIFitsViewer);
-            if (!modelMode) {
-                jTabbedPaneVizualizations.add("Output parameters", jPanelOutputParamViewer);
+            jTabbedPaneVizualizations.add("OIFits", jPanelOIFitsViewer);
+            jTabbedPaneVizualizations.add("Parameters", jPanelOutputParamViewer);
+            if (mode.equals(SHOW_MODE.MODEL)) {
                 jTabbedPaneVizualizations.add("Execution log", jPanelLogViewer);
             }
         }
+        syncingUI = false;
+
         enableActions();
+        restoreLastShownPanel();
     }
 
     public void displayModel(IRModel irModel) {
+        showMode = SHOW_MODE.MODEL;
         if (irModel != null && irModel.getOifitsFile() != null) {
-            displayOiFits(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
+            displayOiFitsAndParams(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
             displayImage(irModel.getSelectedInputImageHDU());
-            if (irModel.getSelectedInputImageHDU() == null) {
-                jTabbedPaneVizualizations.setSelectedComponent(jPanelOIFitsViewer);
-            }
         }
-
-        setTabMode(true);
+        setTabMode(SHOW_MODE.MODEL);
     }
 
     public void displayResult(ServiceResult result) {
+        showMode = SHOW_MODE.RESULT;
         FitsImageHDU imageHdu = null;
         OIFitsFile oifitsFile = null;
         String target = null;
@@ -137,29 +158,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 imageHdu = imageHdus.isEmpty() ? null : imageHdus.get(0);
                 target = oifitsFile.getImageOiData().getInputParam().getTarget();
 
-                // get Output Param Table
-                jTableOutpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
-                jTableInpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
-
             } catch (IOException ex) {
-                Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("Can't retrieve result oifile", ex);
             } catch (FitsException ex) {
-                Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("Can't retrieve result oifile", ex);
             }
-        }
-        displayImage(imageHdu);
-        displayOiFits(oifitsFile, target);
+            displayImage(imageHdu);
+            displayOiFitsAndParams(oifitsFile, target);
 
-        setTabMode(false);
-        if (imageHdu == null && oifitsFile == null) {
-            jTabbedPaneVizualizations.setSelectedComponent(jPanelLogViewer);
+            setTabMode(SHOW_MODE.RESULT);
         }
     }
 
-    void selectImageViewer() {
-        jTabbedPaneVizualizations.setSelectedComponent(jPanelImageViewer);
-    }
-
+    // TODO move out of this class
     public void exportOIFits() {
         OIFitsFile oifitsFile = fitsViewPanel.getOIFitsData();
         File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
@@ -187,6 +198,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
+    // TODO move out of this class
     public void exportFitsImage() {
         File file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", null, MimeType.FITS_IMAGE, null);
 
@@ -211,11 +223,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     }
 
-    private void enableActions() {
-        exportOiFitsAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelOIFitsViewer && fitsViewPanel.getOIFitsData() != null);
-        exportFitsImageAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelImageViewer && fitsImagePanel.getFitsImage() != null);
-    }
-
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -235,11 +242,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jScrollPane1 = new javax.swing.JScrollPane();
         jEditorPaneExecutionLog = new javax.swing.JEditorPane();
         jPanelOutputParamViewer = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
         jTableOutpuParametersKeywords = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
         jTableInpuParametersKeywords = new javax.swing.JTable();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
@@ -280,14 +287,16 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jTabbedPaneVizualizations.addTab("Execution log", jPanelLogViewer);
 
-        jPanelOutputParamViewer.setLayout(new java.awt.GridBagLayout());
+        jPanelOutputParamViewer.setLayout(new javax.swing.BoxLayout(jPanelOutputParamViewer, javax.swing.BoxLayout.LINE_AXIS));
+
+        jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jLabel2.setText("Output");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanelOutputParamViewer.add(jLabel2, gridBagConstraints);
+        jPanel1.add(jLabel2, gridBagConstraints);
 
         jTableOutpuParametersKeywords.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -297,22 +306,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 "Keyword name", "Value", "Comment"
             }
         ));
-        jScrollPane2.setViewportView(jTableOutpuParametersKeywords);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        jPanelOutputParamViewer.add(jScrollPane2, gridBagConstraints);
+        jPanel1.add(jTableOutpuParametersKeywords, gridBagConstraints);
 
         jLabel1.setText("Input");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanelOutputParamViewer.add(jLabel1, gridBagConstraints);
+        jPanel1.add(jLabel1, gridBagConstraints);
 
         jTableInpuParametersKeywords.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -322,15 +328,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 "Keyword name", "Value", "Comment"
             }
         ));
-        jScrollPane3.setViewportView(jTableInpuParametersKeywords);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        jPanelOutputParamViewer.add(jScrollPane3, gridBagConstraints);
+        jPanel1.add(jTableInpuParametersKeywords, gridBagConstraints);
+
+        jScrollPane4.setViewportView(jPanel1);
+
+        jPanelOutputParamViewer.add(jScrollPane4);
 
         jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
 
@@ -349,6 +357,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JEditorPane jEditorPaneExecutionLog;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelImage;
     private javax.swing.JPanel jPanelImageViewer;
     private javax.swing.JPanel jPanelLogViewer;
@@ -356,8 +365,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JPanel jPanelOIFitsViewer;
     private javax.swing.JPanel jPanelOutputParamViewer;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPaneVizualizations;
     private javax.swing.JTable jTableInpuParametersKeywords;
     private javax.swing.JTable jTableOutpuParametersKeywords;
@@ -365,6 +373,37 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        if (syncingUI) {
+            return;
+        }
+
         enableActions();
+        storeLastPanel();
+    }
+
+    private void enableActions() {
+        exportOiFitsAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelOIFitsViewer && fitsViewPanel.getOIFitsData() != null);
+        exportFitsImageAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelImageViewer && fitsImagePanel.getFitsImage() != null);
+    }
+
+    private void storeLastPanel() {
+        if (syncingUI || jTabbedPaneVizualizations.getSelectedComponent() == null) {
+            return;
+        }
+
+        if (showMode == SHOW_MODE.MODEL) {
+            lastModelPanel = jTabbedPaneVizualizations.getSelectedComponent();
+        } else {
+            lastResultPanel = jTabbedPaneVizualizations.getSelectedComponent();
+        }
+    }
+
+    private void restoreLastShownPanel() {
+        // last panel refs may be null during program startup...
+        if (showMode == SHOW_MODE.MODEL && lastModelPanel != null) {
+            jTabbedPaneVizualizations.setSelectedComponent(lastModelPanel);
+        } else if (lastResultPanel != null) {
+            jTabbedPaneVizualizations.setSelectedComponent(lastResultPanel);
+        }
     }
 }
