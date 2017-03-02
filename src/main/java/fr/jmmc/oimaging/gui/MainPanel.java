@@ -22,7 +22,6 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
-import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiInputParam;
@@ -763,11 +762,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         resultSetListModel.clear();
         resultSetListModel.add(currentModel.getResultSets());
         jListResultSet.setModel(resultSetListModel);
-
-        // avoid null service
-        if (currentModel.getSelectedService() == null) {
-            currentModel.setSelectedSoftware(ServiceList.getPreferedService());
-        }
 
         // perform analysis:
         List<String> failures = new LinkedList<String>();
