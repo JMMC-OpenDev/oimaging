@@ -445,8 +445,10 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         mainPanel = panel;
 
         ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
-        tableEditor1.setModel(inputParam, inputParam.getSubTable().getKeywordsDesc().keySet(), this);
 
+        if (inputParam.getSubTable() != null) {
+            tableEditor1.setModel(inputParam, inputParam.getSubTable().getKeywordsDesc().keySet(), this);
+        }
         // image combo
         jComboBoxImage.removeAllItems();
         for (FitsImageHDU fitsImageHDU : irModel.getFitsImageHDUs()) {
