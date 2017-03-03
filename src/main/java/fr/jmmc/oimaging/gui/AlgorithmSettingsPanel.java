@@ -566,7 +566,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
             wString = (String) jComboBoxRglName.getSelectedItem();
             if (!wString.equals(mString)) {
                 params.setRglName(wString);
-//                irModel.initSpecificParams();
+                irModel.initSpecificParams(); // update call required to apply on fly specific param handling
                 changed = true;
             }
         }
