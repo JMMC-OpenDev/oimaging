@@ -286,7 +286,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Container class="fr.jmmc.oimaging.gui.TableEditor" name="tableEditor1">
+        <Container class="fr.jmmc.oimaging.gui.TableKeywordsEditor" name="tableEditor1">
           <Properties>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="null"/>
