@@ -11,6 +11,7 @@ import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
 
     /** associated mainPanel */
     private MainPanel mainPanel;
+    private boolean forceChange;
 
     /** Creates new form AlgorithmSettinsPanel */
     public AlgorithmSettingsPanel() {
@@ -50,8 +52,10 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     private void registerActions() {
         // Map actions to widgets
         loadFitsImageAction = ActionRegistrar.getInstance().get(LoadFitsImageAction.className, LoadFitsImageAction.actionName);
-        jButtonLoadFitsImage.setAction(loadFitsImageAction);
-        jButtonLoadFitsImage.setText((String) loadFitsImageAction.getValue(Action.SHORT_DESCRIPTION));
+        if (loadFitsImageAction != null) {
+            jButtonLoadFitsImage.setAction(loadFitsImageAction);
+            jButtonLoadFitsImage.setText((String) loadFitsImageAction.getValue(Action.SHORT_DESCRIPTION));
+        }
     }
 
     /** This method is called from within the constructor to
@@ -85,6 +89,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jCheckBoxAutoWgt = new javax.swing.JCheckBox();
         jLabelFluxErr = new javax.swing.JLabel();
         jFormattedTextFieldFluxErr = new javax.swing.JFormattedTextField();
+        tableEditor1 = new fr.jmmc.oimaging.gui.TableEditor();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -205,7 +210,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jComboBoxRglName, gridBagConstraints);
 
-        jFormattedTextFieldRglWgt.setFormatterFactory(getFormatterFactory());
+        jFormattedTextFieldRglWgt.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldRglWgt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldRglWgtjFormattedTextFieldActionPerformed(evt);
@@ -225,7 +230,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglWgt, gridBagConstraints);
 
-        jFormattedTextFieldRglAlph.setFormatterFactory(getFormatterFactory());
+        jFormattedTextFieldRglAlph.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldRglAlph.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldRglAlphjFormattedTextFieldActionPerformed(evt);
@@ -244,7 +249,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelAlgorithmSettings.add(jFormattedTextFieldRglAlph, gridBagConstraints);
 
-        jFormattedTextFieldRglBeta.setFormatterFactory(getFormatterFactory());
+        jFormattedTextFieldRglBeta.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldRglBeta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldRglBetajFormattedTextFieldActionPerformed(evt);
@@ -314,7 +319,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelFluxErr, gridBagConstraints);
 
-        jFormattedTextFieldFluxErr.setFormatterFactory(getFormatterFactory());
+        jFormattedTextFieldFluxErr.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldFluxErr.setToolTipText("Error on zero-baseline squared visibility point (used to enforce flux   normalisation)");
         jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -332,6 +337,16 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanelAlgorithmSettings.add(jFormattedTextFieldFluxErr, gridBagConstraints);
+
+        tableEditor1.setMinimumSize(null);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        jPanelAlgorithmSettings.add(tableEditor1, gridBagConstraints);
 
         add(jPanelAlgorithmSettings);
     }// </editor-fold>//GEN-END:initComponents
@@ -415,22 +430,22 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelRglWgt;
     private javax.swing.JPanel jPanelAlgorithmSettings;
     private javax.swing.JSpinner jSpinnerMaxIter;
+    private fr.jmmc.oimaging.gui.TableEditor tableEditor1;
     // End of variables declaration//GEN-END:variables
 
-    private JFormattedTextField.AbstractFormatterFactory getFormatterFactory() {
+    public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
         return new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.#####")));
     }
 
-    private void updateModel() {
-        if (mainPanel != null) {
-            mainPanel.updateModel();
-        }
+    public static JFormattedTextField.AbstractFormatterFactory getIntegerFormatterFactory() {
+        return new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(NumberFormat.getIntegerInstance()));
     }
 
     void syncUI(MainPanel panel, IRModel irModel, List<String> failures) {
         mainPanel = panel;
 
         ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
+        tableEditor1.setModel(inputParam, inputParam.getSubTable().getKeywordsDesc().keySet(), this);
 
         // image combo
         jComboBoxImage.removeAllItems();
@@ -442,6 +457,9 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jSpinnerMaxIter.setValue(new Integer(inputParam.getMaxiter()));
 
         // regulation
+        // update content of jCombobox
+        updateJComboBoxRglName(irModel);
+
         String rglName = inputParam.getRglName();
         if (rglName != null) {
             jComboBoxRglName.setSelectedItem(rglName);
@@ -486,6 +504,19 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
 
     }
 
+    protected void updateModel() {
+        updateModel(false);
+    }
+
+    protected void updateModel(final boolean forceChange) {
+
+        this.forceChange = forceChange;
+
+        if (mainPanel != null) {
+            mainPanel.updateModel();
+        }
+    }
+
     boolean updateModel(IRModel irModel) {
         ImageOiInputParam params = irModel.getImageOiData().getInputParam();
 
@@ -501,6 +532,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         final Service modelSoftware = irModel.getSelectedService();
         if (guiService != null && !guiService.equals(modelSoftware)) {
             irModel.setSelectedSoftware(guiService);
+            updateJComboBoxRglName(irModel);
             changed = true;
         }
 
@@ -532,6 +564,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
             wString = (String) jComboBoxRglName.getSelectedItem();
             if (!wString.equals(mString)) {
                 params.setRglName(wString);
+//                irModel.initSpecificParams();
                 changed = true;
             }
         }
@@ -589,7 +622,16 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
             }
         }
 
+        changed = changed || forceChange;
+        forceChange = false;
         return changed;
+    }
+
+    private void updateJComboBoxRglName(IRModel irModel) {
+        jComboBoxRglName.removeAllItems();
+        for (String v : irModel.getSelectedService().getSupported_RGL_NAME()) {
+            jComboBoxRglName.addItem(v);
+        }
     }
 
 }
