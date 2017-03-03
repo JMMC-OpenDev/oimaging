@@ -10,6 +10,7 @@ import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.oimaging.services.Service;
+import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
@@ -80,10 +81,15 @@ public class IRModel {
         this.fitsImageHDUs = new LinkedList<FitsImageHDU>();
         this.serviceResults = new LinkedList<ServiceResult>();
 
-        this.selectedService = null;
         this.selectedInputImageHDU = null;
         this.fitsImageHdu2Filename.clear();
         imageOiData = new ImageOiData();
+
+        // avoid null service
+        //this.selectedService = null;
+        if (getSelectedService() == null) {
+            setSelectedSoftware(ServiceList.getPreferedService());
+        }
 
     }
 
@@ -152,6 +158,9 @@ public class IRModel {
 
         // TODO check every other consistency links (images ....)
         oifitsFile.setImageOiData(imageOiData);
+
+        // force initi of specific params
+        setSelectedSoftware(getSelectedService());
     }
 
     /**
@@ -303,6 +312,13 @@ public class IRModel {
 
     public void setSelectedSoftware(Service selectedService) {
         this.selectedService = selectedService;
+        initSpecificParams();
+    }
+
+    public void initSpecificParams() {
+        ImageOiInputParam params = getImageOiData().getInputParam();
+        // Get the specific params of given software if any
+        selectedService.initSpecificParams(params);
     }
 
     public String toString() {
