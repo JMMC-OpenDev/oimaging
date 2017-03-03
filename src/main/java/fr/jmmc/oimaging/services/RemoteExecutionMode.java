@@ -36,7 +36,8 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     // TODO add a preference to switch or revert order between dev/prod
     public static final String[] SERVER_URLS = new String[]{
-        "http://jmmc-fe-1.jmmc.fr/OImaging-uws/",
+        "http://fe.jmmc.fr/OImaging-uws/",
+        "http://fe.preprod.jmmc.fr/OImaging-uws/",
         "http://127.0.0.1:8080/OImaging-uws/",
         "http://localhost:8800/OImaging-uws/",
         "http://localhost:8888/OImaging-uws/"
