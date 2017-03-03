@@ -82,6 +82,7 @@ public class Service {
             wisard_params.update(params);
             return wisard_params;
         } else {
+            params.addSubTable(null); // clean old specific params
             return null;
         }
     }
