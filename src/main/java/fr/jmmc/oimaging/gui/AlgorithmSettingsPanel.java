@@ -89,7 +89,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jCheckBoxAutoWgt = new javax.swing.JCheckBox();
         jLabelFluxErr = new javax.swing.JLabel();
         jFormattedTextFieldFluxErr = new javax.swing.JFormattedTextField();
-        tableEditor1 = new fr.jmmc.oimaging.gui.TableEditor();
+        tableEditor1 = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -430,7 +430,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelRglWgt;
     private javax.swing.JPanel jPanelAlgorithmSettings;
     private javax.swing.JSpinner jSpinnerMaxIter;
-    private fr.jmmc.oimaging.gui.TableEditor tableEditor1;
+    private fr.jmmc.oimaging.gui.TableKeywordsEditor tableEditor1;
     // End of variables declaration//GEN-END:variables
 
     public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
