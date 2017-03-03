@@ -390,6 +390,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
         jPanelDataSelection.add(jSliderWaveMin, gridBagConstraints);
 
@@ -397,6 +399,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
         jPanelDataSelection.add(jSliderWaveMax, gridBagConstraints);
 
         jFormattedTextFieldWaveMin.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
@@ -646,6 +650,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         currentModel = irModel;
 
         ImageOiInputParam params = irModel.getImageOiData().getInputParam();
+
+        // specific params must be updated
+        irModel.initSpecificParams();
 
         // Update if model_values != swing_values and detect change if one or more values change
         boolean changed = false;
