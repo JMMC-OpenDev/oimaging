@@ -101,6 +101,9 @@ public class Service {
         public final static String KEYWORD_NP_MIN = "NP_MIN";
         private KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN, "minimum number of reconstructed voxels", Types.TYPE_INT);
 
+        public final static String KEYWORD_FOV = "FOV";
+        private KeywordMeta FOV = new KeywordMeta(KEYWORD_FOV, "field of view", Types.TYPE_DBL);
+
         public final static String KEYWORD_SCALE = "SCALE";
         private KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE, "TBD", Types.TYPE_DBL);
 
@@ -112,6 +115,8 @@ public class Service {
         public WisardInputParam() {
             addKeywordMeta(NP_MIN);
             setKeywordInt(KEYWORD_NP_MIN, 32);
+            addKeywordMeta(FOV);
+            setKeywordInt(KEYWORD_FOV, 20);
 
             addKeywordMeta(SCALE);
             setKeywordDouble(KEYWORD_SCALE, .0001);
