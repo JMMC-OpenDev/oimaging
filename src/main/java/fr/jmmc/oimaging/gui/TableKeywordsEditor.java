@@ -36,7 +36,7 @@ public class TableKeywordsEditor extends javax.swing.JPanel implements ActionLis
     }
 
     public void setModel(final Table model, AlgorithmSettingsPanel notifiedParent) {
-        setModel(model, model.getKeywordsDesc().keySet(), notifiedParent);
+        setModel(model, model == null ? null : model.getKeywordsDesc() == null ? null : model.getKeywordsDesc().keySet(), notifiedParent);
 
     }
 

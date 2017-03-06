@@ -30,6 +30,10 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
 
     /** associated mainPanel */
     private MainPanel mainPanel;
+
+    /** temporary flag set to force notification of model changed .
+     * Mostly used by TableKeywordEditor.
+     */
     private boolean forceChange;
 
     /** Creates new form AlgorithmSettinsPanel */
@@ -448,6 +452,8 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
 
         if (inputParam.getSubTable() != null) {
             tableEditor1.setModel(inputParam, inputParam.getSubTable().getKeywordsDesc().keySet(), this);
+        } else {
+            tableEditor1.setModel(null, this);
         }
         // image combo
         jComboBoxImage.removeAllItems();
