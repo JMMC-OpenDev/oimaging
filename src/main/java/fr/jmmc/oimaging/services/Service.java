@@ -116,7 +116,7 @@ public class Service {
             addKeywordMeta(NP_MIN);
             setKeywordInt(KEYWORD_NP_MIN, 32);
             addKeywordMeta(FOV);
-            setKeywordInt(KEYWORD_FOV, 20);
+            setKeywordDouble(KEYWORD_FOV, 20.0);
 
             addKeywordMeta(SCALE);
             setKeywordDouble(KEYWORD_SCALE, .0001);
