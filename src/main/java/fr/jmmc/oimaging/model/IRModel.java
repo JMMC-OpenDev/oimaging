@@ -105,8 +105,7 @@ public class IRModel {
         return oifitsFile;
     }
 
-    public void setOifitsFile(OIFitsFile oifitsFile) {
-        this.oifitsFile = oifitsFile;
+    public void setOifitsFile(final OIFitsFile oifitsFile) {
 
         // TODO refactor using OifitsCollectionManager
         // Reset + add all target of given OIFits
@@ -132,35 +131,42 @@ public class IRModel {
         }
         // Fix input param according content:
         ImageOiInputParam inputParam = imageOiData.getInputParam();
-        // Select first target by default
-        // assume we have one
-        if (targets != null) {
-            inputParam.setTarget(targets[0]);
+
+        // keep input param values on first load only
+        // may be branched according to a user preference
+        if (true || this.oifitsFile != null) {
+
+            // Select first target by default
+            // assume we have one
+            if (targets != null) {
+                inputParam.setTarget(targets[0]);
+            }
+
+            // Define observable use according available tables
+            inputParam.useVis(oifitsFile.hasOiVis());
+            inputParam.useVis2(oifitsFile.hasOiVis2());
+            inputParam.useT3(oifitsFile.hasOiT3());
+
+            // Set wavelength bounds
+            minWavelentghBound = Double.MAX_VALUE;
+            maxWavelentghBound = Double.MIN_VALUE;
+            for (OIWavelength oiWavelength : oifitsFile.getOiWavelengths()) {
+                float omin = oiWavelength.getEffWaveMin();
+                float omax = oiWavelength.getEffWaveMax();
+                minWavelentghBound = omin < minWavelentghBound ? omin : minWavelentghBound;
+                maxWavelentghBound = omax > maxWavelentghBound ? omax : maxWavelentghBound;
+            }
+            // TODO init input param
+            inputParam.setWaveMin(minWavelentghBound);
+            inputParam.setWaveMax(maxWavelentghBound);
+
+            // TODO check every other consistency links (images ....)
+            oifitsFile.setImageOiData(imageOiData);
+
+            // force initi of specific params
+            setSelectedSoftware(getSelectedService());
         }
-
-        // Define observable use according available tables
-        inputParam.useVis(oifitsFile.hasOiVis());
-        inputParam.useVis2(oifitsFile.hasOiVis2());
-        inputParam.useT3(oifitsFile.hasOiT3());
-
-        // Set wavelength bounds
-        minWavelentghBound = Double.MAX_VALUE;
-        maxWavelentghBound = Double.MIN_VALUE;
-        for (OIWavelength oiWavelength : oifitsFile.getOiWavelengths()) {
-            float omin = oiWavelength.getEffWaveMin();
-            float omax = oiWavelength.getEffWaveMax();
-            minWavelentghBound = omin < minWavelentghBound ? omin : minWavelentghBound;
-            maxWavelentghBound = omax > maxWavelentghBound ? omax : maxWavelentghBound;
-        }
-        // TODO init input param
-        inputParam.setWaveMin(minWavelentghBound);
-        inputParam.setWaveMax(maxWavelentghBound);
-
-        // TODO check every other consistency links (images ....)
-        oifitsFile.setImageOiData(imageOiData);
-
-        // force initi of specific params
-        setSelectedSoftware(getSelectedService());
+        this.oifitsFile = oifitsFile;
     }
 
     /**
@@ -451,5 +457,6 @@ public class IRModel {
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+
     }
 }
