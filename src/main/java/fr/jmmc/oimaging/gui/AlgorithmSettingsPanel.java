@@ -341,8 +341,6 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanelAlgorithmSettings.add(jFormattedTextFieldFluxErr, gridBagConstraints);
-
-        tableEditor1.setMinimumSize(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
