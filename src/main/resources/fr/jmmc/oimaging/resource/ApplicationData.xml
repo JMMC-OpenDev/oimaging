@@ -144,6 +144,13 @@
     </menubar>
 
     <releasenotes>
+        <!-- TODO
+        - prevent duplicates in init-image list
+        - choose real for default color table
+        - add interop exports for image and oifits
+        - import FOV if present in input-oiimage
+        -->
+
         <release version="0.3">
             <prerelease version="0.3 alpha 2">
                 <change type="CHANGE">Add wisard in the list of supported IR program for testing.</change>
