@@ -26,9 +26,9 @@
 
     <distribution>
         <application_data_file>ApplicationRelease.xml</application_data_file>
-        <public_url>http://apps.jmmc.fr/~swmgr/OImaging/</public_url>
-        <beta_url>http://apps.jmmc.fr/~betaswmgr/OImaging/</beta_url>
-        <alpha_url>http://apps.jmmc.fr/~mellag/OImaging/</alpha_url>
+        <public_url>http://www.jmmc.fr/apps/public/OImaging/</public_url>
+        <beta_url>http://www.jmmc.fr/apps/beta/OImaging/</beta_url>
+        <alpha_url>http://www.jmmc.fr/apps/alpha/OImaging/</alpha_url>
     </distribution>
 
     <dependences>
