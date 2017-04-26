@@ -125,10 +125,9 @@
                   icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load an OIFits file"/>
             <menu label="Load Fits Image file" classpath="fr.jmmc.oimaging.gui.action.LoadFitsImageAction" action="loadFitsImage"
                   icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load a Fits Image file"/>
-            <!--<separator/>
-            <menu label="Save oifits" classpath="fr.jmmc.oimaging.gui.action.ExportOIfitsAction" action="exportOIFits" description="Export selected OIFits to a local file"/>
+            <separator/>
+            <menu label="Save oifits" classpath="fr.jmmc.oimaging.gui.action.ExportOIFitsAction" action="exportOIFits" description="Export selected OIFits to a local file"/>
             <menu label="Save image" classpath="fr.jmmc.oimaging.gui.action.ExportFitsImageAction" action="exportFitsImage" description="Export selected Fits image to a local file"/>
-            -->
         </menu>
 
         <menu label="Edit">

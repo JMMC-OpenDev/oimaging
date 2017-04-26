@@ -33,7 +33,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -74,8 +74,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     /* members */
     /** actions */
     private RunAction runAction;
-    private AbstractAction exportOiFitsAction;
-    private AbstractAction exportFitsImageAction;
+    private Action exportOiFitsAction;
+    private Action exportFitsImageAction;
 
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
@@ -188,13 +188,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
         jButtonExportOIFits.setAction(exportOiFitsAction);
-        //jButtonExportOIFits.setText((String) exportOiFitsAction.getValue(Action.SHORT_DESCRIPTION));
-        jButtonExportOIFits.setText("Save OIFits");
 
         exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
         jButtonExportImage.setAction(exportFitsImageAction);
-        //jButtonExportImage.setText((String) exportFitsImageAction.getValue(Action.SHORT_DESCRIPTION));
-        jButtonExportImage.setText("Save image");
 
     }
 
