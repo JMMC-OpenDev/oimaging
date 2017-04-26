@@ -15,7 +15,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Level;
-import javax.swing.Action;
 import javax.swing.JFormattedTextField;
 
 /**
@@ -25,9 +24,6 @@ import javax.swing.JFormattedTextField;
 public class AlgorithmSettingsPanel extends javax.swing.JPanel {
 
     /* members */
-    /** actions */
-    private Action loadFitsImageAction;
-
     /** associated mainPanel */
     private MainPanel mainPanel;
 
@@ -55,11 +51,8 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
      */
     private void registerActions() {
         // Map actions to widgets
-        loadFitsImageAction = ActionRegistrar.getInstance().get(LoadFitsImageAction.className, LoadFitsImageAction.actionName);
-        if (loadFitsImageAction != null) {
-            jButtonLoadFitsImage.setAction(loadFitsImageAction);
-            jButtonLoadFitsImage.setText((String) loadFitsImageAction.getValue(Action.SHORT_DESCRIPTION));
-        }
+        jButtonLoadFitsImage.setAction(ActionRegistrar.getInstance().get(LoadFitsImageAction.className, LoadFitsImageAction.actionName));
+        jButtonLoadFitsImage.setHideActionText(true);
     }
 
     /** This method is called from within the constructor to
