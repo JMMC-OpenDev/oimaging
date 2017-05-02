@@ -127,7 +127,7 @@ public class IRModel {
         }
         final FitsImageHDU pHDU = oifitsFile.getPrimaryImageHDU();
         if (pHDU != null) {
-            setSelectedInputImageHDU(oifitsFile.getPrimaryImageHDU());
+            setSelectedInputImageHDU(pHDU);
         }
         // Fix input param according content:
         ImageOiInputParam inputParam = imageOiData.getInputParam();
@@ -270,16 +270,28 @@ public class IRModel {
 
     }
 
+    /**
+     * Set given fitsImageHDU as the selected one for input.
+     * @param fitsImageHDU image to select (must be present in the previous list
+     */
     public void setSelectedInputImageHDU(FitsImageHDU fitsImageHDU) {
         if (fitsImageHDU.getHduName() == null) {
             // this imageHDU is probably not an image oi extension
             return;
         }
-        selectedInputImageHDU = fitsImageHDU;
-        imageOiData.getInputParam().setInitImg(selectedInputImageHDU.getHduName());
-        // ?? oifitsFile.setPrimaryImageHdu(fitsImageHDU);
-        if (!getFitsImageHDUs().contains(selectedInputImageHDU)) {
-            getFitsImageHDUs().add(selectedInputImageHDU);
+
+        boolean added = false;
+        for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
+            if (currentHDU.getChecksum() == fitsImageHDU.getChecksum()) {
+                selectedInputImageHDU = fitsImageHDU;
+                imageOiData.getInputParam().setInitImg(selectedInputImageHDU.getHduName());
+                // ?? oifitsFile.setPrimaryImageHdu(fitsImageHDU);
+                added = true;
+            }
+        }
+
+        if (!added && !getFitsImageHDUs().contains(selectedInputImageHDU)) {
+            throw new IllegalStateException(fitsImageHDU.getHduName() + " HDU was not added before");
         }
     }
 
@@ -300,8 +312,9 @@ public class IRModel {
         List<FitsImageHDU> hdus = fitsImageFile.getFitsImageHDUs();
         if (hdus.size() > 0) {
             logger.debug("add " + hdus.size() + "ImageHDUs from " + fitsImageFile.getAbsoluteFilePath());
-            addFitsImageHDUs(hdus, fitsImageFile.getFileName());
-            setSelectedInputImageHDU(hdus.get(hdus.size() - 1));
+            if (addFitsImageHDUs(hdus, fitsImageFile.getFileName())) {
+                setSelectedInputImageHDU(hdus.get(hdus.size() - 1));
+            }
         } else {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("Image loading", "no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
