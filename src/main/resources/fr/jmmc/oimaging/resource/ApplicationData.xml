@@ -21,7 +21,7 @@
     <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
     <authors>the JMMC Technical Group</authors>
-    <!--<jnlp>http://apps.jmmc.fr/~swmgr/OImaging/OImaging.jnlp</jnlp>-->
+    <jnlp>http://www.jmmc.fr/apps/public/OImaging/OImaging.jnlp</jnlp>
     <sampdescription>Perform image reconstruction from your interferometric observation data file (OIFits)</sampdescription>
 
     <distribution>
