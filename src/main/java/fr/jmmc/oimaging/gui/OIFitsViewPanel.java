@@ -185,7 +185,7 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
         // memorize chart data (used by export PDF):
         setOIFitsData(oiFitsFile);
 
-        if (oiFitsFile == null) {
+        if (oiFitsFile == null || !oiFitsFile.hasOiData() || targetName == null || oiFitsFile.getAbsoluteFilePath() == null) {
             this.jLabelMessage.setText("No OIFits data available.");
 
             display(false, true);
