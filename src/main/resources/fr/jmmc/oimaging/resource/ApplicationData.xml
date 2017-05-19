@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.3 alpha 2"/>
+    <program name="OImaging" version="0.4 alpha 1"/>
     <compilation date="06/12/2016" compiler="JDK 1.6.0_24"/>
 
     <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -150,6 +150,12 @@
         - import FOV if present in input-oiimage
         -->
 
+        <release version="0.4">
+            <prerelease version="0.4 alpha 1">
+                <change type="CHANGE">BSMem and Wisard are both available in remote mode (no installation required on the user machine).</change>
+                <change type="CHANGE">Result Images are now appended into the available hdu images list (time suffix if already present)</change>
+            </prerelease>
+        </release>
         <release version="0.3">
             <prerelease version="0.3 alpha 2">
                 <change type="CHANGE">Add wisard in the list of supported IR program for testing.</change>

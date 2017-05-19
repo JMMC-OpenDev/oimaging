@@ -18,24 +18,19 @@ import java.util.Date;
  */
 public class ServiceResult {
 
+    private final File inputFile;
     private final File oifitsResultFile;
     private final File executionLogResultFile;
-
-    // Post process cached data
-    private OIFitsFile oiFitsFile = null;
-    private String executionLog = null;
+    // TODO int errorCode;
 
     private boolean valid = false;
     private String errorMessage = null;
     private Date startTime;
     private Date endTime;
 
-    // TODO int errorCode;
-    public ServiceResult(final File oifitsResultFile, final File executionLogResultFile) {
-        this.oifitsResultFile = oifitsResultFile;
-        this.executionLogResultFile = executionLogResultFile;
-        init();
-    }
+    // Post process cached data
+    private OIFitsFile oiFitsFile = null;
+    private String executionLog = null;
 
     /**
      * Helper constructor that created result files using given inputfile name.
@@ -45,6 +40,7 @@ public class ServiceResult {
      */
     public ServiceResult(File inputFile) {
         String inputFilename = inputFile.getName();
+        this.inputFile = inputFile;
         this.oifitsResultFile = FileUtils.getTempFile(inputFilename + ".output.fits");
         this.executionLogResultFile = FileUtils.getTempFile(inputFilename + ".log.txt");
         init();
@@ -52,6 +48,10 @@ public class ServiceResult {
 
     private void init() {
         setStartTime(new Date());
+    }
+
+    public File getInputFile() {
+        return inputFile;
     }
 
     public File getOifitsResultFile() {

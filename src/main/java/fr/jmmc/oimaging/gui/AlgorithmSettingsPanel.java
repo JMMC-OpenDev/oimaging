@@ -10,7 +10,6 @@ import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiInputParam;
-import fr.jmmc.oitools.model.OIFitsFile;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
@@ -104,7 +103,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jLabelMaxIter.setText("MAXITER");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelMaxIter, gridBagConstraints);
@@ -112,7 +111,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jLabelRglName.setText("RGL_NAME");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelRglName, gridBagConstraints);
@@ -120,7 +119,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jLabelRglWgt.setText("RGL_WGT");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelRglWgt, gridBagConstraints);
@@ -128,7 +127,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jLabelRglAlph.setText("RGL_ALPH");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelRglAlph, gridBagConstraints);
@@ -136,7 +135,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jLabelRglBeta.setText("RGL_BETA");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelRglBeta, gridBagConstraints);
@@ -144,7 +143,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jLabelRglPrio.setText("RGL_PRIO");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.weighty = 0.1;
@@ -171,9 +170,9 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -187,7 +186,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -201,7 +200,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -220,7 +219,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -240,7 +239,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -259,7 +258,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -268,7 +267,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jComboBoxRglPrio.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
@@ -283,13 +282,13 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         jPanelAlgorithmSettings.add(jButtonRemoveFitsImage, gridBagConstraints);
 
         jButtonLoadFitsImage.setText("+");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         jPanelAlgorithmSettings.add(jButtonLoadFitsImage, gridBagConstraints);
 
@@ -302,7 +301,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jCheckBoxAutoWgt, gridBagConstraints);
@@ -311,7 +310,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jLabelFluxErr.setToolTipText("Error on zero-baseline squared visibility point (used to enforce flux   normalisation)");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelAlgorithmSettings.add(jLabelFluxErr, gridBagConstraints);
@@ -330,13 +329,13 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanelAlgorithmSettings.add(jFormattedTextFieldFluxErr, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
@@ -453,7 +452,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         }
 
         // max iter
-        jSpinnerMaxIter.setValue(new Integer(inputParam.getMaxiter()));
+        jSpinnerMaxIter.setValue(inputParam.getMaxiter());
 
         // regulation
         // update content of jCombobox
@@ -491,8 +490,6 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         if (mService != wService) {
             jComboBoxSoftware.setSelectedItem(mService);
         }
-
-        OIFitsFile oifitsFile = irModel.getOifitsFile();
 
         FitsImageHDU selectedFitsImageHDU = irModel.getSelectedInputImageHDU();
         if (selectedFitsImageHDU != null) {

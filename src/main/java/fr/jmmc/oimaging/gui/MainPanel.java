@@ -716,14 +716,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         syncingUI = true;
         currentModel = event.getIrModel();
 
+        OIFitsFile oifitsFile = currentModel.getOifitsFile();
+        boolean hasOiFits = oifitsFile != null;
         ImageOiInputParam inputParam = currentModel.getImageOiData().getInputParam();
 
         // associate target list
         jComboBoxTarget.setModel(currentModel.getTargetListModel());
         Object sel = inputParam.getTarget();
         jComboBoxTarget.setSelectedItem(sel);
-
-        boolean hasOiFits = currentModel.getOifitsFile() != null;
 
         // TODO Update OIFitsViewer:
         // arrange target
@@ -733,8 +733,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSliderWaveMin.setEnabled(hasOiFits);
         jSliderWaveMax.setEnabled(hasOiFits);
 
-        fieldSliderAdapterWaveMin.reset(currentModel.getMinWavelentghBound() / MICRO_METER, currentModel.getMaxWavelentghBound() / MICRO_METER, inputParam.getWaveMin() / MICRO_METER);
-        fieldSliderAdapterWaveMax.reset(currentModel.getMinWavelentghBound() / MICRO_METER, currentModel.getMaxWavelentghBound() / MICRO_METER, inputParam.getWaveMax() / MICRO_METER);
+        fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelentghBound() / MICRO_METER, oifitsFile.getMaxWavelentghBound() / MICRO_METER, inputParam.getWaveMin() / MICRO_METER);
+        fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelentghBound() / MICRO_METER, oifitsFile.getMaxWavelentghBound() / MICRO_METER, inputParam.getWaveMax() / MICRO_METER);
 
         jFormattedTextFieldWaveMin.setEnabled(hasOiFits);
         jFormattedTextFieldWaveMax.setEnabled(hasOiFits);
@@ -742,9 +742,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jFormattedTextFieldWaveMax.setValue(inputParam.getWaveMax() / MICRO_METER);
 
         // arrange observable checkboxes
-        jCheckBoxUseVis.setEnabled(hasOiFits && currentModel.getOifitsFile().hasOiVis());
-        jCheckBoxUseVis2.setEnabled(hasOiFits && currentModel.getOifitsFile().hasOiVis2());
-        jCheckBoxUseT3.setEnabled(hasOiFits && currentModel.getOifitsFile().hasOiT3());
+        jCheckBoxUseVis.setEnabled(hasOiFits && oifitsFile.hasOiVis());
+        jCheckBoxUseVis2.setEnabled(hasOiFits && oifitsFile.hasOiVis2());
+        jCheckBoxUseT3.setEnabled(hasOiFits && oifitsFile.hasOiT3());
         jCheckBoxUseVis.setSelected(hasOiFits && inputParam.useVis());
         jCheckBoxUseVis2.setSelected(hasOiFits && inputParam.useVis2());
         jCheckBoxUseT3.setSelected(hasOiFits && inputParam.useT3());
@@ -754,15 +754,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         resultSetListModel.add(currentModel.getResultSets());
         jListResultSet.setModel(resultSetListModel);
 
-        // perform analysis:
+        // perform analysis
         List<String> failures = new LinkedList<String>();
         failures.clear();
 
         algorithmSettinsPanel1.syncUI(this, currentModel, failures);
 
-        OIFitsFile oifitsFile = currentModel.getOifitsFile();
-        jLabelOifitsFile.setText(oifitsFile == null ? "" : oifitsFile.getName());
-        if (oifitsFile == null) {
+        jLabelOifitsFile.setText(hasOiFits ? oifitsFile.getName() : "");
+
+        if (!hasOiFits) {
             failures.add("Missing OIFits");
         } else if (inputParam.getWaveMax() < inputParam.getWaveMin()) {
             failures.add("WAVE_MIN is higher than WAVE_MAX");
@@ -776,6 +776,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
          */
 
         // if nothing is wrong allow related actions
+        // TODO make this idea more global and on an higher level Manager.setValid(true) e.g. ?
         final boolean modelOk = failures.size() == 0;
         runAction.setEnabled(modelOk);
 

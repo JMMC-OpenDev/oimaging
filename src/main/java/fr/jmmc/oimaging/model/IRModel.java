@@ -3,11 +3,10 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.model;
 
-import fr.jmmc.jmcs.data.MimeType;
-import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
+import fr.jmmc.jmcs.util.DateUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
@@ -19,8 +18,6 @@ import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
-import fr.jmmc.oitools.model.OITable;
-import fr.jmmc.oitools.model.OIWavelength;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple model based on top of observer/observable pattern.
+ * Simple model for Image Reconstruction based on top of observer/observable pattern.
  *
  * @author mellag
  */
@@ -42,7 +39,9 @@ public class IRModel {
     private static final Logger logger = LoggerFactory.getLogger(IRModel.class);
 
     /* Members */
-    /** Main input oifits File */
+    /** User's input oifits File */
+    private OIFitsFile userOifitsFile;
+    /** Model oifits File */
     private OIFitsFile oifitsFile;
     /** List of loaded imageHUDs */
     private List<FitsImageHDU> fitsImageHDUs;
@@ -55,42 +54,105 @@ public class IRModel {
     private FitsImageHDU selectedInputImageHDU;
 
     private final Hashtable<FitsImageHDU, String> fitsImageHdu2Filename = new Hashtable<FitsImageHDU, String>();
-
+    ;
     private final List<String> targetList = new ArrayList<String>(5);
     private final GenericListModel<String> targetListModel = new GenericListModel<String>(targetList, true);
 
-    /** Store min wavelength of oifits file */
-    private double minWavelentghBound;
-    /** Store max wavelength of oifits file */
-    private double maxWavelentghBound;
-
-    private ImageOiData imageOiData = null;
-
     /** status flag : set by RunAction */
-    private boolean running = false;
+    private boolean running;
 
     /** export counter */
-    private int exportCount = 0;
+    private int exportCount;
 
     public IRModel() {
         reset();
     }
 
+    /**
+     * Reset the main attributes of the model.
+     */
     private void reset() {
-        this.oifitsFile = null;
+
+        resetOiData(null);
+
         this.fitsImageHDUs = new LinkedList<FitsImageHDU>();
         this.serviceResults = new LinkedList<ServiceResult>();
-
-        this.selectedInputImageHDU = null;
         this.fitsImageHdu2Filename.clear();
-        imageOiData = new ImageOiData();
+
+        this.running = false;
+        this.exportCount = 0;
+    }
+
+    /**
+     * Reset the OiData attributes of the model (oifits file, targets).
+     */
+    private void resetOiData(final OIFitsFile inputOifitsFile) {
+
+        this.targetListModel.clear();
+
+        if (inputOifitsFile == null) {
+            this.oifitsFile = new OIFitsFile();
+            this.oifitsFile.setImageOiData(new ImageOiData());
+        } else {
+            this.oifitsFile = inputOifitsFile;
+
+            // load targets
+            String[] targets = null;
+            if (oifitsFile.hasOiTarget()) {
+                targets = oifitsFile.getOiTarget().getTarget();
+                for (String target : targets) {
+                    targetListModel.add(target);
+                }
+            }
+
+            ImageOiInputParam inputParam;
+            // load inputImageOiData or create a new one
+            ImageOiData inputImageOiData = oifitsFile.getImageOiData();
+            if (inputImageOiData == null) {
+                inputImageOiData = new ImageOiData();
+                oifitsFile.setImageOiData(inputImageOiData);
+
+                inputParam = oifitsFile.getImageOiData().getInputParam();
+                // Reset observable use according available tables
+                inputParam.useVis(oifitsFile.hasOiVis());
+                inputParam.useVis2(oifitsFile.hasOiVis2());
+                inputParam.useT3(oifitsFile.hasOiT3());
+
+                // Reset WLen bounds
+                inputParam.setWaveMin(oifitsFile.getMinWavelentghBound());
+                inputParam.setWaveMax(oifitsFile.getMaxWavelentghBound());
+            }
+
+            // fix input param according given input:
+            inputParam = oifitsFile.getImageOiData().getInputParam();
+
+            // Select first target by default
+            // assume we have one
+            if (targets != null) {
+                inputParam.setTarget(targets[0]);
+            }
+
+            // load fits Image HDU data of given oifits if any present
+            // TODO handle primary HDU ?
+            if (!inputImageOiData.getFitsImageHDUs().isEmpty()) {
+                addFitsImageHDUs(inputImageOiData.getFitsImageHDUs(), oifitsFile.getName());
+            }
+
+            final FitsImageHDU pHDU = oifitsFile.getPrimaryImageHDU();
+            if (pHDU != null && pHDU.getImageCount() > 0) {
+                setSelectedInputImageHDU(pHDU);
+            }
+
+            // Select first image as selected one if not yet initialized
+            if (selectedInputImageHDU == null && !fitsImageHDUs.isEmpty()) {
+                setSelectedInputImageHDU(fitsImageHDUs.get(0));
+            }
+        }
 
         // avoid null service
-        //this.selectedService = null;
         if (getSelectedService() == null) {
             setSelectedSoftware(ServiceList.getPreferedService());
         }
-
     }
 
     public boolean isRunning() {
@@ -105,68 +167,17 @@ public class IRModel {
         return oifitsFile;
     }
 
-    public void setOifitsFile(final OIFitsFile oifitsFile) {
+    /**
+     * Get user input file with OIData.
+     * @param oifitsFile
+     */
+    public void loadOifitsFile(final OIFitsFile userOifitsFile) {
 
-        // TODO refactor using OifitsCollectionManager
-        // Reset + add all target of given OIFits
-        targetListModel.clear();
+        this.userOifitsFile = userOifitsFile;
+        logger.info("loadOifitsFile: userOifitsFile: {}", userOifitsFile);
 
-        String[] targets = null;
-        if (oifitsFile.hasOiTarget()) {
-            targets = oifitsFile.getOiTarget().getTarget();
-            for (String target : targets) {
-                targetListModel.add(target);
-            }
-        }
-
-        ImageOiData iod = oifitsFile.getImageOiData();
-        // use imageOi data of given oifits if any present
-        if (iod != null && !iod.getFitsImageHDUs().isEmpty()) {
-            imageOiData = iod;
-            addFitsImageHDUs(iod.getFitsImageHDUs(), oifitsFile.getName());
-        }
-        final FitsImageHDU pHDU = oifitsFile.getPrimaryImageHDU();
-        if (pHDU != null) {
-            setSelectedInputImageHDU(pHDU);
-        }
-        // Fix input param according content:
-        ImageOiInputParam inputParam = imageOiData.getInputParam();
-
-        // keep input param values on first load only
-        // may be branched according to a user preference
-        if (true || this.oifitsFile != null) {
-
-            // Select first target by default
-            // assume we have one
-            if (targets != null) {
-                inputParam.setTarget(targets[0]);
-            }
-
-            // Define observable use according available tables
-            inputParam.useVis(oifitsFile.hasOiVis());
-            inputParam.useVis2(oifitsFile.hasOiVis2());
-            inputParam.useT3(oifitsFile.hasOiT3());
-
-            // Set wavelength bounds
-            minWavelentghBound = Double.MAX_VALUE;
-            maxWavelentghBound = Double.MIN_VALUE;
-            for (OIWavelength oiWavelength : oifitsFile.getOiWavelengths()) {
-                float omin = oiWavelength.getEffWaveMin();
-                float omax = oiWavelength.getEffWaveMax();
-                minWavelentghBound = omin < minWavelentghBound ? omin : minWavelentghBound;
-                maxWavelentghBound = omax > maxWavelentghBound ? omax : maxWavelentghBound;
-            }
-            // TODO init input param
-            inputParam.setWaveMin(minWavelentghBound);
-            inputParam.setWaveMax(maxWavelentghBound);
-
-            // TODO check every other consistency links (images ....)
-            oifitsFile.setImageOiData(imageOiData);
-
-            // force initi of specific params
-            setSelectedSoftware(getSelectedService());
-        }
-        this.oifitsFile = oifitsFile;
+        // reset oidata and put some user data into the new containers
+        resetOiData(userOifitsFile);
     }
 
     /**
@@ -180,20 +191,31 @@ public class IRModel {
         final List<FitsImageHDU> hdusToAdd = new LinkedList<FitsImageHDU>();
         hdusToAdd.addAll(hdus);
 
-        // Remove duplicates
+        // Remove duplicates and skip hdu with hduname present in current input oifits
         for (FitsImageHDU hdu : hdus) {
+            if (getSelectedInputImageHDU() != null && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
+                hdusToAdd.remove(hdu);
+                break;
+            }
             for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
                 if (currentHDU.getChecksum() == hdu.getChecksum()) {
+                    logger.info("skipping image hdu '{}' : already present ", hdu.getHduName());
                     hdusToAdd.remove(hdu);
+                    break;
                 }
             }
         }
 
+        String now = DateUtils.now().substring(0, 19);
         // And continue with remaining ones
         for (FitsImageHDU hdu : hdusToAdd) {
-            // TODO check length because of fits keyword limitation
+            // if returned hdu has no name : use extname or filename + date
             if (hdu.getHduName() == null) {
-                hdu.setHduName(filename);
+                if (hdu.getExtName() != null) {
+                    hdu.setHduName(hdu.getExtName() + "-" + now);
+                } else {
+                    hdu.setHduName(filename.substring(0, 50) + "-" + now);
+                }
             } else {
                 for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
                     if (currentHDU.getHduName() == null) {
@@ -201,10 +223,9 @@ public class IRModel {
                         logger.warn("present hdu had no hduName {}", currentHDU);
                     }
                     if (currentHDU.getHduName().equals(hdu.getHduName())) {
-
-                        final String defaultHduName = hdu.getHduName() + "-" + exportCount;
+                        final String defaultHduName = hdu.getHduName() + "-" + now;
                         if (hdu.getHduName().equals(defaultHduName)) {
-                            // TODO cheh if thie branch can be reached
+                            // TODO check if this branch can be reached
                             MessagePane.showErrorMessage("HDU already loaded with hduname='" + hdu.getHduName() + "'");
                             //TODO propose here to replace the previous loaded HDU
                             hdusToAdd.remove(hdu);
@@ -213,10 +234,12 @@ public class IRModel {
                             String confMsg = "'" + hdu.getHduName() + "' HDU already exists.\n Do you agree to rename it '" + defaultHduName + "' ? \nElse it will be ignored. ";
                             boolean okToRename = MessagePane.showConfirmMessage(confMsg);
                             if (okToRename) {
+                                logger.info("hduname '{}' already used, user accepted to rename to '{}'  ", hdu.getHduName(), defaultHduName);
                                 hdu.setHduName(defaultHduName);
                                 break;
                             } else {
                                 hdusToAdd.remove(hdu);
+                                logger.info("hduname '{}' already used : user skip prefer to skip it ", hdu.getHduName());
                             }
                         }
                     }
@@ -238,24 +261,6 @@ public class IRModel {
     }
 
     /**
-     * Returns the smallest wavelength of given oifits.
-     *
-     * @return smallest wlen
-     */
-    public double getMinWavelentghBound() {
-        return minWavelentghBound;
-    }
-
-    /**
-     * Returns the biggest wavelength of given oifits.
-     *
-     * @return biggest wlen
-     */
-    public double getMaxWavelentghBound() {
-        return maxWavelentghBound;
-    }
-
-    /**
      * Return the selected imageHDU for input or first one.
      * @return selected fitsImageHDU
      */
@@ -274,18 +279,21 @@ public class IRModel {
      * Set given fitsImageHDU as the selected one for input.
      * @param fitsImageHDU image to select (must be present in the previous list
      */
-    public void setSelectedInputImageHDU(FitsImageHDU fitsImageHDU) {
+    public void setSelectedInputImageHDU(final FitsImageHDU fitsImageHDU) {
         if (fitsImageHDU.getHduName() == null) {
             // this imageHDU is probably not an image oi extension
-            return;
+            throw new IllegalStateException("Can't select given image HDU with null HDUNANE");
+            // return;
         }
 
         boolean added = false;
         for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
             if (currentHDU.getChecksum() == fitsImageHDU.getChecksum()) {
                 selectedInputImageHDU = fitsImageHDU;
-                imageOiData.getInputParam().setInitImg(selectedInputImageHDU.getHduName());
-                // ?? oifitsFile.setPrimaryImageHdu(fitsImageHDU);
+                oifitsFile.getImageOiData().getInputParam().setInitImg(fitsImageHDU.getHduName());
+                oifitsFile.getImageOiData().getFitsImageHDUs().clear();
+                oifitsFile.getImageOiData().getFitsImageHDUs().add(fitsImageHDU);
+                logger.info("Set new hdu '{}' as selectedInputImageHDU", fitsImageHDU.getHduName());
                 added = true;
             }
         }
@@ -344,47 +352,12 @@ public class IRModel {
         return "IRModel [" + oifitsFile + ", " + fitsImageHDUs + ", " + selectedService + "]";
     }
 
-    public void exportOIFits() {
-
-        File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
-        String name = oifitsFile.getName();
-        if (!name.contains(".image-oi")) {
-            name = FileUtils.getFileNameWithoutExtension(name) + ".image-oi." + FileUtils.getExtension(oifitsFile.getName());
-        }
-
-        File file = FileChooser.showSaveFileChooser("Choose location of prepared OIFits file", dir, MimeType.OIFITS, name);
-
-        // Cancel
-        if (file == null) {
-            return;
-        }
-
-        try {
-            prepareOIFits(file);
-            StatusBar.show("OIFits exported into " + file.getName());
-        } catch (IOException ioe) {
-            MessagePane.showErrorMessage("Can't write oifits", "Can't store OIFits into " + file, ioe);
-        } catch (FitsException fe) {
-            MessagePane.showErrorMessage("Can't write oifits", "Can't store OIFits into " + file, fe);
-        }
-
-    }
-
-    private void prepareOIFits(File file) throws FitsException, IOException {
-        // Create a virtual container, associate related material (only selected Image is left!)
-        OIFitsFile virtu = new OIFitsFile();
-        virtu.setAbsoluteFilePath(file.getAbsolutePath());
-        virtu.setImageOiData(imageOiData);
-        imageOiData.getFitsImageHDUs().clear();
-        if (selectedInputImageHDU != null) {
-            imageOiData.getFitsImageHDUs().add(selectedInputImageHDU);
-        }
-        // Feed every oitables reference (no cloning -> reference to internal oifitsfile will not be consistent)
-        for (OITable table : oifitsFile.getOiTables()) {
-            virtu.addOiTable(table);
-        }
-
-        OIFitsWriter.writeOIFits(file.getAbsolutePath(), virtu);
+    public File prepareTempFile() throws FitsException, IOException {
+        File tmpFile = FileUtils.getTempFile(oifitsFile.getName(), ".export-" + exportCount + ".fits");
+        exportCount++;
+        oifitsFile.setAbsoluteFilePath(tmpFile.getAbsolutePath());
+        OIFitsWriter.writeOIFits(tmpFile.getAbsolutePath(), oifitsFile);
+        return tmpFile;
     }
 
     public String getelectedInputFitsImageError() {
@@ -404,13 +377,7 @@ public class IRModel {
     }
 
     public ImageOiData getImageOiData() {
-        return imageOiData;
-    }
-
-    public File prepareTempFile() throws FitsException, IOException {
-        File tmpFile = FileUtils.getTempFile("export-" + exportCount + "-" + oifitsFile.getName(), ".fits");
-        prepareOIFits(tmpFile);
-        return tmpFile;
+        return oifitsFile.getImageOiData();
     }
 
     public boolean updateWithNewModel(final ServiceResult serviceResult) {
@@ -467,6 +434,16 @@ public class IRModel {
 
     public void addServiceResult(ServiceResult serviceResult) {
         getResultSets().add(0, serviceResult);
+
+        if (serviceResult.isValid()) {
+            try {
+                addFitsImageHDUs(serviceResult.getOifitsFile().getImageOiData().getFitsImageHDUs(), serviceResult.getInputFile().getName());
+            } catch (IOException ex) {
+                logger.error("Can't get imageHDU from result oifile", ex);
+            } catch (FitsException ex) {
+                logger.error("Can't get imageHDU from result oifile", ex);
+            }
+        }
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
