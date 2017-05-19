@@ -197,7 +197,7 @@ public class IRModel {
 
         // Remove duplicates and skip hdu with hduname present in current input oifits
         for (FitsImageHDU hdu : hdus) {
-            if (getSelectedInputImageHDU() != null && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
+            if (getSelectedInputImageHDU() != null && hdu.getHduName() != null && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
                 hdusToAdd.remove(hdu);
                 break;
             }
