@@ -214,7 +214,7 @@ public class IRModel {
                 if (hdu.getExtName() != null) {
                     hdu.setHduName(hdu.getExtName() + "-" + now);
                 } else {
-                    hdu.setHduName(filename.substring(0, 50) + "-" + now);
+                    hdu.setHduName(filename.substring(0, Math.min(50, filename.length())) + "-" + now);
                 }
             } else {
                 for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
