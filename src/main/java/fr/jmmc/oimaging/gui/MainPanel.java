@@ -760,7 +760,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         algorithmSettinsPanel1.syncUI(this, currentModel, failures);
 
-        jLabelOifitsFile.setText(hasOIData ? oifitsFile.getName() : "");
+        jLabelOifitsFile.setText(hasOIData ? currentModel.getUserOifitsFile().getName() : "");
 
         if (!hasOIData) {
             failures.add("Missing OIData, please load an OIFits");

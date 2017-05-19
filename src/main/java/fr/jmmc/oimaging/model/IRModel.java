@@ -180,6 +180,10 @@ public class IRModel {
         resetOiData(userOifitsFile);
     }
 
+    public OIFitsFile getUserOifitsFile() {
+        return userOifitsFile;
+    }
+
     /**
      * Add HDU to present ones.
      * @param hdus new hdus
