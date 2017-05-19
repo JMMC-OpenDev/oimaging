@@ -28,6 +28,8 @@ public class ServiceResult {
     private Date startTime;
     private Date endTime;
 
+    private Service service;
+
     // Post process cached data
     private OIFitsFile oiFitsFile = null;
     private String executionLog = null;
@@ -111,6 +113,14 @@ public class ServiceResult {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public Service getService() {
+        return service;
+    }
+
+    public void setService(Service service) {
+        this.service = service;
     }
 
 }
