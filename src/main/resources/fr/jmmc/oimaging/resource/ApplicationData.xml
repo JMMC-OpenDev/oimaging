@@ -18,7 +18,7 @@
     <program name="OImaging" version="0.5 alpha 1"/>
     <compilation date="07/06/2017" compiler="JDK 1.6.0_24"/>
 
-    <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
+    <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
     <authors>the JMMC Technical Group</authors>
     <jnlp>http://www.jmmc.fr/apps/public/OImaging/OImaging.jnlp</jnlp>
