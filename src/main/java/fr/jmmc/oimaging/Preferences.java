@@ -3,6 +3,8 @@
  ******************************************************************************/
 package fr.jmmc.oimaging;
 
+import fr.jmmc.jmal.image.ColorModels;
+import fr.jmmc.jmcs.data.preference.PreferencesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,21 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         }
 
         return _singleton;
+    }
+
+    /**
+     * Define the default properties used to reset default preferences.
+     *
+     * @throws PreferencesException if any preference value has a unsupported class type
+     */
+    @Override
+    protected void setDefaultPreferences() throws PreferencesException {
+        super.setDefaultPreferences();
+
+        logger.debug("Preferences.setDefaultPreferences()");
+
+        // Use GD's prefered value for a better image viewing that isophot...
+        setDefaultPreference(MODEL_IMAGE_LUT, ColorModels.COLOR_MODEL_HEAT);
     }
 
     @Override

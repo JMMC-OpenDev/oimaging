@@ -6,6 +6,7 @@ package fr.jmmc.oimaging;
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.app.ApplicationDescription;
+import fr.jmmc.jmcs.gui.PreferencesView;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
@@ -22,6 +23,7 @@ import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oimaging.gui.MainPanel;
+import fr.jmmc.oimaging.gui.PreferencePanel;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
@@ -41,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -124,8 +127,27 @@ public final class OImaging extends App {
     @Override
     protected void setupGui() throws RuntimeException {
         logger.debug("OifitsExplorerGui.setupGui() handler : enter");
+
         prepareFrame();
+        createPreferencesView();
+
         logger.debug("OifitsExplorerGui.setupGui() handler : exit");
+    }
+
+    /**
+     * Create the Preferences view
+     * @return Preferences view
+     */
+    public static PreferencesView createPreferencesView() {
+        // Retrieve application preferences and attach them to their view
+        // (This instance must be instanciated after dependencies)
+        final LinkedHashMap<String, JPanel> panels = new LinkedHashMap<String, JPanel>(2);
+        panels.put("General settings", new PreferencePanel());
+
+        final PreferencesView preferencesView = new PreferencesView(Preferences.getInstance(), panels);
+        preferencesView.init();
+
+        return preferencesView;
     }
 
     /**

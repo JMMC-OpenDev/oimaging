@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.4 alpha 1"/>
-    <compilation date="06/12/2016" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 alpha 1"/>
+    <compilation date="07/06/2017" compiler="JDK 1.6.0_24"/>
 
     <text>IRGui send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -149,7 +149,11 @@
         - add interop exports for image and oifits
         - import FOV if present in input-oiimage
         -->
-
+        <release version="0.5">
+            <prerelease version="0.5 alpha 1">
+                <change type="CHANGE">Use heat as default LUT table for the FITS image viewer ().</change>
+            </prerelease>
+        </release>
         <release version="0.4">
             <prerelease version="0.4 alpha 1">
                 <change type="CHANGE">BSMem and Wisard are both available in remote mode (no installation required on the user machine).</change>
