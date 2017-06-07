@@ -270,9 +270,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel3 = new javax.swing.JPanel();
-        algorithmSettinsPanel1 = new fr.jmmc.oimaging.gui.AlgorithmSettingsPanel();
+        jSplitPane = new javax.swing.JSplitPane();
+        jScrollPane = new javax.swing.JScrollPane();
+        jPanelLeft = new javax.swing.JPanel();
         jPanelDataSelection = new javax.swing.JPanel();
         jComboBoxTarget = new javax.swing.JComboBox();
         jLabelTarget = new javax.swing.JLabel();
@@ -287,6 +287,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSliderWaveMax = new javax.swing.JSlider();
         jFormattedTextFieldWaveMin = new javax.swing.JFormattedTextField();
         jFormattedTextFieldWaveMax = new javax.swing.JFormattedTextField();
+        algorithmSettinsPanel = new fr.jmmc.oimaging.gui.AlgorithmSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -299,14 +300,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
 
         setMaximumSize(new java.awt.Dimension(100, 100));
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        jPanel3.add(algorithmSettinsPanel1, gridBagConstraints);
+        jSplitPane.setResizeWeight(0.2);
+        jSplitPane.setContinuousLayout(true);
+
+        jScrollPane.setMinimumSize(new java.awt.Dimension(300, 300));
+
+        jPanelLeft.setMinimumSize(new java.awt.Dimension(200, 500));
+        jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
         jPanelDataSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Data selection"));
         jPanelDataSelection.setLayout(new java.awt.GridBagLayout());
@@ -456,7 +458,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        jPanel3.add(jPanelDataSelection, gridBagConstraints);
+        jPanelLeft.add(jPanelDataSelection, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanelLeft.add(algorithmSettinsPanel, gridBagConstraints);
 
         jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
         jPanelExecutionLog.setPreferredSize(new java.awt.Dimension(82, 100));
@@ -510,10 +517,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.2;
-        jPanel3.add(jPanelExecutionLog, gridBagConstraints);
+        jPanelLeft.add(jPanelExecutionLog, gridBagConstraints);
 
         jPanelResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Result sets"));
+        jPanelResults.setPreferredSize(new java.awt.Dimension(200, 152));
         jPanelResults.setLayout(new javax.swing.BoxLayout(jPanelResults, javax.swing.BoxLayout.LINE_AXIS));
+
+        jScrollPane4.setPreferredSize(new java.awt.Dimension(180, 130));
 
         jScrollPane4.setViewportView(jListResultSet);
 
@@ -525,16 +535,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.6;
-        jPanel3.add(jPanelResults, gridBagConstraints);
+        jPanelLeft.add(jPanelResults, gridBagConstraints);
 
-        jSplitPane1.setLeftComponent(jPanel3);
-        jSplitPane1.setRightComponent(viewerPanel);
+        jScrollPane.setViewportView(jPanelLeft);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        add(jSplitPane1, gridBagConstraints);
+        jSplitPane.setLeftComponent(jScrollPane);
+        jSplitPane.setRightComponent(viewerPanel);
+
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxActionPerformed
@@ -569,7 +577,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private fr.jmmc.oimaging.gui.AlgorithmSettingsPanel algorithmSettinsPanel1;
+    private fr.jmmc.oimaging.gui.AlgorithmSettingsPanel algorithmSettinsPanel;
     private javax.swing.JButton jButtonExportImage;
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;
@@ -586,15 +594,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
     private javax.swing.JList jListResultSet;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
+    private javax.swing.JPanel jPanelLeft;
     private javax.swing.JPanel jPanelResults;
+    private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
-    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JSplitPane jSplitPane;
     private fr.jmmc.oimaging.gui.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -695,7 +704,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // Check if algo settings change given model
-        if (algorithmSettinsPanel1.updateModel(irModel)) {
+        if (algorithmSettinsPanel.updateModel(irModel)) {
             changed = true;
         }
         // some values have changed
@@ -758,7 +767,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         List<String> failures = new LinkedList<String>();
         failures.clear();
 
-        algorithmSettinsPanel1.syncUI(this, currentModel, failures);
+        algorithmSettinsPanel.syncUI(this, currentModel, failures);
 
         jLabelOifitsFile.setText(hasOIData ? currentModel.getUserOifitsFile().getName() : "");
 
