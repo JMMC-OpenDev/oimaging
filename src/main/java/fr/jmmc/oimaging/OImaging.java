@@ -144,7 +144,7 @@ public final class OImaging extends App {
         final LinkedHashMap<String, JPanel> panels = new LinkedHashMap<String, JPanel>(2);
         panels.put("General settings", new PreferencePanel());
 
-        final PreferencesView preferencesView = new PreferencesView(Preferences.getInstance(), panels);
+        final PreferencesView preferencesView = new PreferencesView(getFrame(), Preferences.getInstance(), panels);
         preferencesView.init();
 
         return preferencesView;
