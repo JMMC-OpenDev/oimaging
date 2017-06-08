@@ -151,7 +151,7 @@
         -->
         <release version="0.5">
             <prerelease version="0.5 alpha 1">
-                <change type="CHANGE">Use heat as default LUT table for the FITS image viewer ().</change>
+                <change type="CHANGE">Use heat as default LUT table for the FITS image viewer.</change>
             </prerelease>
         </release>
         <release version="0.4">
