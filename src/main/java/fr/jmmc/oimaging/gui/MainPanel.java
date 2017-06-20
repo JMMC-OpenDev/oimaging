@@ -742,8 +742,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSliderWaveMin.setEnabled(hasOIData);
         jSliderWaveMax.setEnabled(hasOIData);
 
-        fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelentghBound() / MICRO_METER, oifitsFile.getMaxWavelentghBound() / MICRO_METER, inputParam.getWaveMin() / MICRO_METER);
-        fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelentghBound() / MICRO_METER, oifitsFile.getMaxWavelentghBound() / MICRO_METER, inputParam.getWaveMax() / MICRO_METER);
+        fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMin() / MICRO_METER);
+        fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMax() / MICRO_METER);
 
         jFormattedTextFieldWaveMin.setEnabled(hasOIData);
         jFormattedTextFieldWaveMax.setEnabled(hasOIData);

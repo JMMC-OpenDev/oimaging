@@ -119,8 +119,8 @@ public class IRModel {
                 inputParam.useT3(oifitsFile.hasOiT3());
 
                 // Reset WLen bounds
-                inputParam.setWaveMin(oifitsFile.getMinWavelentghBound());
-                inputParam.setWaveMax(oifitsFile.getMaxWavelentghBound());
+                inputParam.setWaveMin(oifitsFile.getMinWavelengthBound());
+                inputParam.setWaveMax(oifitsFile.getMaxWavelengthBound());
             }
 
             // fix input param according given input:
