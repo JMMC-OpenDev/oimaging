@@ -99,7 +99,7 @@ public class Service {
     private static class WisardInputParam extends Table {
 
         public final static String KEYWORD_NP_MIN = "NP_MIN";
-        private KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN, "minimum number of reconstructed voxels", Types.TYPE_INT);
+        private KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN, "minimum number of reconstructed voxels", Types.TYPE_SHORT);
 
         public final static String KEYWORD_FOV = "FOV";
         private KeywordMeta FOV = new KeywordMeta(KEYWORD_FOV, "field of view", Types.TYPE_DBL);

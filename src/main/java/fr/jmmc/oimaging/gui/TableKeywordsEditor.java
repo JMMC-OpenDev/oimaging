@@ -77,7 +77,7 @@ public class TableKeywordsEditor extends javax.swing.JPanel implements ActionLis
                         jFormattedTextField.setFormatterFactory(AlgorithmSettingsPanel.getDecimalFormatterFactory());
                         jTextField = jFormattedTextField;
                         break;
-                    case TYPE_INT:
+                    case TYPE_SHORT:
                         jFormattedTextField = new JFormattedTextField(value);
                         jFormattedTextField.setFormatterFactory(AlgorithmSettingsPanel.getIntegerFormatterFactory());
                         jTextField = jFormattedTextField;
