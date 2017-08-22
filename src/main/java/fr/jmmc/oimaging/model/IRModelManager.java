@@ -181,7 +181,7 @@ public final class IRModelManager implements IRModelEventListener {
     }
 
     public void loadOIFitsFile(File file) throws IOException {
-        IRModelManager.this.loadOIFitsFile(file.getAbsolutePath(), null);
+        loadOIFitsFile(file.getAbsolutePath(), null);
     }
 
     /**
