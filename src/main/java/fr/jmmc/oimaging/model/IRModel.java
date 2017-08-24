@@ -15,6 +15,7 @@ import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
@@ -91,7 +92,7 @@ public class IRModel {
         this.targetListModel.clear();
 
         if (inputOifitsFile == null) {
-            this.oifitsFile = new OIFitsFile();
+            this.oifitsFile = new OIFitsFile(OIFitsStandard.VERSION_1);
             this.oifitsFile.setImageOiData(new ImageOiData());
         } else {
             this.oifitsFile = inputOifitsFile;
