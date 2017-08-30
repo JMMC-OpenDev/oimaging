@@ -93,7 +93,7 @@ public class IRModel {
 
         if (inputOifitsFile == null) {
             this.oifitsFile = new OIFitsFile(OIFitsStandard.VERSION_1);
-            this.oifitsFile.setImageOiData(new ImageOiData());
+            this.oifitsFile.setImageOiData(new ImageOiData(oifitsFile));
         } else {
             this.oifitsFile = inputOifitsFile;
 
@@ -110,7 +110,7 @@ public class IRModel {
             // load inputImageOiData or create a new one
             ImageOiData inputImageOiData = oifitsFile.getImageOiData();
             if (inputImageOiData == null) {
-                inputImageOiData = new ImageOiData();
+                inputImageOiData = new ImageOiData(oifitsFile);
                 oifitsFile.setImageOiData(inputImageOiData);
 
                 inputParam = oifitsFile.getImageOiData().getInputParam();
