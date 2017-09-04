@@ -93,14 +93,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         // image combo
         jComboBoxImage.removeAllItems();
 
-        if (imageHDU != null && !imageHDU.getFitsImages().isEmpty()) {
-
-            for (FitsImageHDU fitsImageHDU : imageHdus) {
+        for (FitsImageHDU fitsImageHDU : imageHdus) {
+            if (fitsImageHDU.hasImages()) {
                 jComboBoxImage.addItem(fitsImageHDU);
             }
-            jComboBoxImage.setSelectedItem(imageHDU);
-            displaySelection(imageHDU);
-
+        }
+        
+        if (jComboBoxImage.getItemCount() != 0) {
+            if (imageHDU != null && imageHDU.hasImages()) {
+                jComboBoxImage.setSelectedItem(imageHDU);
+                displaySelection(imageHDU);
+            }
         } else {
             jPanelImage.remove(fitsImagePanel);
             logger.info("Remove image panel");
@@ -185,7 +188,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
                 // TODO have a look in the ouput param to look at right image ?
                 // show first one :
-                imageHdus = oifitsFile.getImageOiData().getFitsImageHDUs();
+                imageHdus = oifitsFile.getFitsImageHDUs();
                 imageHduToShow = imageHdus.isEmpty() ? null : imageHdus.get(0);
                 target = oifitsFile.getImageOiData().getInputParam().getTarget();
 

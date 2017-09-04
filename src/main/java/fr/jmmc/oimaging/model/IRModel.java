@@ -140,7 +140,7 @@ public class IRModel {
             }
 
             final FitsImageHDU pHDU = oifitsFile.getPrimaryImageHDU();
-            if (pHDU != null && pHDU.getImageCount() > 0) {
+            if (pHDU != null && pHDU.hasImages()) {
                 setSelectedInputImageHDU(pHDU);
             }
 
@@ -194,7 +194,12 @@ public class IRModel {
     private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
         // Start with all hdus
         final List<FitsImageHDU> hdusToAdd = new LinkedList<FitsImageHDU>();
-        hdusToAdd.addAll(hdus);
+        
+        for (FitsImageHDU fitsImageHDU : hdus) {
+            if (fitsImageHDU.hasImages()) {
+                hdusToAdd.add(fitsImageHDU);
+            }
+        }
 
         // Remove duplicates and skip hdu with hduname present in current input oifits
         for (FitsImageHDU hdu : hdus) {
