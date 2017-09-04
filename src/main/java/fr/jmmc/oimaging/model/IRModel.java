@@ -442,7 +442,7 @@ public class IRModel {
 
         if (serviceResult.isValid()) {
             try {
-                addFitsImageHDUs(serviceResult.getOifitsFile().getImageOiData().getFitsImageHDUs(), serviceResult.getInputFile().getName());
+                addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
             } catch (IOException ex) {
                 logger.error("Can't get imageHDU from result oifile", ex);
             } catch (FitsException ex) {
