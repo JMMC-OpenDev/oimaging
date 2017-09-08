@@ -93,61 +93,55 @@ public class IRModel {
 
         if (inputOifitsFile == null) {
             this.oifitsFile = new OIFitsFile(OIFitsStandard.VERSION_1);
-            this.oifitsFile.setImageOiData(new ImageOiData(oifitsFile));
         } else {
             this.oifitsFile = inputOifitsFile;
+        }
+        if (oifitsFile.getImageOiData() == null) {
+            this.oifitsFile.setImageOiData(new ImageOiData(oifitsFile));
+        }
 
-            // load targets
-            String[] targets = null;
-            if (oifitsFile.hasOiTarget()) {
-                targets = oifitsFile.getOiTarget().getTarget();
-                for (String target : targets) {
-                    targetListModel.add(target);
-                }
+        // load targets
+        String[] targets = null;
+        if (oifitsFile.hasOiTarget()) {
+            targets = oifitsFile.getOiTarget().getTarget();
+            for (String target : targets) {
+                targetListModel.add(target);
             }
+        }
 
-            ImageOiInputParam inputParam;
-            // load inputImageOiData or create a new one
-            ImageOiData inputImageOiData = oifitsFile.getImageOiData();
-            if (inputImageOiData == null) {
-                inputImageOiData = new ImageOiData(oifitsFile);
-                oifitsFile.setImageOiData(inputImageOiData);
+        // load inputImageOiData or create a new one
+        final ImageOiData inputImageOiData = oifitsFile.getImageOiData();
+        final ImageOiInputParam inputParam = oifitsFile.getImageOiData().getInputParam();
 
-                inputParam = oifitsFile.getImageOiData().getInputParam();
-                // Reset observable use according available tables
-                inputParam.useVis(oifitsFile.hasOiVis());
-                inputParam.useVis2(oifitsFile.hasOiVis2());
-                inputParam.useT3(oifitsFile.hasOiT3());
+        // Reset observable use according available tables
+        inputParam.useVis(oifitsFile.hasOiVis());
+        inputParam.useVis2(oifitsFile.hasOiVis2());
+        inputParam.useT3(oifitsFile.hasOiT3());
 
-                // Reset WLen bounds
-                inputParam.setWaveMin(oifitsFile.getMinWavelengthBound());
-                inputParam.setWaveMax(oifitsFile.getMaxWavelengthBound());
-            }
+        // Reset WLen bounds
+        inputParam.setWaveMin(oifitsFile.getMinWavelengthBound());
+        inputParam.setWaveMax(oifitsFile.getMaxWavelengthBound());
 
-            // fix input param according given input:
-            inputParam = oifitsFile.getImageOiData().getInputParam();
+        // Select first target by default
+        // assume we have one
+        if (targets != null) {
+            inputParam.setTarget(targets[0]);
+        }
 
-            // Select first target by default
-            // assume we have one
-            if (targets != null) {
-                inputParam.setTarget(targets[0]);
-            }
+        // load fits Image HDU data of given oifits if any present
+        // TODO handle primary HDU ?
+        if (!inputImageOiData.getFitsImageHDUs().isEmpty()) {
+            addFitsImageHDUs(inputImageOiData.getFitsImageHDUs(), oifitsFile.getName());
+        }
 
-            // load fits Image HDU data of given oifits if any present
-            // TODO handle primary HDU ?
-            if (!inputImageOiData.getFitsImageHDUs().isEmpty()) {
-                addFitsImageHDUs(inputImageOiData.getFitsImageHDUs(), oifitsFile.getName());
-            }
+        final FitsImageHDU pHDU = oifitsFile.getPrimaryImageHDU();
+        if (pHDU != null && pHDU.hasImages()) {
+            setSelectedInputImageHDU(pHDU);
+        }
 
-            final FitsImageHDU pHDU = oifitsFile.getPrimaryImageHDU();
-            if (pHDU != null && pHDU.hasImages()) {
-                setSelectedInputImageHDU(pHDU);
-            }
-
-            // Select first image as selected one if not yet initialized
-            if (selectedInputImageHDU == null && !fitsImageHDUs.isEmpty()) {
-                setSelectedInputImageHDU(fitsImageHDUs.get(0));
-            }
+        // Select first image as selected one if not yet initialized
+        if (selectedInputImageHDU == null && fitsImageHDUs != null && !fitsImageHDUs.isEmpty()) {
+            setSelectedInputImageHDU(fitsImageHDUs.get(0));
         }
 
         // avoid null service
