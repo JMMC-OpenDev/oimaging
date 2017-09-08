@@ -93,9 +93,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         // image combo
         jComboBoxImage.removeAllItems();
 
-        for (FitsImageHDU fitsImageHDU : imageHdus) {
-            if (fitsImageHDU.hasImages()) {
-                jComboBoxImage.addItem(fitsImageHDU);
+        if (imageHdus != null) {
+            for (FitsImageHDU fitsImageHDU : imageHdus) {
+                if (fitsImageHDU.hasImages()) {
+                    jComboBoxImage.addItem(fitsImageHDU);
+                }
             }
         }
         
