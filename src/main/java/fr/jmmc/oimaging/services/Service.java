@@ -6,7 +6,7 @@ package fr.jmmc.oimaging.services;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
-import fr.jmmc.oitools.model.FitsTable;
+import fr.jmmc.oitools.fits.FitsTable;
 
 /**
  * Details service as a combinaison of program handled by a dedicated execution

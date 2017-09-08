@@ -5,7 +5,7 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.oitools.fits.FitsUtils;
 import fr.jmmc.oitools.meta.KeywordMeta;
-import fr.jmmc.oitools.model.FitsTable;
+import fr.jmmc.oitools.fits.FitsTable;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
