@@ -17,6 +17,7 @@ import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageLoader;
 import fr.jmmc.oitools.image.ImageOiData;
+import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
@@ -123,7 +124,7 @@ public final class IRModelManager implements IRModelEventListener {
      * @throws XmlBindException if a JAXBException was caught while creating an unmarshaller
      */
     public void loadIRModel(final File file, final OIFitsChecker checker,
-            final LoadIRModelListener listener) throws IOException, IllegalStateException, XmlBindException {
+                            final LoadIRModelListener listener) throws IOException, IllegalStateException, XmlBindException {
         loadIRModel(file, checker, listener, false);
     }
 
@@ -138,7 +139,7 @@ public final class IRModelManager implements IRModelEventListener {
      * @throws XmlBindException if a JAXBException was caught while creating an unmarshaller
      */
     public void loadIRModel(final File file, final OIFitsChecker checker,
-            final LoadIRModelListener listener, final boolean appendOIFitsFilesOnly) throws IOException, IllegalStateException, XmlBindException {
+                            final LoadIRModelListener listener, final boolean appendOIFitsFilesOnly) throws IOException, IllegalStateException, XmlBindException {
 
         final IRModel loadedModel = (IRModel) JAXBUtils.loadObject(file.toURI().toURL(), this.jf);
 
@@ -218,7 +219,7 @@ public final class IRModelManager implements IRModelEventListener {
                     // TODO: remove StatusBar !
                     StatusBar.show("loading file: " + fileLocation + " ( local copy: " + localCopy.getAbsolutePath() + " )");
 
-                    oifitsFile = OIFitsLoader.loadOIFits(checker, localCopy.getAbsolutePath());
+                    oifitsFile = OIFitsLoader.loadOIFits(OIFitsStandard.VERSION_1, checker, localCopy.getAbsolutePath());
                     oifitsFile.setSourceURI(new URI(fileLocation));
                 } else {
                     // download failed:
@@ -228,7 +229,7 @@ public final class IRModelManager implements IRModelEventListener {
                 // TODO: remove StatusBar !
                 StatusBar.show("loading file: " + fileLocation);
 
-                oifitsFile = OIFitsLoader.loadOIFits(checker, fileLocation);
+                oifitsFile = OIFitsLoader.loadOIFits(OIFitsStandard.VERSION_1, checker, fileLocation);
             }
         } catch (AuthenticationException ae) {
             throw new IOException("Could not load the file : " + fileLocation, ae);

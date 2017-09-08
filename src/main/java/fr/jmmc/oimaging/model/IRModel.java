@@ -298,15 +298,19 @@ public class IRModel {
                 
                 oifitsFile.getImageOiData().getInputParam().setInitImg(fitsImageHDU.getHduName());
                 
+                // OIFITS2 are not supported (2017/09/08)
+/*                
                 // keep primary HDU if present (oifits 2 ?)
                 final FitsImageHDU primaryHDU = oifitsFile.getPrimaryImageHDU();
-                
+*/                
                 final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
                 imageHdus.clear();
                 // add images:
+/*                
                 if (primaryHDU != null) {
                     imageHdus.add(primaryHDU);
                 }
+*/                
                 imageHdus.add(fitsImageHDU);
                 
                 logger.info("Set new hdu '{}' as selectedInputImageHDU", fitsImageHDU.getHduName());
@@ -411,7 +415,7 @@ public class IRModel {
         // the file does exist (checked previously):
         Exception e = null;
         try {
-            OIFitsFile result = OIFitsLoader.loadOIFits(resultFile.getAbsolutePath());
+            OIFitsFile result = OIFitsLoader.loadOIFits(OIFitsStandard.VERSION_1, resultFile.getAbsolutePath());
 
             // TODO 1 - show plot for oidata part
             // 2 - show result images
