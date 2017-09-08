@@ -6,7 +6,7 @@ package fr.jmmc.oimaging.services;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
-import fr.jmmc.oitools.model.Table;
+import fr.jmmc.oitools.model.FitsTable;
 
 /**
  * Details service as a combinaison of program handled by a dedicated execution
@@ -69,7 +69,7 @@ public class Service {
 
     final WisardInputParam wisard_params = new WisardInputParam();
 
-    public Table initSpecificParams(ImageOiInputParam params) {
+    public FitsTable initSpecificParams(ImageOiInputParam params) {
         final String rglName = params.getRglName();
         // check that RGL_NAME is compliant.
 
@@ -96,7 +96,7 @@ public class Service {
         return false;
     }
 
-    private static class WisardInputParam extends Table {
+    private static class WisardInputParam extends FitsTable {
 
         public final static String KEYWORD_NP_MIN = "NP_MIN";
         private KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN, "minimum number of reconstructed voxels", Types.TYPE_SHORT);

@@ -5,7 +5,7 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.oitools.fits.FitsUtils;
 import fr.jmmc.oitools.meta.KeywordMeta;
-import fr.jmmc.oitools.model.Table;
+import fr.jmmc.oitools.model.FitsTable;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 // TODO move it in oitools module ?
 public class TableKeywordsEditor extends javax.swing.JPanel implements ActionListener, PropertyChangeListener {
 
-    Table model = null;
+    FitsTable model = null;
     AlgorithmSettingsPanel notifiedParent = null;
 
     final static Insets insets = new java.awt.Insets(2, 2, 2, 2);
@@ -35,12 +35,12 @@ public class TableKeywordsEditor extends javax.swing.JPanel implements ActionLis
         initComponents();
     }
 
-    public void setModel(final Table model, AlgorithmSettingsPanel notifiedParent) {
+    public void setModel(final FitsTable model, AlgorithmSettingsPanel notifiedParent) {
         setModel(model, model == null ? null : model.getKeywordsDesc() == null ? null : model.getKeywordsDesc().keySet(), notifiedParent);
 
     }
 
-    void setModel(Table model, Set<String> keywords, AlgorithmSettingsPanel notifiedParent) {
+    void setModel(FitsTable model, Set<String> keywords, AlgorithmSettingsPanel notifiedParent) {
 
         this.model = model;
         this.notifiedParent = notifiedParent;
