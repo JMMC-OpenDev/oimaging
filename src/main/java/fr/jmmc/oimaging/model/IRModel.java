@@ -16,6 +16,7 @@ import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.OIFitsStandard;
+import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
@@ -294,9 +295,20 @@ public class IRModel {
         for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
             if (currentHDU.getChecksum() == fitsImageHDU.getChecksum()) {
                 selectedInputImageHDU = fitsImageHDU;
+                
                 oifitsFile.getImageOiData().getInputParam().setInitImg(fitsImageHDU.getHduName());
-                oifitsFile.getImageOiData().getFitsImageHDUs().clear();
-                oifitsFile.getImageOiData().getFitsImageHDUs().add(fitsImageHDU);
+                
+                // keep primary HDU if present (oifits 2 ?)
+                final FitsImageHDU primaryHDU = oifitsFile.getPrimaryImageHDU();
+                
+                final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
+                imageHdus.clear();
+                // add images:
+                if (primaryHDU != null) {
+                    imageHdus.add(primaryHDU);
+                }
+                imageHdus.add(fitsImageHDU);
+                
                 logger.info("Set new hdu '{}' as selectedInputImageHDU", fitsImageHDU.getHduName());
                 added = true;
             }
@@ -357,6 +369,12 @@ public class IRModel {
     }
 
     public File prepareTempFile() throws FitsException, IOException {
+        // validate OIFITS:
+        final OIFitsChecker checker = new OIFitsChecker();
+        oifitsFile.check(checker);
+        // validation results
+        logger.info("validation results:\n{}", checker.getCheckReport());
+        
         File tmpFile = FileUtils.getTempFile(oifitsFile.getName(), ".export-" + exportCount + ".fits");
         exportCount++;
         oifitsFile.setAbsoluteFilePath(tmpFile.getAbsolutePath());
@@ -364,7 +382,7 @@ public class IRModel {
         return tmpFile;
     }
 
-    public String getelectedInputFitsImageError() {
+    public String getSelectedInputFitsImageError() {
         if (getSelectedInputImageHDU() == null) {
             return "No image data loaded";
         }

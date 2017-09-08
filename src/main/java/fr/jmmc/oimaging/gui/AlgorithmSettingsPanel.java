@@ -495,7 +495,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         if (selectedFitsImageHDU != null) {
             jComboBoxImage.getModel().setSelectedItem(selectedFitsImageHDU);
         } else {
-            failures.add(irModel.getelectedInputFitsImageError());
+            failures.add(irModel.getSelectedInputFitsImageError());
         }
 
     }
