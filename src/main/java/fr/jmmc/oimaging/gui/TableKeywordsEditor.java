@@ -69,15 +69,13 @@ public class TableKeywordsEditor extends javax.swing.JPanel implements ActionLis
                 switch (model.getKeywordsDesc().get(key).getDataType()) {
                     case TYPE_CHAR:
                         jTextField = new JTextField(value == null ? "" : value.toString());
-
                         break;
                     case TYPE_DBL:
-                    case TYPE_REAL:
                         jFormattedTextField = new JFormattedTextField(value);
                         jFormattedTextField.setFormatterFactory(AlgorithmSettingsPanel.getDecimalFormatterFactory());
                         jTextField = jFormattedTextField;
                         break;
-                    case TYPE_SHORT:
+                    case TYPE_INT:
                         jFormattedTextField = new JFormattedTextField(value);
                         jFormattedTextField.setFormatterFactory(AlgorithmSettingsPanel.getIntegerFormatterFactory());
                         jTextField = jFormattedTextField;

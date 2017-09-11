@@ -96,39 +96,46 @@ public class Service {
         return false;
     }
 
-    private static class WisardInputParam extends FitsTable {
+    private static final class WisardInputParam extends FitsTable {
 
         public final static String KEYWORD_NP_MIN = "NP_MIN";
-        private KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN, "minimum number of reconstructed voxels", Types.TYPE_SHORT);
-
         public final static String KEYWORD_FOV = "FOV";
-        private KeywordMeta FOV = new KeywordMeta(KEYWORD_FOV, "field of view", Types.TYPE_DBL);
-
         public final static String KEYWORD_SCALE = "SCALE";
-        private KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE, "TBD", Types.TYPE_DBL);
-
         public final static String KEYWORD_DELTA = "DELTA";
-        private KeywordMeta DELTA = new KeywordMeta(KEYWORD_DELTA, "TBD", Types.TYPE_DBL);
-        private Object oldScale;
-        private Object oldDelta;
+
+        private final static KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN, "minimum number of reconstructed voxels", Types.TYPE_INT);
+
+        private final static KeywordMeta FOV = new KeywordMeta(KEYWORD_FOV, "field of view", Types.TYPE_DBL);
+
+        private final static KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE, "TBD", Types.TYPE_DBL);
+
+        private final static KeywordMeta DELTA = new KeywordMeta(KEYWORD_DELTA, "TBD", Types.TYPE_DBL);
 
         public WisardInputParam() {
+            super();
+            
+            // define keywords:
             addKeywordMeta(NP_MIN);
-            setKeywordInt(KEYWORD_NP_MIN, 32);
             addKeywordMeta(FOV);
+            addKeywordMeta(SCALE);
+            addKeywordMeta(DELTA);
+
+            // default values:
+            setKeywordInt(KEYWORD_NP_MIN, 32);
             setKeywordDouble(KEYWORD_FOV, 20.0);
 
-            addKeywordMeta(SCALE);
             setKeywordDouble(KEYWORD_SCALE, .0001);
-            addKeywordMeta(DELTA);
             setKeywordDouble(KEYWORD_DELTA, 1);
         }
 
         public void update(ImageOiInputParam params) {
+            // TODO: cleanup all tha logic !!
             params.addSubTable(null);
+            
             // for our first implementation, just add to params if not TOTVAR
             getKeywordsDesc().remove(KEYWORD_SCALE);
             getKeywordsDesc().remove(KEYWORD_DELTA);
+            
             if (params.getRglName().startsWith("L1")) {
                 addKeywordMeta(SCALE);
                 addKeywordMeta(DELTA);
