@@ -169,7 +169,7 @@
                         </Constraint>
                       </Constraints>
                     </Component>
-                    <Component class="javax.swing.JTable" name="jTableOutpuParametersKeywords">
+                    <Component class="javax.swing.JTable" name="jTableOutputParamKeywords">
                       <Properties>
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                           <Table columnCount="3" rowCount="0">
@@ -195,7 +195,7 @@
                         </Constraint>
                       </Constraints>
                     </Component>
-                    <Component class="javax.swing.JTable" name="jTableInpuParametersKeywords">
+                    <Component class="javax.swing.JTable" name="jTableInputParamKeywords">
                       <Properties>
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                           <Table columnCount="3" rowCount="0">

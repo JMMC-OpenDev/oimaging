@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.FeedbackReport;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.FileChooser;
+import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
@@ -39,17 +40,19 @@ import org.slf4j.LoggerFactory;
  */
 public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
+    private static final long serialVersionUID = 1L;
+
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(ViewerPanel.class);
 
     /** Fits image panel */
-    private FitsImagePanel fitsImagePanel;
+    private final FitsImagePanel fitsImagePanel;
 
     /** OIFits viewer panel */
-    private OIFitsViewPanel oifitsViewPanel;
+    private final OIFitsViewPanel oifitsViewPanel;
 
-    private Action exportOiFitsAction;
-    private Action exportFitsImageAction;
+    private final Action exportOiFitsAction;
+    private final Action exportFitsImageAction;
     private Component lastModelPanel;
     private Component lastResultPanel;
 
@@ -65,6 +68,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     /** Creates new form ViewerPanel */
     public ViewerPanel() {
         initComponents();
+
+        // Fix row height:
+        SwingUtils.adjustRowHeight(jTableOutputParamKeywords);
+        SwingUtils.adjustRowHeight(jTableInputParamKeywords);
 
         jTabbedPaneVizualizations.addChangeListener(this);
 
@@ -100,7 +107,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 }
             }
         }
-        
+
         if (jComboBoxImage.getItemCount() != 0) {
             if (imageHDU != null && imageHDU.hasImages()) {
                 jComboBoxImage.setSelectedItem(imageHDU);
@@ -129,8 +136,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             jPanelOIFits.add(oifitsViewPanel);
 
             // init Param Tables
-            jTableOutpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
-            jTableInpuParametersKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
+            jTableOutputParamKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
+            jTableInputParamKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
 
         } else {
             jPanelOIFits.remove(oifitsViewPanel);
@@ -283,9 +290,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jScrollPane4 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jTableOutpuParametersKeywords = new javax.swing.JTable();
+        jTableOutputParamKeywords = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        jTableInpuParametersKeywords = new javax.swing.JTable();
+        jTableInputParamKeywords = new javax.swing.JTable();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
         setLayout(new java.awt.GridBagLayout());
@@ -340,7 +347,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelLogViewer.setLayout(new javax.swing.BoxLayout(jPanelLogViewer, javax.swing.BoxLayout.LINE_AXIS));
 
-        jEditorPaneExecutionLog.setEditable(false);
         jScrollPane1.setViewportView(jEditorPaneExecutionLog);
 
         jPanelLogViewer.add(jScrollPane1);
@@ -351,14 +357,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jLabel2.setText("Output");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         jPanel1.add(jLabel2, gridBagConstraints);
 
-        jTableOutpuParametersKeywords.setModel(new javax.swing.table.DefaultTableModel(
+        jTableOutputParamKeywords.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -371,16 +376,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        jPanel1.add(jTableOutpuParametersKeywords, gridBagConstraints);
+        jPanel1.add(jTableOutputParamKeywords, gridBagConstraints);
 
-        jLabel1.setText("Input");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         jPanel1.add(jLabel1, gridBagConstraints);
 
-        jTableInpuParametersKeywords.setModel(new javax.swing.table.DefaultTableModel(
+        jTableInputParamKeywords.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -394,15 +398,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        jPanel1.add(jTableInpuParametersKeywords, gridBagConstraints);
+        jPanel1.add(jTableInputParamKeywords, gridBagConstraints);
 
         jScrollPane4.setViewportView(jPanel1);
 
         jPanelOutputParamViewer.add(jScrollPane4);
 
         jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
-
-        jTabbedPaneVizualizations.setSelectedIndex(1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -433,8 +435,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPaneVizualizations;
-    private javax.swing.JTable jTableInpuParametersKeywords;
-    private javax.swing.JTable jTableOutpuParametersKeywords;
+    private javax.swing.JTable jTableInputParamKeywords;
+    private javax.swing.JTable jTableOutputParamKeywords;
     // End of variables declaration//GEN-END:variables
 
     @Override
