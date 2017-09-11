@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<jnlp spec="1.0+" codebase="@GENERATED@" href="OIExplorerCore.jnlp">
+    <information>
+        <title>OIExplorer Framework</title>
+        <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
+        <homepage href="http://www.jmmc.fr/dev/"/>
+        <description>OIExplorer common libs</description>
+        <offline-allowed/>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <!-- MANUALLY EDITED - Should be generated with maven ASAP ! -->
+
+        <!-- Module code -->
+        <jar href="jar/oiexplorer-core-TRUNK.jar"/>
+        <jar href="jar/oitools-TRUNK.jar"/>
+
+
+        <!-- Libraries -->
+        <!-- JEL (oitools) -->
+        <jar href="@SHARED@/JEL-2.1.1-jdk5.jar" />
+
+        <!-- JFreeChart -->
+        <jar href="@SHARED@/jfreechart-1.0.19.jar" />
+        <jar href="@SHARED@/jcommon-1.0.23.jar" />
+
+        <!-- PDF -->
+        <jar href="@SHARED@/itext-2.1.5.jar" />
+
+    </resources>
+
+    <component-desc/>
+</jnlp>
