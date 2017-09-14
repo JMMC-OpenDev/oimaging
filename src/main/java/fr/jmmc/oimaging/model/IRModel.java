@@ -373,6 +373,8 @@ public class IRModel {
     }
 
     public File prepareTempFile() throws FitsException, IOException {
+        // TODO don't copy file on every loop (because the oifitsFile always is synchronized as an input file model)
+
         // validate OIFITS:
         final OIFitsChecker checker = new OIFitsChecker();
         oifitsFile.check(checker);
