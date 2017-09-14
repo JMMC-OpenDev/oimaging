@@ -189,7 +189,7 @@ public class IRModel {
     private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
         // Start with all hdus
         final List<FitsImageHDU> hdusToAdd = new LinkedList<FitsImageHDU>();
-        
+
         for (FitsImageHDU fitsImageHDU : hdus) {
             if (fitsImageHDU.hasImages()) {
                 hdusToAdd.add(fitsImageHDU);
@@ -295,24 +295,24 @@ public class IRModel {
         for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
             if (currentHDU.getChecksum() == fitsImageHDU.getChecksum()) {
                 selectedInputImageHDU = fitsImageHDU;
-                
+
                 oifitsFile.getImageOiData().getInputParam().setInitImg(fitsImageHDU.getHduName());
-                
+
                 // OIFITS2 are not supported (2017/09/08)
-/*                
+/*
                 // keep primary HDU if present (oifits 2 ?)
                 final FitsImageHDU primaryHDU = oifitsFile.getPrimaryImageHDU();
-*/                
+                 */
                 final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
                 imageHdus.clear();
                 // add images:
-/*                
+/*
                 if (primaryHDU != null) {
                     imageHdus.add(primaryHDU);
                 }
-*/                
+                 */
                 imageHdus.add(fitsImageHDU);
-                
+
                 logger.info("Set new hdu '{}' as selectedInputImageHDU", fitsImageHDU.getHduName());
                 added = true;
             }
@@ -378,11 +378,17 @@ public class IRModel {
         oifitsFile.check(checker);
         // validation results
         logger.info("validation results:\n{}", checker.getCheckReport());
-        
-        File tmpFile = FileUtils.getTempFile(oifitsFile.getName(), ".export-" + exportCount + ".fits");
-        exportCount++;
-        oifitsFile.setAbsoluteFilePath(tmpFile.getAbsolutePath());
+
+        // store original filename
+        final String originalAbsoluteFilePath = oifitsFile.getAbsoluteFilePath();
+
+        File tmpFile = FileUtils.getTempFile(oifitsFile.getFileName(), ".export-" + exportCount + ".fits");
         OIFitsWriter.writeOIFits(tmpFile.getAbsolutePath(), oifitsFile);
+
+        //restore filename
+        oifitsFile.setAbsoluteFilePath(originalAbsoluteFilePath);
+
+        exportCount++;
         return tmpFile;
     }
 
