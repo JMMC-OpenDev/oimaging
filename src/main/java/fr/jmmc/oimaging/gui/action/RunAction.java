@@ -77,18 +77,19 @@ public class RunAction extends RegisteredAction {
             File inputFile = null;
             try {
                 inputFile = irModel.prepareTempFile();
+                StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
+                // change model state to lock it and extract its snapshot
+                setRunningState(irModel, true);
+                new RunFitActionWorker(getTask(), inputFile, irModel, this).executeTask();
             } catch (FitsException ex) {
-                logger.error("Can't prepare temporary file before running process", ex);
                 setRunningState(irModel, false);
+                logger.error("Can't prepare temporary file before running process", ex);
+                StatusBar.show("Can't spawn new process : " + ex.getMessage());
             } catch (IOException ex) {
                 logger.error("Can't prepare temporary file before running process", ex);
+                StatusBar.show("Can't spawn new process : " + ex.getMessage());
                 setRunningState(irModel, false);
             }
-
-            StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
-            // change model state to lock it and extract its snapshot
-            setRunningState(irModel, true);
-            new RunFitActionWorker(getTask(), inputFile, irModel, this).executeTask();
         }
     }
 
