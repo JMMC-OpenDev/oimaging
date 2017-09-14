@@ -10,11 +10,11 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
+import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
-import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImage;
@@ -347,6 +347,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelLogViewer.setLayout(new javax.swing.BoxLayout(jPanelLogViewer, javax.swing.BoxLayout.LINE_AXIS));
 
+        jEditorPaneExecutionLog.setEditable(false);
         jScrollPane1.setViewportView(jEditorPaneExecutionLog);
 
         jPanelLogViewer.add(jScrollPane1);
@@ -357,6 +358,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
+        jLabel2.setText("Output");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -376,8 +378,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
         jPanel1.add(jTableOutputParamKeywords, gridBagConstraints);
 
+        jLabel1.setText("Input");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -405,6 +409,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelOutputParamViewer.add(jScrollPane4);
 
         jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
+
+        jTabbedPaneVizualizations.setSelectedIndex(1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
