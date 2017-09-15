@@ -148,6 +148,8 @@ public class IRModel {
         // avoid null service
         if (getSelectedService() == null) {
             setSelectedSoftware(ServiceList.getPreferedService());
+        } else {
+            initSpecificParams();
         }
     }
 
