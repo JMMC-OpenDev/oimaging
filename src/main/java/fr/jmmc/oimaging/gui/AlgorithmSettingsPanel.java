@@ -514,7 +514,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     }
 
     boolean updateModel(IRModel irModel) {
-        ImageOiInputParam params = irModel.getImageOiData().getInputParam();
+        final ImageOiInputParam params = irModel.getImageOiData().getInputParam();
 
         // Update if model_values != swing_values and detect change if one or more values change
         boolean changed = false;
