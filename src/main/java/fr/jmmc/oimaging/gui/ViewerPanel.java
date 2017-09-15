@@ -31,6 +31,8 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         RESULT;
     }
     private SHOW_MODE showMode;
+
+    private final static TableModel emptyTableModel = new DefaultTableModel();
 
     /** Creates new form ViewerPanel */
     public ViewerPanel() {
@@ -138,9 +142,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // init Param Tables
             jTableOutputParamKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
             jTableInputParamKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
-
         } else {
             jPanelOIFits.remove(oifitsViewPanel);
+            jTableOutputParamKeywords.setModel(emptyTableModel);
+            jTableInputParamKeywords.setModel(emptyTableModel);
         }
     }
 
