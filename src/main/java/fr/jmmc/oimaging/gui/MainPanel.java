@@ -639,10 +639,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // TODO may be a copy dedicated to this class
-        IRModel irModel = IRModelManager.getInstance().getIRModel();
+        final IRModel irModel = IRModelManager.getInstance().getIRModel();
         currentModel = irModel;
 
-        ImageOiInputParam params = irModel.getImageOiData().getInputParam();
+        final ImageOiInputParam params = irModel.getImageOiData().getInputParam();
 
         // specific params must be updated
         irModel.initSpecificParams();
@@ -652,7 +652,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         double mDouble, wDouble;
         String mString, wString;
         boolean mFlag, wFlag;
-        int mInt, wInt;
 
         // Target
         mString = params.getTarget();
@@ -710,11 +709,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // some values have changed
         if (changed) {
             // notify to other listener - if any in the future
-
             StatusBar.show("GUI updated");
             IRModelManager.getInstance().fireIRModelChanged(this, null);
         }
-
     }
 
     /**
@@ -723,90 +720,93 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
      */
     private void syncUI(IRModelEvent event) {
         syncingUI = true;
-        currentModel = event.getIrModel();
+        try {
+            currentModel = event.getIrModel();
 
-        OIFitsFile oifitsFile = currentModel.getOifitsFile();
-        boolean hasOIData = oifitsFile.hasOiData();
-        ImageOiInputParam inputParam = currentModel.getImageOiData().getInputParam();
+            final OIFitsFile oifitsFile = currentModel.getOifitsFile();
+            boolean hasOIData = oifitsFile.hasOiData();
+            final ImageOiInputParam inputParam = currentModel.getImageOiData().getInputParam();
 
-        // associate target list
-        jComboBoxTarget.setModel(currentModel.getTargetListModel());
-        Object sel = inputParam.getTarget();
-        jComboBoxTarget.setSelectedItem(sel);
+            // associate target list
+            jComboBoxTarget.setModel(currentModel.getTargetListModel());
+            Object sel = inputParam.getTarget();
+            jComboBoxTarget.setSelectedItem(sel);
 
-        // TODO Update OIFitsViewer:
-        // arrange target
-        jComboBoxTarget.setEnabled(hasOIData);
+            // TODO Update OIFitsViewer:
+            // arrange target
+            jComboBoxTarget.setEnabled(hasOIData);
 
-        // arrange wavelength filters
-        jSliderWaveMin.setEnabled(hasOIData);
-        jSliderWaveMax.setEnabled(hasOIData);
+            // arrange wavelength filters
+            jSliderWaveMin.setEnabled(hasOIData);
+            jSliderWaveMax.setEnabled(hasOIData);
 
-        fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMin() / MICRO_METER);
-        fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMax() / MICRO_METER);
+            fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMin() / MICRO_METER);
+            fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMax() / MICRO_METER);
 
-        jFormattedTextFieldWaveMin.setEnabled(hasOIData);
-        jFormattedTextFieldWaveMax.setEnabled(hasOIData);
-        jFormattedTextFieldWaveMin.setValue(inputParam.getWaveMin() / MICRO_METER);
-        jFormattedTextFieldWaveMax.setValue(inputParam.getWaveMax() / MICRO_METER);
+            jFormattedTextFieldWaveMin.setEnabled(hasOIData);
+            jFormattedTextFieldWaveMax.setEnabled(hasOIData);
+            jFormattedTextFieldWaveMin.setValue(inputParam.getWaveMin() / MICRO_METER);
+            jFormattedTextFieldWaveMax.setValue(inputParam.getWaveMax() / MICRO_METER);
 
-        // arrange observable checkboxes
-        jCheckBoxUseVis.setEnabled(hasOIData && oifitsFile.hasOiVis());
-        jCheckBoxUseVis2.setEnabled(hasOIData && oifitsFile.hasOiVis2());
-        jCheckBoxUseT3.setEnabled(hasOIData && oifitsFile.hasOiT3());
-        jCheckBoxUseVis.setSelected(hasOIData && inputParam.useVis());
-        jCheckBoxUseVis2.setSelected(hasOIData && inputParam.useVis2());
-        jCheckBoxUseT3.setSelected(hasOIData && inputParam.useT3());
+            // arrange observable checkboxes
+            jCheckBoxUseVis.setEnabled(hasOIData && oifitsFile.hasOiVis());
+            jCheckBoxUseVis2.setEnabled(hasOIData && oifitsFile.hasOiVis2());
+            jCheckBoxUseT3.setEnabled(hasOIData && oifitsFile.hasOiT3());
+            jCheckBoxUseVis.setSelected(hasOIData && inputParam.useVis());
+            jCheckBoxUseVis2.setSelected(hasOIData && inputParam.useVis2());
+            jCheckBoxUseT3.setSelected(hasOIData && inputParam.useT3());
 
-        // resultSet List
-        resultSetListModel.clear();
-        resultSetListModel.add(currentModel.getResultSets());
-        jListResultSet.setModel(resultSetListModel);
+            // resultSet List
+            resultSetListModel.clear();
+            resultSetListModel.add(currentModel.getResultSets());
+            jListResultSet.setModel(resultSetListModel);
 
-        // perform analysis
-        List<String> failures = new LinkedList<String>();
-        failures.clear();
+            // perform analysis
+            List<String> failures = new LinkedList<String>();
+            failures.clear();
 
-        algorithmSettinsPanel.syncUI(this, currentModel, failures);
+            algorithmSettinsPanel.syncUI(this, currentModel, failures);
 
-        jLabelOifitsFile.setText(hasOIData ? currentModel.getUserOifitsFile().getName() : "");
+            jLabelOifitsFile.setText(hasOIData ? currentModel.getUserOifitsFile().getName() : "");
 
-        if (!hasOIData) {
-            failures.add("Missing OIData, please load an OIFits");
-        } else if (inputParam.getWaveMax() < inputParam.getWaveMin()) {
-            failures.add("WAVE_MIN is higher than WAVE_MAX");
-        }
-        /* Not sure
+            if (!hasOIData) {
+                failures.add("Missing OIData, please load an OIFits");
+            } else if (inputParam.getWaveMax() < inputParam.getWaveMin()) {
+                failures.add("WAVE_MIN is higher than WAVE_MAX");
+            }
+            /* Not sure
             for (OIData table : oifitsFile.getOiDataList()) {
                 if (table.getOiRevn() > 1) {
                     failures.add("OIFits V2 tables not yet supported (" + table.getExtName() + "#" + table.getExtNb() + ")");
                 }
             }
-         */
+             */
 
-        // if nothing is wrong allow related actions
-        // TODO make this idea more global and on an higher level Manager.setValid(true) e.g. ?
-        final boolean modelOk = failures.size() == 0;
-        runAction.setEnabled(modelOk);
+            // if nothing is wrong allow related actions
+            // TODO make this idea more global and on an higher level Manager.setValid(true) e.g. ?
+            final boolean modelOk = failures.size() == 0;
+            runAction.setEnabled(modelOk);
 
-        StringBuffer sb = new StringBuffer(200);
-        for (String fail : failures) {
-            sb.append("<li><font color=red>").append(fail).append("</font></li>");
+            StringBuffer sb = new StringBuffer(200);
+            for (String fail : failures) {
+                sb.append("<li><font color=red>").append(fail).append("</font></li>");
+            }
+
+            if (failures.size() == 0) {
+                sb.append("<li><font color=green>Ready to spawn process</font></li>");
+            }
+
+            jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
+
+            if (event.getType().equals(event.getType().IRMODEL_CHANGED) || jListResultSet.getModel().getSize() == 0) {
+                viewerPanel.displayModel(currentModel);
+            } else {
+                jListResultSet.setSelectedIndex(0);
+            }
+
+        } finally {
+            syncingUI = false;
         }
-
-        if (failures.size() == 0) {
-            sb.append("<li><font color=green>Ready to spawn process</font></li>");
-        }
-
-        jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
-
-        if (event.getType().equals(event.getType().IRMODEL_CHANGED) || jListResultSet.getModel().getSize() == 0) {
-            viewerPanel.displayModel(currentModel);
-        } else {
-            jListResultSet.setSelectedIndex(0);
-        }
-
-        syncingUI = false;
     }
 
     public ViewerPanel getViewerPanel() {
