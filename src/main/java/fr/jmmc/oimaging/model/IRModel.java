@@ -214,44 +214,35 @@ public class IRModel {
         }
 
         String now = DateUtils.now().substring(0, 19);
-        // And continue with remaining ones
+        // And continue with remaining ones to find proper name
         for (FitsImageHDU hdu : hdusToAdd) {
-            // if returned hdu has no name : use extname or filename + date
-            if (hdu.getHduName() == null) {
-                if (hdu.getExtName() != null) {
-                    hdu.setHduName(hdu.getExtName() + "-" + now);
-                } else {
-                    hdu.setHduName(filename.substring(0, Math.min(50, filename.length())) + "-" + now);
-                }
-            } else {
-                for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
-                    if (currentHDU.getHduName() == null) {
-                        currentHDU.setHduName("undefined" + currentHDU.getChecksum());
-                        logger.warn("present hdu had no hduName {}", currentHDU);
-                    }
-                    if (currentHDU.getHduName().equals(hdu.getHduName())) {
-                        final String defaultHduName = hdu.getHduName() + "-" + now;
-                        if (hdu.getHduName().equals(defaultHduName)) {
-                            // TODO check if this branch can be reached
-                            MessagePane.showErrorMessage("HDU already loaded with hduname='" + hdu.getHduName() + "'");
-                            //TODO propose here to replace the previous loaded HDU
-                            hdusToAdd.remove(hdu);
-                            break;
+            final String tryName = hdu.getHduName() != null ? hdu.getHduName() : (hdu.getExtName() != null ? hdu.getExtName() : filename.substring(0, Math.min(50, filename.length())));
+            hdu.setHduName(tryName);
+
+            for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
+                if (currentHDU.getHduName() == null) {
+                    currentHDU.setHduName("undefined" + currentHDU.getChecksum());
+                    logger.warn("present hdu had no hduName {}", currentHDU);
+                } else if (currentHDU.getHduName().equals(tryName)) {
+                    final String newName = tryName + "-" + now;
+                    if (hdu.getHduName().equals(newName)) {
+                        // TODO check if this branch can be reached
+                        MessagePane.showErrorMessage("HDU already loaded with hduname='" + newName + "', skipping");
+                        // TODO propose here to replace the previous loaded HDU
+                        hdusToAdd.remove(hdu);
+                    } else {
+                        String confMsg = "'" + tryName + "' HDU already exists in the available init images.\n Do you agree to rename it '" + newName + "' ? \nElse it will be ignored. ";
+                        boolean okToRename = MessagePane.showConfirmMessage(confMsg);
+                        if (okToRename) {
+                            logger.info("hduname '{}' already used, user accepted to rename to '{}'  ", hdu.getHduName(), newName);
+                            hdu.setHduName(newName);
                         } else {
-                            String confMsg = "'" + hdu.getHduName() + "' HDU already exists.\n Do you agree to rename it '" + defaultHduName + "' ? \nElse it will be ignored. ";
-                            boolean okToRename = MessagePane.showConfirmMessage(confMsg);
-                            if (okToRename) {
-                                logger.info("hduname '{}' already used, user accepted to rename to '{}'  ", hdu.getHduName(), defaultHduName);
-                                hdu.setHduName(defaultHduName);
-                                break;
-                            } else {
-                                hdusToAdd.remove(hdu);
-                                logger.info("hduname '{}' already used : user skip prefer to skip it ", hdu.getHduName());
-                            }
+                            hdusToAdd.remove(hdu);
+                            logger.info("hduname '{}' already used : user skip prefer to skip it ", hdu.getHduName());
                         }
                     }
+                    break;
                 }
-
             }
         }
 
