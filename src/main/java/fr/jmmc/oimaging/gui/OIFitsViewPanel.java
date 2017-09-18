@@ -186,7 +186,13 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
         setOIFitsData(oiFitsFile);
 
         if (oiFitsFile == null || !oiFitsFile.hasOiData() || targetName == null || oiFitsFile.getAbsoluteFilePath() == null) {
-            this.jLabelMessage.setText("No OIFits data available.");
+            if (targetName == null) {
+                this.jLabelMessage.setText("Missing target name in response.");
+                // We could implement some fall back looking at OI_TARGET, using selected input one...
+            } else {
+                this.jLabelMessage.setText("No OIFits data available.");
+
+            }
 
             display(false, true);
 
