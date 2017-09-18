@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 2"/>
+    <program name="OImaging" version="0.5 beta 3"/>
     <compilation date="07/06/2017" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -150,6 +150,9 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
+            <prerelease version="0.5 beta 3">
+                <!-- change type="CHANGE">Code rafactoring on image renaming.</change-->
+            </prerelease>
             <prerelease version="0.5 beta 2">
                 <change type="CHANGE">Internal refactoring arround OIFits internal model. At present time, OIFits V2 are loaded as V1.</change>
             </prerelease>
