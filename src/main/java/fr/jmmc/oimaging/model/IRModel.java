@@ -131,8 +131,8 @@ public class IRModel {
 
         // load fits Image HDU data of given oifits if any present
         // TODO handle primary HDU ?
-        if (!inputImageOiData.getFitsImageHDUs().isEmpty()) {
-            addFitsImageHDUs(inputImageOiData.getFitsImageHDUs(), oifitsFile.getName());
+        if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
+            addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName());
         }
 
         final FitsImageHDU pHDU = oifitsFile.getPrimaryImageHDU();
@@ -366,8 +366,8 @@ public class IRModel {
     }
 
     public File prepareTempFile() throws FitsException, IOException {
-        // TODO don't copy file on every loop (because the oifitsFile always is synchronized as an input file model)
 
+        // TODO don't copy file on every loop (because the oifitsFile always is synchronized as an input file model)
         // validate OIFITS:
         final OIFitsChecker checker = new OIFitsChecker();
         oifitsFile.check(checker);
@@ -420,7 +420,7 @@ public class IRModel {
 
             // TODO 1 - show plot for oidata part
             // 2 - show result images
-            dataAdded = addFitsImageHDUs(result.getImageOiData().getFitsImageHDUs(), result.getAbsoluteFilePath());
+            dataAdded = addFitsImageHDUs(result.getFitsImageHDUs(), result.getAbsoluteFilePath());
 
         } catch (IOException ioe) {
             e = ioe;

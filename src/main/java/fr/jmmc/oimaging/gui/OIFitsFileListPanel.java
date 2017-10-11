@@ -254,7 +254,7 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
             if (value == null) {
                 val = null;
             } else if (value instanceof OIFitsFile) {
-                val = ((OIFitsFile) value).getName(); // or getAbsoluteFilePath()
+                val = ((OIFitsFile) value).getFileName(); // or getAbsoluteFilePath()
             } else {
                 val = value.toString();
             }

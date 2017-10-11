@@ -48,7 +48,7 @@ public final class DummyExecutionMode implements OImagingExecutionMode {
             OIFitsFile outputOIFitsFile = OIFitsLoader.loadOIFits(inputFile.getAbsolutePath());
 
             // TODO change hdu names for images
-            for (FitsImageHDU imageHdu : outputOIFitsFile.getImageOiData().getFitsImageHDUs()) {
+            for (FitsImageHDU imageHdu : outputOIFitsFile.getFitsImageHDUs()) {
                 imageHdu.setHduName(imageHdu.getHduName() + idx);
                 idx++;
             }

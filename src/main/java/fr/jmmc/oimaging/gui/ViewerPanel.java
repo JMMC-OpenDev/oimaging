@@ -222,10 +222,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     public void exportOIFits() {
         OIFitsFile oifitsFile = oifitsViewPanel.getOIFitsData();
         File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
-        String name = oifitsFile.getName();
+        String name = oifitsFile.getFileName();
 
         if (!name.contains(".image-oi")) {
-            name = FileUtils.getFileNameWithoutExtension(name) + ".image-oi." + FileUtils.getExtension(oifitsFile.getName());
+            name = FileUtils.getFileNameWithoutExtension(name) + ".image-oi." + FileUtils.getExtension(oifitsFile.getFileName());
         }
 
         File file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", dir, MimeType.OIFITS, name);
