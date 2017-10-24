@@ -8,9 +8,9 @@
         <description kind="tooltip">Image reconstruction algorithms</description>
         <icon href="@GENERATED@/OImaging.jpg"/>
         <offline-allowed/>
-        <shortcut online="true" install="false">
+        <shortcut online="true" install="true">
             <desktop/>
-            <menu submenu="JMMC"/>
+            <menu/>
         </shortcut>
     </information>
     <security>
