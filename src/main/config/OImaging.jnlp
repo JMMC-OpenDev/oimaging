@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<jnlp spec="1.0+" codebase="@GENERATED@" href="OImaging.jnlp">
+<jnlp spec="6.0+" codebase="@GENERATED@" href="OImaging.jnlp">
     <information>
         <title>OImaging</title>
         <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
@@ -8,20 +8,22 @@
         <description kind="tooltip">Image reconstruction algorithms</description>
         <icon href="@GENERATED@/OImaging.jpg"/>
         <offline-allowed/>
-        <shortcut>
+        <shortcut online="true" install="false">
             <desktop/>
+            <menu submenu="JMMC"/>
         </shortcut>
     </information>
     <security>
         <all-permissions/>
     </security>
+    <update check="background" policy="prompt-update"/>
     <resources>
         <j2se version="1.6+" initial-heap-size="256m" max-heap-size="1024m"/>
 
         <!-- MANUALLY EDITED - Should be generated with maven ASAP ! -->
 
         <!-- Application module first (main class) -->
-        <jar href="jar/oimaging-TRUNK.jar" />
+        <jar href="jar/oimaging-TRUNK.jar" main="true"/>
 
 
         <!-- doc module -->
