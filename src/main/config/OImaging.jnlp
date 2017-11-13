@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<jnlp spec="6.0+" codebase="@GENERATED@" href="OImaging.jnlp">
+<jnlp spec="1.0+" codebase="@GENERATED@" href="OImaging.jnlp">
     <information>
         <title>OImaging</title>
         <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
@@ -16,14 +16,13 @@
     <security>
         <all-permissions/>
     </security>
-    <update check="always" policy="always"/>
     <resources>
         <j2se version="1.6+" initial-heap-size="256m" max-heap-size="1024m"/>
 
         <!-- MANUALLY EDITED - Should be generated with maven ASAP ! -->
 
         <!-- Application module first (main class) -->
-        <jar href="jar/oimaging-TRUNK.jar" main="true"/>
+        <jar href="jar/oimaging-TRUNK.jar"/>
 
 
         <!-- doc module -->
