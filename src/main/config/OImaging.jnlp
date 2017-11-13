@@ -16,7 +16,7 @@
     <security>
         <all-permissions/>
     </security>
-    <update check="background" policy="always"/>
+    <update check="timeout" policy="always"/>
     <resources>
         <j2se version="1.6+" initial-heap-size="256m" max-heap-size="1024m"/>
 
