@@ -1,0 +1,63 @@
+ // rule [GENERIC_ARRNAME_REF] check if an OI_ARRAY table matches the ARRNAME keyword:2 hack:"""//keyword[not(values) and name='ARRNAME']"""
+ // rule [GENERIC_ARRNAME_UNIQ] check if a single OI_ARRAY table corresponds to the ARRNAME keyword:2 hack:"""//keyword[not(values) and name='ARRNAME']"""
+ // rule [GENERIC_COL_DIM] check if the dimension of column values >= 1:2 hack:"""//column"""
+ // rule [GENERIC_COL_ERR] check if the UNFLAGGED *ERR column values are valid (positive or NULL):1:"""//column[contains(name, 'ERR') and ./array='true']"""
+ // rule [GENERIC_COL_FORMAT] check if the column format matches the expected format (data type & dimensions):2 hack:"""//column"""
+ // rule [GENERIC_COL_MANDATORY] check if the required column is present:1:"""//column"""
+ // rule [GENERIC_COL_NBROWS] check if the column length matches the expected number of rows:1:"""//column"""
+ // rule [GENERIC_COL_UNIT] check if the column unit matches the expected unit:2 hack:"""//column"""
+ // rule [GENERIC_COL_UNIT_EXIST] check if the column unit exist:2 hack:"""//column"""
+ // rule [GENERIC_COL_UNKNOWN] check if the column belongs to the OIFITS standard and version:3 hacker:"""//column"""
+ // rule [GENERIC_COL_VAL_ACCEPTED_INT] check if column values match the 'accepted' values (integer):1:"""//column[values and datatype='TYPE_SHORT']"""
+ // rule [GENERIC_COL_VAL_ACCEPTED_STR] check if column values match the 'accepted' values (string):1:"""//column[values and datatype='TYPE_CHAR']"""
+ // rule [GENERIC_COL_VAL_POSITIVE] check if column values are finite and positive:1:"""//column[./datarange/name='RANGE_POSITIVE_STRICT' and (datatype='TYPE_DBL' or datatype='TYPE_REAL')]"" "
+ // rule [GENERIC_CORRINDX_MAX] check if the CORRINDX values <= NDATA:1:"""//column[contains(name, 'CORRINDX')]"""
+ // rule [GENERIC_CORRINDX_MIN] check if the CORRINDX values >= 1:1:"""//column[contains(name, 'CORRINDX')]"""
+ // rule [GENERIC_CORRINDX_UNIQ] check duplicates or overlaps within correlation indexes (CORRINDX):1:"""//column[contains(name, 'CORRINDX')]"""
+ // rule [GENERIC_CORRNAME_REF] check if an OI_CORR table matches the CORRNAME keyword:2 hack:"""//keyword[not(values) and name='CORRNAME]"""
+ // rule [GENERIC_CORRNAME_UNIQ] check if a single OI_CORR table corresponds to the CORRNAME keyword:2 hack:"""//keyword[not(values) and name='CORRNAME]"""
+ // rule [GENERIC_DATE_OBS_RANGE] check if the DATE_OBS value is within 'normal' range (1933 - 2150):2 hack:"""//keyword[name='DATE-OBS']"""
+" // rule [GENERIC_DATE_OBS_STANDARD] check if the DATE_OBS keyword is in the standard format: YYYY-MM-DD":2 hack:"""//keyword[name='DATE-OBS']"""
+ // rule [GENERIC_FILE_EXIST] check if the file exist:3 hacker:
+ // rule [GENERIC_FILE_LOAD] check if the OIFITS file is loaded properly (IO error):3 hacker:
+ // rule [GENERIC_INSNAME_REF] check if an OI_WAVELENGTH table matches the INSNAME keyword:2 hack:"""//keyword[not(values) and name=’INSNAME’]"""
+ // rule [GENERIC_INSNAME_UNIQ] check if a single OI_WAVELENGTH table corresponds to the INSNAME keyword:2 hack:"""//keyword[not(values) and name=’INSNAME’]"""
+ // rule [GENERIC_KEYWORD_FORMAT] check if the keyword format matches the expected format (data type):1:"""//keyword"""
+ // rule [GENERIC_KEYWORD_MANDATORY] check if the required keyword is present:1:"""//keyword"""
+ // rule [GENERIC_KEYWORD_VAL_ACCEPTED_INT] check if the keyword value matches the 'accepted' values (integer):1:"""//keyword[values and datatype='TYPE_INT']"""
+ // rule [GENERIC_KEYWORD_VAL_ACCEPTED_STR] check if the keyword value matches the 'accepted' values (string):1:"""//keyword[values and datatype='TYPE_CHAR']"""
+ // rule [GENERIC_MJD_RANGE] check if the MJD value is within 'normal' range (1933 - 2150):1:"""//*[contains(name, 'MJD') and not(ancestor::table/@name ='OI_INSPOL')]"""
+ // rule [GENERIC_OI_ARRAY_EXIST_V2] check if at least one OI_ARRAY table exists in the OIFITS 2 file:1:
+ // rule [GENERIC_OIFITS_OIDATA] check if at least one data table exists in the OIFITS file:3 mais regler:
+ // rule [GENERIC_OIREV_FIX] Fix the OI_REV keyword when the table is not in the proper OIFITS version:1:"xml sel -t -m ""//table"" -v ""@name"" -n DataModelV2.xml"
+ // rule [GENERIC_OI_TARGET_EXIST] check if only one OI_TARGET table exists in the OIFITS file:1:
+ // rule [GENERIC_OI_WAVELENGTH_EXIST] check if at least one OI_WAVELENGTH table exists in the OIFITS file:1:
+ // rule [GENERIC_PRIMARYHDU_EXIST_V2] check if the main header (PRIMARY HDU) exists in the OIFITS 2 file:1:
+ // rule [GENERIC_STA_INDEX_UNIQ] check duplicated indexes inside each STA_INDEX column values (data table):1:"""//column[contains(name, 'STA_INDEX') and not(ancestor::table/@name ='OI_ARRAY')]"""
+ // rule [GENERIC_TABLE_NOT_OIFITS2] check if any OIFITS 2 specific table (OI_CORR, OI_INSPOL or OI_FLUX) is present in the OIFITS 1 file:3 mais regler:
+ // rule [GENERIC_TABLE_UNKNOWN] check if the table belongs to the OIFITS standard and version:3 hacker:
+ // rule [GENERIC_TARGET_EXIST] check if the OI_TARGET table have at least one target:1:
+ // rule [OI_ARRAY_ARRNAME] check the ARRNAME keyword has a not null or empty value:1:
+ // rule [OI_ARRAY_STA_INDEX_MIN] check if the STA_INDEX values >= 1:2 hack:
+ // rule [OI_ARRAY_STA_INDEX_UNIQ] check duplicated indexes in the STA_INDEX column of the OI_ARRAY table:2 hack:
+ // rule [OI_ARRAY_STA_NAME] check if the STA_NAME column values have a not null or empty value:2 hack:
+ // rule [OI_ARRAY_STA_NAME_UNIQ] check duplicated values in the STA_NAME column of the OI_ARRAY table:2 hack:
+ // rule [OI_ARRAY_XYZ] check if the ARRAY_XYZ keyword values corresponds to a proper coordinate on earth:1:
+ // rule [OI_ARRAY_XYZ_FIX] fix the ARRAY_XYZ keyword values (to VLTI or CHARA according to the ARRNAME keyword) when the ARRAY_XYZ keyword values are incorrect:1:
+ // rule [OI_CORR_CORRNAME] check the CORRNAME keyword has a not null or empty value:1:
+ // rule [OI_CORR_IINDEX_MIN] check if the IINDEX values >= 1 (JINDEX >= 2):1:
+ // rule [OI_CORR_IJINDEX_MAX] check if the IINDEX values <= NDATA and JINDEX values <= NDATA:1:
+ // rule [OI_CORR_JINDEX_SUP] check if the JINDEX values > IINDEX values:1:
+ // rule [OI_FLUX_CORRINDX] check if the referenced OI_CORR table exists when the column CORRINDX_FLUXDATA is present:1:
+ // rule [OI_INSPOL_INSNAME_UNIQ] check if the INSNAME column values are only present in a single OI_INSPOL table::
+ // rule [OI_INSPOL_MJD_RANGE] check if MJD values in data tables are within MJD intervals (MJD_OBS and MJD_END columns) of the referenced OI_INSPOL table [!! TBD in data tables !!]::
+ // rule [OI_T3_CORRINDX] check if the referenced OI_CORR exists when the column CORRINDX_T3AMP or CORRINDX_T3PHI is present:1:
+ // rule [OI_TARGET_COORD] check if the TARGET RA and DEC values are not 0.0:2 hack:
+ // rule [OI_TARGET_COORD_EXIST] check if the TARGET RA or DEC value is not undefined:2 hack:
+ // rule [OI_TARGET_TARGET] check if the TARGET column values have a not null or empty value:1:
+ // rule [OI_TARGET_TARGETID_MIN] check if the TARGET_ID values >= 1:1:
+ // rule [OI_TARGET_TARGETID_UNIQ] check duplicated indexes in the TARGET_ID column of the OI_TARGET table:1:
+ // rule [OI_TARGET_TARGET_UNIQ] check duplicated values in the TARGET column of the OI_TARGET table:1:
+ // rule [OI_VIS2_CORRINDX] check if the referenced OI_CORR table exists when the column CORRINDX_VIS2DATA is present:1:
+ // rule [OI_VIS_CORRINDX] check if the referenced OI_CORR table exists when the column CORRINDX_VISAMP, CORRINDX_VISPHI, CORRINDX_RVIS or CORRINDX_IVIS is present:1:
+ // rule [OI_WAVELENGTH_INSNAME] check the INSNAME keyword has a not null or empty value:1:
