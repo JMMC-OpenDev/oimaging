@@ -21,6 +21,7 @@ import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.FitsImageWriter;
+import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
@@ -31,8 +32,6 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,8 +65,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         RESULT;
     }
     private SHOW_MODE showMode;
-
-    private final static TableModel emptyTableModel = new DefaultTableModel();
 
     /** Creates new form ViewerPanel */
     public ViewerPanel() {
@@ -138,14 +135,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         if (oifitsFile != null) {
             oifitsViewPanel.plot(oifitsFile, targetName);
             jPanelOIFits.add(oifitsViewPanel);
-
+            final ImageOiData imageOiData = oifitsFile.getImageOiData();
             // init Param Tables
-            jTableOutputParamKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getOutputParam()));
-            jTableInputParamKeywords.setModel(new KeywordsTableModel(oifitsFile.getImageOiData().getInputParam()));
+            ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getOutputParam());
+            ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(imageOiData.getInputParam());
         } else {
             jPanelOIFits.remove(oifitsViewPanel);
-            jTableOutputParamKeywords.setModel(emptyTableModel);
-            jTableInputParamKeywords.setModel(emptyTableModel);
+            // reset Param Tables
+            ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(null);
+            ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(null);
         }
     }
 
@@ -289,14 +287,14 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageSelector = new javax.swing.JPanel();
         jComboBoxImage = new javax.swing.JComboBox();
         jPanelLogViewer = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jScrollPaneLog = new javax.swing.JScrollPane();
         jEditorPaneExecutionLog = new javax.swing.JEditorPane();
         jPanelOutputParamViewer = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        jLabelOutput = new javax.swing.JLabel();
+        jScrollPaneTableOutput = new javax.swing.JScrollPane();
         jTableOutputParamKeywords = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
+        jLabelInput = new javax.swing.JLabel();
+        jScrollPaneTableInput = new javax.swing.JScrollPane();
         jTableInputParamKeywords = new javax.swing.JTable();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
@@ -353,65 +351,53 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelLogViewer.setLayout(new javax.swing.BoxLayout(jPanelLogViewer, javax.swing.BoxLayout.LINE_AXIS));
 
         jEditorPaneExecutionLog.setEditable(false);
-        jScrollPane1.setViewportView(jEditorPaneExecutionLog);
+        jScrollPaneLog.setViewportView(jEditorPaneExecutionLog);
 
-        jPanelLogViewer.add(jScrollPane1);
+        jPanelLogViewer.add(jScrollPaneLog);
 
         jTabbedPaneVizualizations.addTab("Execution log", jPanelLogViewer);
 
-        jPanelOutputParamViewer.setLayout(new javax.swing.BoxLayout(jPanelOutputParamViewer, javax.swing.BoxLayout.LINE_AXIS));
+        jPanelOutputParamViewer.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-
-        jLabel2.setText("Output");
+        jLabelOutput.setText("Output");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel1.add(jLabel2, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelOutputParamViewer.add(jLabelOutput, gridBagConstraints);
 
-        jTableOutputParamKeywords.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+        jTableOutputParamKeywords.setModel(new KeywordsTableModel());
+        jScrollPaneTableOutput.setViewportView(jTableOutputParamKeywords);
 
-            },
-            new String [] {
-                "Keyword name", "Value", "Comment"
-            }
-        ));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.1;
-        jPanel1.add(jTableOutputParamKeywords, gridBagConstraints);
+        jPanelOutputParamViewer.add(jScrollPaneTableOutput, gridBagConstraints);
 
-        jLabel1.setText("Input");
+        jLabelInput.setText("Input");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel1.add(jLabel1, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelOutputParamViewer.add(jLabelInput, gridBagConstraints);
 
-        jTableInputParamKeywords.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+        jTableInputParamKeywords.setModel(new KeywordsTableModel());
+        jScrollPaneTableInput.setViewportView(jTableInputParamKeywords);
 
-            },
-            new String [] {
-                "Keyword name", "Value", "Comment"
-            }
-        ));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        jPanel1.add(jTableInputParamKeywords, gridBagConstraints);
-
-        jScrollPane4.setViewportView(jPanel1);
-
-        jPanelOutputParamViewer.add(jScrollPane4);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.8;
+        jPanelOutputParamViewer.add(jScrollPaneTableInput, gridBagConstraints);
 
         jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
 
@@ -433,9 +419,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxImage;
     private javax.swing.JEditorPane jEditorPaneExecutionLog;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jLabelInput;
+    private javax.swing.JLabel jLabelOutput;
     private javax.swing.JPanel jPanelImage;
     private javax.swing.JPanel jPanelImageSelector;
     private javax.swing.JPanel jPanelImageViewer;
@@ -443,8 +428,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JPanel jPanelOIFits;
     private javax.swing.JPanel jPanelOIFitsViewer;
     private javax.swing.JPanel jPanelOutputParamViewer;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPaneLog;
+    private javax.swing.JScrollPane jScrollPaneTableInput;
+    private javax.swing.JScrollPane jScrollPaneTableOutput;
     private javax.swing.JTabbedPane jTabbedPaneVizualizations;
     private javax.swing.JTable jTableInputParamKeywords;
     private javax.swing.JTable jTableOutputParamKeywords;
