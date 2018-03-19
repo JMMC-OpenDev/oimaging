@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 3"/>
-    <compilation date="06/03/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 4"/>
+    <compilation date="18/03/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -150,7 +150,10 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Tue, 06 Mar 2018 13:00:00 GMT</pubDate>
+            <pubDate>Tue, 19 Mar 2018 14:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 4">
+                <change type="CHANGE">Request UWS job deletion after result retrieval (is also done weekly on the server side in case of failure).</change>
+            </prerelease>
             <prerelease version="0.5 beta 3">
                 <change type="FEATURE">Improved Java support (9 + mac OS X) but Java 7 minimum is now required</change>
                 <!-- change type="CHANGE">Code refactoring on image renaming.</change-->
