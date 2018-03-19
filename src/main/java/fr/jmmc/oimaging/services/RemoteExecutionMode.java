@@ -195,19 +195,25 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         }
         _logger.info("End of execution for job '{}' in phase '{}'", jobId, phase);
 
-        if (phase == ExecutionPhase.COMPLETED) {
-            prepareResult(jobId, result);
-        } else {
-            JobSummary jobInfo = client.getJobInfo(jobId, true);
-            _logger.error("Error in execution for job '{}': {} ", jobId, jobInfo.getErrorSummary());
+        try {
+            if (phase == ExecutionPhase.COMPLETED) {
+                prepareResult(client, jobId, result);
+            } else {
+                JobSummary jobInfo = client.getJobInfo(jobId);
+                _logger.error("Error in execution for job '{}': {} ", jobId, jobInfo.getErrorSummary());
 
-            result.setErrorMessage("Execution error: " + jobInfo.getErrorSummary());
+                result.setErrorMessage("Execution error: " + jobInfo.getErrorSummary());
+            }
+        } finally {
+            try {
+                client.deleteJobInfo(jobId);
+            } catch (ClientUWSException cue) {
+                _logger.warn("Can't delete job", cue);
+            }
         }
     }
 
-    private static void prepareResult(String jobId, ServiceResult result) throws ClientUWSException, URISyntaxException, IOException {
-        final ClientUWS client = FACTORY.getClient();
-
+    private static void prepareResult(final ClientUWS client, String jobId, ServiceResult result) throws ClientUWSException, URISyntaxException, IOException {
         Results results = client.getJobResults(jobId);
 
         for (ResultReference resultRef : results.getResult()) {
