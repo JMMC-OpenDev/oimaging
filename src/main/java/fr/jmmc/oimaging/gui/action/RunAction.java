@@ -113,15 +113,21 @@ public class RunAction extends RegisteredAction {
         @Override
         public ServiceResult computeInBackground() {
             final Service service = irModel.getSelectedService();
-            final ServiceResult result = service.getExecMode().reconstructsImage(service.getProgram(), inputFile);
-            result.setService(service);
-            // Result is valid only if the OIFITS file was downloaded successfully:
-            final boolean exist = result.getOifitsResultFile().exists();
-            result.setValid(exist);
-            if (!exist) {
-                result.setErrorMessage("No OIFits ouput (probably a server error occured) !");
+
+            try {
+                final ServiceResult result = service.getExecMode().reconstructsImage(service.getProgram(), inputFile);
+                result.setService(service);
+                // Result is valid only if the OIFITS file was downloaded successfully:
+                final boolean exist = result.getOifitsResultFile().exists();
+                result.setValid(exist);
+                if (!exist) {
+                    result.setErrorMessage("No OIFits ouput (probably a server error occured) !");
+                }
+                return result;
+            } catch (IllegalStateException ise) {
+                logger.warn("computeInBackground: exception: ", ise);
+                throw ise;
             }
-            return result;
         }
 
         @Override
