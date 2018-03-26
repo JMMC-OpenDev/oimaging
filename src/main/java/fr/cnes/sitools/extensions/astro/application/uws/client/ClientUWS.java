@@ -308,7 +308,7 @@ public class ClientUWS {
      */
     public void deleteJobInfo(String jobId) throws ClientUWSException {
         if (!Util.isSet(jobId)) {
-            throw new IllegalArgumentException("GetJobInfo: jobId is required");
+            throw new IllegalArgumentException("deleteJobInfo: jobId is required");
         }
         ClientResource client = null;
         try {
