@@ -15,7 +15,7 @@ import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.ACT
 import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.COLLECTION_CHANGED;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
-import fr.jmmc.oiexplorer.core.model.util.OIFitsFileComparator;
+import fr.jmmc.oitools.util.OIFitsFileComparator;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
 import java.awt.Component;
