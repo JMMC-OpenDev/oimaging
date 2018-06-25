@@ -121,9 +121,7 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
      * @param oiFitsCollection OIFitsCollection to process
      */
     protected void updateOIFitsList(final OIFitsCollection oiFitsCollection) {
-        final List<OIFitsFile> oifitsFiles = oiFitsCollection.getOIFitsFiles();
-
-        Collections.sort(oifitsFiles, OIFitsFileComparator.INSTANCE);
+        final List<OIFitsFile> oifitsFiles = oiFitsCollection.getSortedOIFitsFiles();
 
         // Sort OIFits files by file name (not path):
         final GenericListModel lm = new GenericListModel<OIFitsFile>(oifitsFiles);
