@@ -12,7 +12,6 @@ import fr.jmmc.oiexplorer.core.gui.PlotView;
 import fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
-import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.BorderLayout;
 import org.jfree.chart.ChartColor;
@@ -215,10 +214,8 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
             // get current subset definition (copy):
             final SubsetDefinition subsetCopy = ocm.getCurrentSubsetDefinition();
-            // Use the selected target from any OIFitsFile:
-            final TargetUID target = new TargetUID(targetName);
 
-            subsetCopy.setTarget(target);
+            subsetCopy.getFilter().setTargetUID(targetName);
             // use all data files (default):
             // subset.getTables().clear();
 
