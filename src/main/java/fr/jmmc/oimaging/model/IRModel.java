@@ -56,7 +56,7 @@ public class IRModel {
     private FitsImageHDU selectedInputImageHDU;
 
     private final Hashtable<FitsImageHDU, String> fitsImageHdu2Filename = new Hashtable<FitsImageHDU, String>();
-    ;
+    
     private final List<String> targetList = new ArrayList<String>(5);
     private final GenericListModel<String> targetListModel = new GenericListModel<String>(targetList, true);
 

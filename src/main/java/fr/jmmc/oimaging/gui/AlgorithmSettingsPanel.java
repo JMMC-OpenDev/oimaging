@@ -43,6 +43,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     private void postInit() {
         registerActions();
         jComboBoxImage.setRenderer(new OiCellRenderer());
+        jTableKeywordsEditor.setNotifiedParent(this);
     }
 
     /**
@@ -85,7 +86,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         jCheckBoxAutoWgt = new javax.swing.JCheckBox();
         jLabelFluxErr = new javax.swing.JLabel();
         jFormattedTextFieldFluxErr = new javax.swing.JFormattedTextField();
-        tableEditor1 = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
+        jTableKeywordsEditor = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -340,7 +341,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        jPanelAlgorithmSettings.add(tableEditor1, gridBagConstraints);
+        jPanelAlgorithmSettings.add(jTableKeywordsEditor, gridBagConstraints);
 
         add(jPanelAlgorithmSettings);
     }// </editor-fold>//GEN-END:initComponents
@@ -424,7 +425,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelRglWgt;
     private javax.swing.JPanel jPanelAlgorithmSettings;
     private javax.swing.JSpinner jSpinnerMaxIter;
-    private fr.jmmc.oimaging.gui.TableKeywordsEditor tableEditor1;
+    private fr.jmmc.oimaging.gui.TableKeywordsEditor jTableKeywordsEditor;
     // End of variables declaration//GEN-END:variables
 
     public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
@@ -438,12 +439,14 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     void syncUI(MainPanel panel, IRModel irModel, List<String> failures) {
         mainPanel = panel;
 
-        ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
+        final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
 
         if (inputParam.getSubTable() != null) {
-            tableEditor1.setModel(inputParam, inputParam.getSubTable().getKeywordsDesc().keySet(), this);
+            jTableKeywordsEditor.setModel(inputParam, inputParam.getSubTable().getKeywordsDesc().keySet());
+            jTableKeywordsEditor.setVisible(true);
         } else {
-            tableEditor1.setModel(null, this);
+            jTableKeywordsEditor.setModel(null, null);
+            jTableKeywordsEditor.setVisible(false);
         }
         // image combo
         jComboBoxImage.removeAllItems();

@@ -22,28 +22,31 @@ import javax.swing.JTextField;
  * To be improved with all keywords types JCheckBox for boolean, combobox if meta give accepted values...
  * @author mellag
  */
-// TODO move it in oitools module ?
-public class TableKeywordsEditor extends javax.swing.JPanel implements ActionListener, PropertyChangeListener {
+public final class TableKeywordsEditor extends javax.swing.JPanel implements ActionListener, PropertyChangeListener {
 
-    FitsTable model = null;
-    AlgorithmSettingsPanel notifiedParent = null;
+    private static final long serialVersionUID = 1L;
 
-    final static Insets insets = new java.awt.Insets(2, 2, 2, 2);
+    private final static Insets insets = new java.awt.Insets(2, 2, 2, 2);
+
+    // members
+    private AlgorithmSettingsPanel notifiedParent = null;
+    private FitsTable model = null;
 
     /** Creates new form TableEditor */
     public TableKeywordsEditor() {
         initComponents();
     }
 
-    public void setModel(final FitsTable model, AlgorithmSettingsPanel notifiedParent) {
-        setModel(model, model == null ? null : model.getKeywordsDesc() == null ? null : model.getKeywordsDesc().keySet(), notifiedParent);
-
+    public AlgorithmSettingsPanel getNotifiedParent() {
+        return notifiedParent;
     }
 
-    void setModel(FitsTable model, Set<String> keywords, AlgorithmSettingsPanel notifiedParent) {
-
-        this.model = model;
+    public void setNotifiedParent(final AlgorithmSettingsPanel notifiedParent) {
         this.notifiedParent = notifiedParent;
+    }
+
+    void setModel(final FitsTable model, final Set<String> keywords) {
+        this.model = model;
 
         removeAll();
 
@@ -92,7 +95,6 @@ public class TableKeywordsEditor extends javax.swing.JPanel implements ActionLis
                     jTextField.addActionListener(this);
                     jTextField.addPropertyChangeListener(this);
                 } else {
-
                     jTextField.setEditable(false);
                 }
 
