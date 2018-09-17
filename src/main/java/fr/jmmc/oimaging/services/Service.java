@@ -15,13 +15,13 @@ import fr.jmmc.oitools.fits.FitsTable;
  */
 // Could be replaced by a jaxb generated class that could load input from xml
 // ...and completed at runtime by a remote capability discovery ...
-public class Service {
+public final class Service {
 
-    final String name;
-    final String program;
-    final OImagingExecutionMode execMode;
-    final String description;
-    final String contact;
+    private final String name;
+    private final String program;
+    private final OImagingExecutionMode execMode;
+    private final String description;
+    private final String contact;
 
     public Service(final String name, final String program, final OImagingExecutionMode execMode, final String description, final String contact) {
         this.name = name;
@@ -55,30 +55,34 @@ public class Service {
         return name;
     }
 
-    final String[] default_RGL_NAME = new String[]{"mem_prior"};
+    // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
+    private static final String[] RGL_NAME_DEFAULT = new String[]{"mem_prior"};
     //final String[] wisard_RGL_NAME = new String[]{"TOTVAR", "PSD", "L1L2", "L1L2WHITE", "SOFT_SUPPORT"};
-    final String[] wisard_RGL_NAME = new String[]{"TOTVAR", "L1L2", "L1L2WHITE"};
+    private static final String[] RGL_NAME_WISARD = new String[]{"TOTVAR", "L1L2", "L1L2WHITE"};
 
     public String[] getSupported_RGL_NAME() {
-        if (name.startsWith("WISARD")) {
-            return wisard_RGL_NAME;
+        // TODO: generalise ?
+        if (name.startsWith(ServiceList.SERVICE_WISARD)) {
+            return RGL_NAME_WISARD;
         } else {
-            return default_RGL_NAME;
+            return RGL_NAME_DEFAULT;
         }
     }
 
+    // TODO: cleanup => use template instances
     final WisardInputParam wisard_params = new WisardInputParam();
 
-    public FitsTable initSpecificParams(ImageOiInputParam params) {
-        final String rglName = params.getRglName();
+    public FitsTable initSpecificParams(final ImageOiInputParam params) {
         // check that RGL_NAME is compliant.
+        final String rglName = params.getRglName();
 
         if (rglName == null || !isSupported(getSupported_RGL_NAME(), rglName)) {
             // use first as default one if null or not included in the supported values
             params.setRglName(getSupported_RGL_NAME()[0]);
         }
 
-        if (name.startsWith("WISARD")) {
+        // TODO: generalise ?
+        if (name.startsWith(ServiceList.SERVICE_WISARD)) {
             wisard_params.update(params);
             return wisard_params;
         } else {
@@ -87,7 +91,7 @@ public class Service {
         }
     }
 
-    private boolean isSupported(String[] list, String value) {
+    private static boolean isSupported(final String[] list, final String value) {
         for (String str : list) {
             if (str.trim().contains(value)) {
                 return true;
@@ -113,7 +117,7 @@ public class Service {
 
         public WisardInputParam() {
             super();
-            
+
             // define keywords:
             addKeywordMeta(NP_MIN);
             addKeywordMeta(FOV);
@@ -124,18 +128,18 @@ public class Service {
             setKeywordInt(KEYWORD_NP_MIN, 32);
             setKeywordDouble(KEYWORD_FOV, 20.0);
 
-            setKeywordDouble(KEYWORD_SCALE, .0001);
+            setKeywordDouble(KEYWORD_SCALE, 0.0001);
             setKeywordDouble(KEYWORD_DELTA, 1);
         }
 
-        public void update(ImageOiInputParam params) {
+        public void update(final ImageOiInputParam params) {
             // TODO: cleanup all tha logic !!
             params.addSubTable(null);
-            
+
             // for our first implementation, just add to params if not TOTVAR
             getKeywordsDesc().remove(KEYWORD_SCALE);
             getKeywordsDesc().remove(KEYWORD_DELTA);
-            
+
             if (params.getRglName().startsWith("L1")) {
                 addKeywordMeta(SCALE);
                 addKeywordMeta(DELTA);

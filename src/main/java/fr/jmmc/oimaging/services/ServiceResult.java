@@ -16,7 +16,7 @@ import java.util.Date;
  * Result container that gather multiple elements.
  * @author mellag
  */
-public class ServiceResult {
+public final class ServiceResult {
 
     private final File inputFile;
     private final File oifitsResultFile;

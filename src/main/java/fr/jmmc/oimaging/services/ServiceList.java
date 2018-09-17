@@ -12,32 +12,32 @@ import javax.swing.ComboBoxModel;
  *
  * @author mellag
  */
-public class ServiceList {
+public final class ServiceList {
+
+    public static final String SERVICE_BSMEM = "BSMEM";
+    public static final String SERVICE_WISARD = "WISARD";
 
     /** Singleton instance */
     private static ServiceList _instance = null;
 
     /** Default service */
-    private Service preferedService = null;
-
-    GenericListModel<Service> availableServices = null;
+    final Service preferedService;
+    /** service list */
+    final GenericListModel<Service> availableServices;
 
     private ServiceList() {
-        //OImagingExecutionMode dummyExecutionMode = new DummyExecutionMode();
-        OImagingExecutionMode remoteExecutionMode = new RemoteExecutionMode();
-        OImagingExecutionMode localExecutionMode = new LocalExecutionMode();
+        final OImagingExecutionMode remoteExecutionMode = RemoteExecutionMode.INSTANCE;
+        final OImagingExecutionMode localExecutionMode = LocalExecutionMode.INSTANCE;
 
-        availableServices = new GenericListModel<Service>(new ArrayList<Service>(25), true);
+        availableServices = new GenericListModel<Service>(new ArrayList<Service>(8), true);
 
-        availableServices.add(new Service("BSMEM", "bsmem-ci", localExecutionMode, "", ""));
-        availableServices.add(new Service("WISARD", "wisard-ci", localExecutionMode, "", ""));
+        availableServices.add(new Service(SERVICE_BSMEM, "bsmem-ci", localExecutionMode, "", ""));
+        availableServices.add(new Service(SERVICE_WISARD, "wisard-ci", localExecutionMode, "", ""));
 
-        //availableServices.add(new Service("DummyOI", "dummy", dummyExecutionMode, "This is a dummy service", "by G.MELLA"));
-        availableServices.add(new Service("BSMEM (remote)", "bsmem-ci", remoteExecutionMode, "", ""));
+        availableServices.add(new Service(SERVICE_BSMEM + " (remote)", "bsmem-ci", remoteExecutionMode, "", ""));
         // TODO remove code configuration and link this it to a preference
-        preferedService = new Service("WISARD (remote)", "wisard-ci", remoteExecutionMode, "", "");
+        preferedService = new Service(SERVICE_WISARD + " (remote)", "wisard-ci", remoteExecutionMode, "", "");
         availableServices.add(preferedService);
-
     }
 
     private static ServiceList getInstance() {
