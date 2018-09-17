@@ -45,6 +45,9 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     private static final ClientFactory FACTORY = new ClientFactory();
 
+    /** singleton */
+    public static final RemoteExecutionMode INSTANCE = new RemoteExecutionMode();
+
     private final static class ClientFactory {
 
         /** UWS client to execute IR on a remote server */
@@ -94,7 +97,8 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         }
     }
 
-    public RemoteExecutionMode() {
+    private RemoteExecutionMode() {
+        super();
     }
 
     /**

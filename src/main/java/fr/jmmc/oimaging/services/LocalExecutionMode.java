@@ -28,7 +28,11 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
     /** task identifier for LocalExecutionMode */
     public final static String TASK_NAME = "LocalRunner";
 
-    public LocalExecutionMode() {
+    /** singleton */
+    public static final LocalExecutionMode INSTANCE = new LocalExecutionMode();
+
+    private LocalExecutionMode() {
+        super();
     }
 
     /**
@@ -90,7 +94,9 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
     @Override
     public ServiceResult reconstructsImage(final String software, final File inputFile) {
         ServiceResult result = new ServiceResult(inputFile);
-        LocalExecutionMode.exec(software, inputFile.getAbsolutePath(), result.getOifitsResultFile().getAbsolutePath(), result.getExecutionLogResultFile().getAbsolutePath());
+        LocalExecutionMode.exec(software, inputFile.getAbsolutePath(),
+                result.getOifitsResultFile().getAbsolutePath(),
+                result.getExecutionLogResultFile().getAbsolutePath());
         return result;
     }
 
