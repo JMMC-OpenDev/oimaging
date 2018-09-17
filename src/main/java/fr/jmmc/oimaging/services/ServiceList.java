@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging.services;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.oimaging.services.software.SoftwareInputParam;
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.ComboBoxModel;
@@ -31,12 +32,15 @@ public final class ServiceList {
 
         availableServices = new GenericListModel<Service>(new ArrayList<Service>(8), true);
 
-        availableServices.add(new Service(SERVICE_BSMEM, "bsmem-ci", localExecutionMode, "", ""));
-        availableServices.add(new Service(SERVICE_WISARD, "wisard-ci", localExecutionMode, "", ""));
+        final SoftwareInputParam swParamBsmem = SoftwareInputParam.newInstance(SERVICE_BSMEM);
+        final SoftwareInputParam swParamWisard = SoftwareInputParam.newInstance(SERVICE_WISARD);
 
-        availableServices.add(new Service(SERVICE_BSMEM + " (remote)", "bsmem-ci", remoteExecutionMode, "", ""));
+        availableServices.add(new Service(SERVICE_BSMEM, "bsmem-ci", localExecutionMode, "", "", swParamBsmem));
+        availableServices.add(new Service(SERVICE_WISARD, "wisard-ci", localExecutionMode, "", "", swParamWisard));
+
+        availableServices.add(new Service(SERVICE_BSMEM + " (remote)", "bsmem-ci", remoteExecutionMode, "", "", swParamBsmem));
         // TODO remove code configuration and link this it to a preference
-        preferedService = new Service(SERVICE_WISARD + " (remote)", "wisard-ci", remoteExecutionMode, "", "");
+        preferedService = new Service(SERVICE_WISARD + " (remote)", "wisard-ci", remoteExecutionMode, "", "", swParamWisard);
         availableServices.add(preferedService);
     }
 

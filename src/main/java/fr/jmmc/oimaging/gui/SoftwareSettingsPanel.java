@@ -20,7 +20,7 @@ import javax.swing.JFormattedTextField;
  *
  * @author mellag
  */
-public class AlgorithmSettingsPanel extends javax.swing.JPanel {
+public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     /* members */
     /** associated mainPanel */
@@ -32,7 +32,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     private boolean forceChange;
 
     /** Creates new form AlgorithmSettinsPanel */
-    public AlgorithmSettingsPanel() {
+    public SoftwareSettingsPanel() {
         initComponents();
         postInit();
     }
@@ -440,6 +440,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         mainPanel = panel;
 
         final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
+        final Service mService = irModel.getSelectedService();
 
         if (inputParam.getSubTable() != null) {
             jTableKeywordsEditor.setModel(inputParam, inputParam.getSubTable().getKeywordsDesc().keySet());
@@ -459,8 +460,9 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
 
         // regulation
         // update content of jCombobox
-        updateJComboBoxRglName(irModel);
+        updateJComboBoxRglName(mService);
 
+        // refactor
         String rglName = inputParam.getRglName();
         if (rglName != null) {
             jComboBoxRglName.setSelectedItem(rglName);
@@ -488,9 +490,8 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
             failures.add("FluxErr must be smaller than 1");
         }
 
-        Service mService = irModel.getSelectedService();
-        Service wService = (Service) jComboBoxSoftware.getSelectedItem();
-        if (mService != wService) {
+        // identity check on singletons:
+        if (mService != jComboBoxSoftware.getSelectedItem()) {
             jComboBoxSoftware.setSelectedItem(mService);
         }
 
@@ -500,7 +501,6 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         } else {
             failures.add(irModel.getSelectedInputFitsImageError());
         }
-
     }
 
     protected void updateModel() {
@@ -508,7 +508,6 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
     }
 
     protected void updateModel(final boolean forceChange) {
-
         this.forceChange = forceChange;
 
         if (mainPanel != null) {
@@ -530,8 +529,7 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         final Service guiService = (Service) jComboBoxSoftware.getSelectedItem();
         final Service modelSoftware = irModel.getSelectedService();
         if (guiService != null && !guiService.equals(modelSoftware)) {
-            irModel.setSelectedSoftware(guiService);
-            updateJComboBoxRglName(irModel);
+            irModel.setSelectedService(guiService);
             changed = true;
         }
 
@@ -626,9 +624,9 @@ public class AlgorithmSettingsPanel extends javax.swing.JPanel {
         return changed;
     }
 
-    private void updateJComboBoxRglName(IRModel irModel) {
+    private void updateJComboBoxRglName(Service service) {
         jComboBoxRglName.removeAllItems();
-        for (String v : irModel.getSelectedService().getSupported_RGL_NAME()) {
+        for (String v : service.getSupported_RGL_NAME()) {
             jComboBoxRglName.addItem(v);
         }
     }

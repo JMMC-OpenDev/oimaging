@@ -147,7 +147,7 @@ public class IRModel {
 
         // avoid null service
         if (getSelectedService() == null) {
-            setSelectedSoftware(ServiceList.getPreferedService());
+            setSelectedService(ServiceList.getPreferedService());
         } else {
             initSpecificParams();
         }
@@ -350,7 +350,7 @@ public class IRModel {
         return selectedService;
     }
 
-    public void setSelectedSoftware(Service selectedService) {
+    public void setSelectedService(final Service selectedService) {
         this.selectedService = selectedService;
         initSpecificParams();
     }

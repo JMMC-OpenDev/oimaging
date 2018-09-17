@@ -49,6 +49,8 @@ import org.slf4j.LoggerFactory;
  * @author mella
  */
 public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener {
+    /** Logger */
+    private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
 
     /** micrometres to meter */
     public final static double MICRO_METER = 1e-6;
@@ -61,8 +63,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private static final int REFRESH_PERIOD = 100;
 
     // if multi page activated the export file will containt global view + each plot on a page/image
-    /** Logger */
-    private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
 
     private final List<String> hduNameList = new ArrayList<String>(5);
 
@@ -287,7 +287,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSliderWaveMax = new javax.swing.JSlider();
         jFormattedTextFieldWaveMin = new javax.swing.JFormattedTextField();
         jFormattedTextFieldWaveMax = new javax.swing.JFormattedTextField();
-        algorithmSettinsPanel = new fr.jmmc.oimaging.gui.AlgorithmSettingsPanel();
+        algorithmSettinsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -577,7 +577,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private fr.jmmc.oimaging.gui.AlgorithmSettingsPanel algorithmSettinsPanel;
+    private fr.jmmc.oimaging.gui.SoftwareSettingsPanel algorithmSettinsPanel;
     private javax.swing.JButton jButtonExportImage;
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;

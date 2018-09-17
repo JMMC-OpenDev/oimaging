@@ -29,7 +29,7 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
     private final static Insets insets = new java.awt.Insets(2, 2, 2, 2);
 
     // members
-    private AlgorithmSettingsPanel notifiedParent = null;
+    private SoftwareSettingsPanel notifiedParent = null;
     private FitsTable model = null;
 
     /** Creates new form TableEditor */
@@ -37,11 +37,11 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
         initComponents();
     }
 
-    public AlgorithmSettingsPanel getNotifiedParent() {
+    public SoftwareSettingsPanel getNotifiedParent() {
         return notifiedParent;
     }
 
-    public void setNotifiedParent(final AlgorithmSettingsPanel notifiedParent) {
+    public void setNotifiedParent(final SoftwareSettingsPanel notifiedParent) {
         this.notifiedParent = notifiedParent;
     }
 
@@ -75,12 +75,12 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
                         break;
                     case TYPE_DBL:
                         jFormattedTextField = new JFormattedTextField(value);
-                        jFormattedTextField.setFormatterFactory(AlgorithmSettingsPanel.getDecimalFormatterFactory());
+                        jFormattedTextField.setFormatterFactory(SoftwareSettingsPanel.getDecimalFormatterFactory());
                         jTextField = jFormattedTextField;
                         break;
                     case TYPE_INT:
                         jFormattedTextField = new JFormattedTextField(value);
-                        jFormattedTextField.setFormatterFactory(AlgorithmSettingsPanel.getIntegerFormatterFactory());
+                        jFormattedTextField.setFormatterFactory(SoftwareSettingsPanel.getIntegerFormatterFactory());
                         jTextField = jFormattedTextField;
                         break;
                     default:
