@@ -21,37 +21,36 @@ public final class WisardInputParam extends SoftwareInputParam {
     private static final KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE, "TBD", Types.TYPE_DBL);
     private static final KeywordMeta DELTA = new KeywordMeta(KEYWORD_DELTA, "TBD", Types.TYPE_DBL);
 
-    public WisardInputParam() {
-        super();
-        // define keywords:
-        addKeywordMeta(NP_MIN);
-        addKeywordMeta(FOV);
-        addKeywordMeta(SCALE);
-        addKeywordMeta(DELTA);
-        // default values:
-        setKeywordInt(KEYWORD_NP_MIN, 32);
-        setKeywordDouble(KEYWORD_FOV, 20.0);
-        setKeywordDouble(KEYWORD_SCALE, 0.0001);
-        setKeywordDouble(KEYWORD_DELTA, 1);
-    }
-
-    public void update(final ImageOiInputParam params) {
-        super.update(params);
-
-        // for our first implementation, just add to params if not TOTVAR
-        getKeywordsDesc().remove(KEYWORD_SCALE);
-        getKeywordsDesc().remove(KEYWORD_DELTA);
-
-        if (params.getRglName().startsWith("L1")) {
-            addKeywordMeta(SCALE);
-            addKeywordMeta(DELTA);
-        }
-        params.addSubTable(this);
-    }
-
     // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
     //final String[] wisard_RGL_NAME = new String[]{"TOTVAR", "PSD", "L1L2", "L1L2WHITE", "SOFT_SUPPORT"};
     public static final String[] RGL_NAME_WISARD = new String[]{"TOTVAR", "L1L2", "L1L2WHITE"};
+    public static final String RGL_NAME_WISARD_L1 = "L1";
+
+    public WisardInputParam() {
+        super();
+    }
+
+    @Override
+    public void update(final ImageOiInputParam params) {
+        super.update(params);
+
+        // define keywords:
+        params.addKeyword(NP_MIN);
+        params.addKeyword(FOV);
+
+        // default values:
+        params.setKeywordDefaultInt(KEYWORD_NP_MIN, 32);
+        params.setKeywordDefaultDouble(KEYWORD_FOV, 20.0);
+
+        // for our first implementation, just add to params if not TOTVAR
+        if (params.getRglName().startsWith(RGL_NAME_WISARD_L1)) {
+            params.addKeyword(SCALE);
+            params.addKeyword(DELTA);
+
+            params.setKeywordDefaultDouble(KEYWORD_SCALE, 0.0001);
+            params.setKeywordDefaultDouble(KEYWORD_DELTA, 1);
+        }
+    }
 
     @Override
     public String[] getSupported_RGL_NAME() {
