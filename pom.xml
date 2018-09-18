@@ -71,6 +71,19 @@
                 </dependency>
         -->
         <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.slf4j</artifactId>
+            <version>2.3.7</version>
+            <exclusions>
+                <!-- slf4j API -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <artifactId>junit</artifactId>
             <groupId>junit</groupId>
             <version>4.11</version>
