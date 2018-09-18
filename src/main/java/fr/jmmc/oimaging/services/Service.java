@@ -3,9 +3,9 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.services;
 
-import fr.jmmc.oimaging.gui.MainPanel;
 import fr.jmmc.oimaging.services.software.SoftwareInputParam;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,10 +67,11 @@ public final class Service {
     }
 
     public void initSpecificParams(final ImageOiInputParam params) {
-        // TODO: cleanup all tha logic !!
-        params.addSubTable(null);
-
         softwareInputParam.update(params);
+    }
+
+    public void validate(final ImageOiInputParam params, final List<String> failures) {
+        softwareInputParam.validate(params, failures);
     }
 
 }

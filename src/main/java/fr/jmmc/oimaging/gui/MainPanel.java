@@ -8,7 +8,6 @@ package fr.jmmc.oimaging.gui;
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
-import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
 import fr.jmmc.jmcs.util.ObjectUtils;
@@ -24,6 +23,7 @@ import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageHDU;
+import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Cursor;
@@ -287,7 +287,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSliderWaveMax = new javax.swing.JSlider();
         jFormattedTextFieldWaveMin = new javax.swing.JFormattedTextField();
         jFormattedTextFieldWaveMax = new javax.swing.JFormattedTextField();
-        algorithmSettinsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
+        softwareSettingsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -299,7 +299,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jListResultSet = createCustomList();
         viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
 
-        setMaximumSize(new java.awt.Dimension(100, 100));
         setLayout(new java.awt.BorderLayout());
 
         jSplitPane.setResizeWeight(0.2);
@@ -307,15 +306,17 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jScrollPane.setMinimumSize(new java.awt.Dimension(300, 300));
 
-        jPanelLeft.setMinimumSize(new java.awt.Dimension(200, 500));
+        jPanelLeft.setMinimumSize(new java.awt.Dimension(200, 600));
+        jPanelLeft.setPreferredSize(new java.awt.Dimension(300, 700));
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
         jPanelDataSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Data selection"));
         jPanelDataSelection.setLayout(new java.awt.GridBagLayout());
 
         jComboBoxTarget.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxTarget.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_TARGET));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -323,48 +324,66 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelDataSelection.add(jComboBoxTarget, gridBagConstraints);
 
         jLabelTarget.setText("TARGET");
+        jLabelTarget.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_TARGET));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelDataSelection.add(jLabelTarget, gridBagConstraints);
 
         jLabelOifitsFile.setText("oifits Label");
+        jLabelOifitsFile.setPreferredSize(new java.awt.Dimension(200, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jPanelDataSelection.add(jLabelOifitsFile, gridBagConstraints);
 
         jButtonLoadData.setText("load oifits");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.ipadx = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
         jPanelDataSelection.add(jButtonLoadData, gridBagConstraints);
 
         jLabelWaveMin.setText("WAVE_MIN");
+        jLabelWaveMin.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MIN));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelDataSelection.add(jLabelWaveMin, gridBagConstraints);
 
         jLabelWaveMax.setText("WAVE_MAX");
+        jLabelWaveMax.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MAX));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelDataSelection.add(jLabelWaveMax, gridBagConstraints);
 
         jCheckBoxUseVis.setText("USE_VIS");
+        jCheckBoxUseVis.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_USE_VIS));
         jCheckBoxUseVis.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        jPanelDataSelection.add(jCheckBoxUseVis, gridBagConstraints);
+
+        jCheckBoxUseVis2.setText("USE_VIS2");
+        jCheckBoxUseVis2.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_USE_VIS2));
+        jCheckBoxUseVis2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxActionPerformed(evt);
             }
@@ -372,38 +391,26 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
-        jPanelDataSelection.add(jCheckBoxUseVis, gridBagConstraints);
-
-        jCheckBoxUseVis2.setText("USE_VIS2");
-        jCheckBoxUseVis2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         jPanelDataSelection.add(jCheckBoxUseVis2, gridBagConstraints);
 
         jCheckBoxUseT3.setText("USE_T3");
+        jCheckBoxUseT3.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_USE_T3));
         jCheckBoxUseT3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         jPanelDataSelection.add(jCheckBoxUseT3, gridBagConstraints);
 
         jSliderWaveMin.setPaintTicks(true);
+        jSliderWaveMin.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MIN));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -411,14 +418,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelDataSelection.add(jSliderWaveMin, gridBagConstraints);
 
         jSliderWaveMax.setPaintTicks(true);
+        jSliderWaveMax.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MAX));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         jPanelDataSelection.add(jSliderWaveMax, gridBagConstraints);
 
         jFormattedTextFieldWaveMin.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        jFormattedTextFieldWaveMin.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MIN));
         jFormattedTextFieldWaveMin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldActionPerformed(evt);
@@ -430,13 +439,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
         jPanelDataSelection.add(jFormattedTextFieldWaveMin, gridBagConstraints);
 
         jFormattedTextFieldWaveMax.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        jFormattedTextFieldWaveMax.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MAX));
         jFormattedTextFieldWaveMax.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldActionPerformed(evt);
@@ -448,10 +458,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
         jPanelDataSelection.add(jFormattedTextFieldWaveMax, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -463,7 +473,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        jPanelLeft.add(algorithmSettinsPanel, gridBagConstraints);
+        jPanelLeft.add(softwareSettingsPanel, gridBagConstraints);
 
         jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
         jPanelExecutionLog.setPreferredSize(new java.awt.Dimension(82, 100));
@@ -500,6 +510,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
 
         jButtonExportImage.setText("Save image");
@@ -509,6 +520,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jButtonExportImage, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -520,7 +532,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelLeft.add(jPanelExecutionLog, gridBagConstraints);
 
         jPanelResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Result sets"));
-        jPanelResults.setPreferredSize(new java.awt.Dimension(200, 152));
+        jPanelResults.setPreferredSize(new java.awt.Dimension(100, 100));
         jPanelResults.setLayout(new javax.swing.BoxLayout(jPanelResults, javax.swing.BoxLayout.LINE_AXIS));
 
         jScrollPane4.setPreferredSize(new java.awt.Dimension(180, 130));
@@ -577,7 +589,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private fr.jmmc.oimaging.gui.SoftwareSettingsPanel algorithmSettinsPanel;
     private javax.swing.JButton jButtonExportImage;
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;
@@ -604,6 +615,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
     private javax.swing.JSplitPane jSplitPane;
+    private fr.jmmc.oimaging.gui.SoftwareSettingsPanel softwareSettingsPanel;
     private fr.jmmc.oimaging.gui.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -703,13 +715,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // Check if algo settings change given model
-        if (algorithmSettinsPanel.updateModel(irModel)) {
+        if (softwareSettingsPanel.updateModel(irModel)) {
             changed = true;
         }
         // some values have changed
         if (changed) {
             // notify to other listener - if any in the future
-            StatusBar.show("GUI updated");
+            logger.debug("GUI updated");
             IRModelManager.getInstance().fireIRModelChanged(this, null);
         }
     }
@@ -765,7 +777,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             List<String> failures = new LinkedList<String>();
             failures.clear();
 
-            algorithmSettinsPanel.syncUI(this, currentModel, failures);
+            softwareSettingsPanel.syncUI(this, currentModel, failures);
 
             jLabelOifitsFile.setText(hasOIData ? currentModel.getUserOifitsFile().getFileName() : "");
 
@@ -834,4 +846,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             return label;
         }
     };
+
+    private static String getTooltip(final String name) {
+        return ImageOiInputParam.getDescription(name);
+    }
 }

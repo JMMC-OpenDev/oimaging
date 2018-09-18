@@ -3,16 +3,18 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui;
 
-import fr.jmmc.oitools.fits.FitsUtils;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.fits.FitsTable;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -26,11 +28,11 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
 
     private static final long serialVersionUID = 1L;
 
-    private final static Insets insets = new java.awt.Insets(2, 2, 2, 2);
+    private final static Insets insets = new Insets(2, 6, 2, 6);
 
     // members
     private SoftwareSettingsPanel notifiedParent = null;
-    private FitsTable model = null;
+    private FitsTable fitsTable = null;
 
     /** Creates new form TableEditor */
     public TableKeywordsEditor() {
@@ -45,86 +47,102 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
         this.notifiedParent = notifiedParent;
     }
 
-    void setModel(final FitsTable model, final Set<String> keywords) {
-        this.model = model;
+    void setModel(final FitsTable fitsTable) {
+        setModel(fitsTable, null);
+    }
+
+    void setModel(final FitsTable fitsTable, final Set<String> keywordNames) {
+        this.fitsTable = fitsTable;
 
         removeAll();
 
-        if (model == null) {
+        if (fitsTable == null) {
             return;
         }
 
         int gridy = 0;
-        setLayout(new java.awt.GridBagLayout());
-        java.awt.GridBagConstraints gridBagConstraints;
+        setLayout(new GridBagLayout());
 
-        for (String key : keywords) {
-            if (!FitsUtils.isStandardKeyword(key)) {
+        GridBagConstraints gridBagConstraints;
 
-                final KeywordMeta desc = model.getKeywordsDesc().get(key);
-                final JLabel jLabel = new JLabel(key);
-                jLabel.setToolTipText(desc.getDescription());
+        for (String name : keywordNames) {
+            final KeywordMeta meta = fitsTable.getKeywordsDesc(name);
+            final Object value = fitsTable.getKeywordValue(name);
 
-                JTextField jTextField;
-                JFormattedTextField jFormattedTextField;
-                Object value = model.getKeywordValue(key);
-                boolean supportedKeyword = true;
-                switch (model.getKeywordsDesc().get(key).getDataType()) {
-                    case TYPE_CHAR:
-                        jTextField = new JTextField(value == null ? "" : value.toString());
-                        break;
-                    case TYPE_DBL:
-                        jFormattedTextField = new JFormattedTextField(value);
-                        jFormattedTextField.setFormatterFactory(SoftwareSettingsPanel.getDecimalFormatterFactory());
-                        jTextField = jFormattedTextField;
-                        break;
-                    case TYPE_INT:
-                        jFormattedTextField = new JFormattedTextField(value);
-                        jFormattedTextField.setFormatterFactory(SoftwareSettingsPanel.getIntegerFormatterFactory());
-                        jTextField = jFormattedTextField;
-                        break;
-                    default:
-                        jTextField = new JTextField(model.getKeywordsDesc().get(key).getDataType() + " UNSUPPORTED");
-                        supportedKeyword = false;
-                }
+            final JLabel jLabel = new JLabel(name);
+            jLabel.setToolTipText(meta.getDescription());
 
-                jTextField.setToolTipText(desc.getDescription());
-                if (supportedKeyword) {
-                    // store name to retieve back on edit
-                    jTextField.setName(key);
-                    jTextField.addActionListener(this);
-                    jTextField.addPropertyChangeListener(this);
-                } else {
-                    jTextField.setEditable(false);
-                }
+            final JComponent component;
+            boolean supportedKeyword = true;
 
-                gridBagConstraints = new java.awt.GridBagConstraints();
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = gridy;
-                gridBagConstraints.weightx = 0.1;
-                gridBagConstraints.weighty = 0.1;
-                gridBagConstraints.insets = insets;
-                gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-                add(jLabel, gridBagConstraints);
-
-                gridBagConstraints = new java.awt.GridBagConstraints();
-                gridBagConstraints.gridx = 2;
-                gridBagConstraints.gridy = gridy;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-                gridBagConstraints.gridwidth = 5;
-                gridBagConstraints.weightx = 0.8;
-                gridBagConstraints.weighty = 0.1;
-                gridBagConstraints.insets = insets;
-                gridBagConstraints.anchor = GridBagConstraints.CENTER;
-
-                add(jTextField, gridBagConstraints);
-
-                gridy++;
+            switch (meta.getDataType()) {
+                case TYPE_CHAR:
+                    component = new JTextField((value == null) ? "" : value.toString());
+                    break;
+                case TYPE_DBL:
+                    component = createFormattedTextField(SoftwareSettingsPanel.getDecimalFormatterFactory(), value);
+                    break;
+                case TYPE_INT:
+                    component = createFormattedTextField(SoftwareSettingsPanel.getIntegerFormatterFactory(), value);
+                    break;
+                case TYPE_LOGICAL:
+                    JCheckBox checkbox = new JCheckBox();
+                    checkbox.setSelected(Boolean.TRUE.equals(value));
+                    component = checkbox;
+                    break;
+                default:
+                    component = new JTextField(meta.getDataType() + " UNSUPPORTED");
+                    supportedKeyword = false;
             }
+            component.setToolTipText(meta.getDescription());
+
+            if (supportedKeyword) {
+                // store name to retieve back on edit
+                component.setName(name);
+                component.addPropertyChangeListener("value", this);
+
+                if (component instanceof JTextField) {
+                    ((JTextField) component).addActionListener(this);
+                } else if (component instanceof JCheckBox) {
+                    ((JCheckBox) component).addActionListener(this);
+                }
+            } else {
+                ((JTextField) component).setEditable(false);
+            }
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.weightx = 0.1;
+            gridBagConstraints.weighty = 0.1;
+            gridBagConstraints.insets = insets;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+            add(jLabel, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.gridwidth = 5;
+            gridBagConstraints.weightx = 0.8;
+            gridBagConstraints.weighty = 0.1;
+            gridBagConstraints.insets = insets;
+            gridBagConstraints.anchor = GridBagConstraints.CENTER;
+
+            add(component, gridBagConstraints);
+
+            gridy++;
         }
     }
 
-    /** This method is called from within the constructor to
+    private static JFormattedTextField createFormattedTextField(final JFormattedTextField.AbstractFormatterFactory formatterFactory, final Object value) {
+        final JFormattedTextField jFormattedTextField = new JFormattedTextField(value);
+        jFormattedTextField.setFormatterFactory(formatterFactory);
+        return jFormattedTextField;
+    }
+
+    /** 
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -139,27 +157,35 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
-    public void actionPerformed(ActionEvent evt) {
-        final JTextField textField = (JTextField) evt.getSource();
-        update(textField.getName(), textField.getText());
+    public void actionPerformed(final ActionEvent ae) {
+        final JComponent component = (JComponent) ae.getSource();
+        if (component != null) {
+            final String name = component.getName();
+            String value = null;
+            if (component instanceof JTextField) {
+                value = ((JTextField) component).getText();
+            } else if (component instanceof JCheckBox) {
+                value = Boolean.toString(((JCheckBox) component).isSelected());
+            }
+            update(name, value);
+        }
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        // Ignore most property change except value change
-        // TODO check that this filtering follow standard conventions
-        if (evt.getPropertyName().equals("value")) {
-            final JTextField textField = (JTextField) evt.getSource();
-            if (textField != null && textField.getName() != null && evt.getNewValue() != null) {
-                update(textField.getName(), evt.getNewValue().toString());
+    public void propertyChange(final PropertyChangeEvent pce) {
+        final JComponent component = (JComponent) pce.getSource();
+        if (component != null) {
+            final String name = component.getName();
+            if (pce.getNewValue() != null) {
+                update(name, pce.getNewValue().toString());
             }
         }
     }
 
-    private void update(String name, String value) {
+    private void update(final String name, final String value) {
         // Store content as a string even for every types
         if (name != null && value != null) {
-            model.updateKeyword(name, value);
+            fitsTable.updateKeyword(name, value);
             notifiedParent.updateModel(true);
         }
     }

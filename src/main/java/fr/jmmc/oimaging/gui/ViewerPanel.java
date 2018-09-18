@@ -115,8 +115,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 displaySelection(imageHDU);
             }
         } else {
+            logger.debug("Remove image panel");
             jPanelImage.remove(fitsImagePanel);
-            logger.info("Remove image panel");
         }
     }
 

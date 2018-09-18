@@ -356,9 +356,8 @@ public class IRModel {
     }
 
     public void initSpecificParams() {
-        ImageOiInputParam params = getImageOiData().getInputParam();
         // Get the specific params of given software if any
-        selectedService.initSpecificParams(params);
+        selectedService.initSpecificParams(getImageOiData().getInputParam());
     }
 
     public String toString() {
