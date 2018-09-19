@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 4"/>
-    <compilation date="18/03/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 5"/>
+    <compilation date="19/09/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -150,7 +150,11 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Tue, 19 Mar 2018 14:00:00 GMT</pubDate>
+            <pubDate>Wed, 19 Sep 2018 15:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 5">
+                <change type="FEATURE">Improved GUI to deal with software parameters (common / specific).</change>
+                <change type="CHANGE">Fixed FITS keyword handling to avoid duplicated keywords in image HDUs and IMAGE-OI INPUT PARAM table</change>
+            </prerelease>
             <prerelease version="0.5 beta 4">
                 <change type="CHANGE">Request UWS job deletion after result retrieval (is also done weekly on the server side in case of failure).</change>
             </prerelease>
