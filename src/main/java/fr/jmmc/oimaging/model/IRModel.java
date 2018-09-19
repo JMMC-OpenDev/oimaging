@@ -97,9 +97,8 @@ public class IRModel {
         } else {
             this.oifitsFile = inputOifitsFile;
         }
-        if (oifitsFile.getImageOiData() == null) {
-            this.oifitsFile.setImageOiData(new ImageOiData(oifitsFile));
-        }
+        // create ImageOiData if needed:
+        oifitsFile.getImageOiData();
 
         // load targets
         String[] targets = null;

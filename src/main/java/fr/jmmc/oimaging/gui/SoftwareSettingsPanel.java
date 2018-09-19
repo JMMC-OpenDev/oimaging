@@ -30,11 +30,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     /** associated mainPanel */
     private MainPanel mainPanel;
 
-    /** temporary flag set to force notification of model changed .
-     * Mostly used by TableKeywordEditor.
-     */
-    private boolean forceChange;
-
     /** Creates new form AlgorithmSettinsPanel */
     public SoftwareSettingsPanel() {
         initComponents();
@@ -467,10 +462,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }
 
     protected void updateModel(final boolean forceChange) {
-        this.forceChange = forceChange;
-
         if (mainPanel != null) {
-            mainPanel.updateModel();
+            mainPanel.updateModel(forceChange);
         }
     }
 
@@ -564,8 +557,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             }
         }
 
-        changed = changed || forceChange;
-        forceChange = false;
         return changed;
     }
 

@@ -645,6 +645,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
      *
      */
     protected void updateModel() {
+        updateModel(false);
+    }
+
+    protected void updateModel(final boolean forceChange) {
 
         if (syncingUI) {
             return;
@@ -718,6 +722,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (softwareSettingsPanel.updateModel(irModel)) {
             changed = true;
         }
+        
+        changed |= forceChange;
+        
         // some values have changed
         if (changed) {
             // notify to other listener - if any in the future
