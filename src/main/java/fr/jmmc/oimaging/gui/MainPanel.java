@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author mella
  */
 public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener {
+
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
 
@@ -63,7 +64,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private static final int REFRESH_PERIOD = 100;
 
     // if multi page activated the export file will containt global view + each plot on a page/image
-
     private final List<String> hduNameList = new ArrayList<String>(5);
 
     private final List<ServiceResult> resultSetList = new ArrayList<ServiceResult>(5);
@@ -728,7 +728,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     /**
      * Update swing widgets with content of given irModel.
-     * @param irModel master model to synchronize with.
+     * @param event model event
      */
     private void syncUI(IRModelEvent event) {
         syncingUI = true;
@@ -736,7 +736,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             currentModel = event.getIrModel();
 
             final OIFitsFile oifitsFile = currentModel.getOifitsFile();
-            boolean hasOIData = oifitsFile.hasOiData();
+            final boolean hasOIData = oifitsFile.hasOiData();
             final ImageOiInputParam inputParam = currentModel.getImageOiData().getInputParam();
 
             // associate target list
@@ -774,12 +774,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jListResultSet.setModel(resultSetListModel);
 
             // perform analysis
-            List<String> failures = new LinkedList<String>();
-            failures.clear();
+            final List<String> failures = new LinkedList<String>();
 
             softwareSettingsPanel.syncUI(this, currentModel, failures);
 
-            jLabelOifitsFile.setText(hasOIData ? currentModel.getUserOifitsFile().getFileName() : "");
+            final String fileName = (hasOIData) ? currentModel.getUserOifitsFile().getFileName() : "";
+            jLabelOifitsFile.setText(fileName);
+            jLabelOifitsFile.setToolTipText(fileName);
 
             if (!hasOIData) {
                 failures.add("Missing OIData, please load an OIFits");
@@ -794,20 +795,19 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
              */
 
-            // if nothing is wrong allow related actions
+            // if nothing is wrong, allow related actions
             // TODO make this idea more global and on an higher level Manager.setValid(true) e.g. ?
-            final boolean modelOk = failures.size() == 0;
+            final boolean modelOk = failures.isEmpty();
             runAction.setEnabled(modelOk);
 
-            StringBuffer sb = new StringBuffer(200);
-            for (String fail : failures) {
-                sb.append("<li><font color=red>").append(fail).append("</font></li>");
-            }
-
-            if (failures.size() == 0) {
+            final StringBuffer sb = new StringBuffer(256);
+            if (modelOk) {
                 sb.append("<li><font color=green>Ready to spawn process</font></li>");
+            } else {
+                for (String fail : failures) {
+                    sb.append("<li><font color=red>").append(fail).append("</font></li>");
+                }
             }
-
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
             if (event.getType().equals(event.getType().IRMODEL_CHANGED) || jListResultSet.getModel().getSize() == 0) {
