@@ -187,28 +187,28 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         // Assume that first state is executing
         ExecutionPhase phase = ExecutionPhase.EXECUTING;
 
-        // loop and query return status
-        while (phase == ExecutionPhase.EXECUTING) {
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException ie) {
-                _logger.info("Interrupted.");
+        try {
+            // loop and query return status
+            while (phase == ExecutionPhase.EXECUTING) {
+                try {
+                    Thread.sleep(1000L);
+                } catch (InterruptedException ie) {
+                    _logger.info("Interrupted.");
 
-                result.setErrorMessage("Cancelled job.");
-                client.setAbortJob(jobId);
-                _logger.info("Job aborted.");
+                    result.setErrorMessage("Cancelled job.");
+                    client.setAbortJob(jobId);
+                    _logger.info("Job aborted.");
 
 //                return;
+                }
+                phase = client.getJobPhase(jobId);
+
+                _logger.debug("getJobPhase[{}] : {}", jobId, phase);
+
+                // TODO timeout ? or just wait 'Cancel' button
             }
-            phase = client.getJobPhase(jobId);
+            _logger.info("End of execution for job '{}' in phase '{}'", jobId, phase);
 
-            _logger.debug("getJobPhase[{}] : {}", jobId, phase);
-
-            // TODO timeout ? or just wait 'Cancel' button
-        }
-        _logger.info("End of execution for job '{}' in phase '{}'", jobId, phase);
-
-        try {
             if (phase == ExecutionPhase.COMPLETED) {
                 prepareResult(client, jobId, result);
             } else {
