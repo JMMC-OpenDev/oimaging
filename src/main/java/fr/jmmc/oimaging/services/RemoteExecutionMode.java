@@ -106,11 +106,12 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
      * Start the remote application and wait end of execution.
      *
      * @param software software to run
+     * @param cliOptions software options on command line or null
      * @param inputFilename input filename
      * @param result the service result pointing result file to write data into.
      * @throws IllegalStateException if the job can not be submitted to the job queue
      */
-    public void callUwsOimagingService(final String software, final String inputFilename, ServiceResult result) throws IllegalStateException, ClientUWSException, URISyntaxException, IOException {
+    public void callUwsOimagingService(final String software, final String cliOptions, final String inputFilename, ServiceResult result) throws IllegalStateException, ClientUWSException, URISyntaxException, IOException {
 
         if (StringUtils.isEmpty(software)) {
             throw new IllegalArgumentException("empty application name !");
@@ -125,7 +126,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             throw new IllegalArgumentException("empty log filename !");
         }
 
-        _logger.info("callUwsOimagingService: {} {}", software, inputFilename);
+        _logger.info("callUwsOimagingService: software={} cliOptions={} inputFilenane={}", software, cliOptions, inputFilename);
 
         // prepare input of next uws call
         FormDataSet fds = new FormDataSet();
@@ -142,6 +143,11 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
         FormData fdSoftware = new FormData("software", software);
         fds.getEntries().add(fdSoftware);
+
+        if (cliOptions != null) {
+            FormData fdOptions = new FormData("cliOptions", software);
+            fds.getEntries().add(fdOptions);
+        }
 
         // start task in autostart mode
         fds.add("PHASE", "RUN");
@@ -190,7 +196,9 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
                 result.setErrorMessage("Cancelled job.");
                 client.setAbortJob(jobId);
-                return;
+                _logger.info("Job aborted.");
+
+//                return;
             }
             phase = client.getJobPhase(jobId);
 
@@ -243,13 +251,13 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     }
 
     @Override
-    public ServiceResult reconstructsImage(final String software, final File inputFile) {
+    public ServiceResult reconstructsImage(final String software, final String options, final File inputFile) {
         final ServiceResult result = new ServiceResult(inputFile);
 
         Exception e = null;
         try {
             // TODO add log output retrieval
-            callUwsOimagingService(software, inputFile.getAbsolutePath(), result);
+            callUwsOimagingService(software, options, inputFile.getAbsolutePath(), result);
         } catch (IllegalStateException ise) {
             throw ise;
         } catch (ClientUWSException ce) {

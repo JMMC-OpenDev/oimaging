@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +52,14 @@ public class IRModel {
     private List<ServiceResult> serviceResults;
     /** Selected algorithm */
     private Service selectedService;
+    /** Optional cliOptions (null value is not fowarded to execution)*/
+    private String cliOptions;
 
     /** Selected input image */
     private FitsImageHDU selectedInputImageHDU;
 
     private final Hashtable<FitsImageHDU, String> fitsImageHdu2Filename = new Hashtable<FitsImageHDU, String>();
-    
+
     private final List<String> targetList = new ArrayList<String>(5);
     private final GenericListModel<String> targetListModel = new GenericListModel<String>(targetList, true);
 
@@ -79,6 +82,7 @@ public class IRModel {
 
         this.fitsImageHDUs = new LinkedList<FitsImageHDU>();
         this.serviceResults = new LinkedList<ServiceResult>();
+        this.cliOptions = null;
         this.fitsImageHdu2Filename.clear();
 
         this.running = false;
@@ -339,6 +343,22 @@ public class IRModel {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
         }
+    }
+
+    /**
+     * Set cliOptions. Blank or null values avoid cli option passing.
+     * @param cliOptions software options on command line or null
+     */
+    public void setCliOptions(String cliOptions) {
+        if (StringUtils.isBlank(cliOptions)) {
+            this.cliOptions = null;
+        } else {
+            this.cliOptions = cliOptions;
+        }
+    }
+
+    public String getCliOptions() {
+        return cliOptions;
     }
 
     public String getImageHDUFilename(FitsImageHDU hdu) {

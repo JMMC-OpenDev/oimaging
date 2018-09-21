@@ -39,13 +39,14 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
      * Execute the application and wait end of execution.
      *
      * @param software software to run
+     * @param cliOptions software options on command line or null
      * @param inputFilename input filename
      * @param outputFilename result filename
      * @param logFilename execution log filename
      * @return the job context identifier
      * @throws IllegalStateException if the job can not be submitted to the job queue
      */
-    public static int exec(final String software, final String inputFilename, final String outputFilename, final String logFilename) throws IllegalStateException {
+    public static int exec(final String software, final String cliOptions, final String inputFilename, final String outputFilename, final String logFilename) throws IllegalStateException {
 
         if (StringUtils.isEmpty(software)) {
             throw new IllegalArgumentException("empty application name !");
@@ -60,12 +61,18 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
             throw new IllegalArgumentException("empty log filename !");
         }
 
-        _logger.info("exec: {} {} {}", software, inputFilename, outputFilename);
+        _logger.info("exec: software={} cliOptions={} inputFilenane={} outputFilenane={} logFilename={}", software, cliOptions, inputFilename, outputFilename, logFilename);
 
         // create the execution context without log file:
         final RootContext jobContext = LocalLauncher.prepareMainJob(APP_NAME, USER_NAME, FileUtils.getTempDirPath(), logFilename);
 
-        final String[] cmd = new String[]{software, inputFilename, outputFilename};
+        final String[] cmd;
+        if (cliOptions == null) {
+            cmd = new String[]{software, inputFilename, outputFilename};
+        } else {
+            cmd = new String[]{software, cliOptions, inputFilename, outputFilename};
+        }
+
         LocalLauncher.prepareChildJob(jobContext, TASK_NAME, cmd);
 
         // Puts the job in the job queue (can throw IllegalStateException if job not queued)
@@ -92,9 +99,9 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
     }
 
     @Override
-    public ServiceResult reconstructsImage(final String software, final File inputFile) {
+    public ServiceResult reconstructsImage(final String software, final String cliOptions, final File inputFile) {
         ServiceResult result = new ServiceResult(inputFile);
-        LocalExecutionMode.exec(software, inputFile.getAbsolutePath(),
+        LocalExecutionMode.exec(software, cliOptions, inputFile.getAbsolutePath(),
                 result.getOifitsResultFile().getAbsolutePath(),
                 result.getExecutionLogResultFile().getAbsolutePath());
         return result;

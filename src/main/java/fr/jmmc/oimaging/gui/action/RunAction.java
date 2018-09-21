@@ -74,13 +74,13 @@ public class RunAction extends RegisteredAction {
             setRunningState(irModel, false);
         } else {
 
-            File inputFile = null;
             try {
-                inputFile = irModel.prepareTempFile();
+                String cliOptions = irModel.getCliOptions();
+                File inputFile = irModel.prepareTempFile();
                 StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
                 // change model state to lock it and extract its snapshot
                 setRunningState(irModel, true);
-                new RunFitActionWorker(getTask(), inputFile, irModel, this).executeTask();
+                new RunFitActionWorker(getTask(), cliOptions, inputFile, irModel, this).executeTask();
             } catch (FitsException ex) {
                 setRunningState(irModel, false);
                 logger.error("Can't prepare temporary file before running process", ex);
@@ -99,12 +99,14 @@ public class RunAction extends RegisteredAction {
 
     static class RunFitActionWorker extends TaskSwingWorker<ServiceResult> {
 
+        private final String cliOptions;
         private final File inputFile;
         private final IRModel irModel;
         private final RunAction parentAction;
 
-        RunFitActionWorker(Task task, File inputFile, IRModel irModel, RunAction runAction) {
+        RunFitActionWorker(Task task, String cliOptions, File inputFile, IRModel irModel, RunAction runAction) {
             super(task);
+            this.cliOptions = cliOptions;
             this.inputFile = inputFile;
             this.irModel = irModel; // only for callback
             this.parentAction = runAction;
@@ -115,7 +117,7 @@ public class RunAction extends RegisteredAction {
             final Service service = irModel.getSelectedService();
 
             try {
-                final ServiceResult result = service.getExecMode().reconstructsImage(service.getProgram(), inputFile);
+                final ServiceResult result = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
                 result.setService(service);
                 // Result is valid only if the OIFITS file was downloaded successfully:
                 final boolean exist = result.getOifitsResultFile().exists();

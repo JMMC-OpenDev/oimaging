@@ -16,6 +16,8 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Level;
 import javax.swing.JFormattedTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
@@ -43,6 +45,22 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         registerActions();
         jComboBoxImage.setRenderer(new OiCellRenderer());
         jTableKeywordsEditor.setNotifiedParent(this);
+        this.jTextAreaOptions.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(final DocumentEvent e) {
+                updateModel();
+            }
+
+            @Override
+            public void removeUpdate(final DocumentEvent e) {
+                updateModel();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                //Plain text components do not fire these events
+            }
+        });
     }
 
     /**
@@ -64,6 +82,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jideToggleSplitButton1 = new com.jidesoft.swing.JideToggleSplitButton();
         jPanelAlgorithmSettings = new javax.swing.JPanel();
         jLabelInitImg = new javax.swing.JLabel();
         jLabelMaxIter = new javax.swing.JLabel();
@@ -83,6 +102,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jButtonRemoveFitsImage = new javax.swing.JButton();
         jButtonLoadFitsImage = new javax.swing.JButton();
         jTableKeywordsEditor = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
+        jPanelOptions = new javax.swing.JPanel();
+        jTextAreaOptions = new javax.swing.JTextArea();
+
+        jideToggleSplitButton1.setText("jideToggleSplitButton1");
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -316,7 +339,26 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.5;
         jPanelAlgorithmSettings.add(jTableKeywordsEditor, gridBagConstraints);
-        jTableKeywordsEditor.getAccessibleContext().setAccessibleName("Specific parameters");
+
+        jPanelOptions.setBorder(javax.swing.BorderFactory.createTitledBorder("Manual options"));
+        jPanelOptions.setLayout(new java.awt.GridBagLayout());
+
+        jTextAreaOptions.setColumns(20);
+        jTextAreaOptions.setLineWrap(true);
+        jTextAreaOptions.setRows(5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        jPanelOptions.add(jTextAreaOptions, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        jPanelAlgorithmSettings.add(jPanelOptions, gridBagConstraints);
 
         add(jPanelAlgorithmSettings);
     }// </editor-fold>//GEN-END:initComponents
@@ -384,8 +426,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelRglPrio;
     private javax.swing.JLabel jLabelRglWgt;
     private javax.swing.JPanel jPanelAlgorithmSettings;
+    private javax.swing.JPanel jPanelOptions;
     private javax.swing.JSpinner jSpinnerMaxIter;
     private fr.jmmc.oimaging.gui.TableKeywordsEditor jTableKeywordsEditor;
+    private javax.swing.JTextArea jTextAreaOptions;
+    private com.jidesoft.swing.JideToggleSplitButton jideToggleSplitButton1;
     // End of variables declaration//GEN-END:variables
 
     public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
@@ -455,6 +500,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         } else {
             failures.add(irModel.getSelectedInputFitsImageError());
         }
+
+        // cliOptions
+        String cliOptions = irModel.getCliOptions();
+        jTextAreaOptions.setText(cliOptions == null ? "" : cliOptions);
+
     }
 
     protected void updateModel() {
@@ -555,6 +605,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 inputParam.setRglPrio(wString);
                 changed = true;
             }
+        }
+
+        // cliOptions
+        mString = irModel.getCliOptions();
+        wString = jTextAreaOptions.getText();
+        if (!wString.equals(mString)) {
+            irModel.setCliOptions(wString);
+            changed = true;
         }
 
         return changed;
