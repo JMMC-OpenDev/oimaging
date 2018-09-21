@@ -29,19 +29,20 @@ import org.slf4j.LoggerFactory;
  */
 public final class RemoteExecutionMode implements OImagingExecutionMode {
 
+    // TODO add a preference to switch or revert order between dev/prod
+    public static final boolean USE_LOCAL = false;
+
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
 
     public static final String SERVICE_PATH = "oimaging/oimaging";
 
-    // TODO add a preference to switch or revert order between dev/prod
-    public static final String[] SERVER_URLS = new String[]{
-        "http://fe.jmmc.fr/OImaging-uws/",
-        "http://fe.preprod.jmmc.fr/OImaging-uws/",
-        "http://127.0.0.1:8080/OImaging-uws/",
-        "http://localhost:8800/OImaging-uws/",
-        "http://localhost:8888/OImaging-uws/"
-    };
+    public static final String[] SERVER_URLS = (USE_LOCAL)
+            ? new String[]{"http://127.0.0.1:8080/OImaging-uws/"}
+            : new String[]{
+                "http://fe.jmmc.fr/OImaging-uws/",
+                "http://fe.preprod.jmmc.fr/OImaging-uws/"
+            };
 
     private static final ClientFactory FACTORY = new ClientFactory();
 

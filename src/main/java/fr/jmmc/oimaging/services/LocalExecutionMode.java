@@ -81,7 +81,7 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
             _logger.warn("exec: interrupted", ie);
 
             // TODO: handle resource cleanup
-            LocalLauncher.killJob(jobId);
+            LocalLauncher.cancelOrKillJob(jobId);
 
         } catch (ExecutionException ee) {
             _logger.info("exec: execution error", ee);

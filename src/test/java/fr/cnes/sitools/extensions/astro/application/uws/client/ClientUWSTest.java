@@ -3,12 +3,14 @@
  ******************************************************************************/
 package fr.cnes.sitools.extensions.astro.application.uws.client;
 
+import fr.jmmc.oimaging.services.RemoteExecutionMode;
 import java.io.File;
 import net.ivoa.xml.uws.v1.Jobs;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Disposition;
 import org.restlet.data.MediaType;
 import org.restlet.ext.html.FormData;
@@ -31,7 +33,7 @@ public class ClientUWSTest {
 
     @BeforeClass
     public static void setUpClass() {
-        //instance = new ClientUWS("http://127.0.0.1:8080/uws/oimaging/oimaging");
+        instance = new ClientUWS("http://127.0.0.1:8080/OImaging-uws/", RemoteExecutionMode.SERVICE_PATH);
     }
 
     @AfterClass
@@ -49,7 +51,7 @@ public class ClientUWSTest {
 
     }
 
-//    @Test
+    @Test
     public void testMain() throws Exception {
         File inputFile = new File("src/test/resources/Bin_Ary--MIRC_H_with_img.fits");
 
