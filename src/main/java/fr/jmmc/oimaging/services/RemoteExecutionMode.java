@@ -145,7 +145,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         fds.getEntries().add(fdSoftware);
 
         if (cliOptions != null) {
-            FormData fdOptions = new FormData("cliOptions", software);
+            FormData fdOptions = new FormData("cliOptions", cliOptions);
             fds.getEntries().add(fdOptions);
         }
 
