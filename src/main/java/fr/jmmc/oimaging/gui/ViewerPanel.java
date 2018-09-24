@@ -95,6 +95,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage.setRenderer(new OiCellRenderer());
     }
 
+    private void displayExecutionLog() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
         // Todo Build selector
 
@@ -209,8 +213,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             } catch (FitsException ex) {
                 logger.error("Can't retrieve result oifile", ex);
             }
+
             displayImage(imageHdus, imageHduToShow);
             displayOiFitsAndParams(oifitsFile, target);
+
+            if (oifitsFile == null) {
+                lastResultPanel = jPanelLogViewer;
+            }
 
             setTabMode(SHOW_MODE.RESULT);
         }
