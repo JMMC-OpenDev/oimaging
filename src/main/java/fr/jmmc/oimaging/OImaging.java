@@ -77,6 +77,9 @@ public final class OImaging extends App {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
+        
+        System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
+        
         // Start application with the command line arguments
         Bootstrapper.launchApp(new OImaging(args));
     }
