@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class RemoteExecutionMode implements OImagingExecutionMode {
 
-    // TODO add a preference to switch or revert order between dev/prod
-    public static final boolean USE_LOCAL = false;
+    // Use -DRemoteExecutionMode.local=true (dev) to use local uws server (docker)
+    private static final boolean USE_LOCAL = Boolean.getBoolean("RemoteExecutionMode.local");
 
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
