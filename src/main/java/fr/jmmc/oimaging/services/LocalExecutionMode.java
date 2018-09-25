@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public final class LocalExecutionMode implements OImagingExecutionMode {
 
     /** Class logger */
-    private static final Logger _logger = LoggerFactory.getLogger(LocalExecutionMode.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LocalExecutionMode.class.getName());
     /** application identifier for LocalExecutionMode */
     public final static String APP_NAME = "OImaging";
     /** user for LocalExecutionMode */
@@ -61,7 +61,7 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
             throw new IllegalArgumentException("empty log filename !");
         }
 
-        _logger.info("exec: software={} cliOptions={} inputFilenane={} outputFilenane={} logFilename={}", software, cliOptions, inputFilename, outputFilename, logFilename);
+        logger.info("exec: software={} cliOptions={} inputFilenane={} outputFilenane={} logFilename={}", software, cliOptions, inputFilename, outputFilename, logFilename);
 
         // create the execution context without log file:
         final RootContext jobContext = LocalLauncher.prepareMainJob(APP_NAME, USER_NAME, FileUtils.getTempDirPath(), logFilename);
@@ -82,16 +82,26 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
 
         // Wait for process completion
         try {
+            // TODO: use timeout to kill (too long or hanging) jobs anyway ?
             // Wait for task to be done :
             jobContext.getFuture().get();
         } catch (InterruptedException ie) {
-            _logger.warn("exec: interrupted", ie);
+            logger.warn("exec: interrupted", ie);
 
-            // TODO: handle resource cleanup
             LocalLauncher.cancelOrKillJob(jobId);
 
+            try {
+                // Wait for process to die:
+                jobContext.getFuture().get();
+            } catch (InterruptedException ie2) {
+                logger.debug("Job[{}] waitFor: interrupted 2 {}", jobId);
+            } catch (ExecutionException ee) {
+                logger.debug("Job[{}] waitFor: execution error", jobId, ee);
+            }
+            logger.debug("Job[{}] waitFor: interrupted, done", jobId);
+
         } catch (ExecutionException ee) {
-            _logger.info("exec: execution error", ee);
+            logger.info("exec: execution error", ee);
         }
 
         // TODO: retrieve command execution status code

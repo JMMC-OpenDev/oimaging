@@ -193,13 +193,15 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                 try {
                     Thread.sleep(1000L);
                 } catch (InterruptedException ie) {
-                    _logger.info("Interrupted.");
-
+                    _logger.debug("Interrupted.");
                     result.setErrorMessage("Cancelled job.");
-                    client.setAbortJob(jobId);
-                    _logger.info("Job aborted.");
 
-//                return;
+                    _logger.debug("Job[{}] aborting ...", jobId);
+                    client.setAbortJob(jobId);
+                    _logger.debug("Job[{}] aborted.", jobId);
+
+                    phase = ExecutionPhase.ABORTED;
+                    break;
                 }
                 phase = client.getJobPhase(jobId);
 
@@ -211,7 +213,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
             if (phase == ExecutionPhase.COMPLETED) {
                 prepareResult(client, jobId, result);
-            } else {
+            } else if (phase != ExecutionPhase.ABORTED) {
                 JobSummary jobInfo = client.getJobInfo(jobId);
                 _logger.error("Error in execution for job '{}': {} ", jobId, jobInfo.getErrorSummary());
 
@@ -221,7 +223,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             try {
                 client.deleteJobInfo(jobId);
             } catch (ClientUWSException cue) {
-                _logger.warn("Can't delete job", cue);
+                _logger.warn("Can't delete job '{}'", jobId, cue);
             }
         }
     }
