@@ -22,8 +22,7 @@ public final class WisardInputParam extends SoftwareInputParam {
     private static final KeywordMeta DELTA = new KeywordMeta(KEYWORD_DELTA, "TBD", Types.TYPE_DBL);
 
     // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
-    //final String[] wisard_RGL_NAME = new String[]{"TOTVAR", "PSD", "L1L2", "L1L2WHITE", "SOFT_SUPPORT"};
-    public static final String[] RGL_NAME_WISARD = new String[]{"TOTVAR", "L1L2", "L1L2WHITE"};
+    public static final String[] RGL_NAME_WISARD = new String[]{"TOTVAR", "PSD", "L1L2", "L1L2WHITE", "SOFT_SUPPORT"};
     public static final String RGL_NAME_WISARD_L1 = "L1";
 
     public WisardInputParam() {
