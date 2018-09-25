@@ -16,8 +16,13 @@ import javax.swing.ComboBoxModel;
 public final class ServiceList {
 
     public static final String SERVICE_BSMEM = "BSMEM";
+    public static final String SERVICE_MIRA = "MIRA";
     public static final String SERVICE_WISARD = "WISARD";
 
+    public static final String CMD_BSMEM = "bsmem-ci";
+    public static final String CMD_MIRA = "mira-ci";
+    public static final String CMD_WISARD = "wisard-ci";
+    
     /** Singleton instance */
     private static ServiceList _instance = null;
 
@@ -33,14 +38,18 @@ public final class ServiceList {
         availableServices = new GenericListModel<Service>(new ArrayList<Service>(8), true);
 
         final SoftwareInputParam swParamBsmem = SoftwareInputParam.newInstance(SERVICE_BSMEM);
+        final SoftwareInputParam swParamMira = SoftwareInputParam.newInstance(SERVICE_MIRA);
         final SoftwareInputParam swParamWisard = SoftwareInputParam.newInstance(SERVICE_WISARD);
 
-        availableServices.add(new Service(SERVICE_BSMEM, "bsmem-ci", localExecutionMode, "", "", swParamBsmem));
-        availableServices.add(new Service(SERVICE_WISARD, "wisard-ci", localExecutionMode, "", "", swParamWisard));
+        availableServices.add(new Service(SERVICE_BSMEM, CMD_BSMEM, localExecutionMode, "", "", swParamBsmem));
+        availableServices.add(new Service(SERVICE_MIRA, CMD_MIRA, localExecutionMode, "", "", swParamMira));
+        availableServices.add(new Service(SERVICE_WISARD, CMD_WISARD, localExecutionMode, "", "", swParamWisard));
 
-        availableServices.add(new Service(SERVICE_BSMEM + " (remote)", "bsmem-ci", remoteExecutionMode, "", "", swParamBsmem));
+        availableServices.add(new Service(SERVICE_BSMEM + " (remote)", CMD_BSMEM, remoteExecutionMode, "", "", swParamBsmem));
+        availableServices.add(new Service(SERVICE_MIRA + " (remote)", CMD_MIRA, remoteExecutionMode, "", "", swParamMira));
         // TODO remove code configuration and link this it to a preference
-        preferedService = new Service(SERVICE_WISARD + " (remote)", "wisard-ci", remoteExecutionMode, "", "", swParamWisard);
+        preferedService = new Service(SERVICE_WISARD + " (remote)", CMD_WISARD, remoteExecutionMode, "", "", swParamWisard);
+        
         availableServices.add(preferedService);
     }
 
