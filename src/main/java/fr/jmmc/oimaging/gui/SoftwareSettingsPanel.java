@@ -503,7 +503,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         // cliOptions
         String cliOptions = irModel.getCliOptions();
-        jTextAreaOptions.setText(cliOptions == null ? "" : cliOptions);
+        String text = jTextAreaOptions.getText();
+        if (!text.equals(cliOptions)) {
+            jTextAreaOptions.setText(cliOptions == null ? "" : cliOptions);
+        }
 
     }
 
