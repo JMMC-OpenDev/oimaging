@@ -7,7 +7,6 @@ import fr.jmmc.jmcs.gui.component.Disposable;
 import fr.jmmc.oiexplorer.core.export.DocumentExportable;
 import fr.jmmc.oiexplorer.core.export.DocumentOptions;
 import fr.jmmc.oiexplorer.core.gui.PlotChartPanel;
-import fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor;
 import fr.jmmc.oiexplorer.core.gui.PlotView;
 import fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -30,10 +29,6 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OIFitsViewPanel.class.getName());
 
-    static {
-        // Disable the expression editor until it is ready for production:
-        PlotDefinitionEditor.setEnableExpressionEditor(false);
-    }
     /* members */
     /** OIFitsCollectionManager singleton */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
