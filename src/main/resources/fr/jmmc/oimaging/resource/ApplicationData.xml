@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 6"/>
-    <compilation date="24/09/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 7"/>
+    <compilation date="27/09/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -150,9 +150,13 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Wed, 24 Sep 2018 17:00:00 GMT</pubDate>
+            <pubDate>Thu, 27 Sep 2018 17:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 7">
+                <change type="FEATURE">Preliminary support for MiRA.</change>
+                <change type="FEATURE">Enable expression evaluator in OIFits plots.</change>
+            </prerelease>
             <prerelease version="0.5 beta 6">
-                <change type="FEATURE">Improved GUI to deal with software optionnal parameters.</change>
+                <change type="FEATURE">Improved GUI to deal with software optional parameters.</change>
             </prerelease>
             <prerelease version="0.5 beta 5">
                 <change type="FEATURE">Improved GUI to deal with software parameters (common / specific).</change>
