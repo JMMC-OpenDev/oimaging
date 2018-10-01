@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
 import javax.swing.ButtonModel;
@@ -115,9 +116,9 @@ public class RunAction extends RegisteredAction {
         @Override
         public ServiceResult computeInBackground() {
             final Service service = irModel.getSelectedService();
-
+            ServiceResult result = null;
             try {
-                final ServiceResult result = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
+                result = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
                 result.setService(service);
                 // Result is valid only if the OIFITS file was downloaded successfully:
                 final boolean exist = result.getOifitsResultFile().exists();
@@ -129,6 +130,10 @@ public class RunAction extends RegisteredAction {
             } catch (IllegalStateException ise) {
                 logger.warn("computeInBackground: exception: ", ise);
                 throw ise;
+            } finally {
+                if (result != null) {
+                    result.setEndTime(new Date());
+                }
             }
         }
 

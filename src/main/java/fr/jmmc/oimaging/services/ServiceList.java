@@ -22,7 +22,7 @@ public final class ServiceList {
     public static final String CMD_BSMEM = "bsmem-ci";
     public static final String CMD_MIRA = "mira-ci";
     public static final String CMD_WISARD = "wisard-ci";
-    
+
     /** Singleton instance */
     private static ServiceList _instance = null;
 
@@ -41,15 +41,15 @@ public final class ServiceList {
         final SoftwareInputParam swParamMira = SoftwareInputParam.newInstance(SERVICE_MIRA);
         final SoftwareInputParam swParamWisard = SoftwareInputParam.newInstance(SERVICE_WISARD);
 
-        availableServices.add(new Service(SERVICE_BSMEM, CMD_BSMEM, localExecutionMode, "", "", swParamBsmem));
-        availableServices.add(new Service(SERVICE_MIRA, CMD_MIRA, localExecutionMode, "", "", swParamMira));
-        availableServices.add(new Service(SERVICE_WISARD, CMD_WISARD, localExecutionMode, "", "", swParamWisard));
+        availableServices.add(new Service(SERVICE_BSMEM + " (local)", CMD_BSMEM, localExecutionMode, "", "", swParamBsmem));
+        availableServices.add(new Service(SERVICE_MIRA + " (local)", CMD_MIRA, localExecutionMode, "", "", swParamMira));
+        availableServices.add(new Service(SERVICE_WISARD + " (local)", CMD_WISARD, localExecutionMode, "", "", swParamWisard));
 
-        availableServices.add(new Service(SERVICE_BSMEM + " (remote)", CMD_BSMEM, remoteExecutionMode, "", "", swParamBsmem));
-        availableServices.add(new Service(SERVICE_MIRA + " (remote)", CMD_MIRA, remoteExecutionMode, "", "", swParamMira));
+        availableServices.add(new Service(SERVICE_BSMEM, CMD_BSMEM, remoteExecutionMode, "", "", swParamBsmem));
+        availableServices.add(new Service(SERVICE_MIRA, CMD_MIRA, remoteExecutionMode, "", "", swParamMira));
         // TODO remove code configuration and link this it to a preference
-        preferedService = new Service(SERVICE_WISARD + " (remote)", CMD_WISARD, remoteExecutionMode, "", "", swParamWisard);
-        
+        preferedService = new Service(SERVICE_WISARD, CMD_WISARD, remoteExecutionMode, "", "", swParamWisard);
+
         availableServices.add(preferedService);
     }
 

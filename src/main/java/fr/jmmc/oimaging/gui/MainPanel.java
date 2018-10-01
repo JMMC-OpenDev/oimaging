@@ -722,9 +722,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (softwareSettingsPanel.updateModel(irModel)) {
             changed = true;
         }
-        
+
         changed |= forceChange;
-        
+
         // some values have changed
         if (changed) {
             // notify to other listener - if any in the future
