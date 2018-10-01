@@ -476,7 +476,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         // last panel refs may be null during program startup...
         if (showMode == SHOW_MODE.MODEL && lastModelPanel != null) {
             jTabbedPaneVizualizations.setSelectedComponent(lastModelPanel);
-        } else if (lastResultPanel != null) {
+        } else if (showMode == SHOW_MODE.RESULT & lastResultPanel != null) {
             jTabbedPaneVizualizations.setSelectedComponent(lastResultPanel);
         }
     }
