@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging;
 
 import fr.jmmc.jmal.image.ColorModels;
+import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
             // disable notifications:
             _singleton = new Preferences(false);
 
+            // register color palette observer:
+            _singleton.addPreferenceObserver();
+
             // enable future notifications:
             _singleton.setNotify(true);
         }
@@ -62,6 +66,8 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
 
         // Use GD's prefered value for a better image viewing that isophot...
         setDefaultPreference(MODEL_IMAGE_LUT, ColorModels.COLOR_MODEL_HEAT);
+        // Disable interpolation:
+        setDefaultPreference(MODEL_IMAGE_INTERPOLATION, ImageInterpolation.None.toString());
     }
 
     @Override

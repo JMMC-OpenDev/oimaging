@@ -5,6 +5,7 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmal.image.ColorModels;
 import fr.jmmc.jmal.image.ColorScale;
+import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.oiexplorer.core.gui.IconComboBoxRenderer;
@@ -48,11 +49,12 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         // register this instance as a Preference Observer :
         this.myPreferences.addObserver(this);
 
-        // update GUI
-        update(null, null);
-
         this.jComboBoxLUT.setModel(new DefaultComboBoxModel(ColorModels.getColorModelNames()));
         this.jComboBoxColorScale.setModel(new DefaultComboBoxModel(ColorScale.values()));
+        this.jComboBoxInterpolation.setModel(new DefaultComboBoxModel(ImageInterpolation.values()));
+
+        // update GUI
+        update(null, null);
 
         // Custom renderer for LUT:
         this.jComboBoxLUT.setRenderer(new IconComboBoxRenderer() {
@@ -94,6 +96,8 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jComboBoxLUT = new javax.swing.JComboBox();
         jLabelColorScale = new javax.swing.JLabel();
         jComboBoxColorScale = new javax.swing.JComboBox();
+        jLabelInterpolation = new javax.swing.JLabel();
+        jComboBoxInterpolation = new javax.swing.JComboBox();
         jPanelCommonPreferencesView = new fr.jmmc.jmcs.gui.component.CommonPreferencesView();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
@@ -108,7 +112,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         jPanelModelImage.add(jLabelLutTable, gridBagConstraints);
 
         jComboBoxLUT.addActionListener(new java.awt.event.ActionListener() {
@@ -120,8 +124,9 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 4, 4);
         jPanelModelImage.add(jComboBoxLUT, gridBagConstraints);
 
         jLabelColorScale.setText("Color scale");
@@ -129,7 +134,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         jPanelModelImage.add(jLabelColorScale, gridBagConstraints);
 
         jComboBoxColorScale.addActionListener(new java.awt.event.ActionListener() {
@@ -141,9 +146,32 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 4, 4);
         jPanelModelImage.add(jComboBoxColorScale, gridBagConstraints);
+
+        jLabelInterpolation.setText("Interpolation");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        jPanelModelImage.add(jLabelInterpolation, gridBagConstraints);
+
+        jComboBoxInterpolation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxInterpolationActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        jPanelModelImage.add(jComboBoxInterpolation, gridBagConstraints);
 
         jPanelLayout.add(jPanelModelImage);
         jPanelLayout.add(jPanelCommonPreferencesView);
@@ -171,10 +199,21 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         }
     }//GEN-LAST:event_jComboBoxColorScaleActionPerformed
 
+    private void jComboBoxInterpolationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxInterpolationActionPerformed
+        try {
+            // will fire triggerObserversNotification so update() will be called
+            this.myPreferences.setPreference(Preferences.MODEL_IMAGE_INTERPOLATION, this.jComboBoxInterpolation.getSelectedItem().toString());
+        } catch (PreferencesException pe) {
+            logger.error("property failure : ", pe);
+        }
+    }//GEN-LAST:event_jComboBoxInterpolationActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxColorScale;
+    private javax.swing.JComboBox jComboBoxInterpolation;
     private javax.swing.JComboBox jComboBoxLUT;
     private javax.swing.JLabel jLabelColorScale;
+    private javax.swing.JLabel jLabelInterpolation;
     private javax.swing.JLabel jLabelLutTable;
     private fr.jmmc.jmcs.gui.component.CommonPreferencesView jPanelCommonPreferencesView;
     private javax.swing.JPanel jPanelLayout;
@@ -192,8 +231,8 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         logger.debug("Preferences updated on : {}", this);
 
         // Image viewer:
-        //this.jComboBoxImageSize.setSelectedItem(this.myPreferences.getPreferenceAsInt(Preferences.MODEL_IMAGE_SIZE));
         this.jComboBoxLUT.setSelectedItem(this.myPreferences.getPreference(Preferences.MODEL_IMAGE_LUT));
         this.jComboBoxColorScale.setSelectedItem(this.myPreferences.getImageColorScale());
+        this.jComboBoxInterpolation.setSelectedItem(this.myPreferences.getImageInterpolation());
     }
 }
