@@ -46,12 +46,12 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
      */
     private void postInit() {
 
-        // register this instance as a Preference Observer :
-        this.myPreferences.addObserver(this);
-
         this.jComboBoxLUT.setModel(new DefaultComboBoxModel(ColorModels.getColorModelNames()));
         this.jComboBoxColorScale.setModel(new DefaultComboBoxModel(ColorScale.values()));
         this.jComboBoxInterpolation.setModel(new DefaultComboBoxModel(ImageInterpolation.values()));
+
+        // register this instance as a Preference Observer :
+        this.myPreferences.addObserver(this);
 
         // update GUI
         update(null, null);
@@ -124,7 +124,6 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 4, 4);
         jPanelModelImage.add(jComboBoxLUT, gridBagConstraints);
@@ -146,7 +145,6 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 4, 4);
         jPanelModelImage.add(jComboBoxColorScale, gridBagConstraints);
@@ -168,7 +166,6 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         jPanelModelImage.add(jComboBoxInterpolation, gridBagConstraints);
