@@ -186,7 +186,7 @@ public class IRModel {
     }
 
     /**
-     * Add HDU to present ones.
+     * Add HDU to present ones and select the first new one as selected image input.
      * @param hdus new hdus
      * @param filename filename of given hdu
      * @return true if some hdu have been added
@@ -254,7 +254,14 @@ public class IRModel {
             this.fitsImageHdu2Filename.put(hdu, filename);
         }
 
-        return !hdusToAdd.isEmpty();
+        // select first new one as selected input if anyone has been added
+        if (hdusToAdd.isEmpty()) {
+            return false;
+        }
+
+        setSelectedInputImageHDU(hdusToAdd.get(0));
+
+        return true;
     }
 
     public GenericListModel<String> getTargetListModel() {
