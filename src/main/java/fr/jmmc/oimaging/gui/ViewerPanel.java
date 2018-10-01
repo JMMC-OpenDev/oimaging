@@ -168,7 +168,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             jTabbedPaneVizualizations.add("Image", jPanelImageViewer);
             jTabbedPaneVizualizations.add("OIFits", jPanelOIFitsViewer);
             jTabbedPaneVizualizations.add("Parameters", jPanelOutputParamViewer);
-            if (mode.equals(SHOW_MODE.MODEL)) {
+            if (mode.equals(SHOW_MODE.RESULT)) {
                 jTabbedPaneVizualizations.add("Execution log", jPanelLogViewer);
             }
         }
