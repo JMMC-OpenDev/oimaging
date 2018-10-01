@@ -28,6 +28,7 @@ import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
+import fr.jmmc.oimaging.gui.action.NewAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oitools.model.DataModel;
@@ -302,6 +303,7 @@ public final class OImaging extends App {
      */
     private void registerActions() {
         // File menu :
+        new NewAction();
         new LoadOIFitsAction();
         new LoadFitsImageAction();
 

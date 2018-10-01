@@ -121,6 +121,7 @@
 
     <menubar>
         <menu label="File">
+            <menu label="New OI Image file" classpath="fr.jmmc.oimaging.gui.action.NewAction" action="newOIFits" accelerator="N" />
             <menu label="Load OIFits file" classpath="fr.jmmc.oimaging.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="L"
                   icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load an OIFits file"/>
             <menu label="Load Fits Image file" classpath="fr.jmmc.oimaging.gui.action.LoadFitsImageAction" action="loadFitsImage"
@@ -154,6 +155,8 @@
             <prerelease version="0.5 beta 7">
                 <change type="FEATURE">Preliminary support for MiRA.</change>
                 <change type="FEATURE">Enable expression evaluator in OIFits plots.</change>
+                <change type="FEATURE">Add File/New action to reset current session.</change>
+
             </prerelease>
             <prerelease version="0.5 beta 6">
                 <change type="FEATURE">Improved GUI to deal with software optional parameters.</change>
