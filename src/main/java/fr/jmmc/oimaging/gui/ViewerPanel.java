@@ -130,7 +130,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             FitsImageUtils.updateDataRangeExcludingZero(image);
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
-            logger.info("Display image HDU '{}', with keycards :\n{}", imageHDU.getHduName(), imageHDU.getHeaderCardsAsString("\n"));
+            logger.info("Display image HDU '{}'", imageHDU.getHduName());
         }
     }
 
