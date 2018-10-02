@@ -789,7 +789,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
             softwareSettingsPanel.syncUI(this, currentModel, failures);
 
-            final String fileName = (hasOIData) ? currentModel.getUserOifitsFile().getFileName() : "";
+            final String fileName = (hasOIData) ? currentModel.getOifitsFile().getFileName() : "";
             jLabelOifitsFile.setText(fileName);
             jLabelOifitsFile.setToolTipText(fileName);
 

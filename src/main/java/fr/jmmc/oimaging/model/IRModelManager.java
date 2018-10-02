@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * Handle the model for image reconstruction orchestration.
  * @author mella, bourgesl
  */
-public final class IRModelManager implements IRModelEventListener {
+public final class IRModelManager {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(IRModelManager.class);
@@ -84,33 +84,13 @@ public final class IRModelManager implements IRModelEventListener {
         EventNotifier<IRModelEvent, IRModelEventType, Object> eventNotifier;
 
         for (IRModelEventType eventType : IRModelEventType.values()) {
-            // false argument means allow self notification:
-            final boolean skipSourceListener = (eventType != IRModelEventType.IRMODEL_CHANGED);
-
-            eventNotifier = new EventNotifier<IRModelEvent, IRModelEventType, Object>(eventType.name(), priority, skipSourceListener);
-
+            eventNotifier = new EventNotifier<IRModelEvent, IRModelEventType, Object>(eventType.name(), priority);
             this.irModelManagerEventNotifierMap.put(eventType, eventNotifier);
             priority += 10;
         }
 
-        // listen for IRMODEL_CHANGED event to analyze model and fire initial events:
-        getIRModelChangedEventNotifier().register(this);
-
         // reset anyway:
         reset();
-    }
-
-    /**
-     * Free any resource or reference to this instance :
-     * throw an IllegalStateException as it is invalid
-     */
-    @Override
-    public void dispose() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("dispose: {}", ObjectUtils.getObjectInfo(this));
-        }
-
-        throw new IllegalStateException("Using IRModelManager.dispose() is invalid !");
     }
 
     /* --- data of model handling ------------------------------------- */
@@ -124,7 +104,7 @@ public final class IRModelManager implements IRModelEventListener {
      * @throws XmlBindException if a JAXBException was caught while creating an unmarshaller
      */
     public void loadIRModel(final File file, final OIFitsChecker checker,
-            final LoadIRModelListener listener) throws IOException, IllegalStateException, XmlBindException {
+                            final LoadIRModelListener listener) throws IOException, IllegalStateException, XmlBindException {
         loadIRModel(file, checker, listener, false);
     }
 
@@ -139,7 +119,7 @@ public final class IRModelManager implements IRModelEventListener {
      * @throws XmlBindException if a JAXBException was caught while creating an unmarshaller
      */
     public void loadIRModel(final File file, final OIFitsChecker checker,
-            final LoadIRModelListener listener, final boolean appendOIFitsFilesOnly) throws IOException, IllegalStateException, XmlBindException {
+                            final LoadIRModelListener listener, final boolean appendOIFitsFilesOnly) throws IOException, IllegalStateException, XmlBindException {
 
         final IRModel loadedModel = (IRModel) JAXBUtils.loadObject(file.toURI().toURL(), this.jf);
 
@@ -261,7 +241,6 @@ public final class IRModelManager implements IRModelEventListener {
      */
     public boolean loadOIFitsFile(final OIFitsFile oiFitsFile) {
         if (oiFitsFile != null) {
-
             irModel.loadOifitsFile(oiFitsFile);
             fireIRModelUpdated(this, null);
             return true;
@@ -369,7 +348,6 @@ public final class IRModelManager implements IRModelEventListener {
         this.irModelFile = file;
     }
 
-    // TODO: save / merge ... (elsewhere)
     /**
      * Reset the reference model and start firing events
      */
@@ -382,7 +360,6 @@ public final class IRModelManager implements IRModelEventListener {
      * Reset the reference model.
      */
     public void reset() {
-
         irModel = new IRModel();
         setIRModelFile(null);
 
@@ -503,37 +480,4 @@ public final class IRModelManager implements IRModelEventListener {
                     new IRModelEvent(IRModelEventType.READY, null, getIRModel()), destination);
         }
     }
-
-    /*
-     * IRModelEventListener implementation
-     */
-    /**
-     * Return the optional subject id i.e. related object id that this listener accepts
-     * @param type event type
-     * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
-     */
-    @Override
-    public String getSubjectId(final IRModelEventType type) {
-        // accept all
-        return null;
-    }
-
-    /**
-     * Handle the given IR Model event
-     * @param event IR Model event
-     */
-    @Override
-    public void onProcess(final IRModelEvent event) {
-        logger.debug("onProcess {}", event);
-
-//        switch (event.getType()) {
-//            case IRMODEL_CHANGED:
-//                // perform analysis:
-//                irModel.analyze();
-//                break;
-//            default:
-//        }
-        logger.debug("onProcess {} - done", event);
-    }
-
 }
