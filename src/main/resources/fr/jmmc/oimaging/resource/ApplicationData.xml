@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 7"/>
-    <compilation date="27/09/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 8"/>
+    <compilation date="02/10/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -153,13 +153,14 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Thu, 27 Sep 2018 17:00:00 GMT</pubDate>
+            <pubDate>Tue, 02 Oct 2018 15:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 8">
+                <change type="FEATURE">Add File/New action to reset current session.</change>
+                <change type="FEATURE">Add Edit/Delete action to remove the selected results.</change>
+            </prerelease>
             <prerelease version="0.5 beta 7">
                 <change type="FEATURE">Preliminary support for MiRA.</change>
                 <change type="FEATURE">Enable expression evaluator in OIFits plots.</change>
-                <change type="FEATURE">Add File/New action to reset current session.</change>
-                <change type="FEATURE">Add Edit/Delete action to remove the selected results.</change>
-
             </prerelease>
             <prerelease version="0.5 beta 6">
                 <change type="FEATURE">Improved GUI to deal with software optional parameters.</change>
@@ -183,12 +184,14 @@
             </prerelease>
         </release>
         <release version="0.4">
+            <pubDate>Mon, 07 Jun 2017 12:00:00 GMT</pubDate>
             <prerelease version="0.4 alpha 1">
                 <change type="CHANGE">BSMem and Wisard are both available in remote mode (no installation required on the user machine).</change>
                 <change type="CHANGE">Result Images are now appended into the available hdu images list (time suffix if already present)</change>
             </prerelease>
         </release>
         <release version="0.3">
+            <pubDate>Mon, 02 May 2017 12:00:00 GMT</pubDate>
             <prerelease version="0.3 alpha 2">
                 <change type="CHANGE">Add wisard in the list of supported IR program for testing.</change>
             </prerelease>
@@ -198,7 +201,7 @@
             </prerelease>
         </release>
         <release version="0.2">
-            <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
+            <pubDate>Mon, 13 Dec 2016 12:00:00 GMT</pubDate>
             <prerelease version="0.2 alpha 9">
                 <change type="BUGFIX">enhance format of parameter textfields.</change>
             </prerelease>
@@ -238,7 +241,7 @@
             </prerelease>
         </release>
         <release version="0.1">
-            <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
+            <pubDate>Thu, 16 Jun 2016 12:00:00 GMT</pubDate>
             <prerelease version="0.1 beta 1">
                 <change type="FEATURE">First release with minimal (working) features : take one oifits + fits images and export an input file (behind "Run" Button)</change>
             </prerelease>
