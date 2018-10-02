@@ -6,14 +6,13 @@ package fr.jmmc.oimaging.gui.action;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.oimaging.model.IRModel;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JList;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DeleteSelectionAction extends RegisteredAction implements ListSelectionListener {
+public class DeleteSelectionAction extends RegisteredAction {
 
     /** Class name. This name is used to register to the ActionRegistrar */
     public final static String className = DeleteSelectionAction.class.getName();
@@ -21,8 +20,10 @@ public class DeleteSelectionAction extends RegisteredAction implements ListSelec
     public final static String actionName = "deleteSelection";
 
     /** Class logger */
-    static Logger logger = LoggerFactory.getLogger(className);
+    private static final Logger logger = LoggerFactory.getLogger(className);
+    private static final long serialVersionUID = 1L;
 
+    /* members */
     protected IRModel irModel = null;
     protected List serviceResultsList = null;
 
@@ -38,11 +39,6 @@ public class DeleteSelectionAction extends RegisteredAction implements ListSelec
         }
     }
 
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     public void watchResultsSelection(IRModel irModel, JList jListResultSet) {
         if (jListResultSet.getSelectedIndices().length == 0) {
             this.setEnabled(false);
@@ -51,8 +47,7 @@ public class DeleteSelectionAction extends RegisteredAction implements ListSelec
         } else {
             this.setEnabled(true);
             this.irModel = irModel;
-            this.serviceResultsList = jListResultSet.getSelectedValuesList();
+            this.serviceResultsList = Arrays.asList(jListResultSet.getSelectedValues());
         }
-
     }
 }
