@@ -24,6 +24,7 @@ import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oimaging.gui.MainPanel;
 import fr.jmmc.oimaging.gui.PreferencePanel;
+import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
@@ -78,9 +79,9 @@ public final class OImaging extends App {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        
+
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
-        
+
         // Start application with the command line arguments
         Bootstrapper.launchApp(new OImaging(args));
     }
@@ -311,6 +312,8 @@ public final class OImaging extends App {
         new ExportFitsImageAction();
 
         new RunAction();
+
+        new DeleteSelectionAction();
 
         // Edit menu :
         // Interop menu :

@@ -12,6 +12,7 @@ import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.jmcs.util.SpecialChars;
+import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
@@ -73,6 +74,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     /* members */
     /** actions */
+    private DeleteSelectionAction deleteSelectionAction;
     private RunAction runAction;
     private Action exportOiFitsAction;
     private Action exportFitsImageAction;
@@ -182,6 +184,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonLoadData.setAction(ActionRegistrar.getInstance().get(LoadOIFitsAction.className, LoadOIFitsAction.actionName));
         jButtonLoadData.setHideActionText(true);
 
+        deleteSelectionAction = (DeleteSelectionAction) ActionRegistrar.getInstance().get(DeleteSelectionAction.className, DeleteSelectionAction.actionName);
         runAction = (RunAction) ActionRegistrar.getInstance().get(RunAction.className, RunAction.actionName);
         jButtonRun.setAction(runAction);
         //  TODO fix next call      jButtonRun.setText((String) runAction.getValue(Action.SHORT_DESCRIPTION));
@@ -584,6 +587,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // This action only update GUI but not the model.
         if (e.getSource() == jListResultSet) {
             viewerPanel.displayResult((ServiceResult) jListResultSet.getSelectedValue());
+            deleteSelectionAction.watchResultsSelection(currentModel, jListResultSet);
         }
 
     }

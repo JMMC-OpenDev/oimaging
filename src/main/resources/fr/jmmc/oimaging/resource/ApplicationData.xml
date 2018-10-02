@@ -132,6 +132,8 @@
         </menu>
 
         <menu label="Edit">
+            <menu label="Delete" classpath="fr.jmmc.oimaging.gui.action.DeleteSelectionAction" action="deleteSelection" accelerator="DELETE"/>
+            <!-- TODO  find common icon icon="fr/jmmc/o/gui/icons/button_fewer.png"/-->
             <menu label="Run" classpath="fr.jmmc.oimaging.gui.action.RunAction" action="run" description="Run"/>
         </menu>
 
@@ -156,6 +158,7 @@
                 <change type="FEATURE">Preliminary support for MiRA.</change>
                 <change type="FEATURE">Enable expression evaluator in OIFits plots.</change>
                 <change type="FEATURE">Add File/New action to reset current session.</change>
+                <change type="FEATURE">Add Edit/Delete action to remove the selected results.</change>
 
             </prerelease>
             <prerelease version="0.5 beta 6">

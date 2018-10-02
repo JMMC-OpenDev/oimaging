@@ -501,4 +501,10 @@ public class IRModel {
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
 
     }
+
+    public void removeServiceResults(List<ServiceResult> selectedServicesList) {
+        getResultSets().removeAll(selectedServicesList);
+        // notify model update
+        IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
 }
