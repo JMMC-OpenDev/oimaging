@@ -32,14 +32,11 @@ public class OiCellRenderer extends DefaultListCellRenderer {
         } else if (value instanceof ServiceResult) {
 
             final ServiceResult serviceResult = (ServiceResult) value;
-            final Date start = serviceResult.getStartTime();
-            final Date end = serviceResult.getEndTime();
-            setText(serviceResult.getService().getName() + " run " + (serviceResult.isValid() ? "ok" : "ko") + " @ " + timeFormat.format(start));
+            setText(serviceResult.getService().getName() + " run " + (serviceResult.isValid() ? "ok" : "ko")
+                    + " @ " + timeFormat.format(serviceResult.getStartTime()));
             if (!serviceResult.isValid()) {
                 setForeground(Color.RED);
             }
-            final long duration = (end.getTime() - start.getTime()) / 1000;
-            setToolTipText("Elapsed time : " + duration);
 
         } else if (value instanceof FitsImageHDU) {
 
