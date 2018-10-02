@@ -143,14 +143,6 @@ public class RunAction extends RegisteredAction {
             parentAction.setRunningState(irModel, false);
 
             this.irModel.addServiceResult(serviceResult);
-
-            /*
-            if (serviceResult.isValid()) {
-                this.irModel.updateWithNewModel(serviceResult);
-            } else {
-                this.irModel.showLog(serviceResult.getErrorMessage(), serviceResult, null);
-            }
-             */
         }
 
         /**
