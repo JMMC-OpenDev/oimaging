@@ -32,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.Action;
@@ -240,20 +241,22 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                         // use last tooltip:
                         tooltip = lastTooltip;
                     } else {
-                        Object selectedItem = getModel().getElementAt(index);
-                        if (selectedItem instanceof FitsImageHDUDecorator) {
-                            final FitsImageHDU fih = ((FitsImageHDUDecorator) selectedItem).getFitsImageHDU();
-                            if (fih != null) {
-                                fih.toHtml(sbToolTip);
-                            }
+                        final ServiceResult serviceResult = (ServiceResult) getModel().getElementAt(index);
+
+                        final Date start = serviceResult.getStartTime();
+                        final Date end = serviceResult.getEndTime();
+
+                        if (start != null && end != null) {
+                            final long duration = (end.getTime() - start.getTime());
+                            final long sec = duration / 1000l;
+                            final long ms = duration - sec * 1000l;
+                            sbToolTip.setLength(0); // clear
+                            tooltip = sbToolTip.append("Elapsed time: ").append(sec).append('.').append(ms).append(" s").toString();
                         }
-                        // ignore other object
 
                         lastIndex = index;
                         lastTooltip = tooltip;
-
-                        // Return the tool tip text :
-                        return sbToolTip.toString();
+                        return tooltip;
                     }
                     return tooltip;
                 }
@@ -836,27 +839,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         return viewerPanel;
 
     }
-
-    // Make it generic
-    private class FitsImageHDUDecorator {
-
-        private final FitsImageHDU fitsImageHDU;
-        private final String label;
-
-        public FitsImageHDUDecorator(FitsImageHDU fitsImageHDU) {
-            this.fitsImageHDU = fitsImageHDU;
-            this.label = fitsImageHDU.getHduName();
-        }
-
-        public FitsImageHDU getFitsImageHDU() {
-            return fitsImageHDU;
-        }
-
-        @Override
-        public String toString() {
-            return label;
-        }
-    };
 
     private static String getTooltip(final String name) {
         return ImageOiInputParam.getDescription(name);
