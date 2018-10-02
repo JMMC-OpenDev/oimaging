@@ -84,7 +84,7 @@ public final class IRModelManager {
         EventNotifier<IRModelEvent, IRModelEventType, Object> eventNotifier;
 
         for (IRModelEventType eventType : IRModelEventType.values()) {
-            eventNotifier = new EventNotifier<IRModelEvent, IRModelEventType, Object>(eventType.name(), priority);
+            eventNotifier = new EventNotifier<IRModelEvent, IRModelEventType, Object>(eventType.name(), priority, false);
             this.irModelManagerEventNotifierMap.put(eventType, eventNotifier);
             priority += 10;
         }
