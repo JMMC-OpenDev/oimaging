@@ -192,7 +192,7 @@ public final class OImaging extends App {
 
         // Can't exit if a job is running
         if (IRModelManager.getInstance().getIRModel().isRunning()) {
-            MessagePane.showMessage("A job is running, please wait it's end of cancel it before quitting.");
+            MessagePane.showMessage("A job is running... Please wait for its completion or cancel it before quitting.");
             return false;
         }
 
