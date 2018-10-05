@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 8"/>
-    <compilation date="02/10/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 9"/>
+    <compilation date="05/10/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -153,7 +153,10 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Tue, 02 Oct 2018 15:00:00 GMT</pubDate>
+            <pubDate>Tue, 05 Oct 2018 15:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 9">
+                <change type="FEATURE">Exit will ask to wait if a job is still running or cancel it before quitting.</change>
+            </prerelease>
             <prerelease version="0.5 beta 8">
                 <change type="FEATURE">Add File/New action to reset current session.</change>
                 <change type="FEATURE">Add Edit/Delete action to remove the selected results.</change>
