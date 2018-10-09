@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 9"/>
-    <compilation date="05/10/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 10"/>
+    <compilation date="09/10/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -153,65 +153,68 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Tue, 05 Oct 2018 15:00:00 GMT</pubDate>
+            <pubDate>Tue, 09 Oct 2018 12:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 10">
+                <change type="FEATURE">Use more precision for min/max wavelengths</change>
+            </prerelease>
             <prerelease version="0.5 beta 9">
-                <change type="FEATURE">Exit will ask to wait if a job is still running or cancel it before quitting.</change>
+                <change type="FEATURE">added check if a job is still running before quitting</change>
             </prerelease>
             <prerelease version="0.5 beta 8">
-                <change type="FEATURE">Add File/New action to reset current session.</change>
-                <change type="FEATURE">Add Edit/Delete action to remove the selected results.</change>
+                <change type="FEATURE">Add File/New action to reset current session</change>
+                <change type="FEATURE">Add Edit/Delete action to remove the selected results</change>
             </prerelease>
             <prerelease version="0.5 beta 7">
-                <change type="FEATURE">Preliminary support for MiRA.</change>
-                <change type="FEATURE">Enable expression evaluator in OIFits plots.</change>
+                <change type="FEATURE">Preliminary support for MiRA</change>
+                <change type="FEATURE">Enable expression evaluator in OIFits plots</change>
             </prerelease>
             <prerelease version="0.5 beta 6">
-                <change type="FEATURE">Improved GUI to deal with software optional parameters.</change>
+                <change type="FEATURE">Improved GUI to deal with software optional parameters</change>
             </prerelease>
             <prerelease version="0.5 beta 5">
-                <change type="FEATURE">Improved GUI to deal with software parameters (common / specific).</change>
+                <change type="FEATURE">Improved GUI to deal with software parameters (common / specific)</change>
                 <change type="CHANGE">Fixed FITS keyword handling to avoid duplicated keywords in image HDUs and IMAGE-OI INPUT PARAM table</change>
             </prerelease>
             <prerelease version="0.5 beta 4">
-                <change type="CHANGE">Request UWS job deletion after result retrieval (is also done weekly on the server side in case of failure).</change>
+                <change type="CHANGE">Request UWS job deletion after result retrieval (is also done weekly on the server side in case of failure)</change>
             </prerelease>
             <prerelease version="0.5 beta 3">
                 <change type="FEATURE">Improved Java support (9 + mac OS X) but Java 7 minimum is now required</change>
-                <!-- change type="CHANGE">Code refactoring on image renaming.</change-->
+                <!-- change type="CHANGE">Code refactoring on image renaming</change-->
             </prerelease>
             <prerelease version="0.5 beta 2">
-                <change type="CHANGE">Internal refactoring arround OIFits internal model. At present time, OIFits V2 are loaded as V1.</change>
+                <change type="CHANGE">Internal refactoring arround OIFits internal model. At present time, OIFits V2 are loaded as V1</change>
             </prerelease>
             <prerelease version="0.5 alpha 1">
-                <change type="CHANGE">Use heat as default LUT table for the FITS image viewer.</change>
+                <change type="CHANGE">Use heat as default LUT table for the FITS image viewer</change>
             </prerelease>
         </release>
         <release version="0.4">
             <pubDate>Mon, 07 Jun 2017 12:00:00 GMT</pubDate>
             <prerelease version="0.4 alpha 1">
-                <change type="CHANGE">BSMem and Wisard are both available in remote mode (no installation required on the user machine).</change>
+                <change type="CHANGE">BSMem and Wisard are both available in remote mode (no installation required on the user machine)</change>
                 <change type="CHANGE">Result Images are now appended into the available hdu images list (time suffix if already present)</change>
             </prerelease>
         </release>
         <release version="0.3">
             <pubDate>Mon, 02 May 2017 12:00:00 GMT</pubDate>
             <prerelease version="0.3 alpha 2">
-                <change type="CHANGE">Add wisard in the list of supported IR program for testing.</change>
+                <change type="CHANGE">Add wisard in the list of supported IR program for testing</change>
             </prerelease>
             <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
             <prerelease version="0.3 alpha 1">
-                <change type="CHANGE">provide a default preset with every observables present in the result oifits.</change>
+                <change type="CHANGE">provide a default preset with every observables present in the result oifits</change>
             </prerelease>
         </release>
         <release version="0.2">
             <pubDate>Mon, 13 Dec 2016 12:00:00 GMT</pubDate>
             <prerelease version="0.2 alpha 9">
-                <change type="BUGFIX">enhance format of parameter textfields.</change>
+                <change type="BUGFIX">enhance format of parameter textfields</change>
             </prerelease>
             <prerelease version="0.2 alpha 8">
-                <change type="BUGFIX">Avoid blank INIT_IMG at startup.</change>
-                <change type="CHANGE">Show execution log panel on faulty runs.</change>
-                <change type="BUGFIX">Rename faulty keyword AUTO_RGL to AUTO_WGT.</change>
+                <change type="BUGFIX">Avoid blank INIT_IMG at startup</change>
+                <change type="CHANGE">Show execution log panel on faulty runs</change>
+                <change type="BUGFIX">Rename faulty keyword AUTO_RGL to AUTO_WGT</change>
             </prerelease>
             <prerelease version="0.2 alpha 7">
                 <change type="CHANGE">Add WISARD as new software! Remote execution comming... </change>
@@ -223,17 +226,17 @@
                 <change type="CHANGE">Remove "Image Panel"</change>
             </prerelease>
             <prerelease version="0.2 alpha 5">
-                <change type="CHANGE">Optimize layout.</change>
-                <change type="CHANGE">Don't add results in input image combobox.</change>
+                <change type="CHANGE">Optimize layout</change>
+                <change type="CHANGE">Don't add results in input image combobox</change>
             </prerelease>
             <prerelease version="0.2 alpha 4">
-                <change type="CHANGE">New layout that offers to look on result items.</change>
-                <change type="CHANGE">Fix bug running local version of software.</change>
+                <change type="CHANGE">New layout that offers to look on result items</change>
+                <change type="CHANGE">Fix bug running local version of software</change>
             </prerelease>
             <prerelease version="0.2 alpha 3">
-                <change type="CHANGE">Remove bsmem-remote mode. Waiting the licence agreement for webservice mode.</change>
-                <change type="BUGFIX">Use degree as default axis unit for images following the FITS standard.</change>
-                <change type="CHANGE">Propagate rgl_name param in image-oi input param table.</change>
+                <change type="CHANGE">Remove bsmem-remote mode. Waiting the licence agreement for webservice mode</change>
+                <change type="BUGFIX">Use degree as default axis unit for images following the FITS standard</change>
+                <change type="CHANGE">Propagate rgl_name param in image-oi input param table</change>
             </prerelease>
             <prerelease version="0.2 alpha 2">
                 <change type="CHANGE">Renamed as OImaging courtesy of Laurent Bourges</change>
