@@ -21,10 +21,12 @@ public class SoftwareInputParam {
         if (name.startsWith(ServiceList.SERVICE_BSMEM)) {
             return new BsmemInputParam();
         }
+        if (name.startsWith(ServiceList.SERVICE_MIRA)) {
+            return new MiraInputParam();
+        }
         if (name.startsWith(ServiceList.SERVICE_WISARD)) {
             return new WisardInputParam();
         }
-        // TODO MIRA
         return new SoftwareInputParam();
     }
 
@@ -47,6 +49,10 @@ public class SoftwareInputParam {
 
     public void validate(final ImageOiInputParam params, final List<String> failures) {
         // no-op
+    }
+
+    public boolean supportsStandardKeyword(final String name) {
+        return false;
     }
 
     // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?

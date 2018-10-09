@@ -310,10 +310,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSplitPane.setResizeWeight(0.2);
         jSplitPane.setContinuousLayout(true);
 
-        jScrollPane.setMinimumSize(new java.awt.Dimension(300, 300));
+        jScrollPane.setMinimumSize(new java.awt.Dimension(100, 100));
 
-        jPanelLeft.setMinimumSize(new java.awt.Dimension(200, 600));
-        jPanelLeft.setPreferredSize(new java.awt.Dimension(300, 700));
+        jPanelLeft.setMinimumSize(new java.awt.Dimension(100, 400));
+        jPanelLeft.setPreferredSize(new java.awt.Dimension(100, 600));
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
         jPanelDataSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Data selection"));
@@ -338,8 +338,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanelDataSelection.add(jLabelTarget, gridBagConstraints);
 
-        jLabelOifitsFile.setText("oifits Label");
-        jLabelOifitsFile.setPreferredSize(new java.awt.Dimension(200, 20));
+        jLabelOifitsFile.setText("OIFITS Label");
+        jLabelOifitsFile.setMinimumSize(new java.awt.Dimension(100, 40));
+        jLabelOifitsFile.setPreferredSize(new java.awt.Dimension(100, 40));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -474,11 +475,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
         jPanelLeft.add(jPanelDataSelection, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
         jPanelLeft.add(softwareSettingsPanel, gridBagConstraints);
 
         jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));

@@ -65,4 +65,9 @@ public final class BsmemInputParam extends SoftwareInputParam {
         return RGL_NAME_BSMEM;
     }
 
+    @Override
+    public boolean supportsStandardKeyword(final String name) {
+        return true;
+    }
+
 }
