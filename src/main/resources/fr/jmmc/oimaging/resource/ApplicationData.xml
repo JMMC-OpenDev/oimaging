@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 10"/>
+    <program name="OImaging" version="0.5 beta 11"/>
     <compilation date="09/10/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -153,7 +153,10 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Tue, 09 Oct 2018 12:00:00 GMT</pubDate>
+            <pubDate>Tue, 09 Oct 2018 22:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 11">
+                <change type="FEATURE">Better software parameter handling: hide unsupported standard parameters per software</change>
+            </prerelease>
             <prerelease version="0.5 beta 10">
                 <change type="FEATURE">Use more precision for min/max wavelengths</change>
             </prerelease>
