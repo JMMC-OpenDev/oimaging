@@ -23,7 +23,7 @@ public final class WisardInputParam extends SoftwareInputParam {
 
     public static final String KEYWORD_FOV = "FOV";
     public static final String KEYWORD_NP_MIN = "NP_MIN";
-    public final static String KEYWORD_FLUXERR = "FLUXERR";
+    public static final String KEYWORD_THRESHOLD = "THRESHOL";
     // optional
     public static final String KEYWORD_SCALE = "SCALE";
     public static final String KEYWORD_DELTA = "DELTA";
@@ -33,8 +33,8 @@ public final class WisardInputParam extends SoftwareInputParam {
             "Field of view", Types.TYPE_DBL);
     private static final KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN,
             "Minimum number of reconstructed voxels", Types.TYPE_INT);
-    private final static KeywordMeta FLUXERR = new KeywordMeta(KEYWORD_FLUXERR,
-            "Error on ... TBD", Types.TYPE_DBL); // like bsmem
+    private final static KeywordMeta THRESHOLD = new KeywordMeta(KEYWORD_THRESHOLD,
+            "Threshold value to stop iterations (step limit)", Types.TYPE_DBL);
     // optional
     private static final KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE,
             "TBD", Types.TYPE_DBL);
@@ -63,12 +63,12 @@ public final class WisardInputParam extends SoftwareInputParam {
         // define keywords:
         params.addKeyword(FOV);
         params.addKeyword(NP_MIN);
-        params.addKeyword(FLUXERR);
+        params.addKeyword(THRESHOLD);
 
         // default values:
         params.setKeywordDefaultDouble(KEYWORD_FOV, 20.0);
         params.setKeywordDefaultInt(KEYWORD_NP_MIN, 32);
-        params.setKeywordDefaultDouble(KEYWORD_FLUXERR, 0.01);
+        params.setKeywordDefaultDouble(KEYWORD_THRESHOLD, 1E-6);
 
         // for our first implementation, just add to params if not TOTVAR
         if (params.getRglName().startsWith(RGL_NAME_WISARD_L1)) {
@@ -86,8 +86,8 @@ public final class WisardInputParam extends SoftwareInputParam {
     }
 
     @Override
-    public boolean supportsStandardKeyword(final String name) {
-        return SUPPORTED_STD_KEYWORDS.contains(name);
+    public boolean supportsStandardKeyword(final String keywordName) {
+        return SUPPORTED_STD_KEYWORDS.contains(keywordName);
     }
 
 }

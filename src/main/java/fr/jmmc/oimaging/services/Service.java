@@ -74,9 +74,11 @@ public final class Service {
         softwareInputParam.validate(params, failures);
     }
 
-    public boolean supportsStandardKeyword(final String name) {
-        final boolean supports = softwareInputParam.supportsStandardKeyword(name);
-        logger.info("supports [{}]: {}", name, supports);
+    public boolean supportsStandardKeyword(final String keywordName) {
+        final boolean supports = softwareInputParam.supportsStandardKeyword(keywordName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Service[{}] supports keyword [{}]: {}", name, keywordName, supports);
+        }
         return supports;
     }
 

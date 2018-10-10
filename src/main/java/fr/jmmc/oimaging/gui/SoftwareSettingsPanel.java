@@ -438,7 +438,15 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
-        return new DefaultFormatterFactory(new NumberFormatter(new java.text.DecimalFormat("##0.0###E0")));
+        return new DefaultFormatterFactory(new NumberFormatter(new java.text.DecimalFormat("#0.0####E00")) {
+            public String valueToString(Object value) throws ParseException {
+                final String formatted = super.valueToString(value);
+                if (formatted.endsWith("E00")) {  
+                    return formatted.substring(0, formatted.length() - 3);
+                }
+                return formatted;
+            }
+        });
     }
 
     public static JFormattedTextField.AbstractFormatterFactory getIntegerFormatterFactory() {

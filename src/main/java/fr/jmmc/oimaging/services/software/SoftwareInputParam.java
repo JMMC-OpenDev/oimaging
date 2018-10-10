@@ -51,7 +51,7 @@ public class SoftwareInputParam {
         // no-op
     }
 
-    public boolean supportsStandardKeyword(final String name) {
+    public boolean supportsStandardKeyword(final String keywordName) {
         return false;
     }
 

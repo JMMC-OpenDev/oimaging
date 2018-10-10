@@ -65,7 +65,7 @@ public final class BsmemInputParam extends SoftwareInputParam {
     }
 
     @Override
-    public boolean supportsStandardKeyword(final String name) {
+    public boolean supportsStandardKeyword(final String keywordName) {
         return true;
     }
 
