@@ -32,6 +32,9 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     // Use -DRemoteExecutionMode.local=true (dev) to use local uws server (docker)
     private static final boolean USE_LOCAL = Boolean.getBoolean("RemoteExecutionMode.local");
 
+    // Use -DRemoteExecution.beta=true (dev) to use remote beta uws server (docker)
+    private static final boolean USE_BETA = Boolean.getBoolean("RemoteExecution.beta");
+
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
 
@@ -39,9 +42,12 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     public static final String[] SERVER_URLS = (USE_LOCAL)
             ? new String[]{"http://127.0.0.1:8080/OImaging-uws/"}
-            : new String[]{
-                "http://fe.jmmc.fr/OImaging-uws/",
-                "http://fe.preprod.jmmc.fr/OImaging-uws/"
+            : (USE_BETA)
+                    ? new String[]{"http://oimaging.jmmc.fr/OImaging-uws/"
+        //"http://preprod-oimaging.jmmc.fr/OImaging-uws/"
+            }
+            : new String[]{"http://oimaging-beta.jmmc.fr/OImaging-uws/"
+        //"http://preprod-oimaging-beta.jmmc.fr/OImaging-uws/"
             };
 
     private static final ClientFactory FACTORY = new ClientFactory();
