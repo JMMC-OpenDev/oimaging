@@ -49,7 +49,7 @@ public final class WisardInputParam extends SoftwareInputParam {
     //     - MEAN_OBJECT : An image, rescaled NP_MINxNP_MIN as INIT_IMG. (NULL)
     //     - FWHM : Full Width Half maximum of a lorentzian used as prior, in pixels (3.) (less prefered as costly) 
     // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
-    public static final String[] RGL_NAME_WISARD = new String[]{"TOTVAR", "PSD", "L1L2", "L1L2WHITE", "SOFT_SUPPORT"};
+    public static final String[] RGL_NAME_WISARD = new String[]{"L1L2", "L1L2WHITE", "PSD", "SOFT_SUPPORT", "TOTVAR"};
     public static final String RGL_NAME_WISARD_L1 = "L1";
 
     public WisardInputParam() {
