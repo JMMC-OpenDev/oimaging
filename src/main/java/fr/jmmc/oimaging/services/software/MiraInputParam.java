@@ -5,9 +5,6 @@ package fr.jmmc.oimaging.services.software;
 
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
-import static fr.jmmc.oitools.meta.CellMeta.NO_STR_VALUES;
-import fr.jmmc.oitools.meta.KeywordMeta;
-import fr.jmmc.oitools.meta.Types;
 import java.util.List;
 
 /**
@@ -46,4 +43,11 @@ public final class MiraInputParam extends SoftwareInputParam {
         return false;
     }
 
+    @Override
+    public boolean supportsMissingKeyword(final String keywordName) {
+        if (ImageOiConstants.KEYWORD_INIT_IMG.equals(keywordName)) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -264,34 +264,45 @@ public class IRModel {
      * @param fitsImageHDU image to select (must be present in the previous list
      */
     public void setSelectedInputImageHDU(final FitsImageHDU fitsImageHDU) {
-        if (fitsImageHDU.getHduName() == null) {
-            // this imageHDU is probably not an image oi extension
-            throw new IllegalStateException("Can't select given image HDU with null HDUNANE");
-        }
-
-        boolean match = false;
-        for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
-            if ((currentHDU == fitsImageHDU)
-                    || (currentHDU.getChecksum() == fitsImageHDU.getChecksum())) {
-                match = true;
-
-                selectedInputImageHDU = fitsImageHDU;
-
-                oifitsFile.getImageOiData().getInputParam().setInitImg(fitsImageHDU.getHduName());
-
-                // OIFITS2 are not supported (2017/09/08)
-                /* Prune OIFits images to keep ONLY ONE image */
-                final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
-                imageHdus.clear();
-                imageHdus.add(fitsImageHDU);
-
-                logger.info("Set new hdu '{}' as selectedInputImageHDU", fitsImageHDU.getHduName());
-                break;
+        final String hduName;
+        if (fitsImageHDU == null) {
+            hduName = "";
+        } else {
+            hduName = fitsImageHDU.getHduName();
+            if (hduName == null) {
+                // this imageHDU is probably not an image oi extension
+                throw new IllegalStateException("Can't select given image HDU with null HDUNANE");
             }
         }
 
-        if (!match) {
-            throw new IllegalStateException(fitsImageHDU.getHduName() + " HDU was not added before");
+        /* Prune OIFits images to keep ONLY ONE image */
+        final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
+        imageHdus.clear();
+
+        boolean match = false;
+        if (fitsImageHDU == null) {
+            match = true;
+        } else {
+            for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
+                if ((currentHDU == fitsImageHDU)
+                        || (currentHDU.getChecksum() == fitsImageHDU.getChecksum())) {
+
+                    match = true;
+
+                    // OIFITS2 are not supported (2017/09/08)
+                    imageHdus.add(fitsImageHDU);
+                    break;
+                }
+            }
+        }
+
+        if (match) {
+            selectedInputImageHDU = fitsImageHDU;
+            oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
+
+            logger.info("Set new hdu '{}' as selectedInputImageHDU", hduName);
+        } else {
+            throw new IllegalStateException(hduName + " HDU was not added !");
         }
     }
 
@@ -357,7 +368,6 @@ public class IRModel {
     }
 
     public File prepareTempFile() throws FitsException, IOException {
-
         // TODO don't copy file on every loop (because the oifitsFile always is synchronized as an input file model)
         // validate OIFITS:
         final OIFitsChecker checker = new OIFitsChecker();
@@ -399,7 +409,6 @@ public class IRModel {
     }
 
     public boolean updateWithNewModel(final ServiceResult serviceResult) {
-
         boolean dataAdded = false;
 
         final File resultFile = serviceResult.getOifitsResultFile();
@@ -465,7 +474,6 @@ public class IRModel {
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
-
     }
 
     public void removeServiceResults(List<ServiceResult> selectedServicesList) {

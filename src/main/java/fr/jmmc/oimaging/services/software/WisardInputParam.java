@@ -90,4 +90,12 @@ public final class WisardInputParam extends SoftwareInputParam {
         return SUPPORTED_STD_KEYWORDS.contains(keywordName);
     }
 
+    @Override
+    public boolean supportsMissingKeyword(final String keywordName) {
+        if (ImageOiConstants.KEYWORD_INIT_IMG.equals(keywordName)) {
+            return true;
+        }
+        return false;
+    }
+
 }

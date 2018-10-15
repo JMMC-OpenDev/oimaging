@@ -82,4 +82,11 @@ public final class Service {
         return supports;
     }
 
+    public boolean supportsMissingKeyword(final String keywordName) {
+        final boolean supports = softwareInputParam.supportsMissingKeyword(keywordName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Service[{}] supports Missing keyword [{}]: {}", name, keywordName, supports);
+        }
+        return supports;
+    }
 }

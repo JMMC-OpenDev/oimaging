@@ -69,4 +69,8 @@ public final class BsmemInputParam extends SoftwareInputParam {
         return true;
     }
 
+    @Override
+    public boolean supportsMissingKeyword(final String keywordName) {
+        return false;
+    }
 }

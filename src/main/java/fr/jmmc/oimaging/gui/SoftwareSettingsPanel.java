@@ -14,12 +14,13 @@ import fr.jmmc.oitools.image.ImageOiInputParam;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
-import java.util.logging.Level;
 import javax.swing.JFormattedTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author mellag
@@ -27,6 +28,10 @@ import javax.swing.text.NumberFormatter;
 public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
+
+    /** Logger */
+    private static final Logger logger = LoggerFactory.getLogger(SoftwareSettingsPanel.class);
+
 
     /* members */
     /** associated mainPanel */
@@ -373,7 +378,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     private void jComboBoxImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxImageActionPerformed
         updateModel();
-
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
     private void jSpinnerMaxIterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerMaxIterStateChanged
@@ -439,9 +443,12 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
         return new DefaultFormatterFactory(new NumberFormatter(new java.text.DecimalFormat("#0.0####E00")) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public String valueToString(Object value) throws ParseException {
                 final String formatted = super.valueToString(value);
-                if (formatted.endsWith("E00")) {  
+                if (formatted.endsWith("E00")) {
                     return formatted.substring(0, formatted.length() - 3);
                 }
                 return formatted;
@@ -469,7 +476,13 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         }
 
         // Initial Image (combo):
+        final boolean ignoreMissingInitImg = service.supportsMissingKeyword(ImageOiConstants.KEYWORD_INIT_IMG);
+
+        System.out.println("ignoreMissingInitImg: " + ignoreMissingInitImg);
         jComboBoxImage.removeAllItems();
+        if (ignoreMissingInitImg) {
+            jComboBoxImage.addItem("[No Image]");
+        }
         for (FitsImageHDU fitsImageHDU : irModel.getFitsImageHDUs()) {
             jComboBoxImage.addItem(fitsImageHDU);
         }
@@ -477,7 +490,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         final FitsImageHDU selectedFitsImageHDU = irModel.getSelectedInputImageHDU();
         if (selectedFitsImageHDU != null) {
             jComboBoxImage.getModel().setSelectedItem(selectedFitsImageHDU);
-        } else {
+        } else if (!ignoreMissingInitImg) {
             failures.add(irModel.getSelectedInputFitsImageError());
         }
 
@@ -567,9 +580,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         // Init Image
         final FitsImageHDU mFitsImageHDU = irModel.getSelectedInputImageHDU();
-        final FitsImageHDU sFitsImageHDU = (FitsImageHDU) this.jComboBoxImage.getSelectedItem();
-        if (sFitsImageHDU != null && !(sFitsImageHDU == mFitsImageHDU)) {
-            irModel.setSelectedInputImageHDU(sFitsImageHDU);
+        final Object sFitsImageHDU = this.jComboBoxImage.getSelectedItem();
+        if (sFitsImageHDU != mFitsImageHDU) {
+            final FitsImageHDU fitsImageHDU = (FitsImageHDU) (sFitsImageHDU instanceof FitsImageHDU ? sFitsImageHDU : null);
+            irModel.setSelectedInputImageHDU(fitsImageHDU);
             changed = true;
         }
 
@@ -577,8 +591,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         try {
             // guarantee last user value
             jSpinnerMaxIter.commitEdit();
-        } catch (ParseException ex) {
-            java.util.logging.Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException pe) {
+            logger.warn("jSpinnerMaxIter parsing failed:", pe);
         }
         mInt = inputParam.getMaxiter();
         wInt = (Integer) jSpinnerMaxIter.getValue();

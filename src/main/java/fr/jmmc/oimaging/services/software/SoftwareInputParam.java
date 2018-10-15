@@ -55,6 +55,10 @@ public class SoftwareInputParam {
         return false;
     }
 
+    public boolean supportsMissingKeyword(final String keywordName) {
+        return false;
+    }
+
     // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
     public static final String[] RGL_NAME_DEFAULT = new String[]{""};
 
