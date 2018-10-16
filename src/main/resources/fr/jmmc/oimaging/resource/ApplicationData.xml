@@ -140,6 +140,8 @@
         <menu label="Interop">
             <menu label="Send OIFits data" classpath="fr.jmmc.oimaging.interop.SendOIFitsAction" action="sendOIFitsAction"
                   description="send selected OIFits data to OIFitsExplorer or other VO Tools (SAMP)"/>
+            <menu label="Send Fits image" classpath="fr.jmmc.oimaging.interop.SendFitsAction" action="sendFitsAction"
+                  description="send selected Fits image to any VO Tools (SAMP)"/>
         </menu>
     </menubar>
 
@@ -153,7 +155,8 @@
         <release version="0.5">
             <pubDate>Tue, 16 Oct 2018 12:00:00 GMT</pubDate>
             <prerelease version="0.5 beta 12">
-                <change type="FEATURE">Added 'Send OIFits' action in the Interop menu to share OIFits data with OIFitsExplorer and other VO tools</change>
+                <change type="FEATURE">Added 'Send OIFits data' action in the Interop menu to share OIFits data with OIFitsExplorer and other VO tools</change>
+                <change type="FEATURE">Added 'Send Fits image' action in the Interop menu to share Fits image with any VO tools</change>
             </prerelease>
             <prerelease version="0.5 beta 11">
                 <change type="FEATURE">Better software parameter handling: hide unsupported standard parameters per software</change>

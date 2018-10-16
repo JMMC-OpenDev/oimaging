@@ -31,6 +31,7 @@ import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.NewAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oitools.model.DataModel;
@@ -325,6 +326,8 @@ public final class OImaging extends App {
         // Interop menu :
         // Send OIFits (SAMP) :
         new SendOIFitsAction();
+        // Send Fits (SAMP) :
+        new SendFitsAction();
     }
 
     /**

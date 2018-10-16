@@ -9,12 +9,15 @@ import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
+import fr.jmmc.oimaging.interop.SendFitsAction;
+import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImage;
@@ -45,6 +48,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(ViewerPanel.class);
+    /** fits extension including '.' (dot) character ie '.fits' */
+    public final static String FITS_EXTENSION = "." + MimeType.OIFITS.getExtension();
 
     /** Fits image panel */
     private final FitsImagePanel fitsImagePanel;
@@ -53,7 +58,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private final OIFitsViewPanel oifitsViewPanel;
 
     private final Action exportOiFitsAction;
+    private final Action sendOiFitsAction;
     private final Action exportFitsImageAction;
+    private final Action sendFitsAction;
     private Component lastModelPanel;
     private Component lastResultPanel;
 
@@ -90,7 +97,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelOIFitsViewer.add(oifitsViewPanel, gridBagConstraints);
 
         exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
+        sendOiFitsAction = ActionRegistrar.getInstance().get(SendOIFitsAction.className, SendOIFitsAction.actionName);
         exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
+        sendFitsAction = ActionRegistrar.getInstance().get(SendFitsAction.className, SendFitsAction.actionName);
 
         jComboBoxImage.setRenderer(new OiCellRenderer());
     }
@@ -226,20 +235,28 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     // TODO move out of this class
-    public void exportOIFits() {
-        OIFitsFile oifitsFile = oifitsViewPanel.getOIFitsData();
-        File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
-        String name = oifitsFile.getFileName();
+    public File exportOIFits(final boolean useFileChooser) {
+        final OIFitsFile oifitsFile = oifitsViewPanel.getOIFitsData();
+        // store original filename
+        final String originalAbsoluteFilePath = oifitsFile.getAbsoluteFilePath();
+        final File file;
 
-        if (!name.contains(".image-oi")) {
-            name = FileUtils.getFileNameWithoutExtension(name) + ".image-oi." + FileUtils.getExtension(oifitsFile.getFileName());
+        if (useFileChooser) {
+            final File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
+            String name = oifitsFile.getFileName();
+
+            if (!name.contains(".image-oi")) {
+                name = FileUtils.getFileNameWithoutExtension(name) + ".image-oi." + FileUtils.getExtension(oifitsFile.getFileName());
+            }
+
+            file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", dir, MimeType.OIFITS, name);
+        } else {
+            file = FileUtils.getTempFile(oifitsFile.getFileName(), FITS_EXTENSION);
         }
-
-        File file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", dir, MimeType.OIFITS, name);
 
         // Cancel
         if (file == null) {
-            return;
+            return null;
         }
 
         try {
@@ -250,22 +267,37 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         } catch (FitsException ex) {
             // Show the feedback report (modal) :
             FeedbackReport.openDialog(true, ex);
+        } finally {
+            if (!useFileChooser) {
+                // restore filename
+                oifitsFile.setAbsoluteFilePath(originalAbsoluteFilePath);
+            }
         }
+        return file;
     }
 
     // TODO move out of this class
-    public void exportFitsImage() {
-        File file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", null, MimeType.FITS_IMAGE, null);
+    public File exportFitsImage(final boolean useFileChooser) {
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+        // store original identifier
+        final String originalImageIdentifier = fitsImage.getFitsImageIdentifier();
+        final File file;
+
+        if (useFileChooser) {
+            file = FileChooser.showSaveFileChooser("Choose destination to write the Fits image file", null, MimeType.FITS_IMAGE, null);
+        } else {
+            file = FileUtils.getTempFile(StringUtils.replaceNonAlphaNumericCharsByUnderscore(fitsImage.getFitsImageIdentifier()), FITS_EXTENSION);
+        }
 
         // Cancel
         if (file == null) {
-            return;
+            return null;
         }
 
         try {
             // export whole HDU (even if first image is shown) : image has been modified ( and is not the verbatim one).
-            FitsImageFile fits = new FitsImageFile();
-            fits.getFitsImageHDUs().add(fitsImagePanel.getFitsImage().getFitsImageHDU());
+            final FitsImageFile fits = new FitsImageFile();
+            fits.getFitsImageHDUs().add(fitsImage.getFitsImageHDU());
 
             FitsImageWriter.write(file.getAbsolutePath(), fits);
         } catch (IOException ex) {
@@ -274,8 +306,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         } catch (FitsException ex) {
             // Show the feedback report (modal) :
             FeedbackReport.openDialog(true, ex);
+        } finally {
+            // restore identifier
+            fitsImage.setFitsImageIdentifier(originalImageIdentifier);
         }
-
+        return file;
     }
 
     /** This method is called from within the constructor to
@@ -457,7 +492,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private void enableActions() {
         exportOiFitsAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelOIFitsViewer && oifitsViewPanel.getOIFitsData() != null);
+        sendOiFitsAction.setEnabled(exportOiFitsAction.isEnabled());
         exportFitsImageAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelImageViewer && fitsImagePanel.getFitsImage() != null);
+        sendFitsAction.setEnabled(exportFitsImageAction.isEnabled());
     }
 
     private void storeLastPanel() {

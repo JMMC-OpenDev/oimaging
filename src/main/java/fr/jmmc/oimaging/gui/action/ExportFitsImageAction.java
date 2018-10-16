@@ -41,7 +41,7 @@ public final class ExportFitsImageAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        OImaging.getInstance().getMainPanel().getViewerPanel().exportFitsImage();
+        OImaging.getInstance().getMainPanel().getViewerPanel().exportFitsImage(true);
     }
 
 }

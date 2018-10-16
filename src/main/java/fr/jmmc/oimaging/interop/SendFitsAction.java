@@ -15,26 +15,26 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This registered action represents an Interop Menu entry to
- * send generated oifits data to any FITS application (OIFitsExplorer, topcat)...
+ * send fits image to any FITS application (ds9)...
  *
  * @author LAURENT BOURGES
  */
-public final class SendOIFitsAction extends SampCapabilityAction {
+public final class SendFitsAction extends SampCapabilityAction {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
     /** Class name. This name is used to register to the ActionRegistrar */
-    public final static String className = SendOIFitsAction.class.getName();
+    public final static String className = SendFitsAction.class.getName();
     /** Action name. This name is used to register to the ActionRegistrar */
-    public final static String actionName = "sendOIFitsAction";
+    public final static String actionName = "sendFitsAction";
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(className);
 
     /**
      * Public constructor that automatically register the action in RegisteredAction.
      */
-    public SendOIFitsAction() {
-        super(className, actionName, SampCapability.LOAD_FITS_TABLE);
+    public SendFitsAction() {
+        super(className, actionName, SampCapability.LOAD_FITS_IMAGE);
     }
 
     /**
@@ -60,7 +60,7 @@ public final class SendOIFitsAction extends SampCapabilityAction {
     public Map<?, ?> composeMessage() throws IllegalStateException {
         logger.debug("composeMessage");
 
-        final File file = OImaging.getInstance().getMainPanel().getViewerPanel().exportOIFits(false);
+        final File file = OImaging.getInstance().getMainPanel().getViewerPanel().exportFitsImage(false);
 
         if (file != null) {
             // Store parameters into SAMP message:
