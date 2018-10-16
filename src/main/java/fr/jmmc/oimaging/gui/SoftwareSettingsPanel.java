@@ -216,7 +216,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
         jPanelForm.add(jComboBoxImage, gridBagConstraints);
 
-        jSpinnerMaxIter.setModel(new javax.swing.SpinnerNumberModel(0, -1, null, 5));
+        jSpinnerMaxIter.setModel(new javax.swing.SpinnerNumberModel(50, 0, 1000, 5));
         jSpinnerMaxIter.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_MAXITER));
         jSpinnerMaxIter.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {

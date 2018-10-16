@@ -31,6 +31,7 @@ import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.NewAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oitools.model.DataModel;
 import java.awt.BorderLayout;
@@ -317,12 +318,13 @@ public final class OImaging extends App {
         new ExportOIFitsAction();
         new ExportFitsImageAction();
 
+        // Edit menu :
+        new DeleteSelectionAction();
         new RunAction();
 
-        new DeleteSelectionAction();
-
-        // Edit menu :
         // Interop menu :
+        // Send OIFits (SAMP) :
+        new SendOIFitsAction();
     }
 
     /**

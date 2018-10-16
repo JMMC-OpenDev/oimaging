@@ -167,7 +167,7 @@
         <Component class="javax.swing.JSpinner" name="jSpinnerMaxIter">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-              <SpinnerModel initial="0" minimum="-1" numberType="java.lang.Integer" stepSize="5" type="number"/>
+              <SpinnerModel initial="50" maximum="1000" minimum="0" numberType="java.lang.Integer" stepSize="5" type="number"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="getTooltip(ImageOiConstants.KEYWORD_MAXITER)" type="code"/>

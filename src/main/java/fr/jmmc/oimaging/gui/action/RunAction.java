@@ -22,8 +22,6 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
-import javax.swing.ButtonModel;
-import javax.swing.text.Document;
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,26 +35,11 @@ public class RunAction extends RegisteredAction {
     public final static String className = RunAction.class.getName();
     /** Action name. This name is used to register to the ActionRegistrar */
     public static final String actionName = "run";
-
-    private ButtonModel iTMaxButtonModel = null;
-    private Document iTMaxDocument = null;
-    private ButtonModel skipPlotDocument = null;
-
-    private final Task task;
+    /** Task Run IR */
+    public static final Task TASK_RUN_IR = new Task("RUN_IR");
 
     public RunAction() {
         super(className, actionName);
-        task = new Task("MakeImage");
-    }
-
-    private IRModel getCurrentIRModel() {
-        return IRModelManager.getInstance().getIRModel();
-    }
-
-    public void setConstraints(ButtonModel iTMaxButtonModel, Document iTMaxDocument, ButtonModel skipPlotDocument) {
-        this.iTMaxButtonModel = iTMaxButtonModel;
-        this.iTMaxDocument = iTMaxDocument;
-        this.skipPlotDocument = skipPlotDocument;
     }
 
     private void setRunningState(final IRModel irModel, boolean running) {
@@ -68,20 +51,17 @@ public class RunAction extends RegisteredAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO: make a snapshot of the required information from model
-        final IRModel irModel = getCurrentIRModel();
+        final IRModel irModel = IRModelManager.getInstance().getIRModel();
         if (irModel.isRunning()) {
             // cancel job
-            TaskSwingWorkerExecutor.cancelTask(getTask());
+            TaskSwingWorkerExecutor.cancelTask(TASK_RUN_IR);
             setRunningState(irModel, false);
         } else {
-
             try {
-                String cliOptions = irModel.getCliOptions();
-                File inputFile = irModel.prepareTempFile();
                 StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
                 // change model state to lock it and extract its snapshot
                 setRunningState(irModel, true);
-                new RunFitActionWorker(getTask(), cliOptions, inputFile, irModel, this).executeTask();
+                new RunFitActionWorker(irModel.getCliOptions(), irModel.prepareTempFile(), irModel, this).executeTask();
             } catch (FitsException ex) {
                 setRunningState(irModel, false);
                 logger.error("Can't prepare temporary file before running process", ex);
@@ -94,19 +74,15 @@ public class RunAction extends RegisteredAction {
         }
     }
 
-    public Task getTask() {
-        return task;
-    }
-
-    static class RunFitActionWorker extends TaskSwingWorker<ServiceResult> {
+    static final class RunFitActionWorker extends TaskSwingWorker<ServiceResult> {
 
         private final String cliOptions;
         private final File inputFile;
         private final IRModel irModel;
         private final RunAction parentAction;
 
-        RunFitActionWorker(Task task, String cliOptions, File inputFile, IRModel irModel, RunAction runAction) {
-            super(task);
+        RunFitActionWorker(String cliOptions, File inputFile, IRModel irModel, RunAction runAction) {
+            super(TASK_RUN_IR);
             this.cliOptions = cliOptions;
             this.inputFile = inputFile;
             this.irModel = irModel; // only for callback

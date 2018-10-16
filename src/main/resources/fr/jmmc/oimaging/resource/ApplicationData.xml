@@ -138,10 +138,8 @@
         </menu>
 
         <menu label="Interop">
-            <!--
-              <menu label="Send OIFits" classpath="fr.jmmc." action=""
-                    description=""/>
-            -->
+            <menu label="Send OIFits data" classpath="fr.jmmc.oimaging.interop.SendOIFitsAction" action="sendOIFitsAction"
+                  description="send selected OIFits data to OIFitsExplorer or other VO Tools (SAMP)"/>
         </menu>
     </menubar>
 

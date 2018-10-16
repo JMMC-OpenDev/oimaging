@@ -40,7 +40,7 @@ public final class BsmemInputParam extends SoftwareInputParam {
 
         // default values:
         params.setKeywordDefaultLogical(KEYWORD_AUTO_WGT, true);
-        params.setKeywordDefaultDouble(KEYWORD_FLUXERR, 0.1);
+        params.setKeywordDefaultDouble(KEYWORD_FLUXERR, 0.01); // 1% error on VIS2
 
         if (params.getKeywordLogical(KEYWORD_AUTO_WGT)) {
             params.removeKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
