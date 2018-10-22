@@ -30,16 +30,16 @@ public final class WisardInputParam extends SoftwareInputParam {
 
     // Wisard specific
     private static final KeywordMeta FOV = new KeywordMeta(KEYWORD_FOV,
-            "Field of view", Types.TYPE_DBL);
+            "Field of view (mas)", Types.TYPE_DBL);
     private static final KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN,
-            "Minimum number of reconstructed voxels", Types.TYPE_INT);
+            "MINimum width (Number of Points) of the reconstructed image", Types.TYPE_INT);
     private final static KeywordMeta THRESHOLD = new KeywordMeta(KEYWORD_THRESHOLD,
-            "Threshold value to stop iterations (step limit)", Types.TYPE_DBL);
+            "Convergence threshold to be used as a stopping criterion for the iterations", Types.TYPE_DBL);
     // optional
     private static final KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE,
-            "TBD", Types.TYPE_DBL);
+            "Scalar factor for L1-L2 regularization", Types.TYPE_DBL);
     private static final KeywordMeta DELTA = new KeywordMeta(KEYWORD_DELTA,
-            "TBD", Types.TYPE_DBL);
+            "Scalar factor for L1-L2 regularization, used to set the threshold between quadratic (l2) and linear (L1) regularizations", Types.TYPE_DBL);
 
     // TODO: 
     // - L1L2WHITE/PSD: add MEAN_OBJECT KW: An image, rescaled NP_MINxNP_MIN as INIT_IMG. (NULL) 
