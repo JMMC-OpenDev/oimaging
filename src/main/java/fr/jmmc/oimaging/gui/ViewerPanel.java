@@ -27,7 +27,6 @@ import fr.jmmc.oitools.image.FitsImageWriter;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
-import fr.jmmc.oitools.processing.Resampler;
 import fr.nom.tam.fits.FitsException;
 import java.awt.Component;
 import java.io.File;
@@ -137,7 +136,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private void displaySelection(final FitsImageHDU imageHDU) {
         if (imageHDU != null) {
             FitsImage image = imageHDU.getFitsImages().get(0);
-            FitsImageUtils.updateDataRangeExcludingZero(image);
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
             logger.info("Display image HDU '{}'", imageHDU.getHduName());
@@ -314,6 +312,24 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         return file;
     }
 
+    public void resampleFitsImage() {
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+        if (fitsImage != null) {
+            if (fitsImagePanel.resampleFitsImage()) {
+                displaySelection(fitsImage.getFitsImageHDU());
+            }
+        }
+    }
+
+    public void viewportFitsImage() {
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+        if (fitsImage != null) {
+            if (fitsImagePanel.viewportFitsImage()) {
+                displaySelection(fitsImage.getFitsImageHDU());
+            }
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -332,6 +348,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage = new javax.swing.JComboBox();
         jPanelImage = new javax.swing.JPanel();
         jButtonResample = new javax.swing.JButton();
+        jButtonViewport = new javax.swing.JButton();
         jPanelLogViewer = new javax.swing.JPanel();
         jScrollPaneLog = new javax.swing.JScrollPane();
         jEditorPaneExecutionLog = new javax.swing.JEditorPane();
@@ -378,31 +395,45 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jPanelImageSelector, gridBagConstraints);
 
         jPanelImage.setLayout(new javax.swing.BoxLayout(jPanelImage, javax.swing.BoxLayout.LINE_AXIS));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.gridheight = 5;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.weighty = 1.0;
         jPanelImageViewer.add(jPanelImage, gridBagConstraints);
 
-        jButtonResample.setText("resample to 100x100");
+        jButtonResample.setText("Resample");
         jButtonResample.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonResampleActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
+
+        jButtonViewport.setText("Viewport");
+        jButtonViewport.setEnabled(false);
+        jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonViewportActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
 
         jTabbedPaneVizualizations.addTab("Images", jPanelImageViewer);
 
@@ -475,21 +506,16 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
     private void jButtonResampleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResampleActionPerformed
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            final FitsImageHDU imageHDU = fitsImage.getFitsImageHDU();
-            final int newSize = 100;
-// TODO: select filter        
-//        final int filterType = Resampler.FILTER_MITCHELL;
-//        final int filterType = Resampler.FILTER_BOX;
-            FitsImageUtils.resampleImages(imageHDU, newSize);
-
-            displaySelection(imageHDU);
-        }
+        resampleFitsImage();
     }//GEN-LAST:event_jButtonResampleActionPerformed
+
+    private void jButtonViewportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewportActionPerformed
+        viewportFitsImage();
+    }//GEN-LAST:event_jButtonViewportActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonResample;
+    private javax.swing.JButton jButtonViewport;
     private javax.swing.JComboBox jComboBoxImage;
     private javax.swing.JEditorPane jEditorPaneExecutionLog;
     private javax.swing.JLabel jLabelInput;

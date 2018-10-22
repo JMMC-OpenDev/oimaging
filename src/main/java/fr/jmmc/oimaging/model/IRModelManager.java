@@ -225,12 +225,6 @@ public final class IRModelManager {
             throw new IOException("Could not load the file : " + fileLocation);
         }
 
-        final ImageOiData iod = oifitsFile.getImageOiData();
-        if (iod != null) {
-            // prepare images (negative values, padding, orientation):
-            FitsImageUtils.prepareAllImages(oifitsFile.getFitsImageHDUs());
-        }
-
         return oifitsFile;
     }
 
@@ -311,9 +305,6 @@ public final class IRModelManager {
         if (fitsImageFile == null) {
             throw new IOException("Could not load the file : " + fileLocation);
         }
-
-        // prepare images (negative values, padding, orientation):
-        FitsImageUtils.prepareAllImages(fitsImageFile.getFitsImageHDUs());
 
         return fitsImageFile;
     }

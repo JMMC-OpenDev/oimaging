@@ -8,6 +8,7 @@ import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.DateUtils;
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -170,6 +171,9 @@ public class IRModel {
      */
     private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
+
+        // prepare images (negative values, padding, orientation):
+        FitsImageUtils.prepareAllImages(hdus);
 
         // Start with all hdus
         final List<FitsImageHDU> hdusToAdd = new LinkedList<FitsImageHDU>();
