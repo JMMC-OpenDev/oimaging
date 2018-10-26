@@ -12,7 +12,6 @@ import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
-import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
@@ -139,6 +138,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
             logger.info("Display image HDU '{}'", imageHDU.getHduName());
+        } else {
+            // reset anyway
+            fitsImagePanel.setFitsImage(null);
         }
     }
 
@@ -321,10 +323,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
-    public void viewportFitsImage() {
+    public void changeViewportFitsImage() {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
         if (fitsImage != null) {
-            if (fitsImagePanel.viewportFitsImage()) {
+            if (fitsImagePanel.changeViewportFitsImage()) {
                 displaySelection(fitsImage.getFitsImageHDU());
             }
         }
@@ -423,7 +425,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
 
         jButtonViewport.setText("Viewport");
-        jButtonViewport.setEnabled(false);
         jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonViewportActionPerformed(evt);
@@ -510,7 +511,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }//GEN-LAST:event_jButtonResampleActionPerformed
 
     private void jButtonViewportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewportActionPerformed
-        viewportFitsImage();
+        changeViewportFitsImage();
     }//GEN-LAST:event_jButtonViewportActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
