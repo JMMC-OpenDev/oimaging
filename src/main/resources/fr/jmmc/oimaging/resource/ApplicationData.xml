@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 13"/>
-    <compilation date="22/10/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 14"/>
+    <compilation date="26/10/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -159,9 +159,12 @@
         - import FOV if present in input-oiimage
         -->
         <release version="0.5">
-            <pubDate>Mon, 22 Oct 2018 16:00:00 GMT</pubDate>
+            <pubDate>Fri, 26 Oct 2018 16:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 14">
+                <change type="FEATURE">Added 'Viewport' button on the image viewer to adjust the image RA/DE coverage and FOV (enlarge / reduce)</change>
+            </prerelease>
             <prerelease version="0.5 beta 13">
-                <change type="FEATURE">Added 'Resample image' action in the new Processing menu to resample properly the current FITS image</change>
+                <change type="FEATURE">Added 'Resample image' action in the new Processing menu and on the image viewer to resample properly the current FITS image</change>
             </prerelease>
             <prerelease version="0.5 beta 12">
                 <change type="FEATURE">Added 'Send OIFits data' action in the Interop menu to share OIFits data with OIFitsExplorer and other VO tools</change>
