@@ -314,6 +314,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         return file;
     }
 
+    public void changeViewportFitsImage() {
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+        if (fitsImage != null) {
+            if (fitsImagePanel.changeViewportFitsImage()) {
+                displaySelection(fitsImage.getFitsImageHDU());
+            }
+        }
+    }
+
     public void resampleFitsImage() {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
         if (fitsImage != null) {
@@ -323,10 +332,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
-    public void changeViewportFitsImage() {
+    public void rescaleFitsImage() {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
         if (fitsImage != null) {
-            if (fitsImagePanel.changeViewportFitsImage()) {
+            if (fitsImagePanel.rescaleFitsImage()) {
                 displaySelection(fitsImage.getFitsImageHDU());
             }
         }
@@ -349,8 +358,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageSelector = new javax.swing.JPanel();
         jComboBoxImage = new javax.swing.JComboBox();
         jPanelImage = new javax.swing.JPanel();
-        jButtonResample = new javax.swing.JButton();
         jButtonViewport = new javax.swing.JButton();
+        jButtonResample = new javax.swing.JButton();
+        jButtonRescale = new javax.swing.JButton();
         jPanelLogViewer = new javax.swing.JPanel();
         jScrollPaneLog = new javax.swing.JScrollPane();
         jEditorPaneExecutionLog = new javax.swing.JEditorPane();
@@ -412,6 +422,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 1.0;
         jPanelImageViewer.add(jPanelImage, gridBagConstraints);
 
+        jButtonViewport.setText("Viewport");
+        jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonViewportActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
+
         jButtonResample.setText("Resample");
         jButtonResample.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -424,17 +446,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
 
-        jButtonViewport.setText("Viewport");
-        jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
+        jButtonRescale.setText("Rescale");
+        jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonViewportActionPerformed(evt);
+                jButtonRescaleActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
+        jPanelImageViewer.add(jButtonRescale, gridBagConstraints);
 
         jTabbedPaneVizualizations.addTab("Images", jPanelImageViewer);
 
@@ -506,16 +528,21 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         displaySelection((FitsImageHDU) jComboBoxImage.getSelectedItem());
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
-    private void jButtonResampleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResampleActionPerformed
-        resampleFitsImage();
-    }//GEN-LAST:event_jButtonResampleActionPerformed
+    private void jButtonRescaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRescaleActionPerformed
+        rescaleFitsImage();
+    }//GEN-LAST:event_jButtonRescaleActionPerformed
 
     private void jButtonViewportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewportActionPerformed
         changeViewportFitsImage();
     }//GEN-LAST:event_jButtonViewportActionPerformed
 
+    private void jButtonResampleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResampleActionPerformed
+        resampleFitsImage();
+    }//GEN-LAST:event_jButtonResampleActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonResample;
+    private javax.swing.JButton jButtonRescale;
     private javax.swing.JButton jButtonViewport;
     private javax.swing.JComboBox jComboBoxImage;
     private javax.swing.JEditorPane jEditorPaneExecutionLog;
