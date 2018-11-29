@@ -235,25 +235,30 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     }
 
     private static void prepareResult(final ClientUWS client, String jobId, ServiceResult result) throws ClientUWSException, URISyntaxException, IOException {
-        Results results = client.getJobResults(jobId);
+        final Results results = client.getJobResults(jobId);
 
         for (ResultReference resultRef : results.getResult()) {
             final String id = resultRef.getId();
-            URI uri = new URI(resultRef.getHref());
+            final URI uri = new URI(resultRef.getHref());
+
             if ("logfile".equals(id)) {
                 // get logfile
+                _logger.info("Downloading logfile from : {}", uri);
+
                 if (Http.download(uri, result.getExecutionLogResultFile(), false)) {
                     _logger.info("logfile downloaded at : {}", result.getExecutionLogResultFile());
                 }
             } else if ("outputfile".equals(id)) {
                 // get result file
+                _logger.info("Downloading outputfile from : {}", uri);
+
                 if (Http.download(uri, result.getOifitsResultFile(), false)) {
                     _logger.info("outputfile downloaded at : {}", result.getOifitsResultFile());
                 }
             } else {
                 // TODO: FIX such error
                 // store additional information
-                throw new IllegalStateException("UWS service return more info than required : " + id);
+                throw new IllegalStateException("UWS service returned more results than required : " + id);
             }
         }
     }
