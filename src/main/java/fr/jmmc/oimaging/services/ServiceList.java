@@ -67,8 +67,4 @@ public final class ServiceList {
     public static Service getPreferedService() {
         return getInstance().preferedService;
     }
-
-    public static ServiceResult reconstructsImage(Service service, String cliOptions, File inputFile) {
-        return service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
-    }
 }
