@@ -46,6 +46,7 @@ import java.util.TimeZone;
  * </pre>
  */
 public final class ISO8601 {
+
     /**
      * Parses an ISO8601-compliant date/time string.
      *
@@ -80,7 +81,6 @@ public final class ISO8601 {
          * note that we cannot use java.text.SimpleDateFormat for
          * parsing because it can't handle years <= 0 and TZD's
          */
-
         int year, month, day, hour, min, sec, ms;
         String tzID;
         try {
@@ -282,8 +282,8 @@ public final class ISO8601 {
         }
 
         if (year > 9999 || year < -9999) {
-            throw new IllegalArgumentException("Calendar has more than four " +
-                    "year digits, cannot be formatted as ISO8601: " + year);
+            throw new IllegalArgumentException("Calendar has more than four "
+                    + "year digits, cannot be formatted as ISO8601: " + year);
         }
         return year;
     }
@@ -314,4 +314,3 @@ public final class ISO8601 {
         buf.append(n);
     }
 }
-

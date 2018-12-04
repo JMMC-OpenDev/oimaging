@@ -1,4 +1,4 @@
- /*******************************************************************************
+/*******************************************************************************
  * Copyright 2010-2014 CNES - CENTRE NATIONAL d'ETUDES SPATIALES
  *
  * This file is part of SITools2.
@@ -43,8 +43,12 @@ public class Util {
         return xmlCalendar;
     }
 
-    public static boolean isSet(Object o) {
-        return (o == null) ? false : true;
+    public static boolean isSet(final Object o) {
+        return (o != null);
+    }
+
+    public static boolean isSet(final String s) {
+        return (s != null) && (!s.isEmpty());
     }
 
     public static XMLGregorianCalendar convertIntoXMLGregorian(String val) throws DatatypeConfigurationException, ParseException {
@@ -61,13 +65,4 @@ public class Util {
         xmlCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
         return xmlCalendar;
     }
-
-    public static void wait(int n) {
-        long t0, t1;
-        t0 = System.currentTimeMillis();
-        do {
-            t1 = System.currentTimeMillis();
-        } while (t1 - t0 < n);
-    }
-}    //  end __NAME__
-
+}

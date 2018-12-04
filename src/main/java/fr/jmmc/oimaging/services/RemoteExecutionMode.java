@@ -5,12 +5,10 @@ package fr.jmmc.oimaging.services;
 
 import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWS;
 import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWSException;
-import fr.jmmc.jmcs.network.http.Http;
 import fr.jmmc.jmcs.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import net.ivoa.xml.uws.v1.ExecutionPhase;
 import net.ivoa.xml.uws.v1.JobSummary;
@@ -20,6 +18,7 @@ import org.restlet.data.MediaType;
 import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.FileRepresentation;
+import org.restlet.util.Series;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,28 +134,22 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         _logger.info("callUwsOimagingService: software={} cliOptions={} inputFilenane={}", software, cliOptions, inputFilename);
 
         // prepare input of next uws call
-        FormDataSet fds = new FormDataSet();
-        fds.setMultipart(true);
+        final FormDataSet formDataSet = new FormDataSet();
+        formDataSet.setMultipart(true);
 
-        //Disposition disposition = new Disposition(Disposition.TYPE_INLINE, fileForm);
-        File f = new File(inputFilename);
-        FileRepresentation entity = new FileRepresentation(f, MediaType.IMAGE_PNG); // TODO: FIX MediaType
-        //entity.setDisposition(disposition);
+        final Series<FormData> fdsEntries = formDataSet.getEntries();
 
         // TODO declare field name as constant ( and share them with server side )
-        FormData fdInputFile = new FormData("inputfile", entity);
-        fds.getEntries().add(fdInputFile);
-
-        FormData fdSoftware = new FormData("software", software);
-        fds.getEntries().add(fdSoftware);
+        fdsEntries.add(new FormData("inputfile",
+                new FileRepresentation(new File(inputFilename), MediaType.IMAGE_ALL)));
+        fdsEntries.add(new FormData("software", software));
 
         if (cliOptions != null) {
-            FormData fdOptions = new FormData("cliOptions", cliOptions);
-            fds.getEntries().add(fdOptions);
+            fdsEntries.add(new FormData("cliOptions", cliOptions));
         }
 
         // start task in autostart mode
-        fds.add("PHASE", "RUN");
+        formDataSet.add("PHASE", "RUN");
 
         // create job
         ClientUWS client = null;
@@ -168,7 +161,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             client = FACTORY.getClient();
 
             try {
-                jobId = client.createJob(fds);
+                jobId = client.createJob(formDataSet);
             } catch (ClientUWSException cue) {
                 final Throwable rootCause = getRootCause(cue);
                 if (rootCause instanceof ConnectException) {
@@ -239,21 +232,21 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
         for (ResultReference resultRef : results.getResult()) {
             final String id = resultRef.getId();
-            final URI uri = new URI(resultRef.getHref());
+            final String href = resultRef.getHref();
 
             if ("logfile".equals(id)) {
                 // get logfile
-                _logger.info("Downloading logfile from : {}", uri);
+                _logger.info("Downloading logfile from: {}", href);
 
-                if (Http.download(uri, result.getExecutionLogResultFile(), false)) {
-                    _logger.info("logfile downloaded at : {}", result.getExecutionLogResultFile());
+                if (client.downloadFile(resultRef.getHref(), result.getExecutionLogResultFile())) {
+                    _logger.info("logfile downloaded at: {}", result.getExecutionLogResultFile());
                 }
             } else if ("outputfile".equals(id)) {
                 // get result file
-                _logger.info("Downloading outputfile from : {}", uri);
+                _logger.info("Downloading outputfile from: {}", href);
 
-                if (Http.download(uri, result.getOifitsResultFile(), false)) {
-                    _logger.info("outputfile downloaded at : {}", result.getOifitsResultFile());
+                if (client.downloadFile(href, result.getOifitsResultFile())) {
+                    _logger.info("outputfile downloaded at: {}", result.getOifitsResultFile());
                 }
             } else {
                 // TODO: FIX such error
