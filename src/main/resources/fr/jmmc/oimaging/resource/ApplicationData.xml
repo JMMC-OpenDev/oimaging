@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 15"/>
-    <compilation date="28/11/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5 beta 16"/>
+    <compilation date="05/12/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -152,14 +152,11 @@
     </menubar>
 
     <releasenotes>
-        <!-- TODO
-        - prevent duplicates in init-image list
-        - choose real for default color table
-        - add interop exports for image and oifits
-        - import FOV if present in input-oiimage
-        -->
         <release version="0.5">
-            <pubDate>Wed, 28 Nov 2018 17:00:00 GMT</pubDate>
+            <pubDate>Wed, 05 Dec 2018 10:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 16">
+                <change type="BUGFIX">Fixed HTTP connection issues (using now apache http client 4.x for robustness)</change>
+            </prerelease>
             <prerelease version="0.5 beta 15">
                 <change type="FEATURE">Added 'Rescale' button on the image viewer to adjust the image increments and FOV (scaling)</change>
             </prerelease>
