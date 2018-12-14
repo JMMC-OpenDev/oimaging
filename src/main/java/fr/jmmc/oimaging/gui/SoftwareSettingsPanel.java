@@ -66,6 +66,13 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 //Plain text components do not fire these events
             }
         });
+
+        // disable deprecated alpha / beta:
+        // TODO: cleanup + add autoWgt + flux/fluxErr fields 
+        this.jLabelRglAlph.setVisible(false);
+        this.jFormattedTextFieldRglAlph.setVisible(false);
+        this.jLabelRglBeta.setVisible(false);
+        this.jFormattedTextFieldRglBeta.setVisible(false);
     }
 
     /**
@@ -157,7 +164,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jLabelRglWgt, gridBagConstraints);
 
         jLabelRglAlph.setText("RGL_ALPH");
-        jLabelRglAlph.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH));
+        jLabelRglAlph.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH)*/);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
@@ -167,7 +174,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jLabelRglAlph, gridBagConstraints);
 
         jLabelRglBeta.setText("RGL_BETA");
-        jLabelRglBeta.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_BETA));
+        jLabelRglBeta.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_BETA)*/);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -268,7 +275,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jFormattedTextFieldRglWgt, gridBagConstraints);
 
         jFormattedTextFieldRglAlph.setFormatterFactory(getDecimalFormatterFactory());
-        jFormattedTextFieldRglAlph.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH));
+        jFormattedTextFieldRglAlph.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH)*/);
         jFormattedTextFieldRglAlph.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldRglAlphjFormattedTextFieldActionPerformed(evt);
@@ -288,7 +295,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jFormattedTextFieldRglAlph, gridBagConstraints);
 
         jFormattedTextFieldRglBeta.setFormatterFactory(getDecimalFormatterFactory());
-        jFormattedTextFieldRglBeta.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_BETA));
+        jFormattedTextFieldRglBeta.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_BETA)*/);
         jFormattedTextFieldRglBeta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldRglBetajFormattedTextFieldActionPerformed(evt);
@@ -514,7 +521,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         final boolean enabled = inputParam.hasKeywordMeta(ImageOiConstants.KEYWORD_RGL_WGT);
         jLabelRglWgt.setEnabled(enabled);
         jFormattedTextFieldRglWgt.setEnabled(enabled);
-
+        /*
         // regulation Alpha:
         jFormattedTextFieldRglAlph.setValue(inputParam.getRglAlph());
         show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_ALPH);
@@ -526,7 +533,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_BETA);
         jLabelRglBeta.setVisible(show);
         jFormattedTextFieldRglBeta.setVisible(show);
-
+         */
         // regulation Prior:
         final String rglPrio = inputParam.getRglPrio();
         if (rglPrio != null) {
@@ -620,7 +627,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 changed = true;
             }
         }
-
+        /*
         mDouble = inputParam.getRglAlph();
         if (jFormattedTextFieldRglAlph.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldRglAlph.getValue()).doubleValue();
@@ -638,7 +645,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 changed = true;
             }
         }
-
+         */
         mString = inputParam.getRglPrio();
         if (jComboBoxRglPrio.getSelectedItem() != null) {
             wString = (String) jComboBoxRglPrio.getSelectedItem();
