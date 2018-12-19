@@ -50,6 +50,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         registerActions();
         jComboBoxImage.setRenderer(new OiCellRenderer());
         jTableKeywordsEditor.setNotifiedParent(this);
+        
         this.jTextAreaOptions.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(final DocumentEvent e) {
@@ -66,13 +67,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 //Plain text components do not fire these events
             }
         });
-
-        // disable deprecated alpha / beta:
-        // TODO: cleanup + add autoWgt + flux/fluxErr fields 
-        this.jLabelRglAlph.setVisible(false);
-        this.jFormattedTextFieldRglAlph.setVisible(false);
-        this.jLabelRglBeta.setVisible(false);
-        this.jFormattedTextFieldRglBeta.setVisible(false);
     }
 
     /**
@@ -96,23 +90,25 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         jideToggleSplitButton1 = new com.jidesoft.swing.JideToggleSplitButton();
         jPanelForm = new javax.swing.JPanel();
-        jLabelInitImg = new javax.swing.JLabel();
-        jLabelMaxIter = new javax.swing.JLabel();
-        jLabelRglName = new javax.swing.JLabel();
-        jLabelRglWgt = new javax.swing.JLabel();
-        jLabelRglAlph = new javax.swing.JLabel();
-        jLabelRglBeta = new javax.swing.JLabel();
-        jLabelRglPrio = new javax.swing.JLabel();
         jComboBoxSoftware = new javax.swing.JComboBox();
+        jLabelInitImg = new javax.swing.JLabel();
         jComboBoxImage = new javax.swing.JComboBox();
+        jLabelMaxIter = new javax.swing.JLabel();
         jSpinnerMaxIter = new javax.swing.JSpinner();
+        jLabelRglName = new javax.swing.JLabel();
         jComboBoxRglName = new javax.swing.JComboBox();
+        jLabelAutoWgt = new javax.swing.JLabel();
+        jLabelRglWgt = new javax.swing.JLabel();
         jFormattedTextFieldRglWgt = new javax.swing.JFormattedTextField();
-        jFormattedTextFieldRglAlph = new javax.swing.JFormattedTextField();
-        jFormattedTextFieldRglBeta = new javax.swing.JFormattedTextField();
+        jLabelFlux = new javax.swing.JLabel();
+        jFormattedTextFieldFlux = new javax.swing.JFormattedTextField();
+        jLabelFluxErr = new javax.swing.JLabel();
+        jFormattedTextFieldFluxErr = new javax.swing.JFormattedTextField();
+        jLabelRglPrio = new javax.swing.JLabel();
         jComboBoxRglPrio = new javax.swing.JComboBox();
-        jButtonRemoveFitsImage = new javax.swing.JButton();
         jButtonLoadFitsImage = new javax.swing.JButton();
+        jButtonRemoveFitsImage = new javax.swing.JButton();
+        jCheckBoxAutoWgt = new javax.swing.JCheckBox();
         jTableKeywordsEditor = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
         jPanelOptions = new javax.swing.JPanel();
         jTextAreaOptions = new javax.swing.JTextArea();
@@ -123,75 +119,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         jPanelForm.setLayout(new java.awt.GridBagLayout());
-
-        jLabelInitImg.setText("INIT_IMG");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jLabelInitImg, gridBagConstraints);
-
-        jLabelMaxIter.setText("MAXITER");
-        jLabelMaxIter.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_MAXITER));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jLabelMaxIter, gridBagConstraints);
-
-        jLabelRglName.setText("RGL_NAME");
-        jLabelRglName.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_NAME));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jLabelRglName, gridBagConstraints);
-
-        jLabelRglWgt.setText("RGL_WGT");
-        jLabelRglWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_WGT));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jLabelRglWgt, gridBagConstraints);
-
-        jLabelRglAlph.setText("RGL_ALPH");
-        jLabelRglAlph.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH)*/);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jLabelRglAlph, gridBagConstraints);
-
-        jLabelRglBeta.setText("RGL_BETA");
-        jLabelRglBeta.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_BETA)*/);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jLabelRglBeta, gridBagConstraints);
-
-        jLabelRglPrio.setText("RGL_PRIO");
-        jLabelRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jLabelRglPrio, gridBagConstraints);
 
         jComboBoxSoftware.setModel(ServiceList.getAvailableServices());
         jComboBoxSoftware.addActionListener(new java.awt.event.ActionListener() {
@@ -206,6 +133,15 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
         jPanelForm.add(jComboBoxSoftware, gridBagConstraints);
+
+        jLabelInitImg.setText("INIT_IMG");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelInitImg, gridBagConstraints);
 
         jComboBoxImage.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_INIT_IMG));
         jComboBoxImage.setMinimumSize(new java.awt.Dimension(140, 28));
@@ -223,6 +159,16 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
         jPanelForm.add(jComboBoxImage, gridBagConstraints);
 
+        jLabelMaxIter.setText("MAXITER");
+        jLabelMaxIter.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_MAXITER));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelMaxIter, gridBagConstraints);
+
         jSpinnerMaxIter.setModel(new javax.swing.SpinnerNumberModel(50, 0, 1000, 5));
         jSpinnerMaxIter.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_MAXITER));
         jSpinnerMaxIter.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -237,6 +183,16 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
         jPanelForm.add(jSpinnerMaxIter, gridBagConstraints);
+
+        jLabelRglName.setText("RGL_NAME");
+        jLabelRglName.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_NAME));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelRglName, gridBagConstraints);
 
         jComboBoxRglName.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "mem_prior" }));
         jComboBoxRglName.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_NAME));
@@ -253,37 +209,36 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
         jPanelForm.add(jComboBoxRglName, gridBagConstraints);
 
+        jLabelAutoWgt.setText("AUTO_WGT");
+        jLabelAutoWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_AUTO_WGT));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelAutoWgt, gridBagConstraints);
+
+        jLabelRglWgt.setText("RGL_WGT");
+        jLabelRglWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_WGT));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelRglWgt, gridBagConstraints);
+
         jFormattedTextFieldRglWgt.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldRglWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_WGT));
         jFormattedTextFieldRglWgt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextFieldRglWgtjFormattedTextFieldActionPerformed(evt);
+                jFormattedTextFieldRglWgtActionPerformed(evt);
             }
         });
         jFormattedTextFieldRglWgt.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jFormattedTextFieldRglWgtjFormattedTextFieldPropertyChange(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jFormattedTextFieldRglWgt, gridBagConstraints);
-
-        jFormattedTextFieldRglAlph.setFormatterFactory(getDecimalFormatterFactory());
-        jFormattedTextFieldRglAlph.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH)*/);
-        jFormattedTextFieldRglAlph.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextFieldRglAlphjFormattedTextFieldActionPerformed(evt);
-            }
-        });
-        jFormattedTextFieldRglAlph.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jFormattedTextFieldRglAlphjFormattedTextFieldPropertyChange(evt);
+                jFormattedTextFieldRglWgtPropertyChange(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -291,19 +246,30 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jFormattedTextFieldRglAlph, gridBagConstraints);
+        jPanelForm.add(jFormattedTextFieldRglWgt, gridBagConstraints);
 
-        jFormattedTextFieldRglBeta.setFormatterFactory(getDecimalFormatterFactory());
-        jFormattedTextFieldRglBeta.setToolTipText(""/*getTooltip(ImageOiConstants.KEYWORD_RGL_BETA)*/);
-        jFormattedTextFieldRglBeta.addActionListener(new java.awt.event.ActionListener() {
+        jLabelFlux.setText("FLUX");
+        jLabelFlux.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUX));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelFlux, gridBagConstraints);
+
+        jFormattedTextFieldFlux.setFormatterFactory(getDecimalFormatterFactory());
+        jFormattedTextFieldFlux.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUX));
+        jFormattedTextFieldFlux.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextFieldRglBetajFormattedTextFieldActionPerformed(evt);
+                jFormattedTextFieldFluxActionPerformed(evt);
             }
         });
-        jFormattedTextFieldRglBeta.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+        jFormattedTextFieldFlux.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jFormattedTextFieldRglBetajFormattedTextFieldPropertyChange(evt);
+                jFormattedTextFieldFluxPropertyChange(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -312,17 +278,63 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanelForm.add(jFormattedTextFieldRglBeta, gridBagConstraints);
+        jPanelForm.add(jFormattedTextFieldFlux, gridBagConstraints);
 
-        jComboBoxRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
-        jComboBoxRglPrio.setEnabled(false);
+        jLabelFluxErr.setText("FLUXERR");
+        jLabelFluxErr.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUXERR));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelFluxErr, gridBagConstraints);
+
+        jFormattedTextFieldFluxErr.setFormatterFactory(getDecimalFormatterFactory());
+        jFormattedTextFieldFluxErr.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUXERR));
+        jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFormattedTextFieldFluxErrActionPerformed(evt);
+            }
+        });
+        jFormattedTextFieldFluxErr.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextFieldFluxErrPropertyChange(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jFormattedTextFieldFluxErr, gridBagConstraints);
+
+        jLabelRglPrio.setText("RGL_PRIO");
+        jLabelRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        jPanelForm.add(jLabelRglPrio, gridBagConstraints);
+
+        jComboBoxRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
+        jComboBoxRglPrio.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
         jPanelForm.add(jComboBoxRglPrio, gridBagConstraints);
+
+        jButtonLoadFitsImage.setText("+");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        jPanelForm.add(jButtonLoadFitsImage, gridBagConstraints);
 
         jButtonRemoveFitsImage.setText("-");
         jButtonRemoveFitsImage.setEnabled(false);
@@ -336,11 +348,18 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         jPanelForm.add(jButtonRemoveFitsImage, gridBagConstraints);
 
-        jButtonLoadFitsImage.setText("+");
+        jCheckBoxAutoWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_AUTO_WGT));
+        jCheckBoxAutoWgt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxAutoWgtActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        jPanelForm.add(jButtonLoadFitsImage, gridBagConstraints);
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanelForm.add(jCheckBoxAutoWgt, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -395,48 +414,54 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         updateModel();
     }//GEN-LAST:event_jComboBoxRglNameActionPerformed
 
-    private void jFormattedTextFieldRglWgtjFormattedTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglWgtjFormattedTextFieldActionPerformed
+    private void jFormattedTextFieldRglWgtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglWgtActionPerformed
         updateModel();
-    }//GEN-LAST:event_jFormattedTextFieldRglWgtjFormattedTextFieldActionPerformed
+    }//GEN-LAST:event_jFormattedTextFieldRglWgtActionPerformed
 
-    private void jFormattedTextFieldRglWgtjFormattedTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglWgtjFormattedTextFieldPropertyChange
+    private void jFormattedTextFieldRglWgtPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglWgtPropertyChange
         updateModel();
-    }//GEN-LAST:event_jFormattedTextFieldRglWgtjFormattedTextFieldPropertyChange
+    }//GEN-LAST:event_jFormattedTextFieldRglWgtPropertyChange
 
-    private void jFormattedTextFieldRglAlphjFormattedTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglAlphjFormattedTextFieldActionPerformed
+    private void jFormattedTextFieldFluxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxActionPerformed
         updateModel();
-    }//GEN-LAST:event_jFormattedTextFieldRglAlphjFormattedTextFieldActionPerformed
+    }//GEN-LAST:event_jFormattedTextFieldFluxActionPerformed
 
-    private void jFormattedTextFieldRglAlphjFormattedTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglAlphjFormattedTextFieldPropertyChange
+    private void jFormattedTextFieldFluxPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxPropertyChange
         updateModel();
-    }//GEN-LAST:event_jFormattedTextFieldRglAlphjFormattedTextFieldPropertyChange
+    }//GEN-LAST:event_jFormattedTextFieldFluxPropertyChange
 
-    private void jFormattedTextFieldRglBetajFormattedTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglBetajFormattedTextFieldActionPerformed
+    private void jFormattedTextFieldFluxErrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxErrActionPerformed
         updateModel();
-    }//GEN-LAST:event_jFormattedTextFieldRglBetajFormattedTextFieldActionPerformed
+    }//GEN-LAST:event_jFormattedTextFieldFluxErrActionPerformed
 
-    private void jFormattedTextFieldRglBetajFormattedTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglBetajFormattedTextFieldPropertyChange
+    private void jFormattedTextFieldFluxErrPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxErrPropertyChange
         updateModel();
-    }//GEN-LAST:event_jFormattedTextFieldRglBetajFormattedTextFieldPropertyChange
+    }//GEN-LAST:event_jFormattedTextFieldFluxErrPropertyChange
 
     private void jButtonRemoveFitsImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveFitsImageActionPerformed
         // TODO
     }//GEN-LAST:event_jButtonRemoveFitsImageActionPerformed
 
+    private void jCheckBoxAutoWgtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxAutoWgtActionPerformed
+       updateModel();
+    }//GEN-LAST:event_jCheckBoxAutoWgtActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonLoadFitsImage;
     private javax.swing.JButton jButtonRemoveFitsImage;
+    private javax.swing.JCheckBox jCheckBoxAutoWgt;
     private javax.swing.JComboBox jComboBoxImage;
     private javax.swing.JComboBox jComboBoxRglName;
     private javax.swing.JComboBox jComboBoxRglPrio;
     private javax.swing.JComboBox jComboBoxSoftware;
-    private javax.swing.JFormattedTextField jFormattedTextFieldRglAlph;
-    private javax.swing.JFormattedTextField jFormattedTextFieldRglBeta;
+    private javax.swing.JFormattedTextField jFormattedTextFieldFlux;
+    private javax.swing.JFormattedTextField jFormattedTextFieldFluxErr;
     private javax.swing.JFormattedTextField jFormattedTextFieldRglWgt;
+    private javax.swing.JLabel jLabelAutoWgt;
+    private javax.swing.JLabel jLabelFlux;
+    private javax.swing.JLabel jLabelFluxErr;
     private javax.swing.JLabel jLabelInitImg;
     private javax.swing.JLabel jLabelMaxIter;
-    private javax.swing.JLabel jLabelRglAlph;
-    private javax.swing.JLabel jLabelRglBeta;
     private javax.swing.JLabel jLabelRglName;
     private javax.swing.JLabel jLabelRglPrio;
     private javax.swing.JLabel jLabelRglWgt;
@@ -485,7 +510,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Initial Image (combo):
         final boolean ignoreMissingInitImg = service.supportsMissingKeyword(ImageOiConstants.KEYWORD_INIT_IMG);
 
-        System.out.println("ignoreMissingInitImg: " + ignoreMissingInitImg);
         jComboBoxImage.removeAllItems();
         if (ignoreMissingInitImg) {
             jComboBoxImage.addItem("[No Image]");
@@ -512,28 +536,32 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         updateJComboBoxRglName(inputParam, service);
 
         // regulation Weight:
+        jCheckBoxAutoWgt.setSelected(inputParam.isAutoWgt());
+        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_AUTO_WGT);
+        jLabelAutoWgt.setVisible(show);
+        jCheckBoxAutoWgt.setVisible(show);
+        
         jFormattedTextFieldRglWgt.setValue(inputParam.getRglWgt());
         show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
         jLabelRglWgt.setVisible(show);
         jFormattedTextFieldRglWgt.setVisible(show);
-
         // change visibility / enabled if RglWgt keyword exists (bsmem auto)
         final boolean enabled = inputParam.hasKeywordMeta(ImageOiConstants.KEYWORD_RGL_WGT);
         jLabelRglWgt.setEnabled(enabled);
         jFormattedTextFieldRglWgt.setEnabled(enabled);
-        /*
-        // regulation Alpha:
-        jFormattedTextFieldRglAlph.setValue(inputParam.getRglAlph());
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_ALPH);
-        jLabelRglAlph.setVisible(show);
-        jFormattedTextFieldRglAlph.setVisible(show);
 
-        // regulation Beta:
-        jFormattedTextFieldRglBeta.setValue(inputParam.getRglBeta());
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_BETA);
-        jLabelRglBeta.setVisible(show);
-        jFormattedTextFieldRglBeta.setVisible(show);
-         */
+        // flux:
+        jFormattedTextFieldFlux.setValue(inputParam.getFlux());
+        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUX);
+        jLabelFlux.setVisible(show);
+        jFormattedTextFieldFlux.setVisible(show);
+
+        // flux Err:
+        jFormattedTextFieldFluxErr.setValue(inputParam.getFluxErr());
+        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUXERR);
+        jLabelFluxErr.setVisible(show);
+        jFormattedTextFieldFluxErr.setVisible(show);
+
         // regulation Prior:
         final String rglPrio = inputParam.getRglPrio();
         if (rglPrio != null) {
@@ -568,7 +596,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         }
     }
 
-    boolean updateModel(IRModel irModel) {
+    boolean updateModel(final IRModel irModel) {
         final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
 
         // Update if model_values != swing_values and detect change if one or more values change
@@ -619,6 +647,12 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             }
         }
 
+        // regulation Weight:
+        if (inputParam.isAutoWgt() != jCheckBoxAutoWgt.isSelected()) {
+            inputParam.setAutoWgt(jCheckBoxAutoWgt.isSelected());
+            changed = true;
+        }
+
         mDouble = inputParam.getRglWgt();
         if (jFormattedTextFieldRglWgt.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldRglWgt.getValue()).doubleValue();
@@ -627,25 +661,25 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 changed = true;
             }
         }
-        /*
-        mDouble = inputParam.getRglAlph();
-        if (jFormattedTextFieldRglAlph.getValue() != null) {
-            wDouble = ((Number) jFormattedTextFieldRglAlph.getValue()).doubleValue();
+
+        mDouble = inputParam.getFlux();
+        if (jFormattedTextFieldFlux.getValue() != null) {
+            wDouble = ((Number) jFormattedTextFieldFlux.getValue()).doubleValue();
             if (mDouble != wDouble) {
-                inputParam.setRglAlph(wDouble);
+                inputParam.setFlux(wDouble);
                 changed = true;
             }
         }
 
-        mDouble = inputParam.getRglBeta();
-        if (jFormattedTextFieldRglBeta.getValue() != null) {
-            wDouble = ((Number) jFormattedTextFieldRglBeta.getValue()).doubleValue();
+        mDouble = inputParam.getFluxErr();
+        if (jFormattedTextFieldFluxErr.getValue() != null) {
+            wDouble = ((Number) jFormattedTextFieldFluxErr.getValue()).doubleValue();
             if (mDouble != wDouble) {
-                inputParam.setRglBeta(wDouble);
+                inputParam.setFluxErr(wDouble);
                 changed = true;
             }
         }
-         */
+
         mString = inputParam.getRglPrio();
         if (jComboBoxRglPrio.getSelectedItem() != null) {
             wString = (String) jComboBoxRglPrio.getSelectedItem();

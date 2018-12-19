@@ -43,94 +43,6 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabelInitImg">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="INIT_IMG"/>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="1" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelMaxIter">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="MAXITER"/>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="getTooltip(ImageOiConstants.KEYWORD_MAXITER)" type="code"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="3" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelRglName">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="RGL_NAME"/>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="getTooltip(ImageOiConstants.KEYWORD_RGL_NAME)" type="code"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="4" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelRglWgt">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="RGL_WGT"/>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="getTooltip(ImageOiConstants.KEYWORD_RGL_WGT)" type="code"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="5" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelRglAlph">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="RGL_ALPH"/>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;&quot;/*getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH)*/" type="code"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="6" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelRglBeta">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="RGL_BETA"/>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;&quot;/*getTooltip(ImageOiConstants.KEYWORD_RGL_BETA)*/" type="code"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="7" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelRglPrio">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="RGL_PRIO"/>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO)" type="code"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="8" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
         <Component class="javax.swing.JComboBox" name="jComboBoxSoftware">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -143,6 +55,16 @@
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
               <GridBagConstraints gridX="1" gridY="0" gridWidth="6" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelInitImg">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="INIT_IMG"/>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="1" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -164,6 +86,19 @@
             </Constraint>
           </Constraints>
         </Component>
+        <Component class="javax.swing.JLabel" name="jLabelMaxIter">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="MAXITER"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_MAXITER)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="3" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
         <Component class="javax.swing.JSpinner" name="jSpinnerMaxIter">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
@@ -179,6 +114,19 @@
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
               <GridBagConstraints gridX="2" gridY="3" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelRglName">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="RGL_NAME"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_RGL_NAME)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="4" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -202,6 +150,32 @@
             </Constraint>
           </Constraints>
         </Component>
+        <Component class="javax.swing.JLabel" name="jLabelAutoWgt">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="AUTO_WGT"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_AUTO_WGT)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="5" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelRglWgt">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="RGL_WGT"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_RGL_WGT)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="6" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
         <Component class="javax.swing.JFormattedTextField" name="jFormattedTextFieldRglWgt">
           <Properties>
             <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -212,50 +186,89 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFormattedTextFieldRglWgtjFormattedTextFieldActionPerformed"/>
-            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jFormattedTextFieldRglWgtjFormattedTextFieldPropertyChange"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFormattedTextFieldRglWgtActionPerformed"/>
+            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jFormattedTextFieldRglWgtPropertyChange"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="2" gridY="5" gridWidth="2" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.1" weightY="0.0"/>
+              <GridBagConstraints gridX="2" gridY="6" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.1" weightY="0.0"/>
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JFormattedTextField" name="jFormattedTextFieldRglAlph">
+        <Component class="javax.swing.JLabel" name="jLabelFlux">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="FLUX"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_FLUX)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="7" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JFormattedTextField" name="jFormattedTextFieldFlux">
           <Properties>
             <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="getDecimalFormatterFactory()" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;&quot;/*getTooltip(ImageOiConstants.KEYWORD_RGL_ALPH)*/" type="code"/>
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_FLUX)" type="code"/>
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFormattedTextFieldRglAlphjFormattedTextFieldActionPerformed"/>
-            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jFormattedTextFieldRglAlphjFormattedTextFieldPropertyChange"/>
-          </Events>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="2" gridY="6" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JFormattedTextField" name="jFormattedTextFieldRglBeta">
-          <Properties>
-            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="getDecimalFormatterFactory()" type="code"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;&quot;/*getTooltip(ImageOiConstants.KEYWORD_RGL_BETA)*/" type="code"/>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFormattedTextFieldRglBetajFormattedTextFieldActionPerformed"/>
-            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jFormattedTextFieldRglBetajFormattedTextFieldPropertyChange"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFormattedTextFieldFluxActionPerformed"/>
+            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jFormattedTextFieldFluxPropertyChange"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
               <GridBagConstraints gridX="2" gridY="7" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelFluxErr">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="FLUXERR"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_FLUXERR)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="8" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JFormattedTextField" name="jFormattedTextFieldFluxErr">
+          <Properties>
+            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getDecimalFormatterFactory()" type="code"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_FLUXERR)" type="code"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFormattedTextFieldFluxErrActionPerformed"/>
+            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jFormattedTextFieldFluxErrPropertyChange"/>
+          </Events>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="2" gridY="8" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelRglPrio">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="RGL_PRIO"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="1" gridY="9" gridWidth="1" gridHeight="1" fill="0" ipadX="5" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="22" weightX="0.0" weightY="0.0"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -271,7 +284,17 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="2" gridY="8" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.0" weightY="0.0"/>
+              <GridBagConstraints gridX="2" gridY="9" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="6" insetsBottom="2" insetsRight="6" anchor="10" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonLoadFitsImage">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="+"/>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="2" gridY="1" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -289,13 +312,18 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JButton" name="jButtonLoadFitsImage">
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxAutoWgt">
           <Properties>
-            <Property name="text" type="java.lang.String" value="+"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getTooltip(ImageOiConstants.KEYWORD_AUTO_WGT)" type="code"/>
+            </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBoxAutoWgtActionPerformed"/>
+          </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="2" gridY="1" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
+              <GridBagConstraints gridX="2" gridY="5" gridWidth="5" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
             </Constraint>
           </Constraints>
         </Component>

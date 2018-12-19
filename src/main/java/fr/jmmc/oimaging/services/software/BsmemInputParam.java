@@ -3,25 +3,38 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.services.software;
 
+import static fr.jmmc.oimaging.services.software.MiraInputParam.SUPPORTED_STD_KEYWORDS;
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Specific parameters for BSMEM
  */
 public final class BsmemInputParam extends SoftwareInputParam {
 
-    public final static String KEYWORD_AUTO_WGT = "AUTO_WGT";
-    public final static String KEYWORD_FLUXERR = "FLUXERR";
+    public static final Set<String> SUPPORTED_STD_KEYWORDS = new HashSet<String>(Arrays.asList(new String[]{
+        ImageOiConstants.KEYWORD_MAXITER,
+        ImageOiConstants.KEYWORD_RGL_NAME,
+        ImageOiConstants.KEYWORD_AUTO_WGT,
+        ImageOiConstants.KEYWORD_RGL_WGT,
+        ImageOiConstants.KEYWORD_FLUX,
+        ImageOiConstants.KEYWORD_FLUXERR
+    }));
+
+    public final static String KEYWORD_RGL_ALPH = "RGL_ALPH";
+    public final static String KEYWORD_RGL_BETA = "RGL_BETA";
 
     // Bsmem specific
-    private final static KeywordMeta AUTO_WGT = new KeywordMeta(KEYWORD_AUTO_WGT,
-            "Automatic regularization weight", Types.TYPE_LOGICAL);
-    private final static KeywordMeta FLUXERR = new KeywordMeta(KEYWORD_FLUXERR,
-            "Error on zero-baseline V^2 point", Types.TYPE_DBL); // like wisard
+    private final static KeywordMeta RGL_ALPH = new KeywordMeta(KEYWORD_RGL_ALPH,
+            "Parameter alpha of the regularization", Types.TYPE_DBL);
+    private final static KeywordMeta RGL_BETA = new KeywordMeta(KEYWORD_RGL_BETA,
+            "Parameter beta of the regularization", Types.TYPE_DBL); // like wisard
 
     // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
     public static final String[] RGL_NAME_BSMEM = new String[]{"mem_prior"};
@@ -34,27 +47,27 @@ public final class BsmemInputParam extends SoftwareInputParam {
     public void update(final ImageOiInputParam params) {
         super.update(params);
 
-        // define keywords:
-        params.addKeyword(AUTO_WGT);
-        params.addKeyword(FLUXERR);
-
-        // default values:
-        params.setKeywordDefaultLogical(KEYWORD_AUTO_WGT, true);
-        params.setKeywordDefaultDouble(KEYWORD_FLUXERR, 0.01); // 1% error on VIS2
-
-        if (params.getKeywordLogical(KEYWORD_AUTO_WGT)) {
+        if (params.isAutoWgt()) {
             params.removeKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
         }
+
+        // define keywords:
+        params.addKeyword(RGL_ALPH);
+        params.addKeyword(RGL_BETA);
+
+        // default values:
+        params.setKeywordDefaultDouble(KEYWORD_RGL_ALPH, 1.0);
+        params.setKeywordDefaultDouble(KEYWORD_RGL_BETA, 0.01); // 1% error on VIS2
     }
 
     @Override
     public void validate(final ImageOiInputParam params, final List<String> failures) {
         // custom validation rules:
-        final double fluxerr = params.getKeywordDouble(KEYWORD_FLUXERR);
+        final double fluxerr = params.getKeywordDouble(ImageOiConstants.KEYWORD_FLUXERR);
 
         if (fluxerr < 1e-5) {
             failures.add("FluxErr must be greater than 1e-5");
-        } else if (fluxerr > 1) {
+        } else if (fluxerr > 1.0) {
             failures.add("FluxErr must be smaller than 1.0");
         }
     }
@@ -66,7 +79,7 @@ public final class BsmemInputParam extends SoftwareInputParam {
 
     @Override
     public boolean supportsStandardKeyword(final String keywordName) {
-        return true;
+        return SUPPORTED_STD_KEYWORDS.contains(keywordName);
     }
 
     @Override
