@@ -660,6 +660,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     protected void updateModel(final boolean forceChange) {
         if (syncingUI) {
+            logger.debug("updateModel discarded: syncUI.");
             return;
         }
 
@@ -670,7 +671,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         final ImageOiInputParam params = irModel.getImageOiData().getInputParam();
 
         // specific params must be updated
-        irModel.initSpecificParams();
+        irModel.initSpecificParams(false);
 
         // Update if model_values != swing_values and detect change if one or more values change
         boolean changed = false;
@@ -831,7 +832,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             } else {
                 jListResultSet.setSelectedIndex(0);
             }
-
         } finally {
             syncingUI = false;
         }

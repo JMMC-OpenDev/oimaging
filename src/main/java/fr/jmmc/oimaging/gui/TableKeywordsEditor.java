@@ -3,6 +3,8 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui;
 
+import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.fits.FitsTable;
 import java.awt.GridBagConstraints;
@@ -12,8 +14,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.Set;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -77,7 +81,15 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
 
             switch (meta.getDataType()) {
                 case TYPE_CHAR:
-                    component = new JTextField((value == null) ? "" : value.toString());
+                    if (meta.getStringAcceptedValues() == null) {
+                        component = new JTextField((value == null) ? "" : value.toString());
+                    } else {
+                        JComboBox comboBox = new JComboBox(new GenericListModel(Arrays.asList(meta.getStringAcceptedValues()), true));
+                        if (value != null) {
+                            comboBox.setSelectedItem(value);
+                        }
+                        component = comboBox;
+                    }
                     break;
                 case TYPE_DBL:
                     component = createFormattedTextField(SoftwareSettingsPanel.getDecimalFormatterFactory(), value);
@@ -103,6 +115,8 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
 
                 if (component instanceof JTextField) {
                     ((JTextField) component).addActionListener(this);
+                } else if (component instanceof JComboBox) {
+                    ((JComboBox) component).addActionListener(this);
                 } else if (component instanceof JCheckBox) {
                     ((JCheckBox) component).addActionListener(this);
                 }
@@ -166,6 +180,8 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
                 value = ((JTextField) component).getText();
             } else if (component instanceof JCheckBox) {
                 value = Boolean.toString(((JCheckBox) component).isSelected());
+            } else if (component instanceof JComboBox) {
+                value = (String) ((JComboBox) component).getSelectedItem();
             }
             update(name, value);
         }

@@ -34,7 +34,7 @@ public class SoftwareInputParam {
         super();
     }
 
-    public void update(final ImageOiInputParam params) {
+    public void update(final ImageOiInputParam params, final boolean applyDefaults) {
         // reset initial keywords:
         params.resetDefaultKeywords();
 
@@ -49,6 +49,10 @@ public class SoftwareInputParam {
 
     public void validate(final ImageOiInputParam params, final List<String> failures) {
         // no-op
+    }
+
+    public String getDefaultCliOptions() {
+        return null;
     }
 
     public boolean supportsStandardKeyword(final String keywordName) {

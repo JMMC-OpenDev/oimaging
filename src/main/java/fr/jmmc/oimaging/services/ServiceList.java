@@ -64,6 +64,17 @@ public final class ServiceList {
         return getInstance().availableServices;
     }
 
+    public static Service getAvailableService(final String name) {
+        final ComboBoxModel model = getInstance().availableServices;
+        for (int i = 0, len =  model.getSize(); i < len; i++) {
+            final Service service = (Service)model.getElementAt(i);
+            if (service.getName().equalsIgnoreCase(name)) {
+                return service;
+            }
+        }
+        return null;
+    }
+
     public static Service getPreferedService() {
         return getInstance().preferedService;
     }

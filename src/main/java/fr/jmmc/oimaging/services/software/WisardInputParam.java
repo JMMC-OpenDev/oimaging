@@ -57,8 +57,8 @@ public final class WisardInputParam extends SoftwareInputParam {
     }
 
     @Override
-    public void update(final ImageOiInputParam params) {
-        super.update(params);
+    public void update(final ImageOiInputParam params, final boolean applyDefaults) {
+        super.update(params, applyDefaults);
 
         // define keywords:
         params.addKeyword(FOV);

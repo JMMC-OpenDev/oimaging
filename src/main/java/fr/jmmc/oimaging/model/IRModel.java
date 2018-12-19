@@ -136,7 +136,7 @@ public class IRModel {
             // Note: setSelectedService() calls initSpecificParams():
             setSelectedService(ServiceList.getPreferedService());
         } else {
-            initSpecificParams();
+            initSpecificParams(false);
         }
     }
 
@@ -359,12 +359,12 @@ public class IRModel {
 
     public void setSelectedService(final Service selectedService) {
         this.selectedService = selectedService;
-        initSpecificParams();
+        initSpecificParams(false);
     }
 
-    public void initSpecificParams() {
+    public void initSpecificParams(final boolean applyDefaults) {
         // Get the specific params of given software if any
-        selectedService.initSpecificParams(getImageOiData().getInputParam());
+        selectedService.initSpecificParams(getImageOiData().getInputParam(), applyDefaults);
     }
 
     public String toString() {

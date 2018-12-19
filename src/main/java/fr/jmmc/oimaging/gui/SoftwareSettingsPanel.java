@@ -37,6 +37,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     /** associated mainPanel */
     private MainPanel mainPanel;
 
+    /** Flag set to true while the GUI is being updated by model else false. */
+    private boolean syncingUI = false;
+
     /** Creates new form AlgorithmSettinsPanel */
     public SoftwareSettingsPanel() {
         initComponents();
@@ -50,7 +53,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         registerActions();
         jComboBoxImage.setRenderer(new OiCellRenderer());
         jTableKeywordsEditor.setNotifiedParent(this);
-        
+
         this.jTextAreaOptions.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(final DocumentEvent e) {
@@ -443,7 +446,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButtonRemoveFitsImageActionPerformed
 
     private void jCheckBoxAutoWgtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxAutoWgtActionPerformed
-       updateModel();
+        updateModel();
     }//GEN-LAST:event_jCheckBoxAutoWgtActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -494,95 +497,102 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     void syncUI(final MainPanel panel, final IRModel irModel, final List<String> failures) {
         mainPanel = panel;
+        syncingUI = true;
+        try {
+            final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
+            final Service service = irModel.getSelectedService();
 
-        final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
-        final Service service = irModel.getSelectedService();
-        boolean show;
+            System.out.println("syncUI: " + service);
 
-        if (inputParam.getSpecificKeywords().isEmpty()) {
-            jTableKeywordsEditor.setModel(null);
-            jTableKeywordsEditor.setVisible(false);
-        } else {
-            jTableKeywordsEditor.setModel(inputParam, inputParam.getSpecificKeywords());
-            jTableKeywordsEditor.setVisible(true);
-        }
+            boolean show;
 
-        // Initial Image (combo):
-        final boolean ignoreMissingInitImg = service.supportsMissingKeyword(ImageOiConstants.KEYWORD_INIT_IMG);
+            if (inputParam.getSpecificKeywords().isEmpty()) {
+                jTableKeywordsEditor.setModel(null);
+                jTableKeywordsEditor.setVisible(false);
+            } else {
+                jTableKeywordsEditor.setModel(inputParam, inputParam.getSpecificKeywords());
+                jTableKeywordsEditor.setVisible(true);
+            }
 
-        jComboBoxImage.removeAllItems();
-        if (ignoreMissingInitImg) {
-            jComboBoxImage.addItem("[No Image]");
-        }
-        for (FitsImageHDU fitsImageHDU : irModel.getFitsImageHDUs()) {
-            jComboBoxImage.addItem(fitsImageHDU);
-        }
+            // Initial Image (combo):
+            final boolean ignoreMissingInitImg = service.supportsMissingKeyword(ImageOiConstants.KEYWORD_INIT_IMG);
 
-        final FitsImageHDU selectedFitsImageHDU = irModel.getSelectedInputImageHDU();
-        if (selectedFitsImageHDU != null) {
-            jComboBoxImage.getModel().setSelectedItem(selectedFitsImageHDU);
-        } else if (!ignoreMissingInitImg) {
-            failures.add(irModel.getSelectedInputFitsImageError());
-        }
+            jComboBoxImage.removeAllItems();
+            if (ignoreMissingInitImg) {
+                jComboBoxImage.addItem("[No Image]");
+            }
+            for (FitsImageHDU fitsImageHDU : irModel.getFitsImageHDUs()) {
+                jComboBoxImage.addItem(fitsImageHDU);
+            }
 
-        // Max iter:
-        jSpinnerMaxIter.setValue(inputParam.getMaxiter());
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_MAXITER);
-        jLabelMaxIter.setVisible(show);
-        jSpinnerMaxIter.setVisible(show);
+            final FitsImageHDU selectedFitsImageHDU = irModel.getSelectedInputImageHDU();
+            if (selectedFitsImageHDU != null) {
+                jComboBoxImage.getModel().setSelectedItem(selectedFitsImageHDU);
+            } else if (!ignoreMissingInitImg) {
+                failures.add(irModel.getSelectedInputFitsImageError());
+            }
 
-        // regulation Name:
-        // update content of jCombobox
-        updateJComboBoxRglName(inputParam, service);
+            // Max iter:
+            jSpinnerMaxIter.setValue(inputParam.getMaxiter());
+            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_MAXITER);
+            jLabelMaxIter.setVisible(show);
+            jSpinnerMaxIter.setVisible(show);
 
-        // regulation Weight:
-        jCheckBoxAutoWgt.setSelected(inputParam.isAutoWgt());
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_AUTO_WGT);
-        jLabelAutoWgt.setVisible(show);
-        jCheckBoxAutoWgt.setVisible(show);
-        
-        jFormattedTextFieldRglWgt.setValue(inputParam.getRglWgt());
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
-        jLabelRglWgt.setVisible(show);
-        jFormattedTextFieldRglWgt.setVisible(show);
-        // change visibility / enabled if RglWgt keyword exists (bsmem auto)
-        final boolean enabled = inputParam.hasKeywordMeta(ImageOiConstants.KEYWORD_RGL_WGT);
-        jLabelRglWgt.setEnabled(enabled);
-        jFormattedTextFieldRglWgt.setEnabled(enabled);
+            // regulation Name:
+            // update content of jCombobox
+            updateJComboBoxRglName(inputParam, service);
 
-        // flux:
-        jFormattedTextFieldFlux.setValue(inputParam.getFlux());
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUX);
-        jLabelFlux.setVisible(show);
-        jFormattedTextFieldFlux.setVisible(show);
+            // regulation Weight:
+            jCheckBoxAutoWgt.setSelected(inputParam.isAutoWgt());
+            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_AUTO_WGT);
+            jLabelAutoWgt.setVisible(show);
+            jCheckBoxAutoWgt.setVisible(show);
 
-        // flux Err:
-        jFormattedTextFieldFluxErr.setValue(inputParam.getFluxErr());
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUXERR);
-        jLabelFluxErr.setVisible(show);
-        jFormattedTextFieldFluxErr.setVisible(show);
+            jFormattedTextFieldRglWgt.setValue(inputParam.getRglWgt());
+            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
+            jLabelRglWgt.setVisible(show);
+            jFormattedTextFieldRglWgt.setVisible(show);
+            // change visibility / enabled if RglWgt keyword exists (bsmem auto)
+            final boolean enabled = inputParam.hasKeywordMeta(ImageOiConstants.KEYWORD_RGL_WGT);
+            jLabelRglWgt.setEnabled(enabled);
+            jFormattedTextFieldRglWgt.setEnabled(enabled);
 
-        // regulation Prior:
-        final String rglPrio = inputParam.getRglPrio();
-        if (rglPrio != null) {
-            jComboBoxRglPrio.setSelectedItem(rglPrio);
-        }
-        show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_PRIO);
-        jLabelRglPrio.setVisible(show);
-        jComboBoxRglPrio.setVisible(show);
+            // flux:
+            jFormattedTextFieldFlux.setValue(inputParam.getFlux());
+            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUX);
+            jLabelFlux.setVisible(show);
+            jFormattedTextFieldFlux.setVisible(show);
 
-        // validate
-        service.validate(inputParam, failures);
+            // flux Err:
+            jFormattedTextFieldFluxErr.setValue(inputParam.getFluxErr());
+            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUXERR);
+            jLabelFluxErr.setVisible(show);
+            jFormattedTextFieldFluxErr.setVisible(show);
 
-        // identity check on singletons:
-        if (service != jComboBoxSoftware.getSelectedItem()) {
-            jComboBoxSoftware.setSelectedItem(service);
-        }
+            // regulation Prior:
+            final String rglPrio = inputParam.getRglPrio();
+            if (rglPrio != null) {
+                jComboBoxRglPrio.setSelectedItem(rglPrio);
+            }
+            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_PRIO);
+            jLabelRglPrio.setVisible(show);
+            jComboBoxRglPrio.setVisible(show);
 
-        // CLI Options:
-        final String cliOptions = irModel.getCliOptions();
-        if (!jTextAreaOptions.getText().equals(cliOptions)) {
-            jTextAreaOptions.setText(cliOptions == null ? "" : cliOptions);
+            // validate
+            service.validate(inputParam, failures);
+
+            // identity check on singletons:
+            if (service != jComboBoxSoftware.getSelectedItem()) {
+                jComboBoxSoftware.setSelectedItem(service);
+            }
+
+            // CLI Options:
+            final String cliOptions = irModel.getCliOptions();
+            if (!jTextAreaOptions.getText().equals(cliOptions)) {
+                jTextAreaOptions.setText(cliOptions == null ? "" : cliOptions);
+            }
+        } finally {
+            syncingUI = false;
         }
     }
 
@@ -591,6 +601,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }
 
     protected void updateModel(final boolean forceChange) {
+        if (syncingUI) {
+            logger.debug("updateModel discarded: syncUI.");
+            return;
+        }
         if (mainPanel != null) {
             mainPanel.updateModel(forceChange);
         }
@@ -600,6 +614,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
 
         // Update if model_values != swing_values and detect change if one or more values change
+        boolean changedService = false;
         boolean changed = false;
         double mDouble, wDouble;
         String mString, wString;
@@ -609,6 +624,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         final Service guiService = (Service) jComboBoxSoftware.getSelectedItem();
         final Service modelSoftware = irModel.getSelectedService();
         if (guiService != null && !guiService.equals(modelSoftware)) {
+            changedService = !modelSoftware.isCompatibleParams(guiService);
             irModel.setSelectedService(guiService);
             changed = true;
         }
@@ -642,14 +658,15 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             wString = (String) jComboBoxRglName.getSelectedItem();
             if (!wString.equals(mString)) {
                 inputParam.setRglName(wString);
-                irModel.initSpecificParams(); // update call required to apply on fly specific param handling
+                irModel.initSpecificParams(false); // update call required to apply on fly specific param handling
                 changed = true;
             }
         }
 
         // regulation Weight:
-        if (inputParam.isAutoWgt() != jCheckBoxAutoWgt.isSelected()) {
+        if (jCheckBoxAutoWgt.isSelected() != inputParam.isAutoWgt()) {
             inputParam.setAutoWgt(jCheckBoxAutoWgt.isSelected());
+            irModel.initSpecificParams(false); // update call required to apply on fly specific param handling
             changed = true;
         }
 
@@ -695,6 +712,15 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         if (!wString.equals(mString)) {
             irModel.setCliOptions(wString);
             changed = true;
+        }
+
+        if (changedService) {
+            logger.info("changedService: {}", guiService);
+
+            irModel.initSpecificParams(true); // update call required to reset params to software defaults
+
+            // reset cli options:
+            irModel.setCliOptions(guiService.getDefaultCliOptions());
         }
 
         return changed;

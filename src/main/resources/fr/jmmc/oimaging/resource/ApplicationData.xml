@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5 beta 17"/>
+    <program name="OImaging" version="0.5 beta 18"/>
     <compilation date="19/12/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -155,7 +155,10 @@
 
     <releasenotes>
         <release version="0.5">
-            <pubDate>Wed, 17 Dec 2018 11:00:00 GMT</pubDate>
+            <pubDate>Wed, 19 Dec 2018 17:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 18">
+                <change type="FEATURE">Improved GUI for MiRA parameters (combo box, defaults values)</change>
+            </prerelease>
             <prerelease version="0.5 beta 17">
                 <change type="FEATURE">Improved handling of input parameters for MiRA in GUI</change>
                 <change type="FEATURE">Updated MiRA software on the server side (fully functional): Merry Christmas 2018 !</change>

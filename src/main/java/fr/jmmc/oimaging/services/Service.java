@@ -38,6 +38,10 @@ public final class Service {
         this.softwareInputParam = softwareInputParam;
     }
 
+    public boolean isCompatibleParams(final Service otherService) {
+        return this.softwareInputParam == otherService.getSoftwareInputParam();
+    }
+
     public String getName() {
         return name;
     }
@@ -58,6 +62,10 @@ public final class Service {
         return contact;
     }
 
+    protected SoftwareInputParam getSoftwareInputParam() {
+        return softwareInputParam;
+    }
+
     public String toString() {
         return name;
     }
@@ -66,12 +74,16 @@ public final class Service {
         return softwareInputParam.getSupported_RGL_NAME();
     }
 
-    public void initSpecificParams(final ImageOiInputParam params) {
-        softwareInputParam.update(params);
+    public void initSpecificParams(final ImageOiInputParam params, final boolean applyDefaults) {
+        softwareInputParam.update(params, applyDefaults);
     }
 
     public void validate(final ImageOiInputParam params, final List<String> failures) {
         softwareInputParam.validate(params, failures);
+    }
+
+    public String getDefaultCliOptions() {
+        return softwareInputParam.getDefaultCliOptions();
     }
 
     public boolean supportsStandardKeyword(final String keywordName) {
