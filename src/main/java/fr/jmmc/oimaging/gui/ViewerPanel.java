@@ -137,7 +137,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             FitsImage image = imageHDU.getFitsImages().get(0);
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
-            logger.info("Display image HDU '{}'", imageHDU.getHduName());
+            logger.debug("Display image HDU '{}'", imageHDU.getHduName());
         } else {
             // reset anyway
             fitsImagePanel.setFitsImage(null);
