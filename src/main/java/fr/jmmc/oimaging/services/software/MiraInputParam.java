@@ -3,6 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.services.software;
 
+import fr.jmmc.oitools.image.FitsUnit;
 import java.util.List;
 
 import fr.jmmc.oitools.image.ImageOiConstants;
@@ -64,10 +65,8 @@ public final class MiraInputParam extends SoftwareInputParam {
 
     public static final String KEYWORD_SMEAR_FN = "SMEAR_FN";
     public static final String KEYWORD_SMEAR_FC = "SMEAR_FC";
-//    public static final String KEYWORD_XFORM = "XFORM";
 
     public static final String[] KEYWORD_SMEAR_FN_LIST = new String[]{"none", "sinc", "gauss"};
-    public static final String[] KEYWORD_XFORM_LIST = new String[]{"nfft", "separable", "nonseparable"};
 
     // optional
     public static final String KEYWORD_RGL_TAU = "RGL_TAU"; // - tau
@@ -78,17 +77,13 @@ public final class MiraInputParam extends SoftwareInputParam {
             "Scalar factor for hyperbolic L1-L2 regularization, used to set the threshold "
             + "between quadratic (l2) and linear (L1) regularizations", Types.TYPE_DBL);
     private static final KeywordMeta RGL_GAMM = new KeywordMeta(KEYWORD_RGL_GAMM,
-            "A priori full half width at half maximum for compactness", Types.TYPE_DBL);
+            "A priori full half width at half maximum for compactness (rad)", Types.TYPE_DBL);
 
     private static final KeywordMeta SMEAR_FN = new KeywordMeta(KEYWORD_SMEAR_FN,
             "Bandwidth smearing function", Types.TYPE_CHAR, KEYWORD_SMEAR_FN_LIST);
     private static final KeywordMeta SMEAR_FC = new KeywordMeta(KEYWORD_SMEAR_FC,
             "Bandwidth smearing factor", Types.TYPE_DBL);
-    /*
-    private static final KeywordMeta XFORM = new KeywordMeta(KEYWORD_XFORM,
-            "the name of the model to use for computing the nonuniform Fourier transform",
-            Types.TYPE_CHAR, KEYWORD_XFORM_LIST);
-     */
+
     // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
     public static final String[] RGL_NAME_MIRA = new String[]{"compactness", "hyperbolic"};
 
@@ -104,15 +99,16 @@ public final class MiraInputParam extends SoftwareInputParam {
         // for our first implementation, just add to params if not TOTVAR
         if (params.getRglName().startsWith("compactness")) {
             params.addKeyword(RGL_GAMM);
-            params.setKeywordDefaultDouble(KEYWORD_RGL_GAMM, 6.0); // unit is mas (conversion ?)
+            params.setKeywordDefaultDouble(KEYWORD_RGL_GAMM,
+                    // seems MiRA is doing weird conversions (deg ?)
+                    FitsUnit.ANGLE_MILLI_ARCSEC.convert(20.0 * (180.0 / Math.PI), FitsUnit.ANGLE_RAD));
         } else if (params.getRglName().startsWith("hyperbolic")) {
             params.addKeyword(RGL_TAU);
-            params.setKeywordDefaultDouble(KEYWORD_RGL_TAU, 1.0);
+            params.setKeywordDefaultDouble(KEYWORD_RGL_TAU, 1E-2);
         }
 
         params.addKeyword(SMEAR_FN);
         params.addKeyword(SMEAR_FC);
-//        params.addKeyword(XFORM);
 
         // default values:
         if (applyDefaults) {
@@ -121,7 +117,6 @@ public final class MiraInputParam extends SoftwareInputParam {
         }
         params.setKeywordDefaultDouble(KEYWORD_SMEAR_FC, 1.0);
         params.setKeywordDefault(KEYWORD_SMEAR_FN, KEYWORD_SMEAR_FN_LIST[0]); // none
-//        params.setKeywordDefault(KEYWORD_XFORM, KEYWORD_XFORM_LIST[0]); // nfft
     }
 
     @Override
