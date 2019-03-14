@@ -6,7 +6,7 @@
         <homepage href="http://www.jmmc.fr/oimaging"/>
         <description>User-Friendly imaging algorithms for interferometry</description>
         <description kind="tooltip">Image reconstruction algorithms</description>
-        <icon href="@GENERATED@/OImaging-noel.jpg"/>
+        <icon href="@GENERATED@/OImaging.jpg"/>
         <offline-allowed/>
         <shortcut online="true" install="true">
             <desktop/>
