@@ -416,7 +416,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.weighty = 1.0;
