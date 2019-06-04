@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+
+<project name="oiexplorer-core" default="about" basedir=".">
+
+    <description>
+        Ant build file, mainly dedicated to generate code from xsd using jaxb.
+    </description>
+
+
+    <!--
+        Get build properties (general).
+        Should only contain the location of the JMCS module where JAXB libraries can be found.
+    -->
+    <property file="build.properties" />
+
+    <!-- NOTE: jmcs is supposed to be in the parent folder -->
+    <include file="${jmcs.path}/tools/build-include.xml"/>
+
+
+    <!-- define folder properties -->
+    <property name="root" location=".."/>
+
+    <!-- Maven folders -->
+    <property name="resources" location="${root}/src/main/resources"/>
+    <property name="sources"   location="${root}/src/main/java"/>
+
+
+
+
+    <!-- targets -->
+
+    <!-- target about : -->
+    <target name="about" description="show information for public targets">
+        <echo>available ant targets : </echo>
+        <echo>-------------------------------------------------------------------------------</echo>
+        <echo>  - genXsdCode         : generates the java code from xml schema (xsd)</echo>
+        <echo>-------------------------------------------------------------------------------</echo>
+    </target>
+
+
+
+
+    <target name="genXsdCode" description="generate java classes from XSD schemas">
+
+        <echo>generating java code for OIExplorerModel.xsd</echo>
+
+        <mkdir dir="${sources}/fr/jmmc/oiexplorer/core/model/oi" />
+        <mkdir dir="${sources}/fr/jmmc/oiexplorer/core/model/plot" />
+
+        <xjc destdir="${sources}"
+             schema="${resources}/fr/jmmc/oiexplorer/core/model/OIExplorerModel.xsd" />
+
+        <!--
+        remove several @XmlSchemaType in JAXB 2.2+:
+        - @XmlSchemaType(name = "string") by '' (bad enum)
+        -->
+        <replace summary="true" dir="${sources}/fr/jmmc/oiexplorer/core/model/plot/" includes="*.java" value="">
+            <replacetoken>@XmlSchemaType(name = "string")</replacetoken>
+        </replace>
+    </target>
+
+</project>
