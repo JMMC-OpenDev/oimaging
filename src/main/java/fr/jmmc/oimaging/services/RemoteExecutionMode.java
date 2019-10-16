@@ -186,6 +186,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         // Assume that first state is executing
         ExecutionPhase phase = ExecutionPhase.EXECUTING;
 
+        boolean cancelled = false;
         try {
             // loop and query return status
             while (phase == ExecutionPhase.EXECUTING) {
@@ -199,6 +200,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                     client.setAbortJob(jobId);
                     _logger.debug("Job[{}] aborted.", jobId);
 
+                    cancelled = true;
                     phase = ExecutionPhase.ABORTED;
                     break;
                 }
@@ -212,11 +214,12 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
             if (phase == ExecutionPhase.COMPLETED) {
                 prepareResult(client, jobId, result);
-            } else if (phase != ExecutionPhase.ABORTED) {
+            } else if (!cancelled || (phase != ExecutionPhase.ABORTED)) {
                 JobSummary jobInfo = client.getJobInfo(jobId);
                 _logger.error("Error in execution for job '{}': {} ", jobId, jobInfo.getErrorSummary());
 
-                result.setErrorMessage("Execution error: " + jobInfo.getErrorSummary());
+                result.setErrorMessage("Execution error: "
+                        + ((jobInfo.getErrorSummary() != null) ? jobInfo.getErrorSummary() : phase));
             }
         } finally {
             try {

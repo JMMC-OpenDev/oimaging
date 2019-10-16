@@ -55,7 +55,7 @@ public class RunAction extends RegisteredAction {
         if (irModel.isRunning()) {
             // cancel job
             TaskSwingWorkerExecutor.cancelTask(TASK_RUN_IR);
-            setRunningState(irModel, false);
+            StatusBar.show("Process cancelled.");
         } else {
             try {
                 StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
@@ -94,13 +94,19 @@ public class RunAction extends RegisteredAction {
             final Service service = irModel.getSelectedService();
             ServiceResult result = null;
             try {
+                boolean valid = false;
+
                 result = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
                 result.setService(service);
-                // Result is valid only if the OIFITS file was downloaded successfully:
-                final boolean exist = result.getOifitsResultFile().exists();
-                result.setValid(exist);
-                if (!exist) {
-                    result.setErrorMessage("No OIFits ouput (probably a server error occured) !");
+
+                if (result.getErrorMessage() == null) {
+                    // Result is valid only if the OIFITS file was downloaded successfully:
+                    valid = result.getOifitsResultFile().exists();
+                    result.setValid(valid);
+
+                    if (!valid) {
+                        result.setErrorMessage("No OIFits ouput (probably a server error occured) !");
+                    }
                 }
                 return result;
             } catch (IllegalStateException ise) {
@@ -118,7 +124,11 @@ public class RunAction extends RegisteredAction {
             // action finished, we can change state and update model just after.
             parentAction.setRunningState(irModel, false);
 
-            this.irModel.addServiceResult(serviceResult);
+            if (serviceResult.isValid()) {
+                this.irModel.addServiceResult(serviceResult);
+            } else {
+                StatusBar.show("Error occured during process : " + serviceResult.getErrorMessage());
+            }
         }
 
         /**
