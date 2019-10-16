@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.6 beta 1"/>
-    <compilation date="20/03/2019" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.6 beta 2"/>
+    <compilation date="16/10/2019" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -155,7 +155,10 @@
 
     <releasenotes>
         <release version="0.6">
-            <pubDate>Wed, 20 Mar 2019 14:00:00 GMT</pubDate>
+            <pubDate>Wed, 16 Oct 2019 12:00:00 GMT</pubDate>
+            <prerelease version="0.6 beta 2">
+                <change type="BUGFIX">Added support for server-side job interruption (timeout is 2 hours)</change>
+            </prerelease>
             <prerelease version="0.6 beta 1">
                 <change type="BUGFIX">Fixed panel area for the image viewer</change>
             </prerelease>

@@ -124,7 +124,7 @@ public class RunAction extends RegisteredAction {
             // action finished, we can change state and update model just after.
             parentAction.setRunningState(irModel, false);
 
-            if (serviceResult.isValid()) {
+            if (!serviceResult.isCancelled()) {
                 this.irModel.addServiceResult(serviceResult);
             } else {
                 StatusBar.show("Error occured during process : " + serviceResult.getErrorMessage());

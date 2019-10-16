@@ -22,7 +22,7 @@ public final class ServiceResult {
     private final File oifitsResultFile;
     private final File executionLogResultFile;
     // TODO int errorCode;
-
+    private boolean cancelled = false;
     private boolean valid = false;
     private String errorMessage = null;
     private Date startTime;
@@ -81,6 +81,14 @@ public final class ServiceResult {
             }
         }
         return executionLog;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     public boolean isValid() {

@@ -7,7 +7,7 @@ import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.runner.LocalLauncher;
 import fr.jmmc.jmcs.util.runner.RootContext;
-import fr.jmmc.jmcs.util.runner.RunState;
+import fr.jmmc.jmcs.util.runner.RunContext;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
@@ -41,12 +41,11 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
      * @param software software to run
      * @param cliOptions software options on command line or null
      * @param inputFilename input filename
-     * @param outputFilename result filename
-     * @param logFilename execution log filename
+     * @param result the service result pointing result file to write data into.
      * @return the job context identifier
      * @throws IllegalStateException if the job can not be submitted to the job queue
      */
-    public static int exec(final String software, final String cliOptions, final String inputFilename, final String outputFilename, final String logFilename) throws IllegalStateException {
+    public static void exec(final String software, final String cliOptions, final String inputFilename, final ServiceResult result) throws IllegalStateException {
 
         if (StringUtils.isEmpty(software)) {
             throw new IllegalArgumentException("empty application name !");
@@ -54,12 +53,15 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
         if (StringUtils.isEmpty(inputFilename)) {
             throw new IllegalArgumentException("empty input filename !");
         }
-        if (StringUtils.isEmpty(outputFilename)) {
+        if (StringUtils.isEmpty(result.getOifitsResultFile().getAbsolutePath())) {
             throw new IllegalArgumentException("empty output filename !");
         }
-        if (StringUtils.isEmpty(logFilename)) {
+        if (StringUtils.isEmpty(result.getExecutionLogResultFile().getAbsolutePath())) {
             throw new IllegalArgumentException("empty log filename !");
         }
+
+        final String outputFilename = result.getOifitsResultFile().getAbsolutePath();
+        final String logFilename = result.getExecutionLogResultFile().getAbsolutePath();
 
         logger.info("exec: software={} cliOptions={} inputFilenane={} outputFilenane={} logFilename={}", software, cliOptions, inputFilename, outputFilename, logFilename);
 
@@ -104,16 +106,21 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
             logger.info("exec: execution error", ee);
         }
 
-        // TODO: retrieve command execution status code
-        return jobContext.getState() == RunState.STATE_FINISHED_OK ? 0 : 1;
+        // retrieve command execution status code
+        switch (jobContext.getState()) {
+            case STATE_CANCELED:
+            case STATE_INTERRUPTED:
+            case STATE_KILLED:
+                result.setCancelled(true);
+                break;
+            default:
+        }
     }
 
     @Override
     public ServiceResult reconstructsImage(final String software, final String cliOptions, final File inputFile) {
-        ServiceResult result = new ServiceResult(inputFile);
-        LocalExecutionMode.exec(software, cliOptions, inputFile.getAbsolutePath(),
-                result.getOifitsResultFile().getAbsolutePath(),
-                result.getExecutionLogResultFile().getAbsolutePath());
+        final ServiceResult result = new ServiceResult(inputFile);
+        LocalExecutionMode.exec(software, cliOptions, inputFile.getAbsolutePath(), result);
         return result;
     }
 

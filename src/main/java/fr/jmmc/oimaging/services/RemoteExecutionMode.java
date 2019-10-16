@@ -221,6 +221,9 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                 result.setErrorMessage("Execution error: "
                         + ((jobInfo.getErrorSummary() != null) ? jobInfo.getErrorSummary() : phase));
             }
+            if (cancelled || (phase == ExecutionPhase.ABORTED)) {
+                result.setCancelled(true);
+            }
         } finally {
             try {
                 client.deleteJobInfo(jobId);
