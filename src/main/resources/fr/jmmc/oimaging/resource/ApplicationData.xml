@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.6 beta 2"/>
+    <program name="OImaging" version="0.5.1 beta 2"/>
     <compilation date="17/10/2019" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -154,18 +154,18 @@
     </menubar>
 
     <releasenotes>
-        <release version="0.6">
+        <release version="0.5.1">
             <pubDate>Thu, 17 Oct 2019 10:00:00 GMT</pubDate>
-            <prerelease version="0.6 beta 2">
+            <prerelease version="0.5.1 beta 2">
                 <change type="BUGFIX">Added support for server-side job interruption (timeout is 2 hours)</change>
             </prerelease>
-            <prerelease version="0.6 beta 1">
+            <prerelease version="0.5.1 beta 1">
                 <change type="BUGFIX">Fixed panel area for the image viewer</change>
             </prerelease>
         </release>
         <release version="0.5">
             <pubDate>Thu, 20 Dec 2018 21:00:00 GMT</pubDate>
-            <prerelease version="0.5 beta 18">
+            <prerelease version="0.5 beta 19">
                 <change type="FEATURE">Fixed MiRA default values for regularization parameters Gamma (20mas) / tau (1e-2)</change>
             </prerelease>
             <prerelease version="0.5 beta 18">
