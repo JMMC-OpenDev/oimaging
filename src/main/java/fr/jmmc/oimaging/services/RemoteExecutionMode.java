@@ -39,15 +39,14 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     public static final String SERVICE_PATH = "oimaging/oimaging";
 
-    public static final String[] SERVER_URLS = (USE_LOCAL)
-            ? new String[]{"http://127.0.0.1:8080/OImaging-uws/"}
-            : (USE_BETA)
-                    ? new String[]{"http://oimaging.jmmc.fr/OImaging-uws/"
-        //"http://preprod-oimaging.jmmc.fr/OImaging-uws/"
-            }
-            : new String[]{"http://oimaging-beta.jmmc.fr/OImaging-uws/"
+    public static final String[] SERVER_URLS = ((USE_LOCAL) ? new String[]{"http://127.0.0.1:8080/OImaging-uws/"}
+            : ((USE_BETA)
+                    ? (new String[]{"http://oimaging-beta.jmmc.fr/OImaging-uws/"
         //"http://preprod-oimaging-beta.jmmc.fr/OImaging-uws/"
-            };
+            })
+                    : (new String[]{"http://oimaging.jmmc.fr/OImaging-uws/"
+        //"http://preprod-oimaging.jmmc.fr/OImaging-uws/"
+            })));
 
     private static final ClientFactory FACTORY = new ClientFactory();
 
