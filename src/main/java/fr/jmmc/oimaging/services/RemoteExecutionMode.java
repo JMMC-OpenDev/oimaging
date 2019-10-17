@@ -5,6 +5,7 @@ package fr.jmmc.oimaging.services;
 
 import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWS;
 import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWSException;
+import fr.jmmc.jmcs.data.app.ApplicationDescription;
 import fr.jmmc.jmcs.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import net.ivoa.xml.uws.v1.JobSummary;
 import net.ivoa.xml.uws.v1.ResultReference;
 import net.ivoa.xml.uws.v1.Results;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.FileRepresentation;
@@ -32,7 +34,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     private static final boolean USE_LOCAL = Boolean.getBoolean("RemoteExecutionMode.local");
 
     // Use -DRemoteExecution.beta=true (dev) to use remote beta uws server (docker)
-    private static final boolean USE_BETA = Boolean.getBoolean("RemoteExecution.beta");
+    private static final boolean USE_BETA = Boolean.getBoolean("RemoteExecution.beta") || ApplicationDescription.isBetaVersion();
 
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
@@ -40,13 +42,8 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     public static final String SERVICE_PATH = "oimaging/oimaging";
 
     public static final String[] SERVER_URLS = ((USE_LOCAL) ? new String[]{"http://127.0.0.1:8080/OImaging-uws/"}
-            : ((USE_BETA)
-                    ? (new String[]{"http://oimaging-beta.jmmc.fr/OImaging-uws/"
-        //"http://preprod-oimaging-beta.jmmc.fr/OImaging-uws/"
-            })
-                    : (new String[]{"http://oimaging.jmmc.fr/OImaging-uws/"
-        //"http://preprod-oimaging.jmmc.fr/OImaging-uws/"
-            })));
+            : ((USE_BETA) ? (new String[]{"http://oimaging-beta.jmmc.fr/OImaging-uws/"})
+                    : (new String[]{"http://oimaging.jmmc.fr/OImaging-uws/"})));
 
     private static final ClientFactory FACTORY = new ClientFactory();
 
@@ -68,7 +65,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         public ClientUWS getClient() throws ClientUWSException {
             if (uwsClient == null) {
                 ClientUWSException cue = null;
-                // Move it in a property file ( or constant at least)
+                // Move it in a property file (or constant at least)
                 for (String url : SERVER_URLS) {
                     try {
                         final ClientUWS c = new ClientUWS(url, SERVICE_PATH);
@@ -91,7 +88,10 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                     }
                 }
                 if (uwsClient == null) {
-                    throw cue;
+                    if (cue != null) {
+                        throw cue;
+                    }
+                    throw new ClientUWSException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, "No available endpoint !");
                 }
             }
             return uwsClient;
