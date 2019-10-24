@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.1"/>
-    <compilation date="17/10/2019" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5.2 beta 1"/>
+    <compilation date="24/10/2019" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -154,6 +154,12 @@
     </menubar>
 
     <releasenotes>
+        <release version="0.5.2">
+            <pubDate>Thu, 24 Oct 2019 14:00:00 GMT</pubDate>
+            <prerelease version="0.5.2 beta 1">
+                <change type="FEATURE">Added SPARCO support (plugin in MiRA) with its model parameters</change>
+            </prerelease>
+        </release>
         <release version="0.5.1">
             <pubDate>Thu, 17 Oct 2019 14:00:00 GMT</pubDate>
             <prerelease version="0.5.1 beta 2">
