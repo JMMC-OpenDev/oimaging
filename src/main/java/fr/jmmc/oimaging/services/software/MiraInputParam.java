@@ -51,7 +51,7 @@ func mira_read_input_params(src)
 
 -regul=compactness -mu=1E6 -gamma=6mas 
  */
-public final class MiraInputParam extends SoftwareInputParam {
+public class MiraInputParam extends SoftwareInputParam {
 
     private static final String DEFAULT_CLI_OPTIONS = "-recenter -bootstrap=2 -verb=1";
 
@@ -66,7 +66,7 @@ public final class MiraInputParam extends SoftwareInputParam {
     public static final String KEYWORD_SMEAR_FN = "SMEAR_FN";
     public static final String KEYWORD_SMEAR_FC = "SMEAR_FC";
 
-    public static final String[] KEYWORD_SMEAR_FN_LIST = new String[]{"none", "sinc", "gauss"};
+    private static final String[] KEYWORD_SMEAR_FN_LIST = new String[]{"none", "sinc", "gauss"};
 
     // optional
     public static final String KEYWORD_RGL_TAU = "RGL_TAU"; // - tau

@@ -24,6 +24,9 @@ public class SoftwareInputParam {
         if (name.startsWith(ServiceList.SERVICE_MIRA)) {
             return new MiraInputParam();
         }
+        if (name.startsWith(ServiceList.SERVICE_SPARCO)) {
+            return new SparcoInputParam();
+        }
         if (name.startsWith(ServiceList.SERVICE_WISARD)) {
             return new WisardInputParam();
         }
