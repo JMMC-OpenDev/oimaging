@@ -147,7 +147,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jLabelInitImg, gridBagConstraints);
 
         jComboBoxImage.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_INIT_IMG));
-        jComboBoxImage.setMinimumSize(new java.awt.Dimension(140, 28));
         jComboBoxImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxImageActionPerformed(evt);
@@ -380,6 +379,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         add(jTableKeywordsEditor, gridBagConstraints);
 
         jPanelOptions.setBorder(javax.swing.BorderFactory.createTitledBorder("Manual options"));
+        jPanelOptions.setMinimumSize(new java.awt.Dimension(100, 100));
+        jPanelOptions.setPreferredSize(new java.awt.Dimension(100, 100));
         jPanelOptions.setLayout(new java.awt.GridBagLayout());
 
         jTextAreaOptions.setColumns(10);

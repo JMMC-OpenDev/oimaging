@@ -23,7 +23,6 @@ import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
-import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
@@ -31,6 +30,8 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -38,6 +39,7 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JSplitPane;
 import javax.swing.ListModel;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
@@ -123,16 +125,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         enableMouseCursorRefreshTimer(true);
     }
 
-    /*
-    private void showInputImage() {
-        // avoid selection in the result list
-        jListResultSet.clearSelection();
-
-        // and display input data in the viewer part
-        viewerPanel.displayModel(currentModel);
-        viewerPanel.selectImageViewer();
-    }
-     */
     /**
      * Start/Stop the internal mouse cursor Refresh timer
      * @param enable true to enable it, false otherwise
@@ -160,7 +152,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         IRModelManager.getInstance().bindIRModelChangedEvent(this);
 
-        jListResultSet.setCellRenderer(new OiCellRenderer());
+        jListResults.setCellRenderer(new OiCellRenderer());
 
         jLabelWaveMin.setText("WAVE_MIN [" + SpecialChars.UNIT_MICRO_METER + "]");
         jLabelWaveMax.setText("WAVE_MAX [" + SpecialChars.UNIT_MICRO_METER + "]");
@@ -170,10 +162,24 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         fieldSliderAdapterWaveMax = new FieldSliderAdapter(jSliderWaveMax, jFormattedTextFieldWaveMax, 0, 1, 0);
 
         // become widget listener
-        jListResultSet.addListSelectionListener((ListSelectionListener) this);
+        jListResults.addListSelectionListener((ListSelectionListener) this);
 
         // init viewer Panel
         viewerPanel.displayModel(null);
+
+        jSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(final PropertyChangeEvent changeEvent) {
+                final Integer last = (Integer) changeEvent.getNewValue();
+                final Integer priorLast = (Integer) changeEvent.getOldValue();
+
+                if (last < priorLast) {
+                    // restore free space ie avoid having the left panel too large:
+                    jScrollPane.revalidate();
+                }
+            }
+        });
     }
 
     /**
@@ -296,24 +302,25 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         softwareSettingsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jEditorPane = new javax.swing.JEditorPane();
-        jButtonExportOIFits = new javax.swing.JButton();
         jButtonExportImage = new javax.swing.JButton();
+        jButtonExportOIFits = new javax.swing.JButton();
+        jScrollPaneEditor = new javax.swing.JScrollPane();
+        jEditorPane = new javax.swing.JEditorPane();
         jPanelResults = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jListResultSet = createCustomList();
+        jScrollPaneResults = new javax.swing.JScrollPane();
+        jListResults = createCustomList();
         viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
 
         setLayout(new java.awt.BorderLayout());
 
-        jSplitPane.setResizeWeight(0.2);
+        jSplitPane.setResizeWeight(0.01);
         jSplitPane.setContinuousLayout(true);
+        jSplitPane.setMinimumSize(new java.awt.Dimension(900, 600));
+        jSplitPane.setPreferredSize(new java.awt.Dimension(900, 600));
 
-        jScrollPane.setMinimumSize(new java.awt.Dimension(100, 100));
+        jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane.setViewportView(jPanelLeft);
 
-        jPanelLeft.setMinimumSize(new java.awt.Dimension(100, 400));
-        jPanelLeft.setPreferredSize(new java.awt.Dimension(100, 600));
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
         jPanelDataSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Data selection"));
@@ -475,87 +482,84 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
         jPanelLeft.add(jPanelDataSelection, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
         jPanelLeft.add(softwareSettingsPanel, gridBagConstraints);
 
         jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
-        jPanelExecutionLog.setPreferredSize(new java.awt.Dimension(82, 100));
         jPanelExecutionLog.setLayout(new java.awt.GridBagLayout());
 
         jButtonRun.setText("Run");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
-
-        jEditorPane.setContentType("text/html"); // NOI18N
-        jScrollPane1.setViewportView(jEditorPane);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jScrollPane1, gridBagConstraints);
-
-        jButtonExportOIFits.setText("Save Oifits");
-        jButtonExportOIFits.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
 
         jButtonExportImage.setText("Save image");
         jButtonExportImage.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jButtonExportImage, gridBagConstraints);
+
+        jButtonExportOIFits.setText("Save Oifits");
+        jButtonExportOIFits.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
+
+        jScrollPaneEditor.setMinimumSize(new java.awt.Dimension(100, 100));
+        jScrollPaneEditor.setPreferredSize(new java.awt.Dimension(100, 100));
+
+        jEditorPane.setContentType("text/html"); // NOI18N
+        jScrollPaneEditor.setViewportView(jEditorPane);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelExecutionLog.add(jScrollPaneEditor, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.2;
         jPanelLeft.add(jPanelExecutionLog, gridBagConstraints);
 
         jPanelResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Result sets"));
         jPanelResults.setPreferredSize(new java.awt.Dimension(100, 100));
-        jPanelResults.setLayout(new javax.swing.BoxLayout(jPanelResults, javax.swing.BoxLayout.LINE_AXIS));
+        jPanelResults.setLayout(new java.awt.BorderLayout());
 
-        jScrollPane4.setPreferredSize(new java.awt.Dimension(180, 130));
+        jScrollPaneResults.setMinimumSize(new java.awt.Dimension(100, 200));
+        jScrollPaneResults.setPreferredSize(new java.awt.Dimension(100, 200));
 
-        jScrollPane4.setViewportView(jListResultSet);
+        jScrollPaneResults.setViewportView(jListResults);
 
-        jPanelResults.add(jScrollPane4);
+        jPanelResults.add(jScrollPaneResults, java.awt.BorderLayout.CENTER);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.6;
+        gridBagConstraints.weighty = 0.5;
         jPanelLeft.add(jPanelResults, gridBagConstraints);
 
         jScrollPane.setViewportView(jPanelLeft);
@@ -591,9 +595,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // This action only update GUI but not the model.
-        if (e.getSource() == jListResultSet) {
-            viewerPanel.displayResult((ServiceResult) jListResultSet.getSelectedValue());
-            deleteSelectionAction.watchResultsSelection(currentModel, jListResultSet);
+        if (e.getSource() == jListResults) {
+            viewerPanel.displayResult((ServiceResult) jListResults.getSelectedValue());
+            deleteSelectionAction.watchResultsSelection(currentModel, jListResults);
         }
 
     }
@@ -614,14 +618,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JLabel jLabelTarget;
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
-    private javax.swing.JList jListResultSet;
+    private javax.swing.JList jListResults;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
     private javax.swing.JPanel jPanelLeft;
     private javax.swing.JPanel jPanelResults;
     private javax.swing.JScrollPane jScrollPane;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPaneEditor;
+    private javax.swing.JScrollPane jScrollPaneResults;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
     private javax.swing.JSplitPane jSplitPane;
@@ -788,7 +792,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             // resultSet List
             resultSetListModel.clear();
             resultSetListModel.add(currentModel.getResultSets());
-            jListResultSet.setModel(resultSetListModel);
+            jListResults.setModel(resultSetListModel);
 
             // perform analysis
             final List<String> failures = new LinkedList<String>();
@@ -827,10 +831,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
-            if (event.getType().equals(event.getType().IRMODEL_CHANGED) || jListResultSet.getModel().getSize() == 0) {
+            if (event.getType().equals(event.getType().IRMODEL_CHANGED) || jListResults.getModel().getSize() == 0) {
                 viewerPanel.displayModel(currentModel);
             } else {
-                jListResultSet.setSelectedIndex(0);
+                jListResults.setSelectedIndex(0);
             }
         } finally {
             syncingUI = false;
