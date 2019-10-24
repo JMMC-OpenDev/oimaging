@@ -3,11 +3,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <!--  please install first parent pom from jMCS/parent-pom directory -->
     <parent>
         <groupId>fr.jmmc</groupId>
         <artifactId>jmmc</artifactId>
         <version>TRUNK</version>
-        <!--  please install first parent pom from jMCS/parent-pom directory -->
+        <relativePath />
     </parent>
 
     <groupId>fr.jmmc.oimaging</groupId>
