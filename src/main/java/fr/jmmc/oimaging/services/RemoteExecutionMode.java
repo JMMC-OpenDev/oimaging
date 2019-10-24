@@ -224,10 +224,13 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
                 result.setCancelled(true);
             }
         } finally {
-            try {
-                client.deleteJobInfo(jobId);
-            } catch (ClientUWSException cue) {
-                _logger.warn("Can't delete job '{}'", jobId, cue);
+            // TODO: decide if cleanup is delayed on the server-side to collect datasets in error:
+            if (true) {
+                try {
+                    client.deleteJobInfo(jobId);
+                } catch (ClientUWSException cue) {
+                    _logger.warn("Can't delete job '{}'", jobId, cue);
+                }
             }
         }
     }
