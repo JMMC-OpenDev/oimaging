@@ -23,6 +23,7 @@ import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
+import fr.jmmc.oitools.image.FitsUnit;
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
@@ -154,8 +155,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jListResults.setCellRenderer(new OiCellRenderer());
 
-        jLabelWaveMin.setText("WAVE_MIN [" + SpecialChars.UNIT_MICRO_METER + "]");
-        jLabelWaveMax.setText("WAVE_MAX [" + SpecialChars.UNIT_MICRO_METER + "]");
+        jLabelWaveMin.setText("WAVE_MIN [" + SpecialChars.UNIT_MICRO_METER + ']');
+        jLabelWaveMax.setText("WAVE_MAX [" + SpecialChars.UNIT_MICRO_METER + ']');
 
         // associate sliders and fields
         fieldSliderAdapterWaveMin = new FieldSliderAdapter(jSliderWaveMin, jFormattedTextFieldWaveMin, 0, 1, 0);
@@ -366,7 +367,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelDataSelection.add(jButtonLoadData, gridBagConstraints);
 
         jLabelWaveMin.setText("WAVE_MIN");
-        jLabelWaveMin.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MIN));
+        jLabelWaveMin.setToolTipText("<html>" + getTooltip(ImageOiConstants.KEYWORD_WAVE_MIN) + "<br/><b>Editor unit is '" + FitsUnit.WAVELENGTH_MICRO_METER.getRepresentation() + "'</b></html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -375,7 +376,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelDataSelection.add(jLabelWaveMin, gridBagConstraints);
 
         jLabelWaveMax.setText("WAVE_MAX");
-        jLabelWaveMax.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_WAVE_MAX));
+        jLabelWaveMax.setToolTipText("<html>" + getTooltip(ImageOiConstants.KEYWORD_WAVE_MAX) + "<br/><b>Editor unit is '" + FitsUnit.WAVELENGTH_MICRO_METER.getRepresentation() + "'</b></html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -762,8 +763,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
             // associate target list
             jComboBoxTarget.setModel(currentModel.getTargetListModel());
-            Object sel = inputParam.getTarget();
-            jComboBoxTarget.setSelectedItem(sel);
+            jComboBoxTarget.setSelectedItem(inputParam.getTarget());
 
             // TODO Update OIFitsViewer:
             // arrange target
@@ -773,8 +773,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jSliderWaveMin.setEnabled(hasOIData);
             jSliderWaveMax.setEnabled(hasOIData);
 
-            fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMin() / MICRO_METER);
-            fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER, oifitsFile.getMaxWavelengthBound() / MICRO_METER, inputParam.getWaveMax() / MICRO_METER);
+            fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER,
+                    oifitsFile.getMaxWavelengthBound() / MICRO_METER,
+                    inputParam.getWaveMin() / MICRO_METER);
+            fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER,
+                    oifitsFile.getMaxWavelengthBound() / MICRO_METER,
+                    inputParam.getWaveMax() / MICRO_METER);
 
             jFormattedTextFieldWaveMin.setEnabled(hasOIData);
             jFormattedTextFieldWaveMax.setEnabled(hasOIData);
@@ -831,7 +835,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
-            if (event.getType().equals(event.getType().IRMODEL_CHANGED) || jListResults.getModel().getSize() == 0) {
+            if (event.getType() == IRModelEventType.IRMODEL_CHANGED || jListResults.getModel().getSize() == 0) {
                 viewerPanel.displayModel(currentModel);
             } else {
                 jListResults.setSelectedIndex(0);
