@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
+import fr.jmmc.jmcs.util.FormatterUtils;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.services.Service;
@@ -11,6 +12,7 @@ import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
@@ -478,11 +480,24 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
-        return new DefaultFormatterFactory(new NumberFormatter(new java.text.DecimalFormat("#0.0####E00")) {
+        return new DefaultFormatterFactory(new NumberFormatter(new DecimalFormat("0.0####E00")) {
             private static final long serialVersionUID = 1L;
 
+            private final NumberFormat fmtDef = new DecimalFormat("0.0####");
+
             @Override
-            public String valueToString(Object value) throws ParseException {
+            public String valueToString(final Object value) throws ParseException {
+                if (value == null) {
+                    return "";
+                }
+                if (value instanceof Double) {
+                    // check value range:
+                    final double abs = Math.abs((Double) value);
+
+                    if ((abs > 1e-3d) && (abs < 1e3d)) {
+                        return fmtDef.format(value);
+                    }
+                }
                 final String formatted = super.valueToString(value);
                 if (formatted.endsWith("E00")) {
                     return formatted.substring(0, formatted.length() - 3);
