@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class SoftwareInputParam {
 
+    private static final String[] RGL_NAME_DEFAULT = new String[]{""};
+
     /**
      * Factory pattern
      * @param name Service name
@@ -33,7 +35,7 @@ public class SoftwareInputParam {
         return new SoftwareInputParam();
     }
 
-    public SoftwareInputParam() {
+    SoftwareInputParam() {
         super();
     }
 
@@ -65,9 +67,6 @@ public class SoftwareInputParam {
     public boolean supportsMissingKeyword(final String keywordName) {
         return false;
     }
-
-    // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
-    public static final String[] RGL_NAME_DEFAULT = new String[]{""};
 
     public String[] getSupported_RGL_NAME() {
         return RGL_NAME_DEFAULT;

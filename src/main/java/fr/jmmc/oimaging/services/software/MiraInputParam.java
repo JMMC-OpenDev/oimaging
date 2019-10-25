@@ -10,6 +10,7 @@ import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
+import fr.jmmc.oitools.meta.Units;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,18 +77,18 @@ public class MiraInputParam extends SoftwareInputParam {
     private static final KeywordMeta RGL_TAU = new KeywordMeta(KEYWORD_RGL_TAU,
             "Scalar factor for hyperbolic L1-L2 regularization, used to set the threshold "
             + "between quadratic (l2) and linear (L1) regularizations", Types.TYPE_DBL);
+// TODO: fix conversion
     private static final KeywordMeta RGL_GAMM = new KeywordMeta(KEYWORD_RGL_GAMM,
-            "A priori full half width at half maximum for compactness (rad)", Types.TYPE_DBL);
+            "A priori full half width at half maximum for compactness (deg)", Types.TYPE_DBL, Units.UNIT_DEGREE);
 
     private static final KeywordMeta SMEAR_FN = new KeywordMeta(KEYWORD_SMEAR_FN,
             "Bandwidth smearing function", Types.TYPE_CHAR, KEYWORD_SMEAR_FN_LIST);
     private static final KeywordMeta SMEAR_FC = new KeywordMeta(KEYWORD_SMEAR_FC,
             "Bandwidth smearing factor", Types.TYPE_DBL);
 
-    // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
     public static final String[] RGL_NAME_MIRA = new String[]{"compactness", "hyperbolic"};
 
-    public MiraInputParam() {
+    MiraInputParam() {
         super();
     }
 
@@ -99,9 +100,8 @@ public class MiraInputParam extends SoftwareInputParam {
         // for our first implementation, just add to params if not TOTVAR
         if (params.getRglName().startsWith("compactness")) {
             params.addKeyword(RGL_GAMM);
-            params.setKeywordDefaultDouble(KEYWORD_RGL_GAMM,
-                    // seems MiRA is doing weird conversions (deg ?)
-                    FitsUnit.ANGLE_MILLI_ARCSEC.convert(20.0 * (180.0 / Math.PI), FitsUnit.ANGLE_RAD));
+            params.setKeywordDefaultDouble(KEYWORD_RGL_GAMM, 
+                    FitsUnit.ANGLE_MILLI_ARCSEC.convert(20.0, FitsUnit.ANGLE_DEG)); // 20 mas
         } else if (params.getRglName().startsWith("hyperbolic")) {
             params.addKeyword(RGL_TAU);
             params.setKeywordDefaultDouble(KEYWORD_RGL_TAU, 1E-2);
@@ -130,12 +130,12 @@ public class MiraInputParam extends SoftwareInputParam {
     }
 
     @Override
-    public String[] getSupported_RGL_NAME() {
+    public final String[] getSupported_RGL_NAME() {
         return RGL_NAME_MIRA;
     }
 
     @Override
-    public boolean supportsStandardKeyword(final String keywordName) {
+    public final boolean supportsStandardKeyword(final String keywordName) {
         return SUPPORTED_STD_KEYWORDS.contains(keywordName);
     }
 }

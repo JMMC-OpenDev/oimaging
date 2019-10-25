@@ -36,10 +36,9 @@ public final class BsmemInputParam extends SoftwareInputParam {
     private final static KeywordMeta RGL_BETA = new KeywordMeta(KEYWORD_RGL_BETA,
             "Parameter beta of the regularization", Types.TYPE_DBL); // like wisard
 
-    // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
     public static final String[] RGL_NAME_BSMEM = new String[]{"mem_prior"};
 
-    public BsmemInputParam() {
+    BsmemInputParam() {
         super();
     }
 

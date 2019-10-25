@@ -3,13 +3,12 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.services.software;
 
-import static fr.jmmc.oimaging.services.software.MiraInputParam.KEYWORD_RGL_GAMM;
-import fr.jmmc.oitools.image.ImageOiConstants;
 import java.util.List;
 
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
+import fr.jmmc.oitools.meta.Units;
 
 /**
  * Specific parameters for Sparco (MiRA)
@@ -48,7 +47,10 @@ func read_keywords (tab, fh)
 }
 func add_keywords (master, fh)
  */
-public class SparcoInputParam extends MiraInputParam {
+public final class SparcoInputParam extends MiraInputParam {
+
+    /** Sparco default command line options (do not use -recenter like MiRA as shifts must be absolute coordinates) */
+    private static final String DEFAULT_CLI_OPTIONS = "-verb=1";
 
     public static final String KEYWORD_SWAVE0 = "SWAVE0";
     public static final String KEYWORD_SNMODS = "SNMODS";
@@ -65,17 +67,21 @@ public class SparcoInputParam extends MiraInputParam {
 
     public static final String KEYWORD_SPEC_POW = "POW";
     public static final String KEYWORD_SPEC_BB = "BB";
-    public static final String[] KEYWORD_SPEC_LIST = new String[]{KEYWORD_SPEC_POW, KEYWORD_SPEC_BB}; // or spectrum for a spectrum specified in an ascii file (TO BE IMPLEMENTED)
+    // TODO: support for 'spectrum' for a spectrum specified in an ascii file (TO BE IMPLEMENTED)
+    public static final String[] KEYWORD_SPEC_LIST = new String[]{KEYWORD_SPEC_POW, KEYWORD_SPEC_BB};
 
     public static final String KEYWORD_MODEL_STAR = "star";
     public static final String KEYWORD_MODEL_UD = "UD";
     public static final String KEYWORD_MODEL_BG = "bg";
-    public static final String[] KEYWORD_MODEL_LIST = new String[]{KEYWORD_MODEL_STAR, KEYWORD_MODEL_UD, KEYWORD_MODEL_BG}; // or image computed from specified fits-file (TO BE IMPLEMENTED)
+    // TODO: support for 'image' computed from specified fits-file (TO BE IMPLEMENTED)
+    public static final String[] KEYWORD_MODEL_LIST = new String[]{KEYWORD_MODEL_STAR, KEYWORD_MODEL_UD, KEYWORD_MODEL_BG};
 
-    private static final KeywordMeta SWAVE0 = new KeywordMeta(KEYWORD_SWAVE0, "SPARCO: Central wavelength (m) for chromatism", Types.TYPE_DBL);
-    private static final KeywordMeta SNMODS = new KeywordMeta(KEYWORD_SNMODS, "SPARCO: Number of models used in SPARCO", Types.TYPE_INT);
+    private static final KeywordMeta SWAVE0 = new KeywordMeta(KEYWORD_SWAVE0,
+            "SPARCO: Central wavelength (m) for chromatism", Types.TYPE_DBL, Units.UNIT_METER);
+    private static final KeywordMeta SNMODS = new KeywordMeta(KEYWORD_SNMODS,
+            "SPARCO: Number of models used in SPARCO", Types.TYPE_INT);
 
-    public SparcoInputParam() {
+    SparcoInputParam() {
         super();
     }
 
@@ -99,12 +105,14 @@ public class SparcoInputParam extends MiraInputParam {
                 // Models:
                 final String modelid = KEYWORD_MOD + i;
 
-                params.addKeyword(new KeywordMeta(modelid, "SPARCO: Model used", Types.TYPE_CHAR, KEYWORD_MODEL_LIST));
+                params.addKeyword(new KeywordMeta(modelid,
+                        "SPARCO: Model used", Types.TYPE_CHAR, KEYWORD_MODEL_LIST));
                 params.setKeywordDefault(modelid, KEYWORD_MODEL_LIST[0]);
 
                 final String fluxid = KEYWORD_FLU + i;
 
-                params.addKeyword(new KeywordMeta(fluxid, "SPARCO: Flux ratio of the model", Types.TYPE_DBL));
+                params.addKeyword(new KeywordMeta(fluxid,
+                        "SPARCO: Flux ratio of the model", Types.TYPE_DBL));
                 params.setKeywordDefaultDouble(fluxid, 0.1);
             }
 
@@ -130,8 +138,8 @@ public class SparcoInputParam extends MiraInputParam {
                 final String tempid = KEYWORD_TEM + i;
 
                 params.addKeyword(new KeywordMeta(tempid,
-                        (i == 0) ? "SPARCO: black body temperature of the reconstructed image"
-                                : "SPARCO: black body temperature of the model", Types.TYPE_DBL));
+                        (i == 0) ? "SPARCO: black body temperature of the reconstructed image (K)"
+                                : "SPARCO: black body temperature of the model (K)", Types.TYPE_DBL));
                 params.setKeywordDefaultDouble(tempid, 1000.0);
             }
 
@@ -144,7 +152,8 @@ public class SparcoInputParam extends MiraInputParam {
                 if (KEYWORD_MODEL_UD.equals(model_i)) {
                     final String paramid = KEYWORD_PAR + i;
 
-                    params.addKeyword(new KeywordMeta(paramid, "SPARCO: UD diameter (mas)", Types.TYPE_DBL));
+                    params.addKeyword(new KeywordMeta(paramid,
+                            "SPARCO: UD diameter (mas)", Types.TYPE_DBL, Units.UNIT_MILLI_ARCSEC));
                     params.setKeywordDefaultDouble(paramid, 1.0);
                 }
 
@@ -152,12 +161,14 @@ public class SparcoInputParam extends MiraInputParam {
                     // XY shift:
                     final String xid = KEYWORD_DEX + i;
 
-                    params.addKeyword(new KeywordMeta(xid, "SPARCO: RA shift of the model (mas)", Types.TYPE_DBL));
+                    params.addKeyword(new KeywordMeta(xid,
+                            "SPARCO: RA shift of the model (mas)", Types.TYPE_DBL, Units.UNIT_MILLI_ARCSEC));
                     params.setKeywordDefaultDouble(xid, 0.0);
 
                     final String yid = KEYWORD_DEY + i;
 
-                    params.addKeyword(new KeywordMeta(yid, "SPARCO: DEC shift of the model (mas)", Types.TYPE_DBL));
+                    params.addKeyword(new KeywordMeta(yid,
+                            "SPARCO: DEC shift of the model (mas)", Types.TYPE_DBL, Units.UNIT_MILLI_ARCSEC));
                     params.setKeywordDefaultDouble(yid, 0.0);
                 }
             }
@@ -174,4 +185,7 @@ public class SparcoInputParam extends MiraInputParam {
         }
     }
 
+    public String getDefaultCliOptions() {
+        return DEFAULT_CLI_OPTIONS;
+    }
 }

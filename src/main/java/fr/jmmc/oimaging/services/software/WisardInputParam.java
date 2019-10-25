@@ -7,6 +7,7 @@ import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
+import fr.jmmc.oitools.meta.Units;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +31,7 @@ public final class WisardInputParam extends SoftwareInputParam {
 
     // Wisard specific
     private static final KeywordMeta FOV = new KeywordMeta(KEYWORD_FOV,
-            "Field of view (mas)", Types.TYPE_DBL);
+            "Field of view (mas)", Types.TYPE_DBL, Units.UNIT_MILLI_ARCSEC);
     private static final KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN,
             "MINimum width (Number of Points) of the reconstructed image", Types.TYPE_INT);
     private final static KeywordMeta THRESHOLD = new KeywordMeta(KEYWORD_THRESHOLD,
@@ -48,11 +49,10 @@ public final class WisardInputParam extends SoftwareInputParam {
     // either:
     //     - MEAN_OBJECT : An image, rescaled NP_MINxNP_MIN as INIT_IMG. (NULL)
     //     - FWHM : Full Width Half maximum of a lorentzian used as prior, in pixels (3.) (less prefered as costly) 
-    // Potential Conflict with ImageOiInputParam.KEYWORD_RGL_NAME ?
     public static final String[] RGL_NAME_WISARD = new String[]{"L1L2", "L1L2WHITE", "PSD", "SOFT_SUPPORT", "TOTVAR"};
-    public static final String RGL_NAME_WISARD_L1 = "L1";
+    private static final String PREFIX_RGL_NAME_WISARD_L1 = "L1";
 
-    public WisardInputParam() {
+    WisardInputParam() {
         super();
     }
 
@@ -71,7 +71,7 @@ public final class WisardInputParam extends SoftwareInputParam {
         params.setKeywordDefaultDouble(KEYWORD_THRESHOLD, 1E-6);
 
         // for our first implementation, just add to params if not TOTVAR
-        if (params.getRglName().startsWith(RGL_NAME_WISARD_L1)) {
+        if (params.getRglName().startsWith(PREFIX_RGL_NAME_WISARD_L1)) {
             params.addKeyword(SCALE);
             params.addKeyword(DELTA);
 
