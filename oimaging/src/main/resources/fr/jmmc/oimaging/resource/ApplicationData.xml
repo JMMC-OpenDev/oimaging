@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+
+<ApplicationData link="http://www.jmmc.fr/oimaging">
+
+    <company>
+        <short_name>JMMC</short_name>
+        <legal_name>Jean-Marie Mariotti Center</legal_name>
+        <logo_resource>fr/jmmc/jmcs/resource/image/jmmc_logo.png</logo_resource>
+        <homepage_url>http://www.jmmc.fr/</homepage_url>
+        <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
+    </company>
+
+    <program name="OImaging" version="0.5.2"/>
+    <compilation date="02/12/2019" compiler="JDK 1.6.0_24"/>
+
+    <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
+
+    <authors>the JMMC Technical Group</authors>
+    <jnlp>http://www.jmmc.fr/apps/public/OImaging/OImaging.jnlp</jnlp>
+    <sampdescription>Perform image reconstruction from your interferometric observation data file (OIFits)</sampdescription>
+
+    <logo_resource>fr/jmmc/oimaging/resource/image/OImaging.png</logo_resource>
+
+    <distribution>
+        <application_data_file>ApplicationRelease.xml</application_data_file>
+        <public_url>http://www.jmmc.fr/apps/public/OImaging/</public_url>
+        <beta_url>http://www.jmmc.fr/apps/beta/OImaging/</beta_url>
+        <alpha_url>http://www.jmmc.fr/apps/alpha/OImaging/</alpha_url>
+    </distribution>
+
+    <dependences>
+
+        <!-- JMMC -->
+
+        <!-- Java Mariotti OIfitsExplorer-core -->
+        <package name="OIFits Explorer core"
+                 description="OIFits Explorer core is the JMMC library dedicated to share OIFits GUI components (plots)"
+                 link="http://www.jmmc.fr/dev/oiexplorer-core/"
+                 jars="oiexplorer-core.jar"
+                 license="CECILL-B ???"/>
+
+        <!-- Java Mariotti Astronomical library -->
+        <package name="jMAL"
+                 description="JMMC library to provide common astronomical computations (coordinate conversion, SIMBAD star resolver and analytical object models in interferometry)"
+                 link="http://www.jmmc.fr/dev/jmal/"
+                 jars="jmal.jar"
+                 license="CECILL-B ???"/>
+
+        <!-- Java Mariotti OITools -->
+        <package name="OITools"
+                 description="OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)"
+                 link="http://www.jmmc.fr/dev/oitools/"
+                 jars="oitools.jar"
+                 license="CECILL-B ???"/>
+
+
+        <!-- 1. Science / VO libraries (always on top for better visibility) -->
+
+        <!-- OifitsExplorer dependencies -->
+
+        <!-- OITools dependencies -->
+
+        <package name="nom.tam.fits"
+                 description="The Java FITS library (nom.tam.fits) has been developed which provides efficient I/O for FITS images and binary tables. Made by Dr Thomas A. McGlynn, HEASARC"
+                 link="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/"
+                 license="Copyright: Thomas McGlynn 1997-1999." />
+        <!--
+          Copyright: Thomas McGlynn 1997-1999.
+          This code may be used for any purpose, non-commercial
+          or commercial so long as this copyright notice is retained
+          in the source code or included in or referred to in any
+          derived software.
+        -->
+
+        <!-- jMCS dependencies -->
+
+        <!-- VO interoperability -->
+        <package name="JSAMP"
+                 description="JSAMP is a Java toolkit for use with the Simple Applications Messaging Protocol. Made by Mark Taylor, working in the Astrophysics Group at Bristol University."
+                 link="http://software.astrogrid.org/doc/jsamp/"
+                 jars="jsamp-1.3.jar"
+                 license="(at least) the Academic Free Licence and the BSD License."/>
+
+        <!-- jMAL dependencies -->
+
+        <!-- Model computations (bessel functions) -->
+        <package name="CERN colt"
+                 description="provides a set of Open Source Libraries for High Performance Scientific and Technical Computing in Java"
+                 link="http://acs.lbl.gov/software/colt/"
+                 jars="colt.jar"
+                 license="Copyright (c) 1999 CERN - European Organization for Nuclear Research"/>
+        <!--
+          Copyright (c) 1999 CERN - European Organization for Nuclear Research.
+          Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose is
+          hereby granted without fee, provided that the above copyright notice appear in all copies and that both that
+          copyright notice and this permission notice appear in supporting documentation. CERN makes no representations
+          about the suitability of this software for any purpose. It is provided "as is" without expressed or implied warranty.
+        -->
+
+
+        <!-- 2. Swing -->
+
+        <!-- OifitsExplorer dependencies -->
+
+        <package name="JFreeChart"
+                 description="JFreeChart is a free 100% Java chart library that makes it easy for developers to display professional quality charts in their applications"
+                 link="http://www.jfree.org/jfreechart/"
+                 jars="jfreechart-1.0.13.jar jcommon-1.0.16.jar"
+                 license="LGPL" />
+
+        <package name="iText"
+                 description="iText is a library that allows you to generate PDF files on the fly"
+                 link="http://itextpdf.com/"
+                 jars="iText-2.1.5.jar"
+                 license="AGPL (http://itextpdf.com/terms-of-use/agpl.php)" />
+
+    </dependences>
+
+    <menubar>
+        <menu label="File">
+            <menu label="New OI Image file" classpath="fr.jmmc.oimaging.gui.action.NewAction" action="newOIFits" accelerator="N" />
+            <menu label="Load OIFits file" classpath="fr.jmmc.oimaging.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="L"
+                  icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load an OIFits file"/>
+            <menu label="Load Fits Image file" classpath="fr.jmmc.oimaging.gui.action.LoadFitsImageAction" action="loadFitsImage"
+                  icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load a Fits Image file"/>
+            <separator/>
+            <menu label="Save oifits" classpath="fr.jmmc.oimaging.gui.action.ExportOIFitsAction" action="exportOIFits" description="Export selected OIFits to a local file"/>
+            <menu label="Save image" classpath="fr.jmmc.oimaging.gui.action.ExportFitsImageAction" action="exportFitsImage" description="Export selected Fits image to a local file"/>
+        </menu>
+
+        <menu label="Edit">
+            <menu label="Delete" classpath="fr.jmmc.oimaging.gui.action.DeleteSelectionAction" action="deleteSelection" accelerator="DELETE"/>
+            <!-- TODO  find common icon icon="fr/jmmc/o/gui/icons/button_fewer.png"/-->
+        </menu>
+
+        <menu label="Processing">
+            <menu label="Run" classpath="fr.jmmc.oimaging.gui.action.RunAction" action="run" description="Run"/>
+            <separator/>
+            <menu label="Resample image" classpath="fr.jmmc.oimaging.gui.action.ResampleImageAction" action="resample"
+                  description="Resample the current image (pixels) using advanced image filters"/>
+        </menu>
+
+        <menu label="Interop">
+            <menu label="Send OIFits data" classpath="fr.jmmc.oimaging.interop.SendOIFitsAction" action="sendOIFitsAction"
+                  description="send selected OIFits data to OIFitsExplorer or other VO Tools (SAMP)"/>
+            <menu label="Send Fits image" classpath="fr.jmmc.oimaging.interop.SendFitsAction" action="sendFitsAction"
+                  description="send selected Fits image to any VO Tools (SAMP)"/>
+        </menu>
+    </menubar>
+
+    <releasenotes>
+        <release version="0.5.2">
+            <pubDate>Mon, 02 Dec 2019 12:00:00 GMT</pubDate>
+            <prerelease version="0.5.2 beta 2">
+                <change type="FEATURE">Improved the software parameter editor to automatically display units
+                    and perform automatic conversions (meter vs microns, deg vs mas)</change>
+            </prerelease>
+            <prerelease version="0.5.2 beta 1">
+                <change type="FEATURE">Added SPARCO support (plugin in MiRA) with its model parameters</change>
+            </prerelease>
+        </release>
+        <release version="0.5.1">
+            <pubDate>Thu, 17 Oct 2019 14:00:00 GMT</pubDate>
+            <prerelease version="0.5.1 beta 2">
+                <change type="BUGFIX">Added support for server-side job interruption (timeout is 2 hours)</change>
+            </prerelease>
+            <prerelease version="0.5.1 beta 1">
+                <change type="BUGFIX">Fixed panel area for the image viewer</change>
+            </prerelease>
+        </release>
+        <release version="0.5">
+            <pubDate>Thu, 20 Dec 2018 21:00:00 GMT</pubDate>
+            <prerelease version="0.5 beta 19">
+                <change type="FEATURE">Fixed MiRA default values for regularization parameters Gamma (20mas) / tau (1e-2)</change>
+            </prerelease>
+            <prerelease version="0.5 beta 18">
+                <change type="FEATURE">Improved GUI for MiRA parameters (combo box, defaults values)</change>
+            </prerelease>
+            <prerelease version="0.5 beta 17">
+                <change type="FEATURE">Improved handling of input parameters for MiRA in GUI</change>
+                <change type="FEATURE">Updated MiRA software on the server side (fully functional): Merry Christmas 2018 !</change>
+            </prerelease>
+            <prerelease version="0.5 beta 16">
+                <change type="BUGFIX">Fixed HTTP connection issues (using now apache http client 4.x for robustness)</change>
+            </prerelease>
+            <prerelease version="0.5 beta 15">
+                <change type="FEATURE">Added 'Rescale' button on the image viewer to adjust the image increments and FOV (scaling)</change>
+            </prerelease>
+            <prerelease version="0.5 beta 14">
+                <change type="FEATURE">Added 'Viewport' button on the image viewer to adjust the image RA/DE coverage and FOV (enlarge / reduce)</change>
+            </prerelease>
+            <prerelease version="0.5 beta 13">
+                <change type="FEATURE">Added 'Resample image' action in the new Processing menu and on the image viewer to resample properly the current FITS image</change>
+            </prerelease>
+            <prerelease version="0.5 beta 12">
+                <change type="FEATURE">Added 'Send OIFits data' action in the Interop menu to share OIFits data with OIFitsExplorer and other VO tools</change>
+                <change type="FEATURE">Added 'Send Fits image' action in the Interop menu to share Fits image with any VO tools</change>
+            </prerelease>
+            <prerelease version="0.5 beta 11">
+                <change type="FEATURE">Better software parameter handling: hide unsupported standard parameters per software</change>
+            </prerelease>
+            <prerelease version="0.5 beta 10">
+                <change type="FEATURE">Use more precision for min/max wavelengths</change>
+            </prerelease>
+            <prerelease version="0.5 beta 9">
+                <change type="FEATURE">added check if a job is still running before quitting</change>
+            </prerelease>
+            <prerelease version="0.5 beta 8">
+                <change type="FEATURE">Add File/New action to reset current session</change>
+                <change type="FEATURE">Add Edit/Delete action to remove the selected results</change>
+            </prerelease>
+            <prerelease version="0.5 beta 7">
+                <change type="FEATURE">Preliminary support for MiRA</change>
+                <change type="FEATURE">Enable expression evaluator in OIFits plots</change>
+            </prerelease>
+            <prerelease version="0.5 beta 6">
+                <change type="FEATURE">Improved GUI to deal with software optional parameters</change>
+            </prerelease>
+            <prerelease version="0.5 beta 5">
+                <change type="FEATURE">Improved GUI to deal with software parameters (common / specific)</change>
+                <change type="CHANGE">Fixed FITS keyword handling to avoid duplicated keywords in image HDUs and IMAGE-OI INPUT PARAM table</change>
+            </prerelease>
+            <prerelease version="0.5 beta 4">
+                <change type="CHANGE">Request UWS job deletion after result retrieval (is also done weekly on the server side in case of failure)</change>
+            </prerelease>
+            <prerelease version="0.5 beta 3">
+                <change type="FEATURE">Improved Java support (9 + mac OS X) but Java 7 minimum is now required</change>
+                <!-- change type="CHANGE">Code refactoring on image renaming</change-->
+            </prerelease>
+            <prerelease version="0.5 beta 2">
+                <change type="CHANGE">Internal refactoring arround OIFits internal model. At present time, OIFits V2 are loaded as V1</change>
+            </prerelease>
+            <prerelease version="0.5 alpha 1">
+                <change type="CHANGE">Use heat as default LUT table for the FITS image viewer</change>
+            </prerelease>
+        </release>
+        <release version="0.4">
+            <pubDate>Mon, 07 Jun 2017 12:00:00 GMT</pubDate>
+            <prerelease version="0.4 alpha 1">
+                <change type="CHANGE">BSMem and Wisard are both available in remote mode (no installation required on the user machine)</change>
+                <change type="CHANGE">Result Images are now appended into the available hdu images list (time suffix if already present)</change>
+            </prerelease>
+        </release>
+        <release version="0.3">
+            <pubDate>Mon, 02 May 2017 12:00:00 GMT</pubDate>
+            <prerelease version="0.3 alpha 2">
+                <change type="CHANGE">Add wisard in the list of supported IR program for testing</change>
+            </prerelease>
+            <!--<pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>-->
+            <prerelease version="0.3 alpha 1">
+                <change type="CHANGE">provide a default preset with every observables present in the result oifits</change>
+            </prerelease>
+        </release>
+        <release version="0.2">
+            <pubDate>Mon, 13 Dec 2016 12:00:00 GMT</pubDate>
+            <prerelease version="0.2 alpha 9">
+                <change type="BUGFIX">enhance format of parameter textfields</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 8">
+                <change type="BUGFIX">Avoid blank INIT_IMG at startup</change>
+                <change type="CHANGE">Show execution log panel on faulty runs</change>
+                <change type="BUGFIX">Rename faulty keyword AUTO_RGL to AUTO_WGT</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 7">
+                <change type="CHANGE">Add WISARD as new software! Remote execution comming... </change>
+                <change type="CHANGE">'Save file' action export OIFitsFile + specific OI tables back again looking at input data. </change>
+                <change type="CHANGE">Display output and input parameters informations. </change>
+            </prerelease>
+            <prerelease version="0.2 alpha 6">
+                <change type="CHANGE">Add AUTO_RGL and FLUXERR keyword</change>
+                <change type="CHANGE">Remove "Image Panel"</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 5">
+                <change type="CHANGE">Optimize layout</change>
+                <change type="CHANGE">Don't add results in input image combobox</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 4">
+                <change type="CHANGE">New layout that offers to look on result items</change>
+                <change type="CHANGE">Fix bug running local version of software</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 3">
+                <change type="CHANGE">Remove bsmem-remote mode. Waiting the licence agreement for webservice mode</change>
+                <change type="BUGFIX">Use degree as default axis unit for images following the FITS standard</change>
+                <change type="CHANGE">Propagate rgl_name param in image-oi input param table</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 2">
+                <change type="CHANGE">Renamed as OImaging courtesy of Laurent Bourges</change>
+            </prerelease>
+            <prerelease version="0.2 alpha 1">
+                <change type="CHANGE">Show units for Wavelengths</change>
+                <change type="CHANGE">Fix XTENSION type of 'IMAGE-OI INPUT PARAM' table</change>
+            </prerelease>
+        </release>
+        <release version="0.1">
+            <pubDate>Thu, 16 Jun 2016 12:00:00 GMT</pubDate>
+            <prerelease version="0.1 beta 1">
+                <change type="FEATURE">First release with minimal (working) features : take one oifits + fits images and export an input file (behind "Run" Button)</change>
+            </prerelease>
+        </release>
+    </releasenotes>
+
+    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center \texttt{OImaging}
+service \footnote{Available at http://www.jmmc.fr/oimaging} part of the European Commission's FP7 Capacities programme ( Grant Agreement Number 312430 )]]>
+    </acknowledgment>
+
+</ApplicationData>
