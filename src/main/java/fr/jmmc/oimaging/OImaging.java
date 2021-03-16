@@ -353,9 +353,7 @@ public final class OImaging extends App {
                         public void run() {
                             App.showFrameToFront();
 
-                            Exception e = null; // Store exception if something bad occurs
-
-                            final long startTime = System.nanoTime();
+                            Exception e = null; // Store exception if something bad occurs                            
                             try {
 
                                 if (FileUtils.isRemote(url)) {
@@ -363,14 +361,57 @@ public final class OImaging extends App {
                                     File tmpFile = FileUtils.getTempFile(ResourceUtils.filenameFromResourcePath(url));
                                     if (Http.download(uri, tmpFile, false)) {
                                         IRModelManager.getInstance().loadOIFitsFile(tmpFile);
-                                        // TODO why not to load images through samp
                                     } else {
                                         e = new IOException();
                                     }
 
                                 } else {
-                                    IRModelManager.getInstance().loadOIFitsFile(new File(new URI(url)));
-                                    // TODO why not to load images through samp
+                                    IRModelManager.getInstance().loadOIFitsFile(new File(new URI(url)));                                    
+                                }
+                            } catch (IllegalArgumentException ex) {
+                                e = ex;
+                            } catch (URISyntaxException ex) {
+                                e = ex;
+                            } catch (IOException ex) {
+                                e = ex;
+                            }
+
+                            if (e != null) {
+                                MessagePane.showErrorMessage("Could not load oifits file from samp message : " + message, e);
+                            }
+                        }
+                    });
+                }
+            }
+        };
+        
+        // Add handler to load one new oifits
+        new SampMessageHandler(SampCapability.LOAD_FITS_IMAGE) {
+            @Override
+            protected void processMessage(final String senderId, final Message message) throws SampException {
+                final String url = (String) message.getParam("url");
+
+                if (!StringUtils.isEmpty(url)) {
+                    // bring this application to front and load data
+                    SwingUtils.invokeLaterEDT(new Runnable() {
+                        @Override
+                        public void run() {
+                            App.showFrameToFront();
+
+                            Exception e = null; // Store exception if something bad occurs
+                            try {
+
+                                if (FileUtils.isRemote(url)) {
+                                    final URI uri = new URI(url);
+                                    File tmpFile = FileUtils.getTempFile(ResourceUtils.filenameFromResourcePath(url));
+                                    if (Http.download(uri, tmpFile, false)) {
+                                        IRModelManager.getInstance().loadFitsImageFile(tmpFile);                                        
+                                    } else {
+                                        e = new IOException();
+                                    }
+
+                                } else {
+                                    IRModelManager.getInstance().loadFitsImageFile(new File(new URI(url)));
                                 }
 
                             } catch (IllegalArgumentException ex) {
@@ -382,13 +423,14 @@ public final class OImaging extends App {
                             }
 
                             if (e != null) {
-                                MessagePane.showErrorMessage("Could not load file from samp message : " + message, e);
+                                MessagePane.showErrorMessage("Could not load fits image file from samp message : " + message, e);
                             }
                         }
                     });
                 }
             }
         };
+        
     }
 
     /**
