@@ -9,4 +9,4 @@ Permissions: all-permissions
 Codebase: *.jmmc.fr
 Application-Library-Allowable-Codebase: *.jmmc.fr
 Main-Class: fr.jmmc.oimaging.OImaging
-
+Multi-Release: true
