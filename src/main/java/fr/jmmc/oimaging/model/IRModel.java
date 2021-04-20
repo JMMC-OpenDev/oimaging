@@ -21,6 +21,7 @@ import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.jmmc.oitools.model.range.Range;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
@@ -117,8 +118,9 @@ public class IRModel {
         }
 
         // Reset WLen bounds
-        inputParam.setWaveMin(oifitsFile.getMinWavelengthBound());
-        inputParam.setWaveMax(oifitsFile.getMaxWavelengthBound());
+        final Range effWaveRange = oifitsFile.getWavelengthRange();
+        inputParam.setWaveMin(effWaveRange.getMin());
+        inputParam.setWaveMax(effWaveRange.getMax());
 
         // Reset observable use according available tables
         inputParam.useVis(oifitsFile.hasOiVis());
@@ -172,8 +174,13 @@ public class IRModel {
     private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
-        // prepare images (negative values, padding, orientation):
-        FitsImageUtils.prepareAllImages(hdus);
+        try {
+            // prepare images (negative values, padding, orientation):
+            FitsImageUtils.prepareAllImages(hdus);
+        } catch (IllegalArgumentException iae) {
+            MessagePane.showErrorMessage("Unable to load image from file '{}'", filename, iae);
+            return false;
+        }
 
         // Start with all hdus
         final List<FitsImageHDU> hdusToAdd = new LinkedList<FitsImageHDU>();
@@ -186,7 +193,7 @@ public class IRModel {
 
         // Remove duplicates and skip hdu with hduname present in current input oifits
         for (FitsImageHDU hdu : hdus) {
-            if (getSelectedInputImageHDU() != null && hdu.getHduName() != null && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
+            if ((getSelectedInputImageHDU() != null) && (hdu.getHduName() != null) && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
                 hdusToAdd.remove(hdu);
                 break;
             }
@@ -200,9 +207,11 @@ public class IRModel {
         }
 
         final String now = DateUtils.now().substring(0, 19);
+
         // And continue with remaining ones to find proper name
         for (FitsImageHDU hdu : hdusToAdd) {
-            final String tryName = hdu.getHduName() != null ? hdu.getHduName() : (hdu.getExtName() != null ? hdu.getExtName() : filename.substring(0, Math.min(50, filename.length())));
+            final String tryName = (hdu.getHduName() != null) ? hdu.getHduName()
+                    : ((hdu.getExtName() != null) ? hdu.getExtName() : (filename.substring(0, Math.min(50, filename.length()))));
             hdu.setHduName(tryName);
 
             for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
@@ -218,9 +227,8 @@ public class IRModel {
                         // TODO propose here to replace the previous loaded HDU
                         hdusToAdd.remove(hdu);
                     } else {
-                        String confMsg = "'" + tryName + "' HDU already exists in the available init images.\n Do you agree to rename it '" + newName + "' ? \nElse it will be ignored. ";
-                        boolean okToRename = MessagePane.showConfirmMessage(confMsg);
-                        if (okToRename) {
+                        if (MessagePane.showConfirmMessage("'" + tryName + "' HDU already exists in the available init images.\n "
+                                + "Do you agree to rename it '" + newName + "' ? \nElse it will be ignored.")) {
                             logger.info("hduname '{}' already used, user accepted to rename to '{}'  ", hdu.getHduName(), newName);
                             hdu.setHduName(newName);
                         } else {

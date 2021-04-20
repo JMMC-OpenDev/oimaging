@@ -27,6 +27,7 @@ import fr.jmmc.oitools.image.FitsUnit;
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
+import fr.jmmc.oitools.model.range.Range;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -773,11 +774,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jSliderWaveMin.setEnabled(hasOIData);
             jSliderWaveMax.setEnabled(hasOIData);
 
-            fieldSliderAdapterWaveMin.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER,
-                    oifitsFile.getMaxWavelengthBound() / MICRO_METER,
+            final Range effWaveRange = oifitsFile.getWavelengthRange();
+
+            fieldSliderAdapterWaveMin.reset(effWaveRange.getMin() / MICRO_METER, effWaveRange.getMax() / MICRO_METER,
                     inputParam.getWaveMin() / MICRO_METER);
-            fieldSliderAdapterWaveMax.reset(oifitsFile.getMinWavelengthBound() / MICRO_METER,
-                    oifitsFile.getMaxWavelengthBound() / MICRO_METER,
+            fieldSliderAdapterWaveMax.reset(effWaveRange.getMin() / MICRO_METER, effWaveRange.getMax() / MICRO_METER,
                     inputParam.getWaveMax() / MICRO_METER);
 
             jFormattedTextFieldWaveMin.setEnabled(hasOIData);
