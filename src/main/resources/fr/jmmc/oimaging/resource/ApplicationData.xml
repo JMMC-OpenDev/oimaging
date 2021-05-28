@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.3 beta 1"/>
-    <compilation date="16/03/2021" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5.3 beta 2"/>
+    <compilation date="28/05/2021" compiler="JDK 1.6.0_24"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -154,10 +154,14 @@
     </menubar>
 
     <releasenotes>
-        <release version="0.5.3 beta 1">
+        <release version="0.5.3">
+            <pubDate>Fri, 28 May 2021 16:00:00 GMT</pubDate>
+            <prerelease version="0.5.3 beta 2">
+                <change type="BUGFIX">OITools updates</change>
+            </prerelease>
             <prerelease version="0.5.3 beta 1">
                 <change type="FEATURE">Added SAMP support to load new input fits images</change>
-            </prerelease>           
+            </prerelease>
         </release>
         <release version="0.5.2">
             <pubDate>Mon, 02 Dec 2019 12:00:00 GMT</pubDate>
