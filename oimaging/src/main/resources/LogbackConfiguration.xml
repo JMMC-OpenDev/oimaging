@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- Application specific configuration -->
+<included>
+
+    <!-- OITools -->
+    <!--
+    <logger name="fr.jmmc.oitools" level="INFO"/>
+    <logger name="fr.jmmc.oitools.model.Analyzer" level="DEBUG"/>
+    -->
+
+    <!-- OIExplorer -->
+<!--
+    <logger name="fr.jmmc.oiexplorer" level="INFO"/>
+-->
+
+    <!-- restlet 2.3 -->
+    <!--
+    <logger name="org.restlet" level="DEBUG"/>
+    -->
+
+    <!-- http client 4.x -->
+    <!--
+    <logger name="org.apache.http" level="DEBUG"/>
+    <logger name="org.apache.http.wire" level="INFO"/>
+    -->
+
+</included>

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<jnlp spec="6.0+" codebase="@GENERATED@" href="OImaging.jnlp">
+    <information>
+        <title>OImaging</title>
+        <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
+        <homepage href="http://www.jmmc.fr/oimaging"/>
+        <description>User-Friendly imaging algorithms for interferometry</description>
+        <description kind="tooltip">Image reconstruction algorithms</description>
+        <icon href="@GENERATED@/OImaging.jpg"/>
+        <offline-allowed/>
+        <shortcut online="true" install="true">
+            <desktop/>
+        </shortcut>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.7+" initial-heap-size="256m" max-heap-size="1024m"/>
+
+        <!-- MANUALLY EDITED -->
+
+        <!-- Application module first (main class) -->
+        <jar href="jar/oimaging-TRUNK.jar" main="true"/>
+
+
+        <!-- doc module -->
+        <!-- TODO <jar href="jar/oimaging-doc.jar" /> -->
+
+        <!-- restlet class for the ClientUWS -->
+        <jar href="@SHARED@/org.restlet-2.3.12.jar" />
+        <jar href="@SHARED@/org.restlet.ext.fileupload-2.3.12.jar" />
+        <jar href="@SHARED@/org.restlet.ext.html-2.3.12.jar" />
+        <jar href="@SHARED@/org.restlet.ext.httpclient-2.3.12.jar" />
+        <jar href="@SHARED@/org.restlet.ext.slf4j-2.3.12.jar" />
+
+        <!-- restlet dependencies -->
+        <jar href="@SHARED@/commons-fileupload-1.3.jar" />
+        <jar href="@SHARED@/commons-io-2.2.jar" />
+
+        <!-- restlet dependencies already embedded in JMCS
+        <jar href="@SHARED@/commons-codec-1.8.jar" />
+        <jar href="@SHARED@/commons-httpclient-3.1.jar" />
+        <jar href="@SHARED@/commons-lang-2.6.jar" />
+        -->
+
+        <!-- http client 4.x -->
+        <jar href="@SHARED@/httpclient-4.3.2.jar" />
+        <jar href="@SHARED@/httpcore-4.3.1.jar" />
+        <jar href="@SHARED@/httpmime-4.3.jar" />
+        <jar href="@SHARED@/apache-mime4j-core-0.7.2.jar" />
+        <jar href="@SHARED@/jcip-annotations-1.0.jar" />
+
+        <!-- JMMC modules -->
+        <extension href="../jmcs/Jmcs.jnlp"/>
+        <extension href="../jmal/Jmal.jnlp"/>
+        <extension href="../oiexplorer-core/OIExplorerCore.jnlp"/>
+
+    </resources>
+    <application-desc main-class="fr.jmmc.oimaging.OImaging"/>
+</jnlp>
