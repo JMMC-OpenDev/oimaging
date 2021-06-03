@@ -1,0 +1,13 @@
+nb*.xml
+*.log
+**/.DS_Store
+
+src/test/resources/logging.properties
+/src/test/resources/test/*.csv
+/src/test/resources/test/*.fits
+/src/test/resources/test/*.properties
+/src/test/resources/test/*.xml
+/src/test/resources/test/fits/*
+/src/test/resources/test/oifits/*
+/target/
+/parent-pom/target/
