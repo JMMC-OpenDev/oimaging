@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--  please install first parent pom from jMCS/parent-pom directory -->
+    <parent>
+        <groupId>fr.jmmc</groupId>
+        <artifactId>jmmc</artifactId>
+        <version>TRUNK</version>
+        <relativePath />
+    </parent>
+
+    <groupId>fr.jmmc.oiexplorer</groupId>
+    <artifactId>oiexplorer</artifactId>
+
+    <packaging>jar</packaging>
+    <name>OIFitsExplorer</name>
+
+    <properties>
+	<!-- do make assembly and copy dependencies (JNLP) -->
+	<assembly.skipAssembly>false</assembly.skipAssembly>
+	<mdep.skip>false</mdep.skip>
+
+	<!-- disable tests (fest fails for now) -->
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>fr.jmmc.oiexplorer</groupId>
+            <artifactId>oiexplorer-core</artifactId>
+            <version>TRUNK</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.jmmc.testgui</groupId>
+            <artifactId>testgui</artifactId>
+            <version>TRUNK</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <artifactId>junit</artifactId>
+            <groupId>junit</groupId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

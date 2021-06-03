@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- Application specific configuration -->
+<included>
+
+    <!-- OITools -->
+    <!--
+    <logger name="fr.jmmc.oitools" level="INFO"/>
+    <logger name="fr.jmmc.oitools.model.Analyzer" level="DEBUG"/>
+    -->
+
+    <!-- OIExplorer -->
+    <logger name="fr.jmmc.oiexplorer" level="INFO"/>
+
+</included>

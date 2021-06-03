@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*******************************************************************************
+* JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+*******************************************************************************
+-->
+
+<ApplicationData link="http://www.jmmc.fr/oifitsexplorer">
+
+    <company>
+        <short_name>JMMC</short_name>
+        <legal_name>Jean-Marie Mariotti Center</legal_name>
+        <logo_resource>fr/jmmc/jmcs/resource/image/jmmc_logo.png</logo_resource>
+        <homepage_url>http://www.jmmc.fr/</homepage_url>
+        <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
+    </company>
+
+    <program name="OIFitsExplorer" version="0.2.6"/>
+    <compilation date="03/06/2021" compiler="JDK 1.6.0_24"/>
+
+    <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
+
+    <authors>the JMMC Technical Group</authors>
+    <jnlp>http://www.jmmc.fr/apps/public/OIFitsExplorer/OIFitsExplorer.jnlp</jnlp>
+    <sampdescription>Explore your interferometric observation data files (OIFits)</sampdescription>
+
+    <distribution>
+        <application_data_file>ApplicationRelease.xml</application_data_file>
+        <public_url>http://www.jmmc.fr/apps/public/OIFitsExplorer/</public_url>
+        <beta_url>http://www.jmmc.fr/apps/beta/OIFitsExplorer/</beta_url>
+        <alpha_url>http://www.jmmc.fr/apps/alpha/OIFitsExplorer/</alpha_url>
+    </distribution>
+
+    <dependences>
+
+        <!-- JMMC -->
+
+        <!-- Java Mariotti OIfitsExplorer-core -->
+        <package name="OIFits Explorer core"
+                 description="OIFits Explorer core is the JMMC library dedicated to share OIFits GUI components (plots)"
+                 link="http://www.jmmc.fr/dev/oiexplorer-core/"
+                 jars="oiexplorer-core.jar"
+                 license="CECILL-B ???"/>
+
+        <!-- Java Mariotti Astronomical library -->
+        <package name="jMAL"
+                 description="JMMC library to provide common astronomical computations (coordinate conversion, SIMBAD star resolver and analytical object models in interferometry)"
+                 link="http://www.jmmc.fr/dev/jmal/"
+                 jars="jmal.jar"
+                 license="CECILL-B ???"/>
+
+        <!-- Java Mariotti OITools -->
+        <package name="OITools"
+                 description="OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)"
+                 link="http://www.jmmc.fr/dev/oitools/"
+                 jars="oitools.jar"
+                 license="CECILL-B ???"/>
+
+
+        <!-- 1. Science / VO libraries (always on top for better visibility) -->
+
+        <!-- OifitsExplorer dependencies -->
+
+        <!-- OITools dependencies -->
+
+        <package name="nom.tam.fits"
+                 description="The Java FITS library (nom.tam.fits) has been developed which provides efficient I/O for FITS images and binary tables. Made by Dr Thomas A. McGlynn, HEASARC"
+                 link="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/"
+                 license="Copyright: Thomas McGlynn 1997-1999." />
+        <!--
+          Copyright: Thomas McGlynn 1997-1999.
+          This code may be used for any purpose, non-commercial
+          or commercial so long as this copyright notice is retained
+          in the source code or included in or referred to in any
+          derived software.
+        -->
+
+        <!-- jMCS dependencies -->
+
+        <!-- VO interoperability -->
+        <package name="JSAMP"
+                 description="JSAMP is a Java toolkit for use with the Simple Applications Messaging Protocol. Made by Mark Taylor, working in the Astrophysics Group at Bristol University."
+                 link="http://software.astrogrid.org/doc/jsamp/"
+                 jars="jsamp-1.3.jar"
+                 license="(at least) the Academic Free Licence and the BSD License."/>
+
+        <!-- jMAL dependencies -->
+
+        <!-- Model computations (bessel functions) -->
+        <package name="CERN colt"
+                 description="provides a set of Open Source Libraries for High Performance Scientific and Technical Computing in Java"
+                 link="http://acs.lbl.gov/software/colt/"
+                 jars="colt.jar"
+                 license="Copyright (c) 1999 CERN - European Organization for Nuclear Research"/>
+        <!--
+          Copyright (c) 1999 CERN - European Organization for Nuclear Research.
+          Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose is
+          hereby granted without fee, provided that the above copyright notice appear in all copies and that both that
+          copyright notice and this permission notice appear in supporting documentation. CERN makes no representations
+          about the suitability of this software for any purpose. It is provided "as is" without expressed or implied warranty.
+        -->
+
+
+        <!-- 2. Swing -->
+
+        <!-- OifitsExplorer dependencies -->
+
+        <package name="JFreeChart"
+                 description="JFreeChart is a free 100% Java chart library that makes it easy for developers to display professional quality charts in their applications"
+                 link="http://www.jfree.org/jfreechart/"
+                 jars="jfreechart-1.0.13.jar jcommon-1.0.16.jar"
+                 license="LGPL" />
+
+        <package name="iText"
+                 description="iText is a library that allows you to generate PDF files on the fly"
+                 link="http://itextpdf.com/"
+                 jars="iText-2.1.5.jar"
+                 license="AGPL (http://itextpdf.com/terms-of-use/agpl.php)" />
+
+    </dependences>
+
+    <menubar>
+        <menu label="File">
+            <menu label="New OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.NewAction" action="newCollection" accelerator="N" />
+            <menu/> <!-- menu separator -->
+            <menu label="Add OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="F"
+                  icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add an OIFits file"/>
+            <menu label="Add OIFits files from collection" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction" action="loadOIFitsFromCollection"
+                  icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add OIFits files from OIFits Collection"/>
+
+            <menu/> <!-- menu separator -->
+            <menu label="Open OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction" action="loadOIDataCollection"
+                  accelerator="O" icon="fr/jmmc/jmcs/resource/image/folder.png" description="load an OIFits Collection settings"/>
+            <menu label="Save OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction" action="saveOIDataCollection"
+                  accelerator="S" description="save the current OIFits Collection settings"/>
+
+            <menu/> <!-- menu separator -->
+            <menu label="Export to OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction" action="exportOIFits"
+                  description="Export your current selection to an OIFits file"/>
+            <menu/> <!-- menu separator -->
+            <menu label="Export plot to PDF" classpath="fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction" action="exportPDF" accelerator="P"
+                  icon="fr/jmmc/oiexplorer/core/resource/image/icon_pdf.gif" description="Export the current plot to a PDF document"/>
+            <menu label="Export plot to PNG" classpath="fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction" action="exportPNG"
+                  description="Export the current plot to a PNG image"/>
+            <menu label="Export plot to JPG" classpath="fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction" action="exportJPG"
+                  description="Export the current plot to a JPG image"/>
+            <menu/> <!-- menu separator -->
+            <menu label="Export all plots to PDF" classpath="fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction" action="exportPDF"
+                  icon="fr/jmmc/oiexplorer/core/resource/image/icon_pdf.gif" description="Export all plots to a single PDF document"/>
+            <menu label="Export all plots to PNG" classpath="fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction" action="exportPNG"
+                  description="Export all plots to PNG images"/>
+            <menu label="Export all plots to JPG" classpath="fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction" action="exportJPG"
+                  description="Export all plots to JPG images"/>
+        </menu>
+
+        <menu label="Edit">
+        </menu>
+
+        <menu label="Interop">
+            <menu label="Send OIFits data" classpath="fr.jmmc.oiexplorer.interop.SendOIFitsAction" action="sendOIFitsAction"
+                  description="send selected OIFits data to OImaging or other VO Tools (SAMP)"/>
+        </menu>
+    </menubar>
+
+    <releasenotes>
+        <release version="0.2.6">
+            <pubDate>Thu, 03 Jun 2021 20:00:00 GMT</pubDate>
+            <prerelease version="0.2.6 beta 4">
+                <change type="FEATURE">Added a new Preference 'Max target separation' (1 as by default) to set the crossmatch distance used to consider two targets are the same in the OIFITS collection</change>
+            </prerelease>
+            <prerelease version="0.2.6 beta 3">
+                <change type="BUGFIX">OITools updates</change>
+            </prerelease>
+            <prerelease version="0.2.6 beta 2">
+                <change type="FEATURE">Switched to the new OIFitsTableBrowser to display, browse OIFITS tables (selected data point on the plot is highlighted)</change>
+            </prerelease>
+            <prerelease version="0.2.6 beta 1">
+                <change type="FEATURE">Added more plot presets (errors, SNR ...)</change>
+            </prerelease>
+        </release>
+        <release version="0.2.5">
+            <pubDate>Fri, 04 Oct 2019 11:00:00 GMT</pubDate>
+            <prerelease version="0.2.5 beta 7">
+                <change type="FEATURE">Improved plot editor to quickly switch between viewports (Auto, Default, Fixed modes)</change>
+            </prerelease>
+            <prerelease version="0.2.5 beta 6">
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/896">Improved plot editor to get the plot ranges and better handle fixed ranges</change>
+                <change type="FEATURE">Improved plot editor to preserve recent values in a popup menu for the min/max fields (range mode)</change>
+            </prerelease>
+            <prerelease version="0.2.5 beta 5">
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/990">Fixed Instrument matcher to specifically distinguish between GRAVITY polarizations</change>
+            </prerelease>
+            <prerelease version="0.2.5 beta 4">
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/796">Enhanced Draw Line support: use step line for plots having x-axis = EFF_WAVE (spectrum like)</change>
+            </prerelease>
+            <prerelease version="0.2.5 beta 3">
+                <change type="BUGFIX">Fixed (random) bug while refreshing selected data points (cross hairs)</change>
+            </prerelease>
+            <prerelease version="0.2.5 beta 2">
+                <change type="FEATURE">Added 'Send OIFits' action in the Interop menu to share selected OIFits data with OImaging and other VO tools</change>
+            </prerelease>
+            <prerelease version="0.2.5 beta 1">
+                <change type="FEATURE">Enable Image-OI support.</change>
+            </prerelease>
+        </release>
+        <release version="0.2.4">
+            <pubDate>Fri, 06 Jul 2018 14:00:00 GMT</pubDate>
+            <prerelease version="0.2.4 beta 2">
+                <change type="FEATURE">Added File action 'Export to OIFits file' to export the current selection (subset) as an OIFits file (using OITools Merger)</change>
+            </prerelease>
+            <prerelease version="0.2.4 beta 1">
+                <change type="FEATURE">Improved data selection to use global Target and Instrument modes (matching)</change>
+            </prerelease>
+        </release>
+        <release version="0.2.3">
+            <pubDate>Fri, 09 Mar 2018 16:00:00 GMT</pubDate>
+            <prerelease version="0.2.3 beta 1">
+                <change type="FEATURE">Improved cross hairs on plots to always select matching data points at (row, channel)</change>
+                <change type="FEATURE">Truncate the keyword DATE-OBS if it contains extra characters (display only)</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/904">Always cleanup default file names to avoid special characters</change>
+            </prerelease>
+        </release>
+        <release version="0.2.2">
+            <pubDate>Tue, 06 Mar 2018 16:00:00 GMT</pubDate>
+            <prerelease version="0.2.2 beta 2">
+                <change type="FEATURE">Improved Java support (9 + mac OS X) but Java 7 minimum is now required</change>
+            </prerelease>
+            <prerelease version="0.2.2 beta 1">
+                <change type="FEATURE">Upgraded OITools 2 providing OIFits 2 support</change>
+            </prerelease>
+        </release>
+        <release version="0.2.1">
+            <pubDate>Mon, 21 Nov 2016 15:00:00 GMT</pubDate>
+            <prerelease version="0.2.1 beta 5">
+                <change type="FEATURE">Improved the pointing accuracy for crosshairs with logarithmic axes</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/809">Fixed null pointer exception when clicking a data point on flux data (crosshairs)</change>
+            </prerelease>
+            <prerelease version="0.2.1 beta 4">
+                <change type="FEATURE">Fixed the wavelength color mapping when the OI_WAVELENGTH table contains unordered wavelengths (MIRC)</change>
+            </prerelease>
+            <prerelease version="0.2.1 beta 3">
+                <change type="FEATURE">Updated crosshairs handling on all plots (synchronization)</change>
+                <change type="FEATURE">Updated crosshair handling to show information about the data point</change>
+                <change type="FEATURE">Updated color attribution in plots (sorted baseline or configurations)</change>
+                <change type="FEATURE">Added the color scale for the effective wavelength in the plot legend</change>
+            </prerelease>
+            <prerelease version="0.2.1 beta 2">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/778">Fixed a trivial bug when removing a plot view</change>
+            </prerelease>
+            <prerelease version="0.2.1 beta 1">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/770">Fixed null pointer exception when displaying tooltip on the granule tree panel</change>
+            </prerelease>
+        </release>
+        <release version="0.2">
+            <pubDate>Fri, 08 Apr 2016 12:00:00 GMT</pubDate>
+            <prerelease version="0.2.0 beta 4">
+                <change type="CHANGE">Fixed typical data ranges for VIS [-0.1, 1.1] and ANGLE [-200, 200]</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/569">Added OI_SPECTRUM (OIFits 2) or OI_FLUX (GRAVITY) support</change>
+            </prerelease>
+            <prerelease version="0.2.0 beta 3">
+                <change type="FEATURE">Improved both plot and its editor to support up to 10 y axes (combined plots)</change>
+            </prerelease>
+            <prerelease version="0.2.0 beta 2">
+                <change type="FEATURE">Improved action 'Export plot' to support several formats (PDF, PNG, JPG)</change>
+                <change type="FEATURE">Added action 'Export all plots' to export plots in a single document</change>
+                <change type="FEATURE">Added a global view that displays all plots in the same view</change>
+                <change type="FEATURE">Added command line interface (CLI) support to load an OIFitsExplorer collection [-open file]
+                    and export plots into PDF [-pdf file] or image formats [-png or -jpg arguments]</change>
+                <change type="FEATURE">Added command line argument [-mode multi|single] to define the page mode:
+                    single means all plots on a single page; multi means all plots in a single page and one plot per page; default mode means one plot per page</change>
+                <change type="FEATURE">Added command line argument [-dims width,height] to define fixed dimensions for images</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/676">Fixed compatibility issue with JDK8 HashMap (OITableSerieKey.compareTo)</change>
+            </prerelease>
+            <prerelease version="0.2.0 beta 1">
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/434">Improved loading OIFits files in background with cancellation support</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/484">Improved log scale handling: dynamic tick label placement</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/479">Added sort OIFits files and targets by their name</change>
+                <change type="BUGFIX">Improved mousewheel zoom over sub plots</change>
+            </prerelease>
+        </release>
+        <release version="0.1">
+            <pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>
+            <prerelease version="0.1.4">
+                <change type="FEATURE">Modified plot presets to use computed hour angles instead of MJD as x-axis</change>
+                <change type="FEATURE">Added hour angle estimation from MJD (using array coordinates and target RA)</change>
+                <change type="BUGFIX">Hide plot's legend in case of too many legend items (100)</change>
+            </prerelease>
+            <prerelease version="0.1.3">
+                <change type="FEATURE">Added plot preset for UV spatial coverage (symmetry support)</change>
+                <change type="BUGFIX">Fixed plot's x-axis margins when including zero</change>
+            </prerelease>
+            <prerelease version="0.1.2">
+                <change type="FEATURE">Improved axis editor to adjust its converter and reset the log scale when the selected column changes</change>
+                <change type="FEATURE">Added plot presets with RADIUS (baseline length) and POS_ANGLE (position angle) as x axis</change>
+                <change type="FEATURE">Fixed default converters (MegaLambda, Micrometers) when choosing (SPATIAL_FREQ, EFF_WAVE) columns in the plot editor</change>
+                <change type="FEATURE">Show label 'No data to plot.' on the plot panel when no data matches criteria (flagged data, invalid columns ...)</change>
+                <change type="BUGFIX">Improved plot's display name to show appropriate X and Y axis names in the 'Show' combo box</change>
+                <change type="BUGFIX">Fixed empty column choices occuring when selecting a plot preset</change>
+                <change type="BUGFIX">Improved layout of the plot editor (margin, auto-fit panel's width)</change>
+            </prerelease>
+            <prerelease version="0.1.1">
+                <pubDate>Thu, 06 Mai 2013 12:00:00 GMT</pubDate>
+                <change type="FEATURE">Enhanced renderer settings to have a shape per serie's item:
+                    triangle for flagged data or invalid error (negative); square for valid data points</change>
+                <change type="BUGFIX">Improved plotting performance on huge datasets</change>
+                <change type="BUGFIX">Fixed min/max ranges for the plot's data area</change>
+            </prerelease>
+            <prerelease version="0.1 beta 2">
+                <pubDate>Thu, 26 Apr 2013 16:50:00 GMT</pubDate>
+                <change type="FEATURE">First release with minimal (working) features</change>
+            </prerelease>
+        </release>
+    </releasenotes>
+
+    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center \texttt{OifitsExplorer}
+service \footnote{Available at http://www.jmmc.fr/oifitsExplorer}.]]>
+    </acknowledgment>
+
+</ApplicationData>
