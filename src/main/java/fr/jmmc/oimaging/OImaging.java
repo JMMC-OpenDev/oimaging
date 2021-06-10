@@ -262,19 +262,13 @@ public final class OImaging extends App {
 
             // get screen size to adjust minimum window size :
             final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-            if (logger.isInfoEnabled()) {
-                logger.info("screen size = {} x {}", screenSize.getWidth(), screenSize.getHeight());
-            }
-
-            // hack for screens smaller than 1152x864 screens :
+            logger.info("screen size = {} x {}", screenSize.getWidth(), screenSize.getHeight());
+            // hack for screens smaller than 1024x768 screens:
             final int appWidth = 950;
-            final int appHeightMin = 700;
-            final int appHeightPref = (screenSize.getHeight() >= 864) ? 800 : appHeightMin;
+            final int appHeightMin = (screenSize.getHeight() >= 850) ? 800 : 700;
 
             final Dimension dim = new Dimension(appWidth, appHeightMin);
             frame.setMinimumSize(dim);
-            frame.setPreferredSize(new Dimension(appWidth, appHeightPref));
             frame.addComponentListener(new ComponentResizeAdapter(dim));
             frame.setPreferredSize(INITIAL_DIMENSION);
 
