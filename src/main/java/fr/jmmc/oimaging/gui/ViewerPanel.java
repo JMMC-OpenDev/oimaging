@@ -134,6 +134,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private void displaySelection(final FitsImageHDU imageHDU) {
         if (imageHDU != null) {
+            fitsImagePanel.getSliderPanel().setVisible(false);
+            if (imageHDU.getImageCount() > 1) {
+                fitsImagePanel.getSliderPanel().setFitsImages(imageHDU.getFitsImages());
+                fitsImagePanel.getSliderPanel().setVisible(true);
+            }
             FitsImage image = imageHDU.getFitsImages().get(0);
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
@@ -512,8 +517,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelOutputParamViewer.add(jScrollPaneTableInput, gridBagConstraints);
 
         jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
-
-        jTabbedPaneVizualizations.setSelectedIndex(1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
