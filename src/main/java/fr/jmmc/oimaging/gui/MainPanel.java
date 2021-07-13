@@ -22,6 +22,7 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsUnit;
 import fr.jmmc.oitools.image.ImageOiConstants;
@@ -76,6 +77,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     /** ResultSet list model */
     GenericListModel<ServiceResult> resultSetListModel = new GenericListModel<ServiceResult>(resultSetList);
+    /** ResultSet table model */
+    ResultSetTableModel resultSetTableModel = new ResultSetTableModel();
 
     /* members */
     /** actions */
@@ -284,7 +287,17 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jSplitPaneGlobal = new javax.swing.JSplitPane();
+        jTablePanel = new javax.swing.JPanel();
+        jSplitPaneTable = new javax.swing.JSplitPane();
+        jResultSetTableScrollPane = new javax.swing.JScrollPane();
+        jResultsTable = new javax.swing.JTable(new ResultSetTableModel());
+        jPanelTableOptions = new javax.swing.JPanel();
+        jButtonDelete = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
+        viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
         jScrollPane = new javax.swing.JScrollPane();
         jPanelLeft = new javax.swing.JPanel();
         jPanelDataSelection = new javax.swing.JPanel();
@@ -311,14 +324,47 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelResults = new javax.swing.JPanel();
         jScrollPaneResults = new javax.swing.JScrollPane();
         jListResults = createCustomList();
-        viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
 
         setLayout(new java.awt.BorderLayout());
+
+        jSplitPaneGlobal.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPaneGlobal.setMinimumSize(new java.awt.Dimension(900, 30));
+
+        jTablePanel.setLayout(new java.awt.BorderLayout());
+
+        jResultSetTableScrollPane.setViewportView(jResultsTable);
+
+        jSplitPaneTable.setRightComponent(jResultSetTableScrollPane);
+
+        jPanelTableOptions.setLayout(new javax.swing.BoxLayout(jPanelTableOptions, javax.swing.BoxLayout.PAGE_AXIS));
+
+        jButtonDelete.setText("Delete");
+        jButtonDelete.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButtonDeleteMouseClicked(evt);
+            }
+        });
+        jPanelTableOptions.add(jButtonDelete);
+
+        jButton2.setText("jButton2");
+        jPanelTableOptions.add(jButton2);
+
+        jButton3.setText("jButton3");
+        jPanelTableOptions.add(jButton3);
+
+        jSplitPaneTable.setRightComponent(jPanelTableOptions);
+
+        jTablePanel.add(jSplitPaneTable, java.awt.BorderLayout.CENTER);
+        jSplitPaneTable.setLeftComponent(jPanelTableOptions);
+        jSplitPaneTable.setRightComponent(jResultSetTableScrollPane);
+
+        jSplitPaneGlobal.setLeftComponent(jTablePanel);
 
         jSplitPane.setResizeWeight(0.01);
         jSplitPane.setContinuousLayout(true);
         jSplitPane.setMinimumSize(new java.awt.Dimension(900, 600));
         jSplitPane.setPreferredSize(new java.awt.Dimension(900, 600));
+        jSplitPane.setRightComponent(viewerPanel);
 
         jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane.setViewportView(jPanelLeft);
@@ -567,9 +613,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jScrollPane.setViewportView(jPanelLeft);
 
         jSplitPane.setLeftComponent(jScrollPane);
-        jSplitPane.setRightComponent(viewerPanel);
 
-        add(jSplitPane, java.awt.BorderLayout.CENTER);
+        jSplitPaneGlobal.setLeftComponent(jSplitPane);
+
+        add(jSplitPaneGlobal, java.awt.BorderLayout.CENTER);
+        jSplitPaneGlobal.setTopComponent(jSplitPane);
+        jSplitPaneGlobal.setBottomComponent(jTablePanel);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxActionPerformed
@@ -583,6 +632,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void jFormattedTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldPropertyChange
         updateModel();
     }//GEN-LAST:event_jFormattedTextFieldPropertyChange
+
+    private void jButtonDeleteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonDeleteMouseClicked
+        ResultSetTableModel model = (ResultSetTableModel) jResultsTable.getModel();
+        if (jResultsTable.getRowCount() > 0) {
+            model.removeResult(jResultsTable.getSelectedRow());
+        }
+    }//GEN-LAST:event_jButtonDeleteMouseClicked
 
     /**
      * Listen for list selection changes
@@ -605,6 +661,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButtonDelete;
     private javax.swing.JButton jButtonExportImage;
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;
@@ -625,12 +684,18 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JPanel jPanelExecutionLog;
     private javax.swing.JPanel jPanelLeft;
     private javax.swing.JPanel jPanelResults;
+    private javax.swing.JPanel jPanelTableOptions;
+    private javax.swing.JScrollPane jResultSetTableScrollPane;
+    private javax.swing.JTable jResultsTable;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPaneEditor;
     private javax.swing.JScrollPane jScrollPaneResults;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
     private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JSplitPane jSplitPaneGlobal;
+    private javax.swing.JSplitPane jSplitPaneTable;
+    private javax.swing.JPanel jTablePanel;
     private fr.jmmc.oimaging.gui.SoftwareSettingsPanel softwareSettingsPanel;
     private fr.jmmc.oimaging.gui.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
@@ -798,6 +863,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             resultSetListModel.clear();
             resultSetListModel.add(currentModel.getResultSets());
             jListResults.setModel(resultSetListModel);
+            
+            // resultSet Table
+            resultSetTableModel.clear();
+            currentModel.getResultSets().forEach(result -> {
+                resultSetTableModel.addResult(result);
+            });
+            jResultsTable.setModel(resultSetTableModel);
 
             // perform analysis
             final List<String> failures = new LinkedList<String>();
