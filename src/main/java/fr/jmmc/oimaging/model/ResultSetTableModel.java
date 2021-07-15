@@ -14,11 +14,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
+
 /**
  *
  * @author martin
  */
-public class ResultSetTableModel extends AbstractTableModel {
+public class ResultSetTableModel extends AbstractTableModel { 
 
     private static final String[] HEADERS = {"Tick", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comment"};
     private final List<ServiceResult> results;
@@ -31,10 +32,12 @@ public class ResultSetTableModel extends AbstractTableModel {
 
     public void addResult(ServiceResult result) {
         this.results.add(result);
+        fireTableRowsInserted(results.size() - 1, results.size() - 1);
     }
 
     public void removeResult(int rowIndex) {
         this.results.remove(rowIndex);
+        fireTableRowsDeleted(rowIndex, rowIndex);
     }
     
    public void clear() {
@@ -75,7 +78,9 @@ public class ResultSetTableModel extends AbstractTableModel {
 
             case 3:
             try {
-                return this.results.get(rowIndex).getOifitsFile().getWavelengthRange();
+                return 
+                        Double.toString(this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getWaveMin()) + " " 
+                        + Double.toString(this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getWaveMax());
             } catch (IOException | FitsException ex) {
                 Logger.getLogger(ResultSetTableModel.class.getName()).log(Level.SEVERE, null, ex);
             }

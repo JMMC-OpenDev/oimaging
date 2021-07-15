@@ -525,6 +525,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
 
+        jTabbedPaneVizualizations.setSelectedIndex(1);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
