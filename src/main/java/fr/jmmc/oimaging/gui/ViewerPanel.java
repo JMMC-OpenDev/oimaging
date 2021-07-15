@@ -90,7 +90,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImage.add(fitsImagePanel);
         
         sliderPanel = new SliderPanel(fitsImagePanel);
-        fitsImagePanel.jPanelOptions.add(sliderPanel);
+        fitsImagePanel.addOptionPanel(sliderPanel);
 
         oifitsViewPanel = new OIFitsViewPanel();
         java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
