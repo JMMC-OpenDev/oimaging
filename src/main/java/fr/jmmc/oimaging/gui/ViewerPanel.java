@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
+import fr.jmmc.oiexplorer.core.gui.SliderPanel;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
@@ -55,6 +56,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     /** OIFits viewer panel */
     private final OIFitsViewPanel oifitsViewPanel;
+    
+    /** Slider panel */
+    private SliderPanel sliderPanel;
 
     private final Action exportOiFitsAction;
     private final Action sendOiFitsAction;
@@ -84,6 +88,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         fitsImagePanel = new FitsImagePanel(Preferences.getInstance(), true, true, null);
         jPanelImage.add(fitsImagePanel);
+        
+        sliderPanel = new SliderPanel(fitsImagePanel);
+        fitsImagePanel.jPanelOptions.add(sliderPanel);
 
         oifitsViewPanel = new OIFitsViewPanel();
         java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -134,10 +141,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private void displaySelection(final FitsImageHDU imageHDU) {
         if (imageHDU != null) {
-            fitsImagePanel.getSliderPanel().setVisible(false);
+            sliderPanel.setVisible(false);
             if (imageHDU.getImageCount() > 1) {
-                fitsImagePanel.getSliderPanel().setFitsImages(imageHDU.getFitsImages());
-                fitsImagePanel.getSliderPanel().setVisible(true);
+                sliderPanel.setFitsImages(imageHDU.getFitsImages());
+                sliderPanel.setVisible(true);
             }
             FitsImage image = imageHDU.getFitsImages().get(0);
             fitsImagePanel.setFitsImage(image);
