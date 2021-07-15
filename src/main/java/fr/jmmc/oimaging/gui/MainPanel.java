@@ -324,6 +324,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelResults = new javax.swing.JPanel();
         jScrollPaneResults = new javax.swing.JScrollPane();
         jListResults = createCustomList();
+        jResultsTableShowButton = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -602,6 +603,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jPanelResults.add(jScrollPaneResults, java.awt.BorderLayout.CENTER);
 
+        jResultsTableShowButton.setText("Show details");
+        jResultsTableShowButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jResultsTableShowButtonActionPerformed(evt);
+            }
+        });
+        jPanelResults.add(jResultsTableShowButton, java.awt.BorderLayout.PAGE_END);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -639,6 +648,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             model.removeResult(jResultsTable.getSelectedRow());
         }
     }//GEN-LAST:event_jButtonDeleteMouseClicked
+
+    private void jResultsTableShowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResultsTableShowButtonActionPerformed
+        if (this.jSplitPaneGlobal.getBottomComponent() == null) {
+            this.jSplitPaneGlobal.setBottomComponent(jResultsTable);
+            this.jResultsTable.setVisible(true);
+        } else {
+            this.jSplitPaneGlobal.remove(2);
+            this.jResultsTable.setVisible(false);
+        }
+    }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
 
     /**
      * Listen for list selection changes
@@ -687,6 +706,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JPanel jPanelTableOptions;
     private javax.swing.JScrollPane jResultSetTableScrollPane;
     private javax.swing.JTable jResultsTable;
+    private javax.swing.JButton jResultsTableShowButton;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPaneEditor;
     private javax.swing.JScrollPane jScrollPaneResults;
@@ -866,9 +886,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             
             // resultSet Table
             resultSetTableModel.clear();
-            currentModel.getResultSets().forEach(result -> {
-                resultSetTableModel.addResult(result);
-            });
+            resultSetTableModel.addResult(currentModel.getResultSets());
             jResultsTable.setModel(resultSetTableModel);
 
             // perform analysis

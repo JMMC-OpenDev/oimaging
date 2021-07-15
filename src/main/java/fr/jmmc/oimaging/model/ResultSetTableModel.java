@@ -30,18 +30,18 @@ public class ResultSetTableModel extends AbstractTableModel {
         this.results = new ArrayList<>();
     }
 
-    public void addResult(ServiceResult result) {
-        this.results.add(result);
-        fireTableRowsInserted(results.size() - 1, results.size() - 1);
+    public void addResult(List<ServiceResult> result) {
+        this.results.addAll(result);
+        fireTableDataChanged();
     }
 
     public void removeResult(int rowIndex) {
         this.results.remove(rowIndex);
-        fireTableRowsDeleted(rowIndex, rowIndex);
+        fireTableDataChanged();
     }
     
    public void clear() {
-       for (int i = 0; i < getRowCount(); i++) removeResult(i);
+       results.clear();
    }
 
     @Override
