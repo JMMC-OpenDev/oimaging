@@ -8,6 +8,7 @@ package fr.jmmc.oimaging.gui;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
+import javax.swing.JButton;
 import javax.swing.JTable;
 
 /**
@@ -44,12 +45,12 @@ public class TablePanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         jResultSetTable = new javax.swing.JTable();
         jPanelTableOptions = new javax.swing.JPanel();
-        jButtonDelete = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -58,36 +59,25 @@ public class TablePanel extends javax.swing.JPanel {
 
         jSplitPane1.setRightComponent(jScrollPane1);
 
-        jPanelTableOptions.setLayout(new javax.swing.BoxLayout(jPanelTableOptions, javax.swing.BoxLayout.LINE_AXIS));
-
-        jButtonDelete.setText("Delete");
-        jButtonDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonDeleteActionPerformed(evt);
-            }
-        });
-        jPanelTableOptions.add(jButtonDelete);
-
+        jPanelTableOptions.setLayout(new javax.swing.BoxLayout(jPanelTableOptions, javax.swing.BoxLayout.PAGE_AXIS));
         jSplitPane1.setLeftComponent(jPanelTableOptions);
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-        if (jResultSetTable.getSelectedRow() != -1) 
-            resultSetTableModel.removeResult(jResultSetTable.getSelectedRow());
-    }//GEN-LAST:event_jButtonDeleteActionPerformed
-
     public JTable getTable() {
         return this.jResultSetTable;
     }
     
-    public ResultSetTableModel getModel() {
+    public ResultSetTableModel getTableModel() {
         return this.resultSetTableModel;
     }
     
+    public void addControlButton(JButton button) {
+        jPanelTableOptions.add(button);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonDelete;
     private javax.swing.JPanel jPanelTableOptions;
     private javax.swing.JTable jResultSetTable;
     private javax.swing.JScrollPane jScrollPane1;

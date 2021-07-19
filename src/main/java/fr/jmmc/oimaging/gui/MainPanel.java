@@ -22,6 +22,7 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsUnit;
 import fr.jmmc.oitools.image.ImageOiConstants;
@@ -42,10 +43,13 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.ListModel;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +58,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener {
+public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener, TableModelListener {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
@@ -165,9 +169,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // become widget listener
         jListResults.addListSelectionListener((ListSelectionListener) this);
-
+        jTablePanel.getTable().getModel().addTableModelListener((TableModelListener) this);
+        
         // init viewer Panel
         viewerPanel.displayModel(null);
+        
+        jTablePanel.addControlButton(jButtonCompare);
+        jTablePanel.addControlButton(jButtonDelete);
 
         jSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 
@@ -284,6 +292,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jButtonCompare = new javax.swing.JButton();
+        jButtonDelete = new javax.swing.JButton();
         jSplitPaneGlobal = new javax.swing.JSplitPane();
         jSplitPane = new javax.swing.JSplitPane();
         viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
@@ -315,6 +325,20 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jListResults = createCustomList();
         jResultsTableShowButton = new javax.swing.JButton();
         jTablePanel = new fr.jmmc.oimaging.gui.TablePanel();
+
+        jButtonCompare.setText("Compare");
+        jButtonCompare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCompareActionPerformed(evt);
+            }
+        });
+
+        jButtonDelete.setText("Delete");
+        jButtonDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDeleteActionPerformed(evt);
+            }
+        });
 
         setLayout(new java.awt.BorderLayout());
 
@@ -615,6 +639,20 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
     }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
 
+    private void jButtonCompareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCompareActionPerformed
+        
+    }//GEN-LAST:event_jButtonCompareActionPerformed
+
+    private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
+        JTable table = jTablePanel.getTable();
+        ResultSetTableModel model = jTablePanel.getTableModel();
+        GenericListModel listModel = (GenericListModel) jListResults.getModel();
+        if (table.getSelectedRow() != -1) {
+            resultSetList.remove(table.getSelectedRow());
+            model.removeResult(table.getSelectedRow());
+        }
+    }//GEN-LAST:event_jButtonDeleteActionPerformed
+
     /**
      * Listen for list selection changes
      *
@@ -634,8 +672,24 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
     }
+    
+    /**
+     * Listen for table selection changes
+     * 
+     * @param e 
+     */
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        if (e.getSource() == jTablePanel.getTable()) {
+            viewerPanel.displayResult(resultSetList.get(jTablePanel.getTable().getSelectedRow()));
+            deleteSelectionAction.watchResultsSelection(currentModel, jListResults);
+        }
+        updateModel();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonCompare;
+    private javax.swing.JButton jButtonDelete;
     private javax.swing.JButton jButtonExportImage;
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;
@@ -834,8 +888,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jListResults.setModel(resultSetListModel);
             
             // resultSet Table
-            jTablePanel.getModel().clear();
-            jTablePanel.getModel().addResult(currentModel.getResultSets());
+            jTablePanel.getTableModel().clear();
+            jTablePanel.getTableModel().addResult(currentModel.getResultSets());
 
             // perform analysis
             final List<String> failures = new LinkedList<String>();
