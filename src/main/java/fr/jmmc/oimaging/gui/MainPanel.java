@@ -45,6 +45,7 @@ import javax.swing.JList;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -222,7 +223,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // TODO release child resource if any
     }
-
+    
     private JList createCustomList() {
         final JList list = new JList() {
             /** default serial UID for Serializable interface */
@@ -344,6 +345,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jSplitPaneGlobal.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPaneGlobal.setMinimumSize(new java.awt.Dimension(900, 30));
+        jSplitPaneGlobal.setDividerLocation(100);
 
         jSplitPane.setResizeWeight(0.01);
         jSplitPane.setContinuousLayout(true);
@@ -630,17 +632,19 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }//GEN-LAST:event_jFormattedTextFieldPropertyChange
 
     private void jResultsTableShowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResultsTableShowButtonActionPerformed
-        if (this.jSplitPaneGlobal.getBottomComponent() == null) {
-            this.jSplitPaneGlobal.setBottomComponent(jTablePanel.getTable());
-            this.jTablePanel.getTable().setVisible(true);
+        if (this.jTablePanel.isVisible()) {
+            this.jTablePanel.setVisible(false);
         } else {
-            this.jSplitPaneGlobal.remove(2);
-            this.jTablePanel.getTable().setVisible(false);
+            this.jTablePanel.setVisible(true);
         }
     }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
 
     private void jButtonCompareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCompareActionPerformed
-        
+        List<ServiceResult> results = new ArrayList<>();
+        for (Integer index : jTablePanel.getTable().getSelectedRows()) {
+            results.add(resultSetList.get(index));
+        }
+        viewerPanel.displayGrid(results);
     }//GEN-LAST:event_jButtonCompareActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
@@ -681,10 +685,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     @Override
     public void tableChanged(TableModelEvent e) {
         if (e.getSource() == jTablePanel.getTable()) {
-            viewerPanel.displayResult(resultSetList.get(jTablePanel.getTable().getSelectedRow()));
+            viewerPanel.displayResult((ServiceResult) jListResults.getModel().getElementAt(jTablePanel.getTable().getSelectedRow()));
             deleteSelectionAction.watchResultsSelection(currentModel, jListResults);
         }
-        updateModel();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

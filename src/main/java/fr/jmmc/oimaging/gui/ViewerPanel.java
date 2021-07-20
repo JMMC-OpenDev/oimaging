@@ -29,9 +29,11 @@ import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.Action;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -72,7 +74,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private enum SHOW_MODE {
         MODEL,
-        RESULT;
+        RESULT,
+        GRID;
     }
     private SHOW_MODE showMode;
 
@@ -244,6 +247,29 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
 
             setTabMode(SHOW_MODE.RESULT);
+        }
+    }
+    
+    public void displayGrid(List<ServiceResult> results) {
+        showMode = SHOW_MODE.GRID;
+        
+        FitsImagePanel panel;
+        OIFitsFile oifitsFile;
+        GridLayout grid = new GridLayout(3, 3);
+        
+        jPanelImage.removeAll();
+        jPanelImage.setLayout(grid);
+        
+        for (ServiceResult result : results) {
+            
+            panel = new FitsImagePanel(Preferences.getInstance());
+            jPanelImage.add(panel);
+            try {
+                oifitsFile = result.getOifitsFile();
+                panel.setFitsImage(oifitsFile.getFitsImageHDUs().get(0).getFitsImages().get(0));
+            } catch (IOException | FitsException ex) {
+                java.util.logging.Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

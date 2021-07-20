@@ -20,10 +20,11 @@ import javax.swing.table.AbstractTableModel;
  * @author martin
  */
 public class ResultSetTableModel extends AbstractTableModel { 
-
-    private static final String[] HEADERS = {"Tick", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comment"};
+    
+    private final static int INDEX = 0, FILE = 1, TARGET = 2, TIMESTAMP_RECONSTRUCTION = 3, WAVELENGTH = 4, ALGORITHM = 5, RGL_WGT = 6, SUCCESS = 7, RATING = 8, COMMENTS = 9;
+    private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comment"};
     private final List<ServiceResult> results;
-
+    
     public ResultSetTableModel() {
         super();
 
@@ -51,21 +52,23 @@ public class ResultSetTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return HEADERS.length;
+        return COLUMNS_NAMES.length;
     }
 
     @Override
     public String getColumnName(int columnIndex) {
-        return HEADERS[columnIndex];
+        return COLUMNS_NAMES[columnIndex];
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
-            case 0:
+            case INDEX:
+                return rowIndex;
+            case FILE:
                 return this.results.get(rowIndex).getInputFile().getName();
 
-            case 1:
+            case TARGET:
                 try {
                 return this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getTarget();
             } catch (IOException | FitsException ex) {
@@ -73,10 +76,10 @@ public class ResultSetTableModel extends AbstractTableModel {
             }
             break;
 
-            case 2:
+            case TIMESTAMP_RECONSTRUCTION:
                 return this.results.get(rowIndex).getEndTime();
 
-            case 3:
+            case WAVELENGTH:
             try {
                 return 
                         Double.toString(this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getWaveMin()) + " " 
@@ -86,10 +89,10 @@ public class ResultSetTableModel extends AbstractTableModel {
             }
             break;
 
-            case 4:
+            case ALGORITHM:
                 return this.results.get(rowIndex).getService().getProgram();
 
-            case 5:
+            case RGL_WGT:
                 try {
                 return this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getRglWgt();
             } catch (IOException | FitsException ex) {
@@ -97,13 +100,13 @@ public class ResultSetTableModel extends AbstractTableModel {
             }
             break;
 
-            case 6:
+            case SUCCESS:
                 return this.results.get(rowIndex).isValid();
 
-            case 7:
+            case RATING:
                 return "Rating WIP";
 
-            case 8:
+            case COMMENTS:
                 return "Comment WIP";
 
             default:
