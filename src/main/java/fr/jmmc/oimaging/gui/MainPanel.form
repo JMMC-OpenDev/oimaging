@@ -451,7 +451,7 @@
                         </Container>
                         <Component class="javax.swing.JButton" name="jResultsTableShowButton">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Show details"/>
+                            <Property name="text" type="java.lang.String" value="Hide details"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jResultsTableShowButtonActionPerformed"/>

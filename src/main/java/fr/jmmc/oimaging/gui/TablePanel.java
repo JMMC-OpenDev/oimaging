@@ -1,8 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** *****************************************************************************
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+ ***************************************************************************** */
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
@@ -16,22 +14,23 @@ import javax.swing.JTable;
  * @author martin
  */
 public class TablePanel extends javax.swing.JPanel {
-    
-    /** ResultSet table model */
+
+    /**
+     * ResultSet table model
+     */
     private final ResultSetTableModel resultSetTableModel;
     private final BasicTableSorter resultSetTableSorter;
-    
-    
+
     /**
      * Creates new form TablePanel
      */
     public TablePanel() {
-        
+
         // Build ResultsTable
         resultSetTableModel = new ResultSetTableModel();
-        
+
         initComponents();
-        
+
         resultSetTableSorter = new BasicTableSorter(resultSetTableModel, jResultSetTable.getTableHeader());
         jResultSetTable.setModel(resultSetTableSorter);
         SwingUtils.adjustRowHeight(jResultSetTable);
@@ -68,19 +67,20 @@ public class TablePanel extends javax.swing.JPanel {
     public JTable getTable() {
         return this.jResultSetTable;
     }
-    
+
     public ResultSetTableModel getTableModel() {
         return this.resultSetTableModel;
     }
-    
+
     public void addControlButton(JButton button) {
         jPanelTableOptions.add(button);
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanelTableOptions;
     private javax.swing.JTable jResultSetTable;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
+
 }

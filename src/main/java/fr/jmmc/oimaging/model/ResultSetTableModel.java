@@ -1,8 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*******************************************************************************
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+ ******************************************************************************/
 package fr.jmmc.oimaging.model;
 
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -21,29 +19,45 @@ import javax.swing.table.AbstractTableModel;
  */
 public class ResultSetTableModel extends AbstractTableModel { 
     
-    private final static int INDEX = 0, FILE = 1, TARGET = 2, TIMESTAMP_RECONSTRUCTION = 3, WAVELENGTH = 4, ALGORITHM = 5, RGL_WGT = 6, SUCCESS = 7, RATING = 8, COMMENTS = 9;
+    public final static int INDEX = 0, FILE = 1, TARGET = 2, TIMESTAMP_RECONSTRUCTION = 3, WAVELENGTH = 4, ALGORITHM = 5, RGL_WGT = 6, SUCCESS = 7, RATING = 8, COMMENTS = 9;
     private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comment"};
-    private final List<ServiceResult> results;
+    List<ServiceResult> results;
+    
+    private class Row {
+        public ServiceResult result;
+        public int rating = 5;
+        public String comments = null;
+        
+        public Row(ServiceResult result) {
+            this.result = result;
+        }
+    }
+    List<Row> rows;
     
     public ResultSetTableModel() {
         super();
-
-        this.results = new ArrayList<>();
+        
+        results = new ArrayList<>();
+        rows = new ArrayList<>();
     }
 
-    public void addResult(List<ServiceResult> result) {
-        this.results.addAll(result);
+    public void addResult(List<ServiceResult> results) {
+        this.results.addAll(results);
+        results.forEach(result -> {
+            rows.add(new Row(result));
+        });
         fireTableDataChanged();
     }
 
     public void removeResult(int rowIndex) {
         this.results.remove(rowIndex);
+        this.rows.remove(rowIndex);
         fireTableDataChanged();
     }
     
-   public void clear() {
+    public void clear() {
        results.clear();
-   }
+    }
 
     @Override
     public int getRowCount() {
@@ -59,12 +73,25 @@ public class ResultSetTableModel extends AbstractTableModel {
     public String getColumnName(int columnIndex) {
         return COLUMNS_NAMES[columnIndex];
     }
+    
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return (columnIndex == COMMENTS);
+    }
 
+    @Override
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        switch (columnIndex) {
+            case COMMENTS:
+                rows.get(rowIndex).comments = (String) value;
+        }
+    }
+    
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case INDEX:
-                return rowIndex;
+                return getRowCount() - rowIndex;
             case FILE:
                 return this.results.get(rowIndex).getInputFile().getName();
 
@@ -104,15 +131,15 @@ public class ResultSetTableModel extends AbstractTableModel {
                 return this.results.get(rowIndex).isValid();
 
             case RATING:
-                return "Rating WIP";
+                return rows.get(rowIndex).rating;
 
             case COMMENTS:
-                return "Comment WIP";
+                return rows.get(rowIndex).comments;
 
             default:
                 return null;
         }
         return null;
     }
-
+    
 }

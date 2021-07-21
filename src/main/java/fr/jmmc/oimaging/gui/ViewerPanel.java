@@ -68,6 +68,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private final Action sendFitsAction;
     private Component lastModelPanel;
     private Component lastResultPanel;
+    private Component lastGridPanel;
 
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
@@ -180,10 +181,16 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         syncingUI = true;
 
         // change border title
-        if (mode.equals(SHOW_MODE.MODEL)) {
-            setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (INPUT)"));
-        } else {
-            setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (RESULT)"));
+        switch (mode) {
+            case MODEL:
+                setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (INPUT)"));
+                break;
+            case RESULT:
+                setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (RESULT)"));
+                break;
+            case GRID:
+                setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (GRID)"));
+                break;
         }
 
         // switch tab arrangement only if we switch between model display or result display
@@ -252,24 +259,28 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     
     public void displayGrid(List<ServiceResult> results) {
         showMode = SHOW_MODE.GRID;
-        
+
         FitsImagePanel panel;
         OIFitsFile oifitsFile;
-        GridLayout grid = new GridLayout(3, 3);
-        
-        jPanelImage.removeAll();
-        jPanelImage.setLayout(grid);
-        
-        for (ServiceResult result : results) {
-            
-            panel = new FitsImagePanel(Preferences.getInstance());
-            jPanelImage.add(panel);
-            try {
-                oifitsFile = result.getOifitsFile();
-                panel.setFitsImage(oifitsFile.getFitsImageHDUs().get(0).getFitsImages().get(0));
-            } catch (IOException | FitsException ex) {
-                java.util.logging.Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+        GridLayout grid;
+
+        if (!results.isEmpty()) {
+            grid = new GridLayout(3, 3);
+
+            jPanelImage.removeAll();
+            jPanelImage.setLayout(grid);
+
+            for (ServiceResult result : results) {
+                panel = new FitsImagePanel(Preferences.getInstance());
+                jPanelImage.add(panel);
+                try {
+                    oifitsFile = result.getOifitsFile();
+                    panel.setFitsImage(oifitsFile.getFitsImageHDUs().get(0).getFitsImages().get(0));
+                } catch (IOException | FitsException ex) {
+                    java.util.logging.Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            setTabMode(SHOW_MODE.GRID);
         }
     }
 
@@ -623,10 +634,16 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             return;
         }
 
-        if (showMode == SHOW_MODE.MODEL) {
-            lastModelPanel = jTabbedPaneVizualizations.getSelectedComponent();
-        } else {
-            lastResultPanel = jTabbedPaneVizualizations.getSelectedComponent();
+        switch (showMode) {
+            case MODEL:
+                lastModelPanel = jTabbedPaneVizualizations.getSelectedComponent();
+                break;
+            case RESULT:
+                lastResultPanel = jTabbedPaneVizualizations.getSelectedComponent();
+                break;
+            case GRID:
+                lastGridPanel = jTabbedPaneVizualizations.getSelectedComponent();
+                break;
         }
     }
 
@@ -636,6 +653,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             jTabbedPaneVizualizations.setSelectedComponent(lastModelPanel);
         } else if (showMode == SHOW_MODE.RESULT & lastResultPanel != null) {
             jTabbedPaneVizualizations.setSelectedComponent(lastResultPanel);
+        } else if (showMode == SHOW_MODE.GRID && lastGridPanel != null) {
+            jTabbedPaneVizualizations.setSelectedComponent(lastGridPanel);
         }
     }
 }

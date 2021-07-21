@@ -36,9 +36,11 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -589,7 +591,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jPanelResults.add(jScrollPaneResults, java.awt.BorderLayout.CENTER);
 
-        jResultsTableShowButton.setText("Show details");
+        jResultsTableShowButton.setText("Hide details");
         jResultsTableShowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jResultsTableShowButtonActionPerformed(evt);
@@ -634,8 +636,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void jResultsTableShowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResultsTableShowButtonActionPerformed
         if (this.jTablePanel.isVisible()) {
             this.jTablePanel.setVisible(false);
+            this.jResultsTableShowButton.setText("Show details");
         } else {
             this.jTablePanel.setVisible(true);
+            this.jResultsTableShowButton.setText("Hide details");
         }
     }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
 
@@ -650,11 +654,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
         JTable table = jTablePanel.getTable();
         ResultSetTableModel model = jTablePanel.getTableModel();
-        GenericListModel listModel = (GenericListModel) jListResults.getModel();
-        if (table.getSelectedRow() != -1) {
-            resultSetList.remove(table.getSelectedRow());
-            model.removeResult(table.getSelectedRow());
+                
+        if (table.getSelectedRows().length != 0) {
+            for (Integer index : table.getSelectedRows()) {
+                resultSetList.remove(index);
+                model.removeResult(index);
+            }
         }
+        jPanelLeft.updateUI();
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     /**
