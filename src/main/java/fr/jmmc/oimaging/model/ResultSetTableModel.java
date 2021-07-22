@@ -7,6 +7,7 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import fr.nom.tam.fits.FitsException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,12 +47,6 @@ public class ResultSetTableModel extends AbstractTableModel {
         results.forEach(result -> {
             rows.add(new Row(result));
         });
-        fireTableDataChanged();
-    }
-
-    public void removeResult(int rowIndex) {
-        this.results.remove(rowIndex);
-        this.rows.remove(rowIndex);
         fireTableDataChanged();
     }
     

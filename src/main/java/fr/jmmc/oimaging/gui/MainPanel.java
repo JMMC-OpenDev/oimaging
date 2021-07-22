@@ -37,10 +37,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -53,6 +57,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -644,24 +649,23 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
 
     private void jButtonCompareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCompareActionPerformed
-        List<ServiceResult> results = new ArrayList<>();
+        List<ServiceResult> resultsToCompare = new ArrayList<>();
         for (Integer index : jTablePanel.getTable().getSelectedRows()) {
-            results.add(resultSetList.get(index));
+            resultsToCompare.add(resultSetList.get(index));
         }
-        viewerPanel.displayGrid(results);
+        viewerPanel.displayGrid(resultsToCompare);
     }//GEN-LAST:event_jButtonCompareActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
         JTable table = jTablePanel.getTable();
-        ResultSetTableModel model = jTablePanel.getTableModel();
-                
-        if (table.getSelectedRows().length != 0) {
-            for (Integer index : table.getSelectedRows()) {
-                resultSetList.remove(index);
-                model.removeResult(index);
-            }
+        
+        if (table.getSelectedRowCount() != 0) {
+            List<Integer> rowsToDelete = Arrays.stream(table.getSelectedRows()).boxed().collect(Collectors.toList());
+            Collections.reverse(rowsToDelete);
+            rowsToDelete.forEach((Integer index) -> {
+                currentModel.removeServiceResult(resultSetList.get(index));
+            });
         }
-        jPanelLeft.updateUI();
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     /**

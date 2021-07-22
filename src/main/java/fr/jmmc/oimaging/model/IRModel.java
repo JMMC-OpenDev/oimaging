@@ -487,6 +487,12 @@ public class IRModel {
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
     }
+    
+    public void removeServiceResult(ServiceResult serviceResultToDelete) {
+        getResultSets().remove(serviceResultToDelete);
+        // notify model update
+        IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
 
     public void removeServiceResults(List<ServiceResult> selectedServicesList) {
         getResultSets().removeAll(selectedServicesList);
