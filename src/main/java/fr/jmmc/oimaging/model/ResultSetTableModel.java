@@ -3,12 +3,11 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.model;
 
-import fr.jmmc.oimaging.services.Service;
+import fr.jmmc.oimaging.gui.StarRater;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.nom.tam.fits.FitsException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,15 +24,13 @@ public class ResultSetTableModel extends AbstractTableModel {
     List<ServiceResult> results;
 
     private class Row {
-
         public ServiceResult result = null;
         public StarRater rating = null;
         public String comments = null;
 
         public Row(ServiceResult result) {
             this.result = result;
-            this.rating = new StarRater();
-            this.rating.addStarListener(System.out::println);
+            this.rating = new StarRater(0);
             this.comments = "No comments";
         }
     }
@@ -42,6 +39,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     public ResultSetTableModel() {
         super();
         rows = new ArrayList<>();
+        
     }
 
     public void addResult(List<ServiceResult> results) {
