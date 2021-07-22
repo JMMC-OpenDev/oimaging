@@ -26,11 +26,13 @@ public class ResultSetTableModel extends AbstractTableModel {
 
     private class Row {
         public ServiceResult result;
-        public int rating = 5;
+        public StarRater rating = null;
         public String comments = null;
         
         public Row(ServiceResult result) {
             this.result = result;
+            this.rating = new StarRater(0);
+            this.comments = "No comments";
         }
     }
     List<Row> rows;
@@ -38,6 +40,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     public ResultSetTableModel() {
         super();
         rows = new ArrayList<>();
+        
     }
 
     public void addResult(List<ServiceResult> results) {
@@ -79,14 +82,22 @@ public class ResultSetTableModel extends AbstractTableModel {
     
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return (columnIndex == COMMENTS);
+        switch (columnIndex) {
+            case COMMENTS:
+            case RATING:
+                return true;
+        }
+        return false;
     }
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         switch (columnIndex) {
+            case RATING:
+                rows.get(rowIndex).rating = (StarRater) value;
             case COMMENTS:
                 rows.get(rowIndex).comments = (String) value;
+                break;
         }
     }
     
@@ -144,6 +155,5 @@ public class ResultSetTableModel extends AbstractTableModel {
                 return null;
         }
         return null;
-    }
-
+    }   
 }
