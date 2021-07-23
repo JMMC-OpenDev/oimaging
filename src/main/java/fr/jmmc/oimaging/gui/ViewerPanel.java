@@ -256,17 +256,32 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             setTabMode(SHOW_MODE.RESULT);
         }
     }
+
+    private int calculateGridSize(int resultsSize) {
+
+        int i = resultsSize;
+        double size;
+        
+        while (true) {
+            size = Math.sqrt(i);
+            if (size - Math.floor(size) == 0) {
+                return (int) size;
+            }
+            i++;
+        }
+    }
     
     public void displayGrid(List<ServiceResult> results) {
         showMode = SHOW_MODE.GRID;
 
         FitsImagePanel panel;
         OIFitsFile oifitsFile;
-        GridLayout grid;
+        GridLayout grid = null;
 
         if (!results.isEmpty()) {
-            grid = new GridLayout(3, 3);
-
+            
+            int gridSize = calculateGridSize(results.size());
+            grid = new GridLayout(gridSize, gridSize);
             jPanelImage.removeAll();
             jPanelImage.setLayout(grid);
 
