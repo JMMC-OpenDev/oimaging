@@ -36,6 +36,10 @@ public class TablePanel extends javax.swing.JPanel {
         SwingUtils.adjustRowHeight(jResultSetTable);
         
         jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.SUCCESS), new SuccessCell());
+
+        jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), new RatingCell());
+        jResultSetTable.setDefaultEditor(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), new RatingCell());
+        
     }
 
     /**
@@ -85,15 +89,4 @@ public class TablePanel extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 
-    public class RatingRenderer extends StarRater implements TableCellRenderer {
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            StarRater rating = (StarRater) value;
-            add(rating);
-            
-            return this;
-        }
-
-    }
 }

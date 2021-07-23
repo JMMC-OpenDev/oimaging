@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
 
 
@@ -22,16 +23,18 @@ import javax.swing.table.AbstractTableModel;
 public class ResultSetTableModel extends AbstractTableModel { 
     
     public final static int INDEX = 0, FILE = 1, TARGET = 2, TIMESTAMP_RECONSTRUCTION = 3, WAVELENGTH = 4, ALGORITHM = 5, RGL_WGT = 6, SUCCESS = 7, RATING = 8, COMMENTS = 9;
-    private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comment"};
-
+    private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comments"};
+    List<ServiceResult> results;
+    
     private class Row {
         public ServiceResult result;
-        public StarRater rating = null;
+        public JPanel rating = null;
         public String comments = null;
         
         public Row(ServiceResult result) {
             this.result = result;
-            this.rating = new StarRater(0);
+            RatingCell ratingCell = new RatingCell();
+            this.rating = ratingCell.getCellPanel();
             this.comments = "No comments";
         }
     }
@@ -94,7 +97,8 @@ public class ResultSetTableModel extends AbstractTableModel {
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case RATING:
-                rows.get(rowIndex).rating = (StarRater) value;
+                rows.get(rowIndex).rating = (JPanel) value;
+                break;
             case COMMENTS:
                 rows.get(rowIndex).comments = (String) value;
                 break;
