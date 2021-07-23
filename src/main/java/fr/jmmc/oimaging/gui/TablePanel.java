@@ -6,10 +6,9 @@ package fr.jmmc.oimaging.gui;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
-import java.awt.Component;
-import javax.swing.JButton;
+import fr.jmmc.oimaging.model.RatingCell;
+import javax.swing.JComponent;
 import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
 
 /**
  *
