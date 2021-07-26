@@ -30,6 +30,8 @@ import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -288,6 +290,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             for (ServiceResult result : results) {
                 panel = new FitsImagePanel(Preferences.getInstance());
                 jPanelImage.add(panel);
+                panel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 2) {
+                            System.out.println("double clicked");
+                            jPanelImage.removeAll();
+                            displayResult(result);
+                        }
+                        System.out.println("not double clicked");
+                    }
+                });
                 try {
                     oifitsFile = result.getOifitsFile();
                     panel.setFitsImage(oifitsFile.getFitsImageHDUs().get(0).getFitsImages().get(0));
