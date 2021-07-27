@@ -32,7 +32,7 @@ public class ResultSetTableModel extends AbstractTableModel {
         public Row(ServiceResult result) {
             this.result = result;
             RatingCell ratingCell = new RatingCell();
-            this.rating = ratingCell.getCellPanel();
+            this.rating = new StarRater();
             this.comments = "No comments";
         }
     }
