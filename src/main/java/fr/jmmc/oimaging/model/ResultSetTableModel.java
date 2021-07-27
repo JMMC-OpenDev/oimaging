@@ -28,13 +28,13 @@ public class ResultSetTableModel extends AbstractTableModel {
     
     private class Row {
         public ServiceResult result;
-        public JPanel rating = null;
+        public StarRater rating = null;
         public String comments = null;
         
         public Row(ServiceResult result) {
             this.result = result;
             RatingCell ratingCell = new RatingCell();
-            this.rating = ratingCell.getCellPanel();
+            this.rating = new StarRater();
             this.comments = "No comments";
         }
     }
@@ -78,8 +78,10 @@ public class ResultSetTableModel extends AbstractTableModel {
         switch (columnIndex) {
             case SUCCESS:
                 return boolean.class;
+            case RATING:
+                return StarRater.class;
             default:
-                return Object.class;                
+                return Object.class;
         }
     }
     
@@ -97,7 +99,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case RATING:
-                rows.get(rowIndex).rating = (JPanel) value;
+                rows.get(rowIndex).rating = (StarRater) value;
                 break;
             case COMMENTS:
                 rows.get(rowIndex).comments = (String) value;
