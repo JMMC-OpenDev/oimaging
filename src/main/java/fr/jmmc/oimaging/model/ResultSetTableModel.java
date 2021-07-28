@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -31,8 +30,8 @@ public class ResultSetTableModel extends AbstractTableModel {
 
         public Row(ServiceResult result) {
             this.result = result;
-            RatingCell ratingCell = new RatingCell();
             this.rating = new StarRater();
+            this.rating.addStarListener(System.out::println);
             this.comments = "No comments";
         }
     }
@@ -41,7 +40,6 @@ public class ResultSetTableModel extends AbstractTableModel {
     public ResultSetTableModel() {
         super();
         rows = new ArrayList<>();
-        
     }
 
     public void addResult(List<ServiceResult> results) {
