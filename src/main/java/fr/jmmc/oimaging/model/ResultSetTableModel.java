@@ -7,7 +7,6 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import fr.nom.tam.fits.FitsException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,6 +66,16 @@ public class ResultSetTableModel extends AbstractTableModel {
     @Override
     public String getColumnName(int columnIndex) {
         return COLUMNS_NAMES[columnIndex];
+    }
+    
+    @Override
+    public Class getColumnClass(int columnIndex) {
+        switch (columnIndex) {
+            case SUCCESS:
+                return boolean.class;
+            default:
+                return Object.class;                
+        }
     }
     
     @Override
