@@ -3,6 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.model;
 
+import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.nom.tam.fits.FitsException;
 import java.io.IOException;
@@ -93,46 +94,47 @@ public class ResultSetTableModel extends AbstractTableModel {
     
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+
+        ServiceResult result = (ServiceResult) rows.get(rowIndex).result;
+
         switch (columnIndex) {
             case INDEX:
                 return getRowCount() - rowIndex;
             case FILE:
-                return this.results.get(rowIndex).getInputFile().getName();
+                return result.getInputFile().getName();
 
             case TARGET:
                 try {
-                return this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getTarget();
+                return result.getOifitsFile().getImageOiData().getInputParam().getTarget();
             } catch (IOException | FitsException ex) {
                 Logger.getLogger(ResultSetTableModel.class.getName()).log(Level.SEVERE, null, ex);
             }
             break;
 
             case TIMESTAMP_RECONSTRUCTION:
-                return this.results.get(rowIndex).getEndTime();
+                return result.getEndTime();
 
             case WAVELENGTH:
             try {
-                return 
-                        Double.toString(this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getWaveMin()) + " " 
-                        + Double.toString(this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getWaveMax());
+                    return result.getOifitsFile().getWavelengthRange();
             } catch (IOException | FitsException ex) {
                 Logger.getLogger(ResultSetTableModel.class.getName()).log(Level.SEVERE, null, ex);
             }
             break;
 
             case ALGORITHM:
-                return this.results.get(rowIndex).getService().getProgram();
+                return result.getService().getProgram();
 
             case RGL_WGT:
                 try {
-                return this.results.get(rowIndex).getOifitsFile().getImageOiData().getInputParam().getRglWgt();
+                return result.getOifitsFile().getImageOiData().getInputParam().getRglWgt();
             } catch (IOException | FitsException ex) {
                 Logger.getLogger(ResultSetTableModel.class.getName()).log(Level.SEVERE, null, ex);
             }
             break;
 
             case SUCCESS:
-                return this.results.get(rowIndex).isValid();
+                return result.isValid();
 
             case RATING:
                 return rows.get(rowIndex).rating;
