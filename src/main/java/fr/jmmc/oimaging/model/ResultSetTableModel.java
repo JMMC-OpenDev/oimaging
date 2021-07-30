@@ -8,6 +8,7 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import fr.nom.tam.fits.FitsException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,8 +23,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     
     public final static int INDEX = 0, FILE = 1, TARGET = 2, TIMESTAMP_RECONSTRUCTION = 3, WAVELENGTH = 4, ALGORITHM = 5, RGL_WGT = 6, SUCCESS = 7, RATING = 8, COMMENTS = 9;
     private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comment"};
-    List<ServiceResult> results;
-    
+
     private class Row {
         public ServiceResult result;
         public int rating = 5;
@@ -37,13 +37,11 @@ public class ResultSetTableModel extends AbstractTableModel {
     
     public ResultSetTableModel() {
         super();
-        
-        results = new ArrayList<>();
         rows = new ArrayList<>();
     }
 
     public void addResult(List<ServiceResult> results) {
-        this.results.addAll(results);
+        rows.clear();
         results.forEach(result -> {
             rows.add(new Row(result));
         });
@@ -51,12 +49,12 @@ public class ResultSetTableModel extends AbstractTableModel {
     }
     
     public void clear() {
-       results.clear();
+       rows.clear();
     }
 
     @Override
     public int getRowCount() {
-        return this.results.size();
+        return this.rows.size();
     }
 
     @Override
@@ -95,7 +93,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
 
-        ServiceResult result = (ServiceResult) rows.get(rowIndex).result;
+        ServiceResult result = rows.get(rowIndex).result;
 
         switch (columnIndex) {
             case INDEX:
@@ -147,5 +145,5 @@ public class ResultSetTableModel extends AbstractTableModel {
         }
         return null;
     }
-    
+
 }
