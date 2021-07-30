@@ -28,8 +28,8 @@ import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
-import java.awt.Component;
-import java.awt.GridLayout;
+
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import javax.swing.Action;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
@@ -223,6 +224,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     public void displayResult(ServiceResult result) {
         showMode = SHOW_MODE.RESULT;
+
+        // Remove the grid view if any
+        jPanelImage.removeAll();
+        jPanelImage.setLayout(new BorderLayout());
 
         OIFitsFile oifitsFile = null;
         String target = null;
