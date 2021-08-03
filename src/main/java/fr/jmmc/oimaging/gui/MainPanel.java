@@ -22,7 +22,6 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
-import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsUnit;
 import fr.jmmc.oitools.image.ImageOiConstants;
@@ -38,26 +37,13 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
-import javax.swing.Action;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import javax.swing.*;
+import javax.swing.event.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,8 +168,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // init viewer Panel
         viewerPanel.displayModel(null);
         
-        jTablePanel.addControlButton(jButtonCompare);
-        jTablePanel.addControlButton(jButtonDelete);
+        jTablePanel.addControlComponent(jButtonCompare);
+        jTablePanel.addControlComponent(jButtonDelete);
+        jTablePanel.addControlComponent(jSliderResults);
 
         jSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 
@@ -319,6 +306,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jCheckBoxUseT3 = new javax.swing.JCheckBox();
         jSliderWaveMin = new javax.swing.JSlider();
         jSliderWaveMax = new javax.swing.JSlider();
+        jSliderResults = new javax.swing.JSlider();
         jFormattedTextFieldWaveMin = new javax.swing.JFormattedTextField();
         jFormattedTextFieldWaveMax = new javax.swing.JFormattedTextField();
         softwareSettingsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
@@ -345,6 +333,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonDeleteActionPerformed(evt);
+            }
+        });
+
+        jSliderResults.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSliderResultsStateChanged(evt);
             }
         });
 
@@ -626,6 +620,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSplitPaneGlobal.setBottomComponent(jTablePanel);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jSliderResultsStateChanged(ChangeEvent evt) {
+        if (jSliderResults.getValue() != -1) {
+            viewerPanel.displayResult(resultSetList.get(jSliderResults.getValue()));
+        }
+    }
+
     private void jCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxActionPerformed
         updateModel();
     }//GEN-LAST:event_jCheckBoxActionPerformed
@@ -730,6 +730,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JScrollPane jScrollPaneResults;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
+    private javax.swing.JSlider jSliderResults;
     private javax.swing.JSplitPane jSplitPane;
     private javax.swing.JSplitPane jSplitPaneGlobal;
     private fr.jmmc.oimaging.gui.TablePanel jTablePanel;
@@ -904,6 +905,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             // resultSet Table
             jTablePanel.getTableModel().clear();
             jTablePanel.getTableModel().addResult(currentModel.getResultSets());
+
+            // set the slider results boundaries
+            jSliderResults.setMinimum(0);
+            jSliderResults.setMaximum(resultSetList.size() - 1);
 
             // perform analysis
             final List<String> failures = new LinkedList<String>();

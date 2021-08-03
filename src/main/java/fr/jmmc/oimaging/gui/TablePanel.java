@@ -6,8 +6,8 @@ package fr.jmmc.oimaging.gui;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
-import javax.swing.JButton;
-import javax.swing.JTable;
+
+import javax.swing.*;
 
 /**
  *
@@ -74,8 +74,8 @@ public class TablePanel extends javax.swing.JPanel {
         return this.resultSetTableModel;
     }
 
-    public void addControlButton(JButton button) {
-        jPanelTableOptions.add(button);
+    public void addControlComponent(JComponent component) {
+        jPanelTableOptions.add(component);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
