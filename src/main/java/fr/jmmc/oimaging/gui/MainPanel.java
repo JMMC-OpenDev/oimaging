@@ -336,6 +336,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
 
+        jSliderResults.setMinimum(-1);
+        jSliderResults.setMaximum(-1);
+        jSliderResults.setValue(-1);
         jSliderResults.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSliderResultsStateChanged(evt);
@@ -622,7 +625,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     private void jSliderResultsStateChanged(ChangeEvent evt) {
         if (jSliderResults.getValue() != -1) {
-            viewerPanel.displayResult(resultSetList.get(jSliderResults.getValue()));
+            viewerPanel.displayResult(resultSetList.get(jSliderResults.getMaximum() - jSliderResults.getValue()));
         }
     }
 
@@ -907,8 +910,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jTablePanel.getTableModel().addResult(currentModel.getResultSets());
 
             // set the slider results boundaries
-            jSliderResults.setMinimum(0);
-            jSliderResults.setMaximum(resultSetList.size() - 1);
+            if (resultSetList.size() > 1) {
+                jSliderResults.setMinimum(1);
+                jSliderResults.setMaximum(resultSetList.size());
+                jSliderResults.setVisible(true);
+            }
+            else {
+                jSliderResults.setVisible(false);
+            }
 
             // perform analysis
             final List<String> failures = new LinkedList<String>();
