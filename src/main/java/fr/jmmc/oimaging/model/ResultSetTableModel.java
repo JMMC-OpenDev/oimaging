@@ -23,32 +23,16 @@ public class ResultSetTableModel extends AbstractTableModel {
     private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comments"};
     List<ServiceResult> results;
 
-    private class Row {
-        public ServiceResult result = null;
-        public StarRater rating = null;
-        public String comments = null;
-
-        public Row(ServiceResult result) {
-            this.result = result;
-            this.rating = new StarRater();
-            this.rating.addStarListener(System.out::println);
-            this.comments = "No comments";
-        }
-    }
-    List<Row> rows;
+    List<ServiceResult> results;
 
     public ResultSetTableModel() {
         super();
-        rows = new ArrayList<>();
+        results = new ArrayList<>();
     }
 
     public void addResult(List<ServiceResult> results) {
-        rows.clear();
-        // Not working
+        this.results.clear();
         this.results.addAll(results);
-        results.forEach(result -> {
-            rows.add(new Row(result));
-        });
         fireTableDataChanged();
     }
 
@@ -58,7 +42,7 @@ public class ResultSetTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return this.rows.size();
+        return results.size();
     }
 
     @Override
@@ -96,14 +80,14 @@ public class ResultSetTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
 
-        Row row = rows.get(rowIndex);
+        ServiceResult result = results.get(rowIndex);
 
         switch (columnIndex) {
             case RATING:
-                row.rating = (StarRater) value;
+                result.setRating((StarRater) value);
                 break;
             case COMMENTS:
-                row.comments = (String) value;
+                result.setComments((String) value);
                 break;
         }
     }
@@ -111,7 +95,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
 
-        ServiceResult result = rows.get(rowIndex).result;
+        ServiceResult result = this.results.get(rowIndex);
 
         switch (columnIndex) {
             case INDEX:
@@ -154,10 +138,10 @@ public class ResultSetTableModel extends AbstractTableModel {
                 return result.isValid();
 
             case RATING:
-                return rows.get(rowIndex).rating;
+                return result.getRating();
 
             case COMMENTS:
-                return rows.get(rowIndex).comments;
+                return result.getComments();
 
             default:
                 return null;

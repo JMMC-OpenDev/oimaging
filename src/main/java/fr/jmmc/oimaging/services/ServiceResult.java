@@ -5,6 +5,7 @@ package fr.jmmc.oimaging.services;
 
 import fr.jmmc.jmcs.gui.FeedbackReport;
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.oimaging.gui.StarRater;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.nom.tam.fits.FitsException;
@@ -28,6 +29,10 @@ public final class ServiceResult {
     private Date startTime;
     private Date endTime;
 
+    // User appreciation attribute
+    StarRater rating;
+    String comments;
+
     private Service service;
 
     // Post process cached data
@@ -45,6 +50,11 @@ public final class ServiceResult {
         this.inputFile = inputFile;
         this.oifitsResultFile = FileUtils.getTempFile(inputFilename + ".output.fits");
         this.executionLogResultFile = FileUtils.getTempFile(inputFilename + ".log.txt");
+
+        this.rating = new StarRater();
+        this.rating.addStarListener(System.out::println);
+        this.comments = "No comments";
+
         init();
     }
 
@@ -81,6 +91,14 @@ public final class ServiceResult {
             }
         }
         return executionLog;
+    }
+
+    public StarRater getRating() {
+        return rating;
+    }
+
+    public String getComments() {
+        return comments;
     }
 
     public boolean isCancelled() {
@@ -129,6 +147,14 @@ public final class ServiceResult {
 
     public void setService(Service service) {
         this.service = service;
+    }
+
+    public void setRating(StarRater rating) {
+        this.rating = rating;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
 }
