@@ -625,7 +625,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     private void jSliderResultsStateChanged(ChangeEvent evt) {
         if (jSliderResults.getValue() != -1) {
-            viewerPanel.displayResult(resultSetList.get(jSliderResults.getMaximum() - jSliderResults.getValue()));
+            int index = jSliderResults.getMaximum() - jSliderResults.getValue();
+            viewerPanel.displayResult(resultSetList.get(index));
+            jTablePanel.getTable().setRowSelectionInterval(index, index);
         }
     }
 
