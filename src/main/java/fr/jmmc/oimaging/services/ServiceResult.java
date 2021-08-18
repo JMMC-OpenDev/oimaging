@@ -30,8 +30,8 @@ public final class ServiceResult {
     private Date endTime;
 
     // User appreciation attribute
-    StarRater rating;
-    String comments;
+    private int rating;
+    private String comments;
 
     private Service service;
 
@@ -51,8 +51,7 @@ public final class ServiceResult {
         this.oifitsResultFile = FileUtils.getTempFile(inputFilename + ".output.fits");
         this.executionLogResultFile = FileUtils.getTempFile(inputFilename + ".log.txt");
 
-        this.rating = new StarRater();
-        this.rating.addStarListener(System.out::println);
+        this.rating = 0;
         this.comments = "No comments";
 
         init();
@@ -93,7 +92,7 @@ public final class ServiceResult {
         return executionLog;
     }
 
-    public StarRater getRating() {
+    public int getStarRater() {
         return rating;
     }
 
@@ -149,7 +148,7 @@ public final class ServiceResult {
         this.service = service;
     }
 
-    public void setRating(StarRater rating) {
+    public void setRating(int rating) {
         this.rating = rating;
     }
 

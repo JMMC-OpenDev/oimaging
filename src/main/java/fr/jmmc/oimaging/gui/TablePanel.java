@@ -35,12 +35,13 @@ public class TablePanel extends javax.swing.JPanel {
         resultSetTableSorter = new BasicTableSorter(resultSetTableModel, jResultSetTable.getTableHeader());
         jResultSetTable.setModel(resultSetTableSorter);
         SwingUtils.adjustRowHeight(jResultSetTable);
-        
-        jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.SUCCESS), new SuccessCell());
 
-        jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), new RatingCell());
-        jResultSetTable.setDefaultEditor(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), new RatingCell());
-        
+        RatingCell ratingCell = new RatingCell();
+        jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.SUCCESS), new SuccessCell());
+        jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), ratingCell);
+
+        // Not working
+        //jResultSetTable.setDefaultEditor(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), ratingCell);
     }
 
     /**

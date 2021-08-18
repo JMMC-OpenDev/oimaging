@@ -21,7 +21,6 @@ public class ResultSetTableModel extends AbstractTableModel {
 
     public final static int INDEX = 0, FILE = 1, TARGET = 2, TIMESTAMP_RECONSTRUCTION = 3, WAVELENGTH = 4, ALGORITHM = 5, RGL_WGT = 6, SUCCESS = 7, RATING = 8, COMMENTS = 9;
     private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comments"};
-    List<ServiceResult> results;
 
     List<ServiceResult> results;
 
@@ -84,7 +83,7 @@ public class ResultSetTableModel extends AbstractTableModel {
 
         switch (columnIndex) {
             case RATING:
-                result.setRating((StarRater) value);
+                result.setRating((int) value);
                 break;
             case COMMENTS:
                 result.setComments((String) value);
@@ -138,7 +137,7 @@ public class ResultSetTableModel extends AbstractTableModel {
                 return result.isValid();
 
             case RATING:
-                return result.getRating();
+                return result.getStarRater();
 
             case COMMENTS:
                 return result.getComments();
