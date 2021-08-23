@@ -655,8 +655,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     private void jButtonCompareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCompareActionPerformed
         List<ServiceResult> resultsToCompare = new ArrayList<>();
-        for (Integer index : jTablePanel.getTable().getSelectedRows()) {
-            resultsToCompare.add(resultSetList.get(index));
+        if (jTablePanel.getTable().getSelectedRows().length == 0) {
+            resultsToCompare.addAll(resultSetList);
+        }
+        else {
+            for (Integer index : jTablePanel.getTable().getSelectedRows()) {
+                resultsToCompare.add(resultSetList.get(index));
+            }
         }
         viewerPanel.displayGrid(resultsToCompare);
     }//GEN-LAST:event_jButtonCompareActionPerformed
