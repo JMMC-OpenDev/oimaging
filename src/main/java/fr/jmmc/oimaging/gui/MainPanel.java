@@ -41,8 +41,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.Action;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.ListModel;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +84,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     /** ResultSet list model */
     GenericListModel<ServiceResult> resultSetListModel = new GenericListModel<ServiceResult>(resultSetList);
-        
+
     /* members */
     /** actions */
     private DeleteSelectionAction deleteSelectionAction;
@@ -164,10 +174,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // become widget listener
         jListResults.addListSelectionListener((ListSelectionListener) this);
         jTablePanel.getTable().getModel().addTableModelListener((TableModelListener) this);
-        
+
         // init viewer Panel
         viewerPanel.displayModel(null);
-        
+
         jTablePanel.addControlComponent(jButtonCompare);
         jTablePanel.addControlComponent(jButtonDelete);
         jTablePanel.addControlComponent(jSliderResults);
@@ -217,7 +227,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // TODO release child resource if any
     }
-    
+
     private JList createCustomList() {
         final JList list = new JList() {
             /** default serial UID for Serializable interface */
@@ -623,11 +633,17 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSplitPaneGlobal.setBottomComponent(jTablePanel);
     }// </editor-fold>//GEN-END:initComponents
 
+    private int sliderResultLastIndex = -1;
+
     private void jSliderResultsStateChanged(ChangeEvent evt) {
-        if (jSliderResults.getValue() != -1) {
-            int index = jSliderResults.getMaximum() - jSliderResults.getValue();
-            viewerPanel.displayResult(resultSetList.get(index));
-            jTablePanel.getTable().setRowSelectionInterval(index, index);
+        if (!syncingUI && jSliderResults.getValue() != -1) {
+            final int index = jSliderResults.getMaximum() - jSliderResults.getValue();
+
+            if (index != sliderResultLastIndex) {
+                sliderResultLastIndex = index;
+                viewerPanel.displayResult(resultSetList.get(index));
+                jTablePanel.getTable().setRowSelectionInterval(index, index);
+            }
         }
     }
 
@@ -657,8 +673,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         List<ServiceResult> resultsToCompare = new ArrayList<>();
         if (jTablePanel.getTable().getSelectedRows().length == 0) {
             resultsToCompare.addAll(resultSetList);
-        }
-        else {
+        } else {
             for (Integer index : jTablePanel.getTable().getSelectedRows()) {
                 resultsToCompare.add(resultSetList.get(index));
             }
@@ -668,7 +683,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
         JTable table = jTablePanel.getTable();
-        
+
         if (table.getSelectedRowCount() != 0) {
             List<Integer> rowsToDelete = Arrays.stream(table.getSelectedRows()).boxed().collect(Collectors.toList());
             Collections.reverse(rowsToDelete);
@@ -697,7 +712,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
     }
-    
+
     /**
      * Listen for table selection changes
      * 
@@ -750,7 +765,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     @Override
     public String getSubjectId(IRModelEventType type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     public void onProcess(final IRModelEvent event) {
@@ -911,7 +926,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             resultSetListModel.clear();
             resultSetListModel.add(currentModel.getResultSets());
             jListResults.setModel(resultSetListModel);
-            
+
             // resultSet Table
             jTablePanel.getTableModel().clear();
             jTablePanel.getTableModel().addResult(currentModel.getResultSets());
@@ -921,8 +936,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 jSliderResults.setMinimum(1);
                 jSliderResults.setMaximum(resultSetList.size());
                 jSliderResults.setVisible(true);
-            }
-            else {
+            } else {
                 jSliderResults.setVisible(false);
             }
 
