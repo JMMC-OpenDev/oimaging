@@ -28,16 +28,17 @@ import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.Action;
-import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
@@ -51,6 +52,14 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private static final long serialVersionUID = 1L;
 
+    /** flag to show debug information (label) */
+    private final static boolean SHOW_DEBUG_INFO = false;
+    /** flag to trace display calls */
+    private final static AtomicInteger DEBUG_N_FRAME = (SHOW_DEBUG_INFO) ? new AtomicInteger() : null;
+
+    /** flag to trace display calls */
+    private final static boolean TRACE_DISPLAY = false;
+
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(ViewerPanel.class);
     /** fits extension including '.' (dot) character ie '.fits' */
@@ -61,7 +70,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     /** OIFits viewer panel */
     private final OIFitsViewPanel oifitsViewPanel;
-    
+
     /** Slider panel */
     private SliderPanel sliderPanel;
 
@@ -95,7 +104,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         fitsImagePanel = new FitsImagePanel(Preferences.getInstance(), true, true, null);
         jPanelImage.add(fitsImagePanel);
-        
+
         sliderPanel = new SliderPanel(fitsImagePanel);
         fitsImagePanel.addOptionPanel(sliderPanel);
 
@@ -115,38 +124,46 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         sendFitsAction = ActionRegistrar.getInstance().get(SendFitsAction.className, SendFitsAction.actionName);
 
         jComboBoxImage.setRenderer(new OiCellRenderer());
-    }
 
-    private void displayExecutionLog() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        jLabelImageDebug.setVisible(SHOW_DEBUG_INFO);
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
-        // Todo Build selector
+        syncingUI = true;
+        try {
+            // image combo
+            jComboBoxImage.removeAllItems();
 
-        // image combo
-        jComboBoxImage.removeAllItems();
-
-        if (imageHdus != null) {
-            for (FitsImageHDU fitsImageHDU : imageHdus) {
-                if (fitsImageHDU.hasImages()) {
-                    jComboBoxImage.addItem(fitsImageHDU);
+            if (imageHdus != null) {
+                for (FitsImageHDU fitsImageHDU : imageHdus) {
+                    if (fitsImageHDU.hasImages()) {
+                        jComboBoxImage.addItem(fitsImageHDU);
+                    }
                 }
             }
-        }
 
-        if (jComboBoxImage.getItemCount() != 0) {
-            if (imageHDU != null && imageHDU.hasImages()) {
-                jComboBoxImage.setSelectedItem(imageHDU);
-                displaySelection(imageHDU);
+            if (jComboBoxImage.getItemCount() != 0) {
+                if (imageHDU != null && imageHDU.hasImages()) {
+                    jComboBoxImage.setSelectedItem(imageHDU);
+                    displaySelection(imageHDU);
+                }
+            } else {
+                logger.debug("Remove image panel");
+                jPanelImage.remove(fitsImagePanel);
             }
-        } else {
-            logger.debug("Remove image panel");
-            jPanelImage.remove(fitsImagePanel);
+        } finally {
+            syncingUI = false;
         }
     }
 
     private void displaySelection(final FitsImageHDU imageHDU) {
+        if (TRACE_DISPLAY) {
+            logger.info("displaySelection: {}", imageHDU, new Throwable());
+        }
+        if (SHOW_DEBUG_INFO) {
+            final int frame = DEBUG_N_FRAME.getAndIncrement();
+            jLabelImageDebug.setText("Frame: " + frame);
+        }
         if (imageHDU != null) {
             sliderPanel.setVisible(false);
             if (imageHDU.getImageCount() > 1) {
@@ -182,32 +199,34 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private void setTabMode(SHOW_MODE mode) {
         syncingUI = true;
-
-        // change border title
-        switch (mode) {
-            case MODEL:
-                setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (INPUT)"));
-                break;
-            case RESULT:
-                setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (RESULT)"));
-                break;
-            case GRID:
-                setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (GRID)"));
-                break;
-        }
-
-        // switch tab arrangement only if we switch between model display or result display
-        if ((mode.equals(SHOW_MODE.MODEL) && (jTabbedPaneVizualizations.getComponentCount() > 3))
-                || (mode.equals(SHOW_MODE.RESULT) && (jTabbedPaneVizualizations.getComponentCount() == 3))) {
-            jTabbedPaneVizualizations.removeAll();
-            jTabbedPaneVizualizations.add("Image", jPanelImageViewer);
-            jTabbedPaneVizualizations.add("OIFits", jPanelOIFitsViewer);
-            jTabbedPaneVizualizations.add("Parameters", jPanelOutputParamViewer);
-            if (mode.equals(SHOW_MODE.RESULT)) {
-                jTabbedPaneVizualizations.add("Execution log", jPanelLogViewer);
+        try {
+            // change border title
+            switch (mode) {
+                case MODEL:
+                    setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (INPUT)"));
+                    break;
+                case RESULT:
+                    setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (RESULT)"));
+                    break;
+                case GRID:
+                    setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (GRID)"));
+                    break;
             }
+
+            // switch tab arrangement only if we switch between model display or result display
+            if ((mode.equals(SHOW_MODE.MODEL) && (jTabbedPaneVizualizations.getComponentCount() > 3))
+                    || (mode.equals(SHOW_MODE.RESULT) && (jTabbedPaneVizualizations.getComponentCount() == 3))) {
+                jTabbedPaneVizualizations.removeAll();
+                jTabbedPaneVizualizations.add("Image", jPanelImageViewer);
+                jTabbedPaneVizualizations.add("OIFits", jPanelOIFitsViewer);
+                jTabbedPaneVizualizations.add("Parameters", jPanelOutputParamViewer);
+                if (mode.equals(SHOW_MODE.RESULT)) {
+                    jTabbedPaneVizualizations.add("Execution log", jPanelLogViewer);
+                }
+            }
+        } finally {
+            syncingUI = false;
         }
-        syncingUI = false;
 
         enableActions();
         restoreLastShownPanel();
@@ -229,34 +248,22 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImage.removeAll();
         jPanelImage.setLayout(new BorderLayout());
 
-        OIFitsFile oifitsFile = null;
-        String target = null;
-        List<FitsImageHDU> imageHdus = null;
-        FitsImageHDU imageHduToShow = null;
-
         if (result != null) {
             // execution log
             jEditorPaneExecutionLog.setText(result.getExecutionLog());
 
-            try {
-                oifitsFile = result.getOifitsFile();
+            if (result.isValid()) {
+                final OIFitsFile oifitsFile = result.getOifitsFile();
 
                 // TODO have a look in the ouput param to look at right image ?
                 // show first one :
-                imageHdus = oifitsFile.getFitsImageHDUs();
-                imageHduToShow = imageHdus.isEmpty() ? null : imageHdus.get(0);
-                target = oifitsFile.getImageOiData().getInputParam().getTarget();
+                final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
+                final FitsImageHDU imageHDU = imageHdus.isEmpty() ? null : imageHdus.get(0);
+                final String target = oifitsFile.getImageOiData().getInputParam().getTarget();
 
-            } catch (IOException ex) {
-                logger.error("Can't retrieve result oifile", ex);
-            } catch (FitsException ex) {
-                logger.error("Can't retrieve result oifile", ex);
-            }
-
-            displayImage(imageHdus, imageHduToShow);
-            displayOiFitsAndParams(oifitsFile, target);
-
-            if (oifitsFile == null) {
+                displayImage(imageHdus, imageHDU);
+                displayOiFitsAndParams(oifitsFile, target);
+            } else {
                 lastResultPanel = jPanelLogViewer;
             }
 
@@ -268,7 +275,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         int i = resultsSize;
         double size;
-        
+
+        // TODO: should be easier to find out the size ...
         while (true) {
             size = Math.sqrt(i);
             if (size - Math.floor(size) == 0) {
@@ -277,40 +285,80 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             i++;
         }
     }
-    
+
     public void displayGrid(List<ServiceResult> results) {
         showMode = SHOW_MODE.GRID;
 
-        FitsImagePanel panel;
-        OIFitsFile oifitsFile;
-        GridLayout grid = null;
-
         if (!results.isEmpty()) {
-            
-            int gridSize = calculateGridSize(results.size());
-            grid = new GridLayout(gridSize, gridSize);
+            final int gridSize = calculateGridSize(results.size());
             jPanelImage.removeAll();
-            jPanelImage.setLayout(grid);
+            jPanelImage.setLayout(new GridLayout(gridSize, gridSize));
+
+            // Get min/max range over all images:
+            final float[] globalDataRange = new float[2];
+            globalDataRange[0] = Float.POSITIVE_INFINITY;
+            globalDataRange[1] = Float.NEGATIVE_INFINITY;
 
             for (ServiceResult result : results) {
-                panel = new FitsImagePanel(Preferences.getInstance());
-                jPanelImage.add(panel);
-                panel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.getClickCount() == 2) {
-                            System.out.println("double clicked");
-                            jPanelImage.removeAll();
-                            displayResult(result);
+                // TODO: generalize for comparison (sliders on cube or table)
+                final OIFitsFile oifitsFile = result.getOifitsFile();
+
+                if (result.isValid()) {
+                    // TODO have a look in the ouput param to look at right image ?
+                    // use first one :
+                    final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
+                    final FitsImageHDU imageHDU = imageHdus.isEmpty() ? null : imageHdus.get(0);
+
+                    if (imageHDU != null) {
+                        final FitsImage image = imageHDU.getFitsImages().get(0);
+
+                        final float min = (float) image.getDataMin();
+                        final float max = (float) image.getDataMax();
+
+                        logger.debug("image data range: [{} - {}]", min, max);
+
+                        // update data range:
+                        if (globalDataRange[0] > min) {
+                            globalDataRange[0] = min;
                         }
-                        System.out.println("not double clicked");
+                        if (globalDataRange[1] < max) {
+                            globalDataRange[1] = max;
+                        }
                     }
-                });
-                try {
-                    oifitsFile = result.getOifitsFile();
-                    panel.setFitsImage(oifitsFile.getFitsImageHDUs().get(0).getFitsImages().get(0));
-                } catch (IOException | FitsException ex) {
-                    java.util.logging.Logger.getLogger(ViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            logger.debug("displayGrid: global data range: [{} - {}]", globalDataRange[0], globalDataRange[1]);
+
+            for (ServiceResult result : results) {
+                final OIFitsFile oifitsFile = result.getOifitsFile();
+
+                if (result.isValid()) {
+                    final FitsImagePanel panel = new FitsImagePanel(Preferences.getInstance(), true, false, globalDataRange);
+                    jPanelImage.add(panel);
+
+                    // TODO have a look in the ouput param to look at right image ?
+                    // show first one :
+                    final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
+                    final FitsImageHDU imageHDU = imageHdus.isEmpty() ? null : imageHdus.get(0);
+
+                    if (imageHDU != null) {
+                        final FitsImage image = imageHDU.getFitsImages().get(0);
+                        panel.setFitsImage(image);
+                    }
+
+                    // TODO FIX: not working !! 
+                    // see JFreeChart listeners ?
+                    panel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            if (e.getClickCount() == 2) {
+                                System.out.println("double clicked");
+                                jPanelImage.removeAll();
+                                displayResult(result);
+                            }
+                            System.out.println("not double clicked");
+                        }
+                    });
                 }
             }
             setTabMode(SHOW_MODE.GRID);
@@ -443,6 +491,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
         jButtonRescale = new javax.swing.JButton();
+        jLabelImageDebug = new javax.swing.JLabel();
         jPanelLogViewer = new javax.swing.JPanel();
         jScrollPaneLog = new javax.swing.JScrollPane();
         jEditorPaneExecutionLog = new javax.swing.JEditorPane();
@@ -540,6 +589,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonRescale, gridBagConstraints);
 
+        jLabelImageDebug.setForeground(java.awt.Color.red);
+        jLabelImageDebug.setText("Debug");
+        jPanelImageViewer.add(jLabelImageDebug, new java.awt.GridBagConstraints());
+
         jTabbedPaneVizualizations.addTab("Images", jPanelImageViewer);
 
         jPanelLogViewer.setLayout(new javax.swing.BoxLayout(jPanelLogViewer, javax.swing.BoxLayout.LINE_AXIS));
@@ -607,6 +660,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBoxImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxImageActionPerformed
+        if (syncingUI) {
+            return;
+        }
         displaySelection((FitsImageHDU) jComboBoxImage.getSelectedItem());
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
@@ -628,6 +684,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JButton jButtonViewport;
     private javax.swing.JComboBox jComboBoxImage;
     private javax.swing.JEditorPane jEditorPaneExecutionLog;
+    private javax.swing.JLabel jLabelImageDebug;
     private javax.swing.JLabel jLabelInput;
     private javax.swing.JLabel jLabelOutput;
     private javax.swing.JPanel jPanelImage;
