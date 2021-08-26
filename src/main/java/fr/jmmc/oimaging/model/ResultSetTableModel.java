@@ -3,14 +3,9 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.model;
 
-import fr.jmmc.oimaging.gui.StarRater;
 import fr.jmmc.oimaging.services.ServiceResult;
-import fr.nom.tam.fits.FitsException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -60,7 +55,7 @@ public class ResultSetTableModel extends AbstractTableModel {
             case SUCCESS:
                 return boolean.class;
             case RATING:
-                return StarRater.class;
+                return Integer.class;
             default:
                 return Object.class;
         }
@@ -104,40 +99,34 @@ public class ResultSetTableModel extends AbstractTableModel {
                 return result.getInputFile().getName();
 
             case TARGET:
-                try {
-                return result.getOifitsFile().getImageOiData().getInputParam().getTarget();
-            } catch (IOException | FitsException ex) {
-                Logger.getLogger(ResultSetTableModel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            break;
+                if (result.getOifitsFile() != null) {
+                    return result.getOifitsFile().getImageOiData().getInputParam().getTarget();
+                }
+                break;
 
             case TIMESTAMP_RECONSTRUCTION:
                 return result.getEndTime();
 
             case WAVELENGTH:
-            try {
+                if (result.getOifitsFile() != null) {
                     return result.getOifitsFile().getWavelengthRange();
-            } catch (IOException | FitsException ex) {
-                Logger.getLogger(ResultSetTableModel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            break;
+                }
+                break;
 
             case ALGORITHM:
                 return result.getService().getProgram();
 
             case RGL_WGT:
-                try {
-                return result.getOifitsFile().getImageOiData().getInputParam().getRglWgt();
-            } catch (IOException | FitsException ex) {
-                Logger.getLogger(ResultSetTableModel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            break;
+                if (result.getOifitsFile() != null) {
+                    return result.getOifitsFile().getImageOiData().getInputParam().getRglWgt();
+                }
+                break;
 
             case SUCCESS:
                 return result.isValid();
 
             case RATING:
-                return result.getStarRater();
+                return result.getRating();
 
             case COMMENTS:
                 return result.getComments();

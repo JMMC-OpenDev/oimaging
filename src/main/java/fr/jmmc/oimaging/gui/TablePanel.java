@@ -9,6 +9,7 @@ import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -36,12 +37,13 @@ public class TablePanel extends javax.swing.JPanel {
         jResultSetTable.setModel(resultSetTableSorter);
         SwingUtils.adjustRowHeight(jResultSetTable);
 
-        RatingCell ratingCell = new RatingCell();
         jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.SUCCESS), new SuccessCell());
-        jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), ratingCell);
 
-        // Not working
-        //jResultSetTable.setDefaultEditor(jResultSetTable.getColumnClass(ResultSetTableModel.RATING), ratingCell);
+        final RatingCell ratingCell = new RatingCell();
+        
+        final TableColumn column = jResultSetTable.getColumn(resultSetTableModel.getColumnName(ResultSetTableModel.RATING));
+        column.setCellRenderer(ratingCell);
+        column.setCellEditor(ratingCell);
     }
 
     /**
