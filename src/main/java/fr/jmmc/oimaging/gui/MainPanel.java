@@ -7,7 +7,6 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
-import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
@@ -37,23 +36,18 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
 import javax.swing.ListModel;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener, TableModelListener {
+public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
@@ -173,8 +167,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         fieldSliderAdapterWaveMax = new FieldSliderAdapter(jSliderWaveMax, jFormattedTextFieldWaveMax, 0, 1, 0);
 
         // become widget listener
-        jListResults.addListSelectionListener((ListSelectionListener) this);
-        jTablePanel.getTable().getModel().addTableModelListener((TableModelListener) this);
+        jListResults.addListSelectionListener(this);
+        jTablePanel.getSelectionModel().addListSelectionListener(this);
 
         // init viewer Panel
         viewerPanel.displayModel(null);
@@ -643,7 +637,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             if (index != sliderResultLastIndex) {
                 sliderResultLastIndex = index;
                 viewerPanel.displayResult(resultSetList.get(index));
-                jTablePanel.getTable().setRowSelectionInterval(index, index);
+                jTablePanel.setSelectedRow(index);
             }
         }
     }
@@ -671,27 +665,24 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
 
     private void jButtonCompareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCompareActionPerformed
-        List<ServiceResult> resultsToCompare = new ArrayList<>();
-        if (jTablePanel.getTable().getSelectedRows().length == 0) {
-            resultsToCompare.addAll(resultSetList);
+        final int selected = jTablePanel.getSelectedRowsCount();
+        
+        if (selected == 0) {
+            viewerPanel.displayGrid(resultSetList);
+        } else if (selected == 1) {
+            viewerPanel.displayResult(jTablePanel.getSelectedRow());
         } else {
-            for (Integer index : jTablePanel.getTable().getSelectedRows()) {
-                resultsToCompare.add(resultSetList.get(index));
-            }
+            final List<ServiceResult> resultsToCompare = new ArrayList<>(selected);
+            resultsToCompare.addAll(Arrays.asList(jTablePanel.getSelectedRows()));
+            viewerPanel.displayGrid(resultsToCompare);
         }
-        viewerPanel.displayGrid(resultsToCompare);
     }//GEN-LAST:event_jButtonCompareActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-        JTable table = jTablePanel.getTable();
-
-        if (table.getSelectedRowCount() != 0) {
-            List<Integer> rowsToDelete = Arrays.stream(table.getSelectedRows()).boxed().collect(Collectors.toList());
-            Collections.reverse(rowsToDelete);
-            rowsToDelete.forEach((Integer index) -> {
-                BasicTableSorter sorterModel = (BasicTableSorter) jTablePanel.getTable().getModel();
-                currentModel.removeServiceResult(resultSetList.get(sorterModel.modelIndex(index)));
-            });
+        if (jTablePanel.getSelectedRowsCount() != 0) {
+            for (ServiceResult result : jTablePanel.getSelectedRows()) {
+                currentModel.removeServiceResult(result);
+            }
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
@@ -711,20 +702,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (e.getSource() == jListResults) {
             viewerPanel.displayResult((ServiceResult) jListResults.getSelectedValue());
             deleteSelectionAction.watchResultsSelection(currentModel, jListResults);
-        }
-
-    }
-
-    /**
-     * Listen for table selection changes
-     * 
-     * @param e 
-     */
-    @Override
-    public void tableChanged(TableModelEvent e) {
-        if (e.getSource() == jTablePanel.getTable()) {
-            viewerPanel.displayResult((ServiceResult) jListResults.getModel().getElementAt(jTablePanel.getTable().getSelectedRow()));
+        } else if (e.getSource() == jTablePanel.getSelectionModel()) {
+            viewerPanel.displayResult(jTablePanel.getSelectedRow());
             deleteSelectionAction.watchResultsSelection(currentModel, jListResults);
+        } else {
+            logger.warn("valueChanged: Unsupported component : {}", e.getSource());
         }
     }
 
@@ -930,8 +912,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jListResults.setModel(resultSetListModel);
 
             // resultSet Table
-            jTablePanel.getTableModel().clear();
-            jTablePanel.getTableModel().addResult(currentModel.getResultSets());
+            jTablePanel.setResults(currentModel.getResultSets());
 
             // set the slider results boundaries
             if (resultSetList.size() > 1) {

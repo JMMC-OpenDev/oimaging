@@ -14,24 +14,26 @@ import javax.swing.table.AbstractTableModel;
  */
 public class ResultSetTableModel extends AbstractTableModel {
 
+    private static final long serialVersionUID = 1L;
+
     public final static int INDEX = 0, FILE = 1, TARGET = 2, TIMESTAMP_RECONSTRUCTION = 3, WAVELENGTH = 4, ALGORITHM = 5, RGL_WGT = 6, SUCCESS = 7, RATING = 8, COMMENTS = 9;
     private static final String[] COLUMNS_NAMES = {"Index", "Name", "Target", "Timestamp reconstruction", "Wavelength", "Algorithm", "RGL_WGT", "Success", "Rating", "Comments"};
 
-    List<ServiceResult> results;
+    private List<ServiceResult> results;
 
     public ResultSetTableModel() {
         super();
         results = new ArrayList<>();
     }
 
-    public void addResult(List<ServiceResult> results) {
+    public void setResults(List<ServiceResult> results) {
         this.results.clear();
         this.results.addAll(results);
         fireTableDataChanged();
     }
 
-    public void clear() {
-        results.clear();
+    public ServiceResult getServiceResult(final int rowIndex) {
+        return this.results.get(rowIndex);
     }
 
     @Override
@@ -74,7 +76,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
 
-        ServiceResult result = results.get(rowIndex);
+        final ServiceResult result = getServiceResult(rowIndex);
 
         switch (columnIndex) {
             case RATING:
@@ -89,7 +91,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
 
-        ServiceResult result = this.results.get(rowIndex);
+        final ServiceResult result = getServiceResult(rowIndex);
 
         switch (columnIndex) {
             case INDEX:

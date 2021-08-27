@@ -7,8 +7,11 @@ import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
+import fr.jmmc.oimaging.services.ServiceResult;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
 /**
@@ -16,6 +19,8 @@ import javax.swing.table.TableColumn;
  * @author martin
  */
 public class TablePanel extends javax.swing.JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * ResultSet table model
@@ -40,7 +45,7 @@ public class TablePanel extends javax.swing.JPanel {
         jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.SUCCESS), new SuccessCell());
 
         final RatingCell ratingCell = new RatingCell();
-        
+
         final TableColumn column = jResultSetTable.getColumn(resultSetTableModel.getColumnName(ResultSetTableModel.RATING));
         column.setCellRenderer(ratingCell);
         column.setCellEditor(ratingCell);
@@ -74,11 +79,44 @@ public class TablePanel extends javax.swing.JPanel {
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    public JTable getTable() {
+    public void setResults(List<ServiceResult> results) {
+        getTableModel().setResults(results);
+    }
+
+    public ListSelectionModel getSelectionModel() {
+        return getTable().getSelectionModel();
+    }
+
+    public int getSelectedRowsCount() {
+        return getTable().getSelectedRowCount();
+    }
+
+    public ServiceResult[] getSelectedRows() {
+        final int[] selected = getTable().getSelectedRows();
+
+        final ServiceResult[] results = new ServiceResult[selected.length];
+
+        for (int i = 0; i < selected.length; i++) {
+            results[i] = resultSetTableModel.getServiceResult(resultSetTableSorter.modelIndex(selected[i]));
+        }
+        return results;
+    }
+
+    public ServiceResult getSelectedRow() {
+        final ServiceResult[] results = getSelectedRows();
+        return (results.length == 0) ? null : results[0];
+    }
+
+    public void setSelectedRow(final int rowIndex) {
+        final int index = resultSetTableSorter.viewIndex(rowIndex);
+        getTable().setRowSelectionInterval(index, index);
+    }
+
+    private JTable getTable() {
         return this.jResultSetTable;
     }
 
-    public ResultSetTableModel getTableModel() {
+    private ResultSetTableModel getTableModel() {
         return this.resultSetTableModel;
     }
 
