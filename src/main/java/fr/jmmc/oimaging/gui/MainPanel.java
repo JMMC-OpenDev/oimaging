@@ -7,6 +7,7 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
+import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
@@ -688,7 +689,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             List<Integer> rowsToDelete = Arrays.stream(table.getSelectedRows()).boxed().collect(Collectors.toList());
             Collections.reverse(rowsToDelete);
             rowsToDelete.forEach((Integer index) -> {
-                currentModel.removeServiceResult(resultSetList.get(index));
+                BasicTableSorter sorterModel = (BasicTableSorter) jTablePanel.getTable().getModel();
+                currentModel.removeServiceResult(resultSetList.get(sorterModel.modelIndex(index)));
             });
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
