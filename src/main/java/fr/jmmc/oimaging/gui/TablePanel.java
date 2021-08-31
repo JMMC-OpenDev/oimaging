@@ -8,6 +8,8 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
+
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -91,20 +93,18 @@ public class TablePanel extends javax.swing.JPanel {
         return getTable().getSelectedRowCount();
     }
 
-    public ServiceResult[] getSelectedRows() {
-        final int[] selected = getTable().getSelectedRows();
+    public List<ServiceResult> getSelectedRows() {
+        List<ServiceResult> results = new ArrayList<>();
 
-        final ServiceResult[] results = new ServiceResult[selected.length];
-
-        for (int i = 0; i < selected.length; i++) {
-            results[i] = resultSetTableModel.getServiceResult(resultSetTableSorter.modelIndex(selected[i]));
+        for (int index : getTable().getSelectedRows()) {
+            results.add(resultSetTableModel.getServiceResult(resultSetTableSorter.modelIndex(index)));
         }
         return results;
     }
 
     public ServiceResult getSelectedRow() {
-        final ServiceResult[] results = getSelectedRows();
-        return (results.length == 0) ? null : results[0];
+        final List<ServiceResult> results = getSelectedRows();
+        return (results.isEmpty()) ? null : results.get(0);
     }
 
     public void setSelectedRow(final int rowIndex) {
