@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.4 beta 1"/>
-    <compilation date="16/07/2021" compiler="JDK 1.6.0_24"/>
+    <program name="OImaging" version="0.5.4 beta 2"/>
+    <compilation date="02/09/2021" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -155,7 +155,12 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Fri, 16 Jul 2021 21:00:00 GMT</pubDate>
+            <pubDate>Thu, 02 Sep 2021 13:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 2">
+                <change type="FEATURE">Added a compare action to display selected image results as a grid</change>
+                <change type="FEATURE">Added a slider to navigate through image results</change>
+                <change type="FEATURE">Added new table to show more information about each image results</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 1">
                 <change type="FEATURE">Added new ruler to measure both distance and angle on any FITS image</change>
                 <change type="FEATURE">Added Scientific Color Maps (v7)</change>
