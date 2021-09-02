@@ -456,34 +456,43 @@ public class IRModel {
 
         return dataAdded;
     }
+    
+    private void loadLog(final ServiceResult serviceResult) {
+        try {
+            serviceResult.loadExecutionLogFile();
+        } catch (IOException ioe) {
+            logger.error("Can't read content of executionLog file ", ioe);
+        }
+    }
 
     public void showLog(final String prefixMessage, final ServiceResult serviceResult, final Exception e) {
-        String executionLog = null;
-
-        final File logFile = serviceResult.getExecutionLogResultFile();
-        if (logFile != null && logFile.exists()) {
-            try {
-                executionLog = FileUtils.readFile(serviceResult.getExecutionLogResultFile());
-            } catch (IOException ioe) {
-                logger.error("Can't read content of executionLog file ", ioe);
-            }
-        }
+        loadLog(serviceResult);
+        final String executionLog = serviceResult.getExecutionLog();
         MessagePane.showErrorMessage((executionLog != null) ? (prefixMessage + "\n\n" + executionLog) : prefixMessage, e);
     }
 
     public void addServiceResult(ServiceResult serviceResult) {
+        loadLog(serviceResult);
+        // Load result:
+        try {
+            serviceResult.loadOIFitsFile();
+        } catch (FitsException fe) {
+            logger.error("Can't get imageHDU from result oifile", fe);
+        } catch (IOException ioe) {
+            logger.error("Can't get imageHDU from result oifile", ioe);
+        }
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
-            try {
-                addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
-            } catch (IOException ex) {
-                logger.error("Can't get imageHDU from result oifile", ex);
-            } catch (FitsException ex) {
-                logger.error("Can't get imageHDU from result oifile", ex);
-            }
+            addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
         }
 
+        // notify model update
+        IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    public void removeServiceResult(ServiceResult serviceResultToDelete) {
+        getResultSets().remove(serviceResultToDelete);
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
     }

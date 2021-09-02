@@ -518,8 +518,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
             final Service service = irModel.getSelectedService();
 
-            System.out.println("syncUI: " + service);
-
             boolean show;
 
             if (inputParam.getSpecificKeywords().isEmpty()) {

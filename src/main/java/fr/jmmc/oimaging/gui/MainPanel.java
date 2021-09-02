@@ -8,6 +8,7 @@ package fr.jmmc.oimaging.gui;
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
 import fr.jmmc.jmcs.util.ObjectUtils;
@@ -34,18 +35,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.ListModel;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +59,8 @@ import org.slf4j.LoggerFactory;
  * @author mella
  */
 public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener {
+
+    private static final boolean USE_LIST = true;
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
@@ -69,16 +75,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     /** default mouse cursor refresh period = 100 ms */
     private static final int REFRESH_PERIOD = 100;
 
-    // if multi page activated the export file will containt global view + each plot on a page/image
-    private final List<String> hduNameList = new ArrayList<String>(5);
-
-    private final List<ServiceResult> resultSetList = new ArrayList<ServiceResult>(5);
-
-    /** ResultSet list model */
-    GenericListModel<ServiceResult> resultSetListModel = new GenericListModel<ServiceResult>(resultSetList);
-
     /* members */
-    /** actions */
+ /* actions */
     private DeleteSelectionAction deleteSelectionAction;
     private RunAction runAction;
     private Action exportOiFitsAction;
@@ -87,11 +85,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
 
-    FieldSliderAdapter fieldSliderAdapterWaveMin;
-    FieldSliderAdapter fieldSliderAdapterWaveMax;
+    private FieldSliderAdapter fieldSliderAdapterWaveMin;
+    private FieldSliderAdapter fieldSliderAdapterWaveMax;
     /** timeline refresh Swing timer */
     private final Timer timerMouseCursorRefresh;
     private IRModel currentModel;
+
+    private JSlider jSliderResults;
 
     /**
      * Creates new form MainPanel
@@ -154,7 +154,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         IRModelManager.getInstance().bindIRModelChangedEvent(this);
 
-        jListResults.setCellRenderer(new OiCellRenderer());
+        if (USE_LIST) {
+            jListResults.setCellRenderer(new OiCellRenderer());
+        }
+        jScrollPaneResults.setVisible(USE_LIST);
 
         jLabelWaveMin.setText("WAVE_MIN [" + SpecialChars.UNIT_MICRO_METER + ']');
         jLabelWaveMax.setText("WAVE_MAX [" + SpecialChars.UNIT_MICRO_METER + ']');
@@ -164,10 +167,31 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         fieldSliderAdapterWaveMax = new FieldSliderAdapter(jSliderWaveMax, jFormattedTextFieldWaveMax, 0, 1, 0);
 
         // become widget listener
-        jListResults.addListSelectionListener((ListSelectionListener) this);
+        if (USE_LIST) {
+            jListResults.addListSelectionListener(this);
+        }
+        jTablePanel.getSelectionModel().addListSelectionListener(this);
 
         // init viewer Panel
         viewerPanel.displayModel(null);
+
+        // create image slider:
+        jSliderResults = new JSlider();
+        jSliderResults.setMinimum(-1);
+        jSliderResults.setMaximum(-1);
+        jSliderResults.setValue(-1);
+        jSliderResults.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSliderResultsStateChanged(evt);
+            }
+        });
+
+        jTablePanel.addControlComponent(jButtonCompare);
+        jTablePanel.addControlComponent(new JButton(deleteSelectionAction));
+        jTablePanel.addControlComponent(jSliderResults);
+
+        // to ensure jsplit pane will be given 90% once it becomes visible:
+        showTablePanel(false);
 
         jSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 
@@ -284,7 +308,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jButtonCompare = new javax.swing.JButton();
+        jSplitPaneGlobal = new javax.swing.JSplitPane();
         jSplitPane = new javax.swing.JSplitPane();
+        viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
         jScrollPane = new javax.swing.JScrollPane();
         jPanelLeft = new javax.swing.JPanel();
         jPanelDataSelection = new javax.swing.JPanel();
@@ -311,14 +338,26 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelResults = new javax.swing.JPanel();
         jScrollPaneResults = new javax.swing.JScrollPane();
         jListResults = createCustomList();
-        viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
+        jResultsTableShowButton = new javax.swing.JButton();
+        jTablePanel = new fr.jmmc.oimaging.gui.TablePanel();
+
+        jButtonCompare.setText("Compare");
+        jButtonCompare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCompareActionPerformed(evt);
+            }
+        });
 
         setLayout(new java.awt.BorderLayout());
+
+        jSplitPaneGlobal.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPaneGlobal.setMinimumSize(new java.awt.Dimension(900, 30));
 
         jSplitPane.setResizeWeight(0.01);
         jSplitPane.setContinuousLayout(true);
         jSplitPane.setMinimumSize(new java.awt.Dimension(900, 600));
         jSplitPane.setPreferredSize(new java.awt.Dimension(900, 600));
+        jSplitPane.setRightComponent(viewerPanel);
 
         jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane.setViewportView(jPanelLeft);
@@ -556,6 +595,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jPanelResults.add(jScrollPaneResults, java.awt.BorderLayout.CENTER);
 
+        jResultsTableShowButton.setText("Hide details");
+        jResultsTableShowButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jResultsTableShowButtonActionPerformed(evt);
+            }
+        });
+        jPanelResults.add(jResultsTableShowButton, java.awt.BorderLayout.PAGE_END);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -567,10 +614,29 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jScrollPane.setViewportView(jPanelLeft);
 
         jSplitPane.setLeftComponent(jScrollPane);
-        jSplitPane.setRightComponent(viewerPanel);
 
-        add(jSplitPane, java.awt.BorderLayout.CENTER);
+        jSplitPaneGlobal.setLeftComponent(jSplitPane);
+
+        jTablePanel.setPreferredSize(new java.awt.Dimension(900, 100));
+        jSplitPaneGlobal.setRightComponent(jTablePanel);
+
+        add(jSplitPaneGlobal, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private int sliderResultLastIndex = -1;
+
+    private void jSliderResultsStateChanged(ChangeEvent evt) {
+        if (!syncingUI && jSliderResults.getValue() != -1) {
+            final int index = jSliderResults.getMaximum() - jSliderResults.getValue();
+
+            if (index != sliderResultLastIndex) {
+                sliderResultLastIndex = index;
+                // TODO: use table order, not result order ?
+                viewerPanel.displayResult(currentModel.getResultSets().get(index));
+                jTablePanel.setSelectedRow(index);
+            }
+        }
+    }
 
     private void jCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxActionPerformed
         updateModel();
@@ -584,6 +650,45 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         updateModel();
     }//GEN-LAST:event_jFormattedTextFieldPropertyChange
 
+    private void jResultsTableShowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResultsTableShowButtonActionPerformed
+        showTablePanel(!this.jTablePanel.isVisible());
+    }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
+
+    private void showTablePanel(final boolean visible) {
+        if (this.jTablePanel.isVisible() != visible) {
+            if (visible) {
+                // ensure 10% for table (not too large):
+                this.jSplitPaneGlobal.setDividerLocation(0.9);
+            }
+            this.jTablePanel.setVisible(visible);
+            this.jResultsTableShowButton.setText(visible ? "Hide details" : "Show details");
+        }
+    }
+
+    private void jButtonCompareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCompareActionPerformed
+        final int selected = jTablePanel.getSelectedRowsCount();
+
+        if (selected == 0) {
+            // TODO: use table order, not result order ?
+            viewerPanel.displayGrid(currentModel.getResultSets());
+        } else if (selected == 1) {
+            viewerPanel.displayResult(jTablePanel.getSelectedRow());
+        } else {
+            viewerPanel.displayGrid(jTablePanel.getSelectedRows());
+        }
+    }//GEN-LAST:event_jButtonCompareActionPerformed
+
+    public void deleteSelectedRows() {
+        final int nSelected = jTablePanel.getSelectedRowsCount();
+        if (nSelected != 0) {
+            if (MessagePane.showConfirmMessage(this.jTablePanel,
+                    "Do you want to delete " + nSelected + " result(s) ?")) {
+
+                currentModel.removeServiceResults(jTablePanel.getSelectedRows());
+            }
+        }
+    }
+
     /**
      * Listen for list selection changes
      *
@@ -595,16 +700,24 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (e.getValueIsAdjusting()) {
             return;
         }
-
         // This action only update GUI but not the model.
-        if (e.getSource() == jListResults) {
-            viewerPanel.displayResult((ServiceResult) jListResults.getSelectedValue());
-            deleteSelectionAction.watchResultsSelection(currentModel, jListResults);
-        }
 
+        // enable delete action if the result table has rows selected:
+        deleteSelectionAction.setEnabled(jTablePanel.getSelectedRowsCount() != 0);
+
+        if (e.getSource() == jListResults) {
+            if (USE_LIST) {
+                viewerPanel.displayResult((ServiceResult) jListResults.getSelectedValue());
+            }
+        } else if (e.getSource() == jTablePanel.getSelectionModel()) {
+            viewerPanel.displayResult(jTablePanel.getSelectedRow());
+        } else {
+            logger.warn("valueChanged: Unsupported component : {}", e.getSource());
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonCompare;
     private javax.swing.JButton jButtonExportImage;
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;
@@ -625,19 +738,22 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JPanel jPanelExecutionLog;
     private javax.swing.JPanel jPanelLeft;
     private javax.swing.JPanel jPanelResults;
+    private javax.swing.JButton jResultsTableShowButton;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPaneEditor;
     private javax.swing.JScrollPane jScrollPaneResults;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
     private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JSplitPane jSplitPaneGlobal;
+    private fr.jmmc.oimaging.gui.TablePanel jTablePanel;
     private fr.jmmc.oimaging.gui.SoftwareSettingsPanel softwareSettingsPanel;
     private fr.jmmc.oimaging.gui.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public String getSubjectId(IRModelEventType type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     public void onProcess(final IRModelEvent event) {
@@ -794,10 +910,25 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jCheckBoxUseVis2.setSelected(hasOIData && inputParam.useVis2());
             jCheckBoxUseT3.setSelected(hasOIData && inputParam.useT3());
 
+            // model result list:
+            final List<ServiceResult> modelResults = currentModel.getResultSets();
+
             // resultSet List
-            resultSetListModel.clear();
-            resultSetListModel.add(currentModel.getResultSets());
-            jListResults.setModel(resultSetListModel);
+            if (USE_LIST) {
+                jListResults.setModel(new GenericListModel<ServiceResult>(modelResults));
+            }
+
+            // resultSet Table
+            jTablePanel.setResults(modelResults);
+
+            // set the slider results boundaries
+            if (modelResults.size() > 1) {
+                jSliderResults.setMinimum(1);
+                jSliderResults.setMaximum(modelResults.size());
+                jSliderResults.setVisible(true);
+            } else {
+                jSliderResults.setVisible(false);
+            }
 
             // perform analysis
             final List<String> failures = new LinkedList<String>();
@@ -836,10 +967,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
-            if (event.getType() == IRModelEventType.IRMODEL_CHANGED || jListResults.getModel().getSize() == 0) {
+            if (event.getType() == IRModelEventType.IRMODEL_CHANGED || modelResults.isEmpty()) {
                 viewerPanel.displayModel(currentModel);
             } else {
-                jListResults.setSelectedIndex(0);
+                if (USE_LIST) {
+                    jListResults.setSelectedIndex(0);
+                }
+                showTablePanel(true);
+                jTablePanel.setSelectedRow(0);
             }
         } finally {
             syncingUI = false;
