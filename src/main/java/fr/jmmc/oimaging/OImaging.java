@@ -70,9 +70,6 @@ public final class OImaging extends App {
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OImaging.class.getName());
 
-    /* Minimal size of main component */
-    private static final Dimension INITIAL_DIMENSION = new java.awt.Dimension(1200, 700);
-
     /* members */
     /** main Panel */
     private MainPanel mainPanel;
@@ -267,7 +264,7 @@ public final class OImaging extends App {
             final Dimension dim = new Dimension(950, 700);
             frame.setMinimumSize(dim);
             frame.addComponentListener(new ComponentResizeAdapter(dim));
-            frame.setPreferredSize(INITIAL_DIMENSION);
+            frame.setPreferredSize(dim);
 
             App.setFrame(frame);
 
