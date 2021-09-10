@@ -39,16 +39,16 @@ public class TablePanel extends javax.swing.JPanel {
         resultSetTableModel = new ResultSetTableModel();
 
         initComponents();
-
+        
         resultSetTableSorter = new BasicTableSorter(resultSetTableModel, jResultSetTable.getTableHeader());
         jResultSetTable.setModel(resultSetTableSorter);
         SwingUtils.adjustRowHeight(jResultSetTable);
 
-        jResultSetTable.setDefaultRenderer(jResultSetTable.getColumnClass(ResultSetTableModel.SUCCESS), new SuccessCell());
+        jResultSetTable.setDefaultRenderer(ResultSetTableModel.HardCodedColumnDesc.SUCCESS.getClass(), new SuccessCell()); // TODO: not pretty
 
         final RatingCell ratingCell = new RatingCell();
 
-        final TableColumn column = jResultSetTable.getColumn(resultSetTableModel.getColumnName(ResultSetTableModel.RATING));
+        final TableColumn column = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName()); // TODO: not pretty
         column.setCellRenderer(ratingCell);
         column.setCellEditor(ratingCell);
     }
