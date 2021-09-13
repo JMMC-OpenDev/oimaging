@@ -72,7 +72,7 @@ public final class RatingCell extends AbstractCellEditor implements TableCellEdi
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         rating = UNDEFINED;
-        starRater.setSelection((int) value);
+        if (value != null) starRater.setSelection((int) value);
         if (logger.isDebugEnabled()) {
             logger.debug("getTableCellRendererComponent {}", starRater.getSelection());
         }

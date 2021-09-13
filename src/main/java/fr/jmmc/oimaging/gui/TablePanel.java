@@ -8,12 +8,16 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
+import java.awt.Dimension;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 /**
@@ -29,6 +33,12 @@ public class TablePanel extends javax.swing.JPanel {
      */
     private final ResultSetTableModel resultSetTableModel;
     private final BasicTableSorter resultSetTableSorter;
+    
+    /** object with rendering and editing responsabilities for column RATING.
+     * Careful ! You must have one RatingCell for each RATING column.
+     */
+    private final RatingCell ratingCell;
+    private final SuccessCell successCell;
 
     /**
      * Creates new form TablePanel
@@ -37,19 +47,17 @@ public class TablePanel extends javax.swing.JPanel {
 
         // Build ResultsTable
         resultSetTableModel = new ResultSetTableModel();
+        
+        ratingCell = new RatingCell();
+        successCell = new SuccessCell();
 
         initComponents();
 
+        // must come after initComponents()
         resultSetTableSorter = new BasicTableSorter(resultSetTableModel, jResultSetTable.getTableHeader());
+
         jResultSetTable.setModel(resultSetTableSorter);
         SwingUtils.adjustRowHeight(jResultSetTable);
-
-        jResultSetTable.setDefaultRenderer(ResultSetTableModel.HardCodedColumnDesc.SUCCESS.getDataClass(), new SuccessCell());
-        final RatingCell ratingCell = new RatingCell();
-
-        final TableColumn column = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName());
-        column.setCellRenderer(ratingCell);
-        column.setCellEditor(ratingCell);
     }
 
     /**
@@ -60,12 +68,12 @@ public class TablePanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         jResultSetTable = new javax.swing.JTable();
         jPanelTableOptions = new javax.swing.JPanel();
+        jButtonShowTableEditor = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -75,20 +83,64 @@ public class TablePanel extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jScrollPane1);
 
         jPanelTableOptions.setLayout(new javax.swing.BoxLayout(jPanelTableOptions, javax.swing.BoxLayout.PAGE_AXIS));
+
+        jButtonShowTableEditor.setText("Table editor");
+        jButtonShowTableEditor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonShowTableEditorActionPerformed(evt);
+            }
+        });
+        jPanelTableOptions.add(jButtonShowTableEditor);
+
         jSplitPane1.setLeftComponent(jPanelTableOptions);
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Display the table keywords editor and set the new headers
+     */
+    private void jButtonShowTableEditorActionPerformed(java.awt.event.ActionEvent evt) {
+        // Set the dialog box
+        JOptionPane jOptionPane = new JOptionPane();
+        JDialog dialog = jOptionPane.createDialog("Edit table headers");
+        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, getTableModel().getCopyUnionColumnDesc(), getTableModel().getCopyUserUnionColumnDesc());
+        dialog.setContentPane(tableEditorPanel);
+        dialog.setMinimumSize(new Dimension(600, 500));
+        dialog.setResizable(true);
+        dialog.setVisible(true);
+        
+        // when dialog returns we set the chosen columns by user
+        setUserUnionColumnDesc(tableEditorPanel.getKeywordsToDisplay());
+    }                                                      
+
+    /** find the columns to apply pretty renderers. 
+     * should  be called each time the columns change
+     * it is called in setResults() and setUserUnionColumnDesc().
+     */
+    public void reTargetRenderers () {
+        // We must re-ask for rendering since the TableColumn object is different
+        final TableColumn columnRating = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName());
+        columnRating.setCellRenderer(ratingCell);
+        columnRating.setCellEditor(ratingCell);
+        
+        final TableColumn columnSuccess = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.SUCCESS.getName());
+        columnSuccess.setCellRenderer(successCell);
+    }
+    
     public void setResults(List<ServiceResult> results) {
         getTableModel().setResults(results);
-        
-        // We must re-ask for rendering since the TableColumn object is different
-        final RatingCell ratingCell = new RatingCell();
-        final TableColumn column = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName());
-        column.setCellRenderer(ratingCell);
-        column.setCellEditor(ratingCell);
+        reTargetRenderers();
     }
+    
+    /** modify the user selected columns in ResulTSetTableModel
+     * Used for example when Table Editor dialog returns and we must apply the user choices.
+     * @param userUnionColumnDesc 
+     */
+    public void setUserUnionColumnDesc(List<ResultSetTableModel.ColumnDesc> userUnionColumnDesc) {
+        getTableModel().setUserUnionColumnDesc(userUnionColumnDesc);
+        reTargetRenderers();
+   }
 
     public ListSelectionModel getSelectionModel() {
         return getTable().getSelectionModel();
@@ -130,6 +182,7 @@ public class TablePanel extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonShowTableEditor;
     private javax.swing.JPanel jPanelTableOptions;
     private javax.swing.JTable jResultSetTable;
     private javax.swing.JScrollPane jScrollPane1;

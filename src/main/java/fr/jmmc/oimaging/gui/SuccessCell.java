@@ -37,7 +37,7 @@ public class SuccessCell extends JPanel implements TableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        success = (boolean) value;
+        if (value != null) success = (boolean) value;
         return this;
     }
 

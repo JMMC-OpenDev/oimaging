@@ -59,6 +59,16 @@
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout">
             <Property name="axis" type="int" value="3"/>
           </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JButton" name="jButtonShowTableEditor">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Table editor"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonShowTableEditorActionPerformed"/>
+              </Events>
+            </Component>
+          </SubComponents>
         </Container>
       </SubComponents>
     </Container>
