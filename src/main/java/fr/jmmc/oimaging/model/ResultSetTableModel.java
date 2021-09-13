@@ -14,6 +14,7 @@ import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fr.jmmc.oitools.fits.FitsUtils;
 
 /**
  *
@@ -63,10 +64,14 @@ public class ResultSetTableModel extends AbstractTableModel {
         this.results.clear();
         this.results.addAll(results);
         
-        // update columns : 
-        // 1. Fusion of columns.
-        //    a. we order them by source priority : Output, Input, HardCoded.
-        //    b. we remove every column that has another column with same name at his left.
+        // Fusion of columns.
+        // 1. we add every output, every input, every hardcoded.
+        // 2. we remove any standard FITS keyword.
+        // 3. we order them by source priority : Output, Input, HardCoded.
+        // 4. we remove every column that has another column with same name at his left.
+        // 5. we re order the resulting columns :
+        //    some hardcoded, then inputs, then outputs, then hardcoded success, rating and comments.
+        // 6. we reset userUnionColumnDesc to unionColumnDesc.
         
         // remove all previous columns
         unionColumnDesc.clear();
@@ -104,6 +109,9 @@ public class ResultSetTableModel extends AbstractTableModel {
         unionColumnDesc.add(HardCodedColumnDesc.SUCCESS);
         unionColumnDesc.add(HardCodedColumnDesc.RATING);
         unionColumnDesc.add(HardCodedColumnDesc.COMMENTS);
+        
+        // removing any standard FITS keyword.
+        unionColumnDesc.removeIf(col -> FitsUtils.isStandardKeyword(col.getName()));
         
         // remove duplicates : every column that has another column with same name at his left.
         int nbColumns = unionColumnDesc.size(); // number of columns (it will change because of remove)
