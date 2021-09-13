@@ -39,16 +39,15 @@ public class TablePanel extends javax.swing.JPanel {
         resultSetTableModel = new ResultSetTableModel();
 
         initComponents();
-        
+
         resultSetTableSorter = new BasicTableSorter(resultSetTableModel, jResultSetTable.getTableHeader());
         jResultSetTable.setModel(resultSetTableSorter);
         SwingUtils.adjustRowHeight(jResultSetTable);
 
-        jResultSetTable.setDefaultRenderer(ResultSetTableModel.HardCodedColumnDesc.SUCCESS.getClass(), new SuccessCell()); // TODO: not pretty
-
+        jResultSetTable.setDefaultRenderer(ResultSetTableModel.HardCodedColumnDesc.SUCCESS.getDataClass(), new SuccessCell());
         final RatingCell ratingCell = new RatingCell();
 
-        final TableColumn column = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName()); // TODO: not pretty
+        final TableColumn column = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName());
         column.setCellRenderer(ratingCell);
         column.setCellEditor(ratingCell);
     }
@@ -83,6 +82,12 @@ public class TablePanel extends javax.swing.JPanel {
 
     public void setResults(List<ServiceResult> results) {
         getTableModel().setResults(results);
+        
+        // We must re-ask for rendering since the TableColumn object is different
+        final RatingCell ratingCell = new RatingCell();
+        final TableColumn column = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName());
+        column.setCellRenderer(ratingCell);
+        column.setCellEditor(ratingCell);
     }
 
     public ListSelectionModel getSelectionModel() {

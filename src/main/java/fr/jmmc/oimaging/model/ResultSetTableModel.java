@@ -252,7 +252,7 @@ public class ResultSetTableModel extends AbstractTableModel {
         ALGORITHM("Algorithm", String.class), 
         RGL_WGT("RGL_WGT", String.class), 
         SUCCESS("Success", boolean.class), 
-        RATING("Rating", int.class), 
+        RATING("Rating", Integer.class), 
         COMMENTS("Comments", String.class);
 
         private final String label;
