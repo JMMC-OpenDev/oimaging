@@ -19,6 +19,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,6 +30,8 @@ public class TablePanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
+    private static final Logger logger = LoggerFactory.getLogger(TablePanel.class);
+    
     /**
      * ResultSet table model
      */
@@ -104,7 +108,7 @@ public class TablePanel extends javax.swing.JPanel {
         // Set the dialog box
         JOptionPane jOptionPane = new JOptionPane();
         JDialog dialog = jOptionPane.createDialog("Edit table headers");
-        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, getTableModel().getCopyUnionColumnDesc(), getTableModel().getCopyUserUnionColumnDesc());
+        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, new ArrayList<>(getTableModel().getUnionColumnDesc()), getTableModel().getUserUnionColumnDesc());
         dialog.setContentPane(tableEditorPanel);
         dialog.setMinimumSize(new Dimension(600, 500));
         dialog.setResizable(true);
@@ -120,12 +124,16 @@ public class TablePanel extends javax.swing.JPanel {
      */
     public void reTargetRenderers () {
         // We must re-ask for rendering since the TableColumn object is different
-        final TableColumn columnRating = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.RATING.getName());
-        columnRating.setCellRenderer(ratingCell);
-        columnRating.setCellEditor(ratingCell);
+        try {
+            final TableColumn columnRating = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumn.RATING.toString());
+            columnRating.setCellRenderer(ratingCell);
+            columnRating.setCellEditor(ratingCell);
+        } catch (IllegalArgumentException e) {}
         
-        final TableColumn columnSuccess = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumnDesc.SUCCESS.getName());
-        columnSuccess.setCellRenderer(successCell);
+        try {
+            final TableColumn columnSuccess = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumn.SUCCESS.toString());
+            columnSuccess.setCellRenderer(successCell);
+        } catch (IllegalArgumentException e) {}
     }
     
     public void setResults(List<ServiceResult> results) {

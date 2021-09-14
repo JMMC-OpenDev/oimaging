@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -20,9 +22,6 @@ import java.util.List;
  * @author martin
  */
 public class TableEditorPanel extends javax.swing.JPanel implements MouseListener {
-
-    // The list of column keywords to be returned (updated only if the edition has been completed)
-    private final List<ResultSetTableModel.ColumnDesc> keywordsToDisplay = new ArrayList<>();
 
     // Model and view for the list
     DefaultListModel<ResultSetTableModel.ColumnDesc> modelAvailable = new DefaultListModel<>();
@@ -37,21 +36,18 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
 
         this.dialog = dialog;
 
-        keywordsToDisplay.addAll(keywordsDisplayed);
+        // remove from available all aready displayed columns
+        keywordsDisplayed.forEach(availableKeywords::remove);
+        
+        availableKeywords.forEach(modelAvailable::addElement);
+        keywordsDisplayed.forEach(modelDisplayed::addElement);
 
-        // Add all the results keywords in the list
-        availableKeywords.forEach(keyword -> {
-            modelAvailable.addElement(keyword);
-        });
         jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
-
-        keywordsDisplayed.forEach(keyword -> {
-            modelDisplayed.addElement(keyword);
-        });
         jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
 
         jListAvailable.setModel(modelAvailable);
         jListDisplayed.setModel(modelDisplayed);
+        
         jListAvailable.updateUI();
         jListDisplayed.updateUI();
     }
@@ -178,22 +174,22 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
         if (jListAvailable.getSelectedValue() != null) {
             modelDisplayed.addElement(jListAvailable.getSelectedValue());
+            modelAvailable.removeElement(jListAvailable.getSelectedValue());
+            jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
             jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
         }
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
         if (jListDisplayed.getSelectedValue() != null) {
+            modelAvailable.addElement(jListDisplayed.getSelectedValue());
             modelDisplayed.removeElement(jListDisplayed.getSelectedValue());
+        jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
             jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
         }
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
-        keywordsToDisplay.clear();
-        for (int i = 0; i < modelDisplayed.size(); i++) {
-            keywordsToDisplay.add(modelDisplayed.get(i));
-        }
         dialog.dispose();
     }//GEN-LAST:event_jButtonOkActionPerformed
 
@@ -202,7 +198,11 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     public List<ResultSetTableModel.ColumnDesc> getKeywordsToDisplay() {
-        return keywordsToDisplay;
+        List<ResultSetTableModel.ColumnDesc> keywordsDisplayed = new ArrayList<> ();
+        for (Enumeration<ResultSetTableModel.ColumnDesc> e = modelDisplayed.elements(); e.hasMoreElements();) {
+            keywordsDisplayed.add(e.nextElement());
+        }
+        return keywordsDisplayed;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
