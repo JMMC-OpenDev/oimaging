@@ -7,6 +7,7 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
+import fr.jmmc.oitools.meta.KeywordMeta;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -88,16 +89,16 @@ public class ResultSetTableModel extends AbstractTableModel {
         for (ServiceResult result : results) {
             // input params
             ImageOiInputParam input = result.getOifitsFile().getImageOiData().getInputParam();
-            for (String name : input.getKeywordsValue().keySet()) {
-                listColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, name, Object.class)); // TODO: actual class
+            for (KeywordMeta keyMeta : input.getKeywordsDesc().values()) {
+                listColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, keyMeta.getName(), keyMeta.getClass())); 
             }
             for (FitsHeaderCard card : input.getHeaderCards()) {
                 listColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, card.getKey(), card.getClass()));
             }
             // output params
             ImageOiOutputParam output = result.getOifitsFile().getImageOiData().getOutputParam();
-            for (String name : output.getKeywordsValue().keySet()) {
-                listColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM, name, Object.class)); // TODO: actual class
+            for (KeywordMeta keyMeta : output.getKeywordsDesc().values()) {
+                listColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM,keyMeta.getName(), keyMeta.getClass())); 
             }
             for (FitsHeaderCard card : output.getHeaderCards()) {
                 listColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM, card.getKey(), card.getClass()));
