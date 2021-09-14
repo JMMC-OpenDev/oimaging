@@ -60,6 +60,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     
     public void setUserUnionColumnDesc (List<ColumnDesc> userUnionColumnDesc) {
         this.userUnionColumnDesc.clear();
+        userUnionColumnDesc.sort(ColumnDesc.orderByRevSourceThenName);
         this.userUnionColumnDesc.addAll(userUnionColumnDesc);
         fireTableStructureChanged();
     }
