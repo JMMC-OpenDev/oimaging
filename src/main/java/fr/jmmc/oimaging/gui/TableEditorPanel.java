@@ -45,9 +45,6 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
 
         jListAvailable.setModel(modelAvailable);
         jListDisplayed.setModel(modelDisplayed);
-        
-        jListAvailable.updateUI();
-        jListDisplayed.updateUI();
     }
 
     /**
