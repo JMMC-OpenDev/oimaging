@@ -108,7 +108,7 @@ public class TablePanel extends javax.swing.JPanel {
         // Set the dialog box
         JOptionPane jOptionPane = new JOptionPane();
         JDialog dialog = jOptionPane.createDialog("Edit table headers");
-        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, new ArrayList<>(getTableModel().getUnionColumnDesc()), getTableModel().getUserUnionColumnDesc());
+        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, new ArrayList<>(getTableModel().getSetColumnDesc()), getTableModel().getListColumnDesc());
         dialog.setContentPane(tableEditorPanel);
         dialog.setMinimumSize(new Dimension(600, 500));
         dialog.setResizable(true);
@@ -146,7 +146,7 @@ public class TablePanel extends javax.swing.JPanel {
      * @param userUnionColumnDesc 
      */
     public void setUserUnionColumnDesc(List<ResultSetTableModel.ColumnDesc> userUnionColumnDesc) {
-        getTableModel().setUserUnionColumnDesc(userUnionColumnDesc);
+        getTableModel().setListColumnDesc(userUnionColumnDesc);
         reTargetRenderers();
    }
 

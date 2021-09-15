@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -36,32 +37,33 @@ public class ResultSetTableModel extends AbstractTableModel {
     * when there is several columns with same name, only one is keeped based on priority.
     * the decreasing priority is : OutputParam > InputParam > HardCoded.
     */
-    private final LinkedHashSet<ColumnDesc> unionColumnDesc;
+    private final Set<ColumnDesc> setColumnDesc;
     
-    /** originaly the same as unionColumnDesc but the GUI user can filter some columns. 
-     it is a list because then it is simpler to answer to columns index. */
-    private final List<ColumnDesc> userUnionColumnDesc;
+    /** the list version of setColumnDesc.
+     * It fits better in the Table Model which answers columns by index.
+     * The user can filter some columns with Table Editor. These columns can be retrieved in setColumnDesc. */
+    private final List<ColumnDesc> listColumnDesc;
     
     public ResultSetTableModel() {
         super();
         results = new ArrayList<>();
-        unionColumnDesc = new LinkedHashSet<>();
-        userUnionColumnDesc = new ArrayList<>();
+        setColumnDesc = new HashSet<>();
+        listColumnDesc = new ArrayList<>();
     }
 
-    public Set<ColumnDesc> getUnionColumnDesc () {
-        return Collections.unmodifiableSet(unionColumnDesc);
+    public Set<ColumnDesc> getSetColumnDesc () {
+        return Collections.unmodifiableSet(setColumnDesc);
     }
     
     /** read only of userUnionColumnDesc */
-    public List<ColumnDesc> getUserUnionColumnDesc () {
-        return Collections.unmodifiableList(userUnionColumnDesc);
+    public List<ColumnDesc> getListColumnDesc () {
+        return Collections.unmodifiableList(listColumnDesc);
     }
     
-    public void setUserUnionColumnDesc (List<ColumnDesc> userUnionColumnDesc) {
-        this.userUnionColumnDesc.clear();
-        userUnionColumnDesc.sort(ColumnDesc.orderByRevSourceThenName);
-        this.userUnionColumnDesc.addAll(userUnionColumnDesc);
+    public void setListColumnDesc (List<ColumnDesc> listColumnDesc) {
+        this.listColumnDesc.clear();
+        listColumnDesc.sort(ColumnDesc.orderByRevSourceThenName);
+        this.listColumnDesc.addAll(listColumnDesc);
         fireTableStructureChanged();
     }
     
@@ -72,56 +74,57 @@ public class ResultSetTableModel extends AbstractTableModel {
         this.results.addAll(results);
         
         // Fusion of columns.
-        // 1. we add every hardcoded and input/output params columns.
-        // 2. we filter FITS standard keywords.
-        // 3. we order by reverse source first, name second
-        // 4. we add it to an Ordered Set, with equality on name only, so
-        //    that there is a priority Output > Input > HardCoded on columns.
-        // 5. we reset userUnionColumnDesc to unionColumnDesc.
+        // 1. we clear the set
+        // 2. we add output columns to the set
+        // 3. we add input columns to the set
+        // 4. we add hardcoded columns to the set
+        // 5. we remove standard FITS keywords from the set
+        // 6. we clear the list
+        // 7. we put set elements in the list
+        // 8. we sort the list by reverse Source first, Name second
         
-        List<ColumnDesc> listColumnDesc = new ArrayList<>();
+         // 1. we clear the set
+        setColumnDesc.clear();
         
-        // add hardcoded columns 
-        for (HardCodedColumn hcc : HardCodedColumn.values()) {
-            listColumnDesc.add(hcc.getColumnDesc());
+        // 2. we add output columns to the set
+        for (ServiceResult result : results) {
+            ImageOiOutputParam output = result.getOifitsFile().getImageOiData().getOutputParam();
+            for (KeywordMeta keyMeta : output.getKeywordsDesc().values()) {
+                setColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM,keyMeta.getName(), keyMeta.getClass())); 
+            }
+            for (FitsHeaderCard card : output.getHeaderCards()) {
+                setColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM, card.getKey(), card.getClass()));
+            }
         }
         
-         // add all param columns
+         // 3. we add input columns to the set
         for (ServiceResult result : results) {
             // input params
             ImageOiInputParam input = result.getOifitsFile().getImageOiData().getInputParam();
             for (KeywordMeta keyMeta : input.getKeywordsDesc().values()) {
-                listColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, keyMeta.getName(), keyMeta.getClass())); 
+                setColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, keyMeta.getName(), keyMeta.getClass())); 
             }
             for (FitsHeaderCard card : input.getHeaderCards()) {
-                listColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, card.getKey(), card.getClass()));
-            }
-            // output params
-            ImageOiOutputParam output = result.getOifitsFile().getImageOiData().getOutputParam();
-            for (KeywordMeta keyMeta : output.getKeywordsDesc().values()) {
-                listColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM,keyMeta.getName(), keyMeta.getClass())); 
-            }
-            for (FitsHeaderCard card : output.getHeaderCards()) {
-                listColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM, card.getKey(), card.getClass()));
+                setColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, card.getKey(), card.getClass()));
             }
         }
         
-        // remove any standard FITS keyword.
-        listColumnDesc.removeIf(col -> FitsUtils.isStandardKeyword(col.getName()));
+        // 4. we add hardcoded columns to the set
+        for (HardCodedColumn hcc : HardCodedColumn.values()) {
+            setColumnDesc.add(hcc.getColumnDesc());
+        }
         
-        // order by reverse source first, then name
+        // 5. we remove standard FITS keywords from the set
+        setColumnDesc.removeIf(col -> FitsUtils.isStandardKeyword(col.getName()));
+        
+        // 6. we clear the list
+        listColumnDesc.clear();
+        
+        // 7. we put set elements in the list
+        listColumnDesc.addAll(setColumnDesc);
+        
+        // 8. we sort the list by reverse Source first, Name second
         listColumnDesc.sort(ColumnDesc.orderByRevSourceThenName);
-        
-        // move the list to the set, removing duplicates based on Name unicity
-        // making a priority for duplicates : Ouput > Input > HardCoded
-        unionColumnDesc.clear();
-        listColumnDesc.forEach(unionColumnDesc::add);
-        
-        // clear user union columns
-        // with some work, we could try to keep its previous choices in table editor
-        // instead of reseting it like here.
-        userUnionColumnDesc.clear();
-        userUnionColumnDesc.addAll(unionColumnDesc);
 
         // notify changes
         fireTableStructureChanged();
@@ -139,22 +142,22 @@ public class ResultSetTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return userUnionColumnDesc.size();
+        return listColumnDesc.size();
     }
 
     @Override
     public String getColumnName(int columnIndex) {
-        return userUnionColumnDesc.get(columnIndex).getName();
+        return listColumnDesc.get(columnIndex).getName();
     }
 
     @Override
     public Class getColumnClass(int columnIndex) {
-        return userUnionColumnDesc.get(columnIndex).getDataClass();
+        return listColumnDesc.get(columnIndex).getDataClass();
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        ColumnDesc columnDesc = userUnionColumnDesc.get(columnIndex);
+        ColumnDesc columnDesc = listColumnDesc.get(columnIndex);
         return columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())
                 || columnDesc.equals(HardCodedColumn.RATING.getColumnDesc());
     }
@@ -163,7 +166,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
 
         final ServiceResult result = getServiceResult(rowIndex);
-        ColumnDesc columnDesc = userUnionColumnDesc.get(columnIndex);
+        ColumnDesc columnDesc = listColumnDesc.get(columnIndex);
 
         if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
             result.setComments((String) value);
@@ -177,7 +180,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
 
         final ServiceResult result = getServiceResult(rowIndex);
-        ColumnDesc columnDesc = userUnionColumnDesc.get(columnIndex);
+        ColumnDesc columnDesc = listColumnDesc.get(columnIndex);
         
         switch (columnDesc.getSource()) {
             case HARD_CODED:
