@@ -22,8 +22,8 @@ import java.util.List;
 public class TableEditorPanel extends javax.swing.JPanel implements MouseListener {
 
     // Model and view for the list
-    DefaultListModel<ResultSetTableModel.ColumnDesc> modelAvailable = new DefaultListModel<>();
-    DefaultListModel<ResultSetTableModel.ColumnDesc> modelDisplayed = new DefaultListModel<>();
+    private final DefaultListModel<ResultSetTableModel.ColumnDesc> modelAvailable = new DefaultListModel<>();
+    private final DefaultListModel<ResultSetTableModel.ColumnDesc> modelDisplayed = new DefaultListModel<>();
 
     // Reference to the parent dialog box to handle its events
     private final JDialog dialog;
