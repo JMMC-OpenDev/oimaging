@@ -29,15 +29,21 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
     private final JDialog dialog;
 
     // Constructor used when an edition has already been done
+    /**
+     * 
+     * @param dialog Reference to the parent dialog box to handle its events
+     * @param availableKeywords Available keywords (currently displayed or not) 
+     * @param keywordsDisplayed Currently displayed keywords
+     */
     public TableEditorPanel(JDialog dialog, List<ResultSetTableModel.ColumnDesc> availableKeywords, List<ResultSetTableModel.ColumnDesc> keywordsDisplayed) {
         initComponents();
 
         this.dialog = dialog;
 
-        // remove from available all aready displayed columns
-        keywordsDisplayed.forEach(availableKeywords::remove);
-        
+        // Fill with available keywords, but remove the ones already displayed
         availableKeywords.forEach(modelAvailable::addElement);
+        keywordsDisplayed.forEach(modelAvailable::removeElement);
+        
         keywordsDisplayed.forEach(modelDisplayed::addElement);
 
         jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
