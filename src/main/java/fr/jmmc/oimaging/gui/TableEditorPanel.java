@@ -46,13 +46,17 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
         
         keywordsDisplayed.forEach(modelDisplayed::addElement);
 
-        jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
-        jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
-
         jListAvailable.setModel(modelAvailable);
         jListDisplayed.setModel(modelDisplayed);
+        
+        updateAvailableDisplayedLabels();
     }
 
+    private void updateAvailableDisplayedLabels () {
+        jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
+        jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -176,8 +180,7 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
             modelDisplayed.addElement(columnDesc);
             modelAvailable.removeElement(columnDesc);
         });
-        jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
-        jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
+        updateAvailableDisplayedLabels();
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
@@ -185,8 +188,7 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
             modelAvailable.addElement(columnDesc);
             modelDisplayed.removeElement(columnDesc);
         });
-        jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
-        jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
+        updateAvailableDisplayedLabels();
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
