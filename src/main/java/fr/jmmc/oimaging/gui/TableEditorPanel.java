@@ -141,7 +141,7 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
         gridBagConstraints.gridy = 3;
         add(jLabelDisplayedNb, gridBagConstraints);
 
-        jListAvailable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jListAvailable.setToolTipText("");
         jScrollPaneAvailable.setViewportView(jListAvailable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -153,7 +153,6 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
         gridBagConstraints.weighty = 0.5;
         add(jScrollPaneAvailable, gridBagConstraints);
 
-        jListDisplayed.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPaneDisplayed.setViewportView(jListDisplayed);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -167,21 +166,21 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-        if (jListAvailable.getSelectedValue() != null) {
-            modelDisplayed.addElement(jListAvailable.getSelectedValue());
-            modelAvailable.removeElement(jListAvailable.getSelectedValue());
-            jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
-            jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
-        }
+       jListAvailable.getSelectedValuesList().forEach(columnDesc -> {
+            modelDisplayed.addElement(columnDesc);
+            modelAvailable.removeElement(columnDesc);
+        });
+        jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
+        jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
-        if (jListDisplayed.getSelectedValue() != null) {
-            modelAvailable.addElement(jListDisplayed.getSelectedValue());
-            modelDisplayed.removeElement(jListDisplayed.getSelectedValue());
+        jListDisplayed.getSelectedValuesList().forEach(columnDesc -> {
+            modelAvailable.addElement(columnDesc);
+            modelDisplayed.removeElement(columnDesc);
+        });
         jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
-            jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
-        }
+        jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
