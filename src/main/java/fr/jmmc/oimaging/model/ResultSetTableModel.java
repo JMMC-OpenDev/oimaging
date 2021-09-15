@@ -88,6 +88,7 @@ public class ResultSetTableModel extends AbstractTableModel {
         
         // 2. we add output columns to the set
         for (ServiceResult result : results) {
+            if (result.getOifitsFile() == null) continue;
             ImageOiOutputParam output = result.getOifitsFile().getImageOiData().getOutputParam();
             for (KeywordMeta keyMeta : output.getKeywordsDesc().values()) {
                 setColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM,keyMeta.getName(), keyMeta.getClass())); 
@@ -100,6 +101,7 @@ public class ResultSetTableModel extends AbstractTableModel {
          // 3. we add input columns to the set
         for (ServiceResult result : results) {
             // input params
+            if (result.getOifitsFile() == null) continue;
             ImageOiInputParam input = result.getOifitsFile().getImageOiData().getInputParam();
             for (KeywordMeta keyMeta : input.getKeywordsDesc().values()) {
                 setColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, keyMeta.getName(), keyMeta.getClass())); 
