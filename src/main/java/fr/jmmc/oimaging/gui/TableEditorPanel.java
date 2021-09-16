@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author martin
  */
-public class TableEditorPanel extends javax.swing.JPanel implements MouseListener {
+public class TableEditorPanel extends javax.swing.JPanel {
 
     // Model and view for the list
     private final DefaultListModel<ResultSetTableModel.ColumnDesc> modelAvailable = new DefaultListModel<>();
@@ -229,30 +229,4 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
     private javax.swing.JScrollPane jScrollPaneDisplayed;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void mouseClicked(MouseEvent mouseEvent) {
-        if (mouseEvent.getClickCount() == 2) {
-            if (mouseEvent.getSource() == jListAvailable) {
-                modelDisplayed.addElement(jListAvailable.getSelectedValue());
-            } else if (mouseEvent.getSource() == jListDisplayed) {
-                modelAvailable.removeElement(jListDisplayed.getSelectedValue());
-            }
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent mouseEvent) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent mouseEvent) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent mouseEvent) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent mouseEvent) {
-    }
 }
