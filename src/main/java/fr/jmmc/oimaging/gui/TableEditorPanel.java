@@ -27,6 +27,9 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
 
     // Reference to the parent dialog box to handle its events
     private final JDialog dialog;
+    
+    /** true if the user clicked on OK, false if he clicked on cancel / closed the dialog */
+    private boolean processOK;
 
     // Constructor used when an edition has already been done
     /**
@@ -39,7 +42,8 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
         initComponents();
 
         this.dialog = dialog;
-
+        this.processOK = false;
+        
         // Fill with available keywords, but remove the ones already displayed
         availableKeywords.forEach(modelAvailable::addElement);
         keywordsDisplayed.forEach(modelAvailable::removeElement);
@@ -192,6 +196,7 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
+        this.processOK = true;
         dialog.dispose();
     }//GEN-LAST:event_jButtonOkActionPerformed
 
@@ -206,6 +211,8 @@ public class TableEditorPanel extends javax.swing.JPanel implements MouseListene
         }
         return keywordsDisplayed;
     }
+    
+    public boolean getProcessOK () { return processOK; }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;

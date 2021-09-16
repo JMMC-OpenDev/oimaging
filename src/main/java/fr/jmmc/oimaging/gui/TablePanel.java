@@ -115,7 +115,7 @@ public class TablePanel extends javax.swing.JPanel {
         dialog.setVisible(true);
         
         // when dialog returns we set the chosen columns by user
-        setUserUnionColumnDesc(tableEditorPanel.getKeywordsToDisplay());
+        if (tableEditorPanel.getProcessOK()) setUserUnionColumnDesc(tableEditorPanel.getKeywordsToDisplay());
     }                                                      
 
     /** find the columns to apply pretty renderers. 
