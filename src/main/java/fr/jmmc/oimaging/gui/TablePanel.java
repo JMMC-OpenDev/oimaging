@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.NumberUtils;
+import fr.jmmc.oimaging.model.ColumnDesc;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -161,7 +162,7 @@ public class TablePanel extends javax.swing.JPanel {
      * Used when Table Editor dialog returns and we must apply the user choices.
      * @param userListColumnDesc the new list of columns selected by user. Must be a (possibly reordered) sublist of ResultSetTableModel.getListColumnDesc()
      */
-    public void setUserListColumnDesc(List<ResultSetTableModel.ColumnDesc> userListColumnDesc) {
+    public void setUserListColumnDesc(List<ColumnDesc> userListColumnDesc) {
         // TODO set UserListColumnDesc in BasicTableSorter
         reTargetRenderers();
    }

@@ -38,6 +38,11 @@ public class ResultSetTableModel extends AbstractTableModel {
      */
     private final List<ColumnDesc> listColumnDesc;
     
+    // ColumnDesc source constants
+    public static final int OUTPUT_PARAM = 0;
+    public static final int INPUT_PARAM = 1;
+    public static final int HARD_CODED = 2;
+    
     public ResultSetTableModel() {
         super();
         results = new ArrayList<>();
@@ -63,7 +68,6 @@ public class ResultSetTableModel extends AbstractTableModel {
         // 5. we remove standard FITS keywords from the set
         // 6. we clear the list
         // 7. we put set elements in the list
-        // 8. we sort the list by reverse Source first, Name second
         
         // 1. we create a set of columns, uniques by getName()
         Set<ColumnDesc> setColumnDesc = new HashSet<> ();
@@ -73,10 +77,10 @@ public class ResultSetTableModel extends AbstractTableModel {
             if (result.getOifitsFile() == null) continue;
             ImageOiOutputParam output = result.getOifitsFile().getImageOiData().getOutputParam();
             for (KeywordMeta keyMeta : output.getKeywordsDesc().values()) {
-                setColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM,keyMeta.getName(), keyMeta.getClass())); 
+                setColumnDesc.add(new ColumnDesc(keyMeta.getName(), keyMeta.getClass(), OUTPUT_PARAM)); 
             }
             for (FitsHeaderCard card : output.getHeaderCards()) {
-                setColumnDesc.add(new ColumnDesc(ColumnSource.OUTPUT_PARAM, card.getKey(), card.getClass()));
+                setColumnDesc.add(new ColumnDesc(card.getKey(), card.getClass(), OUTPUT_PARAM));
             }
         }
         
@@ -86,10 +90,10 @@ public class ResultSetTableModel extends AbstractTableModel {
             if (result.getOifitsFile() == null) continue;
             ImageOiInputParam input = result.getOifitsFile().getImageOiData().getInputParam();
             for (KeywordMeta keyMeta : input.getKeywordsDesc().values()) {
-                setColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, keyMeta.getName(), keyMeta.getClass())); 
+                setColumnDesc.add(new ColumnDesc(keyMeta.getName(), keyMeta.getClass(), INPUT_PARAM)); 
             }
             for (FitsHeaderCard card : input.getHeaderCards()) {
-                setColumnDesc.add(new ColumnDesc(ColumnSource.INPUT_PARAM, card.getKey(), card.getClass()));
+                setColumnDesc.add(new ColumnDesc(card.getKey(), card.getClass(), INPUT_PARAM));
             }
         }
         
@@ -106,9 +110,6 @@ public class ResultSetTableModel extends AbstractTableModel {
         
         // 7. we put set elements in the list
         listColumnDesc.addAll(setColumnDesc);
-        
-        // 8. we sort the list by reverse Source first, Name second
-        listColumnDesc.sort(ColumnDesc.orderByRevSourceThenName);
 
         // notify changes
         fireTableStructureChanged();
@@ -247,56 +248,6 @@ public class ResultSetTableModel extends AbstractTableModel {
         // if nothing was found
         return null;
     }
-    
-    // please don't change the order as it is used as is, for sorting operations
-    public enum ColumnSource { HARD_CODED, INPUT_PARAM, OUTPUT_PARAM } 
-
-    public static class ColumnDesc {
-        
-        /** source must be knowned to extract value for columns data. also used for ordering */
-        private ColumnSource source;
-        /** name is used for equality */
-        private String name;
-        /** class of the elements in the columns */
-        private Class dataClass;
-        /** Prettier name for GUI display */
-        private String label;
-        
-        /** alternative order that is based on reverse Source first, Name second */
-        public static Comparator<ColumnDesc> orderByRevSourceThenName = new Comparator<ColumnDesc> () {
-            @Override public int compare (ColumnDesc a, ColumnDesc b) {
-                int compareSource = (-1) * (a.getSource().compareTo(b.getSource()));
-                if (compareSource == 0) return a.getName().compareTo(b.getName());
-                else return compareSource ;
-            }
-        };
-        
-        public ColumnDesc (ColumnSource source, String name, Class dataClass, String label) {
-            this.source = source;
-            this.name = name;
-            this.dataClass = dataClass;
-            this.label = label;
-        }
-        public ColumnDesc (ColumnSource source, String name, Class dataClass) {
-            this(source, name, dataClass, name);
-        }
-        
-        public ColumnSource getSource () { return source; }
-        public String getName () { return name; } 
-        public Class getDataClass () { return dataClass; }
-        public String getLabel () { return label; }
-        
-        /** Equality is only on name, not on source */
-        @Override public boolean equals (Object otherObject) {
-            if (this == otherObject) return true;
-            if (otherObject == null) return false;
-            if (getClass() != otherObject.getClass()) return false;
-            ColumnDesc other = (ColumnDesc) otherObject;
-            return getName().equals(other.getName());
-        }
-        @Override public int hashCode () { return Objects.hash(getName()); }
-        @Override public String toString() { return getName(); }
-    }
 
     /** Some HardCoded Columns. 
      * It does not extends ColumnDesc because it already extends Enum */
@@ -315,7 +266,7 @@ public class ResultSetTableModel extends AbstractTableModel {
         private final ColumnDesc columnDesc;
 
         private HardCodedColumn (Class dataClass, String label) {
-            this.columnDesc = new ColumnDesc(ColumnSource.HARD_CODED, super.toString(), dataClass, label);
+            this.columnDesc = new ColumnDesc(super.toString(), dataClass, HARD_CODED, label);
         }
 
         public ColumnDesc getColumnDesc () { return columnDesc; }

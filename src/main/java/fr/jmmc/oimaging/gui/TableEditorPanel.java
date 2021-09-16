@@ -3,14 +3,12 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.gui;
 
+import fr.jmmc.oimaging.model.ColumnDesc;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 
 import javax.swing.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -22,8 +20,8 @@ import java.util.List;
 public class TableEditorPanel extends javax.swing.JPanel {
 
     // Model and view for the list
-    private final DefaultListModel<ResultSetTableModel.ColumnDesc> modelAvailable = new DefaultListModel<>();
-    private final DefaultListModel<ResultSetTableModel.ColumnDesc> modelDisplayed = new DefaultListModel<>();
+    private final DefaultListModel<ColumnDesc> modelAvailable = new DefaultListModel<>();
+    private final DefaultListModel<ColumnDesc> modelDisplayed = new DefaultListModel<>();
 
     // Reference to the parent dialog box to handle its events
     private final JDialog dialog;
@@ -38,7 +36,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
      * @param availableKeywords Available keywords (currently displayed or not) 
      * @param keywordsDisplayed Currently displayed keywords
      */
-    public TableEditorPanel(JDialog dialog, List<ResultSetTableModel.ColumnDesc> availableKeywords, List<ResultSetTableModel.ColumnDesc> keywordsDisplayed) {
+    public TableEditorPanel(JDialog dialog, List<ColumnDesc> availableKeywords, List<ColumnDesc> keywordsDisplayed) {
         initComponents();
 
         this.dialog = dialog;
@@ -204,9 +202,9 @@ public class TableEditorPanel extends javax.swing.JPanel {
         dialog.dispose();
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
-    public List<ResultSetTableModel.ColumnDesc> getKeywordsToDisplay() {
-        List<ResultSetTableModel.ColumnDesc> keywordsDisplayed = new ArrayList<> ();
-        for (Enumeration<ResultSetTableModel.ColumnDesc> e = modelDisplayed.elements(); e.hasMoreElements();) {
+    public List<ColumnDesc> getKeywordsToDisplay() {
+        List<ColumnDesc> keywordsDisplayed = new ArrayList<> ();
+        for (Enumeration<ColumnDesc> e = modelDisplayed.elements(); e.hasMoreElements();) {
             keywordsDisplayed.add(e.nextElement());
         }
         return keywordsDisplayed;
@@ -223,8 +221,8 @@ public class TableEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelAvailableNb;
     private javax.swing.JLabel jLabelDisplayed;
     private javax.swing.JLabel jLabelDisplayedNb;
-    private javax.swing.JList<ResultSetTableModel.ColumnDesc> jListAvailable;
-    private javax.swing.JList<ResultSetTableModel.ColumnDesc> jListDisplayed;
+    private javax.swing.JList<ColumnDesc> jListAvailable;
+    private javax.swing.JList<ColumnDesc> jListDisplayed;
     private javax.swing.JScrollPane jScrollPaneAvailable;
     private javax.swing.JScrollPane jScrollPaneDisplayed;
     // End of variables declaration//GEN-END:variables
