@@ -55,6 +55,28 @@ public final class ServiceResult {
         init();
     }
     
+    /** Constructor to craft a ServiceResult which is not directly constructed by a Run.
+     * used for example in devMode to add some ServiceResult without having to launch a Run.
+     */
+    public ServiceResult (
+        File inputFile, File oifitsResultFile, File executionLogResultFile,
+        int rating, String comments, Date startTime, Date endTime, Service service
+    ) throws IOException, FitsException {
+        
+        this.inputFile = inputFile;
+        this.oifitsResultFile = oifitsResultFile;
+        this.executionLogResultFile = executionLogResultFile;
+        
+        this.rating = rating;
+        this.comments = comments;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.service = service;
+        
+        this.loadOIFitsFile();
+        this.loadExecutionLogFile();
+    }
+    
     private void init() {
         setStartTime(new Date());
     }

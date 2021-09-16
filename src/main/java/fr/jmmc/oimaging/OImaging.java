@@ -34,8 +34,13 @@ import fr.jmmc.oimaging.gui.action.ResampleImageAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
+import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oimaging.services.Service;
+import fr.jmmc.oimaging.services.ServiceList;
+import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.model.DataModel;
+import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -48,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
@@ -55,6 +61,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import org.apache.commons.lang.SystemUtils;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.SampException;
 import org.slf4j.Logger;
@@ -70,6 +77,8 @@ public final class OImaging extends App {
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OImaging.class.getName());
 
+    private static boolean devMode ;
+    
     /* members */
     /** main Panel */
     private MainPanel mainPanel;
@@ -81,7 +90,11 @@ public final class OImaging extends App {
     public static void main(final String[] args) {
 
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
-
+        
+        
+       String propertyValueDevMode = System.getProperty("fr.jmmc.oimaging.devMode");
+       if (propertyValueDevMode != null && propertyValueDevMode.equals("true")) devMode = true;
+       
         // Start application with the command line arguments
         Bootstrapper.launchApp(new OImaging(args));
     }
@@ -177,8 +190,59 @@ public final class OImaging extends App {
                 if (appFrame != null) {
                     appFrame.setVisible(true);
                 }
+                
+                // devMode
+                if (devMode) {
+                    // add three ServiceResult, so we have some without need to wait for a long Run
+                    
+                    craftServiceResult(
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits8736571368747455694.export-0.fits",
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits8736571368747455694.export-0.fits.output.fits",
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits8736571368747455694.export-0.fits.log.txt",
+                            ServiceList.SERVICE_WISARD);
+                    
+                    craftServiceResult(
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits1339114126933496664.export-1.fits",
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits1339114126933496664.export-1.fits.output.fits",
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits1339114126933496664.export-1.fits.log.txt",
+                            ServiceList.SERVICE_WISARD);
+                    
+                    craftServiceResult(
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits3804739948616985083.export-2.fits",
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits3804739948616985083.export-2.fits.output.fits",
+                            SystemUtils.getUserHome() + "/.jmmc-devmode/PI_GRU_forImage.fits3804739948616985083.export-2.fits.log.txt",
+                            ServiceList.SERVICE_WISARD);
+
+                }
             }
         });
+    }
+    
+    private void craftServiceResult (String sInputFile, String sOifitsResultFile, String sExecutionLogResultFile, String serviceName) {
+        IRModel irModel = IRModelManager.getInstance().getIRModel();
+                    
+        File inputFile = FileUtils.getFile(sInputFile);
+        File oifitsResultFile = FileUtils.getFile(sOifitsResultFile);
+        File executionLogResultFile = FileUtils.getFile(sExecutionLogResultFile);
+
+        if (inputFile == null || oifitsResultFile == null || executionLogResultFile == null) {
+            logger.info("Could not craft Service Result " + sInputFile);
+            System.exit(1);
+        }
+        try {
+            Service service = ServiceList.getAvailableService(serviceName);
+            ServiceResult serviceResult = new ServiceResult(
+                    inputFile, oifitsResultFile, executionLogResultFile,
+                    0, "No comments", new Date(), new Date(), service
+            );
+            serviceResult.setValid(true);
+            irModel.addServiceResult(serviceResult);
+            logger.info("Added one serviceResult");
+        }
+        catch (IOException | FitsException e) {
+            logger.info("Could not create serviceResult0 instance. error: " + e);
+            e.printStackTrace();
+        }
     }
 
     /**
