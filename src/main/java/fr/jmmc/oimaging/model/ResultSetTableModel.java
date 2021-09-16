@@ -5,6 +5,7 @@ package fr.jmmc.oimaging.model;
 
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
+import fr.jmmc.oitools.fits.FitsTable;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -33,38 +33,20 @@ public class ResultSetTableModel extends AbstractTableModel {
    
     private final List<ServiceResult> results;
     
-    /** the union of result columns.
-    * when there is several columns with same name, only one is keeped based on priority.
-    * the decreasing priority is : OutputParam > InputParam > HardCoded.
-    */
-    private final Set<ColumnDesc> setColumnDesc;
-    
-    /** the list version of setColumnDesc.
-     * It fits better in the Table Model which answers columns by index.
-     * The user can filter some columns with Table Editor. These columns can be retrieved in setColumnDesc. */
+    /** the list of ColumnDesc. Uniques by getName().
+     * When there is two equals getName(), we choose by following priority : OutputParam > InputParam > HardCoded column
+     */
     private final List<ColumnDesc> listColumnDesc;
     
     public ResultSetTableModel() {
         super();
         results = new ArrayList<>();
-        setColumnDesc = new HashSet<>();
         listColumnDesc = new ArrayList<>();
-    }
-
-    public Set<ColumnDesc> getSetColumnDesc () {
-        return Collections.unmodifiableSet(setColumnDesc);
     }
     
     /** read only of userUnionColumnDesc */
     public List<ColumnDesc> getListColumnDesc () {
         return Collections.unmodifiableList(listColumnDesc);
-    }
-    
-    public void setListColumnDesc (List<ColumnDesc> listColumnDesc) {
-        this.listColumnDesc.clear();
-        listColumnDesc.sort(ColumnDesc.orderByRevSourceThenName);
-        this.listColumnDesc.addAll(listColumnDesc);
-        fireTableStructureChanged();
     }
     
     /** updates results, then also updates columns (they depend on results) */
@@ -74,7 +56,7 @@ public class ResultSetTableModel extends AbstractTableModel {
         this.results.addAll(results);
         
         // Fusion of columns.
-        // 1. we clear the set
+        // 1. we create a set of columns, uniques by getName()
         // 2. we add output columns to the set
         // 3. we add input columns to the set
         // 4. we add hardcoded columns to the set
@@ -83,8 +65,8 @@ public class ResultSetTableModel extends AbstractTableModel {
         // 7. we put set elements in the list
         // 8. we sort the list by reverse Source first, Name second
         
-         // 1. we clear the set
-        setColumnDesc.clear();
+        // 1. we create a set of columns, uniques by getName()
+        Set<ColumnDesc> setColumnDesc = new HashSet<> ();
         
         // 2. we add output columns to the set
         for (ServiceResult result : results) {
@@ -98,7 +80,7 @@ public class ResultSetTableModel extends AbstractTableModel {
             }
         }
         
-         // 3. we add input columns to the set
+        // 3. we add input columns to the set
         for (ServiceResult result : results) {
             // input params
             if (result.getOifitsFile() == null) continue;
@@ -166,8 +148,19 @@ public class ResultSetTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-
+        
+        if (! isCellEditable(rowIndex, columnIndex)) {
+            logger.debug("Cell row " + rowIndex + " col " + columnIndex + " is not editable.");
+            return;
+        }
+        
         final ServiceResult result = getServiceResult(rowIndex);
+        
+        if (! result.isValid()) {
+            logger.debug("ServiceResult invalid, cannot edit");
+            return;
+        }
+        
         ColumnDesc columnDesc = listColumnDesc.get(columnIndex);
 
         if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
@@ -176,6 +169,32 @@ public class ResultSetTableModel extends AbstractTableModel {
         else if (columnDesc.equals(HardCodedColumn.RATING.getColumnDesc())) {
             result.setRating((int) value);
         }
+    }
+    
+    /**
+     * Method used to get param value from both either input or output params.
+     * @param fitsTable is obtained for example by calling serviceResult.getOifitsFile().getImageOiData().getInputParam(), must not be null
+     * @param paramKey the String key of the targeted param, can be empty or null but then will return null
+     * @return param value if key found, null otherwise
+     */
+    private static Object getKeywordValue (FitsTable fitsTable, String paramKey) {
+        
+        if (paramKey != null) {
+            // Keywords
+            if (fitsTable.hasKeywordMeta(paramKey)) {
+                return fitsTable.getKeywordValue(paramKey);
+            // Header card
+            } else if (fitsTable.hasHeaderCards()) {
+                for (FitsHeaderCard card : fitsTable.getHeaderCards()) {
+                    if (card.getKey().equals(paramKey)) {
+                        return card.getValue();
+                    }
+                }
+            }
+        }
+        
+        // if nothing was found
+        return null;
     }
     
     @Override
@@ -209,50 +228,23 @@ public class ResultSetTableModel extends AbstractTableModel {
                     case SUCCESS: return result.isValid();
                     case RATING: return result.getRating();
                     case COMMENTS: return result.getComments();
-                    default: 
-                        logger.warn("Unknown HardCodedColumnDesc :" + columnDesc);
-                        return null;
                 }
                 break;
             case INPUT_PARAM:
                 if (result.getOifitsFile() != null) {
-                    final ImageOiInputParam param = result.getOifitsFile().getImageOiData().getInputParam();
-                    // Keywords
-                    if (param.hasKeywordMeta(columnDesc.getName())) {
-                        return param.getKeywordValue(columnDesc.getName());
-                    // Header card
-                    } else if (param.hasHeaderCards()) {
-                        for (FitsHeaderCard card : param.getHeaderCards()) {
-                            if (card.getKey().equals(columnDesc.getName())) {
-                                return card.getValue();
-                            }
-                        }
-                        return null;
-                    }
-                    else return null;
+                    final FitsTable inputFitsTable = result.getOifitsFile().getImageOiData().getInputParam();
+                    return getKeywordValue(inputFitsTable, columnDesc.getName());
                 }
-                else return null;
-                // break; (unreachable statement)
+                break;
             case OUTPUT_PARAM:
                 if (result.getOifitsFile() != null) {
-                    final ImageOiOutputParam param = result.getOifitsFile().getImageOiData().getOutputParam();
-                    // Keywords
-                    if (param.hasKeywordMeta(columnDesc.getName())) {
-                        return param.getKeywordValue(columnDesc.getName());
-                    // Header card
-                    }  else if (param.hasHeaderCards()) {
-                        for (FitsHeaderCard card : param.getHeaderCards()) {
-                            if (card.getKey().equals(columnDesc.getName())) {
-                                return card.getValue();
-                            }
-                        }
-                        return null;
-                    }
-                    return null;
+                    final FitsTable outputFitsTable = result.getOifitsFile().getImageOiData().getOutputParam();
+                    return getKeywordValue(outputFitsTable, columnDesc.getName());
                 }
-                return null;
-                // break; (unreachable statement)
+                break;
         }
+        
+        // if nothing was found
         return null;
     }
     

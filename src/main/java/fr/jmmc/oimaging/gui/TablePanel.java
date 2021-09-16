@@ -3,8 +3,10 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.gui;
 
+import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -14,9 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import org.slf4j.Logger;
@@ -36,13 +39,15 @@ public class TablePanel extends javax.swing.JPanel {
      * ResultSet table model
      */
     private final ResultSetTableModel resultSetTableModel;
+    
     private final BasicTableSorter resultSetTableSorter;
     
-    /** object with rendering and editing responsabilities for column RATING.
-     * Careful ! You must have one RatingCell for each RATING column.
-     */
+    /** object with rendering and editing responsabilities for column RATING. */
     private final RatingCell ratingCell;
+    
     private final SuccessCell successCell;
+    
+    private final TableCellRenderer standardRenderer = new TableCellNumberRenderer();
 
     /**
      * Creates new form TablePanel
@@ -62,6 +67,11 @@ public class TablePanel extends javax.swing.JPanel {
 
         jResultSetTable.setModel(resultSetTableSorter);
         SwingUtils.adjustRowHeight(jResultSetTable);
+        
+        // set default renderers
+        jResultSetTable.setDefaultRenderer(Boolean.class, standardRenderer);
+        jResultSetTable.setDefaultRenderer(Double.class, standardRenderer);
+        jResultSetTable.setDefaultRenderer(Float.class, standardRenderer);
     }
 
     /**
@@ -106,16 +116,16 @@ public class TablePanel extends javax.swing.JPanel {
      */
     private void jButtonShowTableEditorActionPerformed(java.awt.event.ActionEvent evt) {
         // Set the dialog box
-        JOptionPane jOptionPane = new JOptionPane();
-        JDialog dialog = jOptionPane.createDialog("Edit table headers");
-        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, new ArrayList<>(getTableModel().getSetColumnDesc()), getTableModel().getListColumnDesc());
+        JDialog dialog = new JDialog(App.getFrame(), "Edit table headers", true);
+        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, new ArrayList<>(getTableModel().getListColumnDesc()), getTableModel().getListColumnDesc()); // TODO : fix displayed column
         dialog.setContentPane(tableEditorPanel);
         dialog.setMinimumSize(new Dimension(600, 500));
+        dialog.setLocationRelativeTo(null); // centering the dialog on the screen
         dialog.setResizable(true);
         dialog.setVisible(true);
         
         // when dialog returns we set the chosen columns by user
-        if (tableEditorPanel.getProcessOK()) setUserUnionColumnDesc(tableEditorPanel.getKeywordsToDisplay());
+        if (tableEditorPanel.getProcessOK()) setUserListColumnDesc(tableEditorPanel.getKeywordsToDisplay());
     }                                                      
 
     /** find the columns to apply pretty renderers. 
@@ -128,12 +138,18 @@ public class TablePanel extends javax.swing.JPanel {
             final TableColumn columnRating = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumn.RATING.toString());
             columnRating.setCellRenderer(ratingCell);
             columnRating.setCellEditor(ratingCell);
-        } catch (IllegalArgumentException e) {}
+        } 
+        catch (IllegalArgumentException e) {
+            logger.debug("Missing RATING column, cannot set Renderer and Editor.");
+        }
         
         try {
             final TableColumn columnSuccess = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumn.SUCCESS.toString());
             columnSuccess.setCellRenderer(successCell);
-        } catch (IllegalArgumentException e) {}
+        } 
+        catch (IllegalArgumentException e) {
+            logger.debug("Missing SUCCESS column, cannot set Renderer.");
+        }
     }
     
     public void setResults(List<ServiceResult> results) {
@@ -141,12 +157,12 @@ public class TablePanel extends javax.swing.JPanel {
         reTargetRenderers();
     }
     
-    /** modify the user selected columns in ResulTSetTableModel
-     * Used for example when Table Editor dialog returns and we must apply the user choices.
-     * @param userUnionColumnDesc 
+    /** modify the user selected columns in BasicTableSorter
+     * Used when Table Editor dialog returns and we must apply the user choices.
+     * @param userListColumnDesc the new list of columns selected by user. Must be a (possibly reordered) sublist of ResultSetTableModel.getListColumnDesc()
      */
-    public void setUserUnionColumnDesc(List<ResultSetTableModel.ColumnDesc> userUnionColumnDesc) {
-        getTableModel().setListColumnDesc(userUnionColumnDesc);
+    public void setUserListColumnDesc(List<ResultSetTableModel.ColumnDesc> userListColumnDesc) {
+        // TODO set UserListColumnDesc in BasicTableSorter
         reTargetRenderers();
    }
 
@@ -197,4 +213,46 @@ public class TablePanel extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 
+        /**
+     * Used to format numbers in cells.
+     *
+     * @warning: No trace log implemented as this is very often called (performance).
+     */
+    private final static class TableCellNumberRenderer extends DefaultTableCellRenderer {
+
+        /** default serial UID for Serializable interface */
+        private static final long serialVersionUID = 1;
+
+        /**
+         * Constructor
+         */
+        private TableCellNumberRenderer() {
+            super();
+        }
+
+        /**
+         * Sets the <code>String</code> object for the cell being rendered to
+         * <code>value</code>.
+         *
+         * @param value  the string value for this cell; if value is
+         *          <code>null</code> it sets the text value to an empty string
+         * @see JLabel#setText
+         *
+         */
+        @Override
+        public void setValue(final Object value) {
+            String text = "";
+            if (value != null) {
+                if (value instanceof Double) {
+                    text = NumberUtils.format(((Double) value));
+                } else if (value instanceof Boolean) {
+                    text = ((Boolean) value) ? "T" : "F";
+                } else {
+                    text = value.toString();
+                }
+            }
+            setText(text);
+        }
+    }
+    
 }
