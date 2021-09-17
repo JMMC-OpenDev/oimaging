@@ -34,13 +34,8 @@ import fr.jmmc.oimaging.gui.action.ResampleImageAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
-import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
-import fr.jmmc.oimaging.services.Service;
-import fr.jmmc.oimaging.services.ServiceList;
-import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.model.DataModel;
-import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -53,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
@@ -61,7 +55,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import org.apache.commons.lang.SystemUtils;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.SampException;
 import org.slf4j.Logger;
@@ -186,7 +179,9 @@ public final class OImaging extends App {
                 if (appFrame != null) {
                     appFrame.setVisible(true);
                 }
-                
+                 
+                // if devMode, load some ServiceResults from home folder .jmmc-devmode
+                if (DEV_MODE) DevMode.craftAllServiceResults();
             }
         });
     }

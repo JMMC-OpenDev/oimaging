@@ -4,18 +4,23 @@
 package fr.jmmc.oimaging.services;
 
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Result container that gather multiple elements.
  * @author mellag
  */
 public final class ServiceResult {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ServiceResult.class.getName());
     
     private final File inputFile;
     private final File oifitsResultFile;
@@ -60,7 +65,7 @@ public final class ServiceResult {
      */
     public ServiceResult (
         File inputFile, File oifitsResultFile, File executionLogResultFile,
-        int rating, String comments, Date startTime, Date endTime, Service service
+        int rating, String comments, Date startTime, Date endTime
     ) throws IOException, FitsException {
         
         this.inputFile = inputFile;
@@ -71,10 +76,33 @@ public final class ServiceResult {
         this.comments = comments;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.service = service;
         
         this.loadOIFitsFile();
         this.loadExecutionLogFile();
+        
+        // guessing service from SOFTWARE header card
+        FitsHeaderCard softwareCard = this.oiFitsFile.getImageOiData().getOutputParam().findFirstHeaderCard("SOFTWARE");
+        if (softwareCard == null) {
+            logger.info("Cannot find SOFTWARE headerCard in resultFile.");
+        }
+        else {
+            String softwareStr = softwareCard.getValue();
+            if (softwareStr == null) {
+                logger.info("SOFTWARE headerCard has null value.");
+            }
+            else {
+                Service serviceGuessed = ServiceList.getAvailableService(softwareStr);
+                if (serviceGuessed == null) {
+                    logger.info("SOFTWARE headerCard value correspond to no known service.");
+                }
+                else {
+                    this.service = serviceGuessed; // success
+                }
+            }
+        }
+        // if no service has been found, defaulting to WISARD
+        if (service == null) service = ServiceList.getAvailableService(ServiceList.SERVICE_WISARD);
+        
     }
     
     private void init() {
