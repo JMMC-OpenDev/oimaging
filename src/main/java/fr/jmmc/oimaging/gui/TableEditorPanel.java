@@ -4,7 +4,6 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.oimaging.model.ColumnDesc;
-import fr.jmmc.oimaging.model.ResultSetTableModel;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -19,6 +18,9 @@ import java.util.List;
  */
 public class TableEditorPanel extends javax.swing.JPanel {
 
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
+    
     // Model and view for the list
     private final DefaultListModel<ColumnDesc> modelAvailable = new DefaultListModel<>();
     private final DefaultListModel<ColumnDesc> modelDisplayed = new DefaultListModel<>();

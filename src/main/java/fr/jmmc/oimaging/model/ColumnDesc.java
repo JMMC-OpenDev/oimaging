@@ -3,7 +3,6 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.model;
 
-import java.util.Comparator;
 import java.util.Objects;
 
 /** describes a column in a table. */
@@ -48,6 +47,7 @@ public class ColumnDesc {
     public String getName () { return name; } 
     public Class getDataClass () { return dataClass; }
     public String getLabel () { return label; }
+    public String getDescription () { return description; }
 
     /** Equality is only on name */
     @Override public boolean equals (Object otherObject) {

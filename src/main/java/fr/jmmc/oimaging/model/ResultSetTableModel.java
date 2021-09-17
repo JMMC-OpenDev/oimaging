@@ -10,9 +10,7 @@ import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +47,7 @@ public class ResultSetTableModel extends AbstractTableModel {
         listColumnDesc = new ArrayList<>();
     }
     
-    /** read only of userUnionColumnDesc */
+    /** read only of listColumnDesc */
     public List<ColumnDesc> getListColumnDesc () {
         return Collections.unmodifiableList(listColumnDesc);
     }
@@ -209,23 +207,8 @@ public class ResultSetTableModel extends AbstractTableModel {
                 switch (HardCodedColumn.valueOf(columnDesc.getName())) {
                     case INDEX: return getRowCount() - rowIndex;
                     case FILE: return result.getInputFile().getName();
-                    case TARGET:
-                        if (result.getOifitsFile() != null) {
-                            return result.getOifitsFile().getImageOiData().getInputParam().getTarget();
-                        }
-                        break;
                     case TIMESTAMP_RECONSTRUCTION: return result.getEndTime();
-                    case WAVELENGTH:
-                        if (result.getOifitsFile() != null) {
-                            return result.getOifitsFile().getWavelengthRange();
-                        }
-                        break;
                     case ALGORITHM: return result.getService().getProgram();
-                    case RGL_WGT:
-                        if (result.getOifitsFile() != null) {
-                            return result.getOifitsFile().getImageOiData().getInputParam().getRglWgt();
-                        }
-                        break;
                     case SUCCESS: return result.isValid();
                     case RATING: return result.getRating();
                     case COMMENTS: return result.getComments();
@@ -253,12 +236,9 @@ public class ResultSetTableModel extends AbstractTableModel {
      * It does not extends ColumnDesc because it already extends Enum */
     public enum HardCodedColumn  {
         INDEX(int.class, "Index"),
-        FILE(String.class, "Name"), 
-        TARGET(String.class, "Target"), 
-        TIMESTAMP_RECONSTRUCTION(String.class, "Timestamp reconstruction"), 
-        WAVELENGTH(double.class, "Wavelength"), 
-        ALGORITHM(String.class, "Algorithm"), 
-        RGL_WGT(String.class, "RGL_WGT"), 
+        FILE(String.class, "Name"),
+        TIMESTAMP_RECONSTRUCTION(String.class, "Timestamp reconstruction"),
+        ALGORITHM(String.class, "Algorithm"),
         SUCCESS(boolean.class, "Success"), 
         RATING(Integer.class, "Rating"), 
         COMMENTS(String.class, "Comments");
