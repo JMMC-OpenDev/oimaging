@@ -22,7 +22,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1;
     
     // Model and view for the list
-    private final DefaultListModel<ColumnDesc> modelAvailable = new DefaultListModel<>();
+    private final DefaultListModel<ColumnDesc> modelHidden = new DefaultListModel<>();
     private final DefaultListModel<ColumnDesc> modelDisplayed = new DefaultListModel<>();
 
     // Reference to the parent dialog box to handle its events
@@ -35,30 +35,23 @@ public class TableEditorPanel extends javax.swing.JPanel {
     /**
      * 
      * @param dialog Reference to the parent dialog box to handle its events
-     * @param availableKeywords Available keywords (currently displayed or not) 
-     * @param keywordsDisplayed Currently displayed keywords
+     * @param allColumns All available columns (currently displayed or not) 
+     * @param displayedColumns Currently displayed columns
      */
-    public TableEditorPanel(JDialog dialog, List<ColumnDesc> availableKeywords, List<ColumnDesc> keywordsDisplayed) {
+    public TableEditorPanel(JDialog dialog, List<ColumnDesc> allColumns, List<ColumnDesc> displayedColumns) {
         initComponents();
 
         this.dialog = dialog;
         this.processOK = false;
         
-        // Fill with available keywords, but remove the ones already displayed
-        availableKeywords.forEach(modelAvailable::addElement);
-        keywordsDisplayed.forEach(modelAvailable::removeElement);
+        // Fill with available columns, but remove the ones already displayed
+        allColumns.forEach(modelHidden::addElement);
+        displayedColumns.forEach(modelHidden::removeElement);
         
-        keywordsDisplayed.forEach(modelDisplayed::addElement);
+        displayedColumns.forEach(modelDisplayed::addElement);
 
-        jListAvailable.setModel(modelAvailable);
+        jListHidden.setModel(modelHidden);
         jListDisplayed.setModel(modelDisplayed);
-        
-        updateAvailableDisplayedLabels();
-    }
-
-    private void updateAvailableDisplayedLabels () {
-        jLabelAvailableNb.setText(modelAvailable.getSize() + " available");
-        jLabelDisplayedNb.setText(modelDisplayed.getSize() + " selected");
     }
     
     /**
@@ -74,13 +67,11 @@ public class TableEditorPanel extends javax.swing.JPanel {
         jButtonAdd = new javax.swing.JButton();
         jLabelDisplayed = new javax.swing.JLabel();
         jButtonOk = new javax.swing.JButton();
-        jLabelAvailable = new javax.swing.JLabel();
+        jLabelHidden = new javax.swing.JLabel();
         jButtonCancel = new javax.swing.JButton();
         jButtonRemove = new javax.swing.JButton();
-        jLabelAvailableNb = new javax.swing.JLabel();
-        jLabelDisplayedNb = new javax.swing.JLabel();
-        jScrollPaneAvailable = new javax.swing.JScrollPane();
-        jListAvailable = new javax.swing.JList<>();
+        jScrollPaneHidden = new javax.swing.JScrollPane();
+        jListHidden = new javax.swing.JList<>();
         jScrollPaneDisplayed = new javax.swing.JScrollPane();
         jListDisplayed = new javax.swing.JList<>();
 
@@ -98,7 +89,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 4;
         add(jButtonAdd, gridBagConstraints);
 
-        jLabelDisplayed.setText("Keywords displayed");
+        jLabelDisplayed.setText("Displayed columns");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -115,11 +106,11 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         add(jButtonOk, gridBagConstraints);
 
-        jLabelAvailable.setText("Available keywords");
+        jLabelHidden.setText("Hidden columns");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        add(jLabelAvailable, gridBagConstraints);
+        add(jLabelHidden, gridBagConstraints);
 
         jButtonCancel.setText("Cancel");
         jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -143,20 +134,8 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 4;
         add(jButtonRemove, gridBagConstraints);
 
-        jLabelAvailableNb.setText("jLabel1");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        add(jLabelAvailableNb, gridBagConstraints);
-
-        jLabelDisplayedNb.setText("jLabel2");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        add(jLabelDisplayedNb, gridBagConstraints);
-
-        jListAvailable.setToolTipText("");
-        jScrollPaneAvailable.setViewportView(jListAvailable);
+        jListHidden.setToolTipText("");
+        jScrollPaneHidden.setViewportView(jListHidden);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -165,7 +144,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
-        add(jScrollPaneAvailable, gridBagConstraints);
+        add(jScrollPaneHidden, gridBagConstraints);
 
         jScrollPaneDisplayed.setViewportView(jListDisplayed);
 
@@ -180,19 +159,17 @@ public class TableEditorPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-       jListAvailable.getSelectedValuesList().forEach(columnDesc -> {
+       jListHidden.getSelectedValuesList().forEach(columnDesc -> {
             modelDisplayed.addElement(columnDesc);
-            modelAvailable.removeElement(columnDesc);
+            modelHidden.removeElement(columnDesc);
         });
-        updateAvailableDisplayedLabels();
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
         jListDisplayed.getSelectedValuesList().forEach(columnDesc -> {
-            modelAvailable.addElement(columnDesc);
+            modelHidden.addElement(columnDesc);
             modelDisplayed.removeElement(columnDesc);
         });
-        updateAvailableDisplayedLabels();
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
@@ -204,12 +181,12 @@ public class TableEditorPanel extends javax.swing.JPanel {
         dialog.dispose();
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
-    public List<ColumnDesc> getKeywordsToDisplay() {
-        List<ColumnDesc> keywordsDisplayed = new ArrayList<> ();
-        for (Enumeration<ColumnDesc> e = modelDisplayed.elements(); e.hasMoreElements();) {
-            keywordsDisplayed.add(e.nextElement());
+    public List<ColumnDesc> getColumnsToDisplay() {
+        List<ColumnDesc> columnsToDisplay = new ArrayList<> ();
+        for (Enumeration<ColumnDesc> enu = modelDisplayed.elements(); enu.hasMoreElements();) {
+            columnsToDisplay.add(enu.nextElement());
         }
-        return keywordsDisplayed;
+        return columnsToDisplay;
     }
     
     public boolean getProcessOK () { return processOK; }
@@ -219,14 +196,12 @@ public class TableEditorPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
     private javax.swing.JButton jButtonRemove;
-    private javax.swing.JLabel jLabelAvailable;
-    private javax.swing.JLabel jLabelAvailableNb;
     private javax.swing.JLabel jLabelDisplayed;
-    private javax.swing.JLabel jLabelDisplayedNb;
-    private javax.swing.JList<ColumnDesc> jListAvailable;
+    private javax.swing.JLabel jLabelHidden;
     private javax.swing.JList<ColumnDesc> jListDisplayed;
-    private javax.swing.JScrollPane jScrollPaneAvailable;
+    private javax.swing.JList<ColumnDesc> jListHidden;
     private javax.swing.JScrollPane jScrollPaneDisplayed;
+    private javax.swing.JScrollPane jScrollPaneHidden;
     // End of variables declaration//GEN-END:variables
 
 }
