@@ -101,7 +101,10 @@ public final class ServiceResult {
             }
         }
         // if no service has been found, defaulting to WISARD
-        if (service == null) service = ServiceList.getAvailableService(ServiceList.SERVICE_WISARD);
+        if (service == null) {
+            service = ServiceList.getAvailableService(ServiceList.SERVICE_WISARD);
+            logger.info("DevMode: Could not guess ServiceResult service, defaulting to WISARD.");
+        }
         
     }
     
