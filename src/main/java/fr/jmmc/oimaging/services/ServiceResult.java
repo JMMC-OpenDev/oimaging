@@ -60,52 +60,23 @@ public final class ServiceResult {
         init();
     }
     
-    /** Constructor to craft a ServiceResult which is not directly constructed by a Run.
-     * used for example in devMode to add some ServiceResult without having to launch a Run.
+    /** Constructor where Result and Log files are given by caller.
+     * thus they are not necessarily temp files.
      */
-    public ServiceResult (
-        File inputFile, File oifitsResultFile, File executionLogResultFile,
-        int rating, String comments, Date startTime, Date endTime
-    ) throws IOException, FitsException {
+    public ServiceResult (File inputFile, File oifitsResultFile, File executionLogResultFile) {
+        
+        // we cannot call this(inputFile) because oiFitsResultFile is final thus we cannot assign it twice
         
         this.inputFile = inputFile;
         this.oifitsResultFile = oifitsResultFile;
         this.executionLogResultFile = executionLogResultFile;
         
-        this.rating = rating;
-        this.comments = comments;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        logger.debug("new ServiceResult(" + inputFile + ", " + oifitsResultFile + ", " + executionLogResultFile + ")");
         
-        this.loadOIFitsFile();
-        this.loadExecutionLogFile();
+        this.rating = 0;
+        this.comments = "No comments";
         
-        // guessing service from SOFTWARE header card
-        FitsHeaderCard softwareCard = this.oiFitsFile.getImageOiData().getOutputParam().findFirstHeaderCard("SOFTWARE");
-        if (softwareCard == null) {
-            logger.info("Cannot find SOFTWARE headerCard in resultFile.");
-        }
-        else {
-            String softwareStr = softwareCard.getValue();
-            if (softwareStr == null) {
-                logger.info("SOFTWARE headerCard has null value.");
-            }
-            else {
-                Service serviceGuessed = ServiceList.getAvailableService(softwareStr);
-                if (serviceGuessed == null) {
-                    logger.info("SOFTWARE headerCard value correspond to no known service.");
-                }
-                else {
-                    this.service = serviceGuessed; // success
-                }
-            }
-        }
-        // if no service has been found, defaulting to WISARD
-        if (service == null) {
-            service = ServiceList.getAvailableService(ServiceList.SERVICE_WISARD);
-            logger.info("DevMode: Could not guess ServiceResult service, defaulting to WISARD.");
-        }
-        
+        init();
     }
     
     private void init() {
