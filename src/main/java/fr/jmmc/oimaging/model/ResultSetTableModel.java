@@ -75,10 +75,10 @@ public class ResultSetTableModel extends AbstractTableModel {
             if (result.getOifitsFile() == null) continue;
             ImageOiOutputParam output = result.getOifitsFile().getImageOiData().getOutputParam();
             for (KeywordMeta keyMeta : output.getKeywordsDesc().values()) {
-                setColumnDesc.add(new ColumnDesc(keyMeta.getName(), keyMeta.getClass(), OUTPUT_PARAM)); 
+                setColumnDesc.add(new ColumnDesc(keyMeta.getName(), keyMeta.getBaseClass(), OUTPUT_PARAM)); 
             }
             for (FitsHeaderCard card : output.getHeaderCards()) {
-                setColumnDesc.add(new ColumnDesc(card.getKey(), card.getClass(), OUTPUT_PARAM));
+                setColumnDesc.add(new ColumnDesc(card.getKey(), Object.class, OUTPUT_PARAM)); // TODO: HeaderCard.getBaseClass()
             }
         }
         
@@ -88,10 +88,10 @@ public class ResultSetTableModel extends AbstractTableModel {
             if (result.getOifitsFile() == null) continue;
             ImageOiInputParam input = result.getOifitsFile().getImageOiData().getInputParam();
             for (KeywordMeta keyMeta : input.getKeywordsDesc().values()) {
-                setColumnDesc.add(new ColumnDesc(keyMeta.getName(), keyMeta.getClass(), INPUT_PARAM)); 
+                setColumnDesc.add(new ColumnDesc(keyMeta.getName(), keyMeta.getBaseClass(), INPUT_PARAM)); 
             }
             for (FitsHeaderCard card : input.getHeaderCards()) {
-                setColumnDesc.add(new ColumnDesc(card.getKey(), card.getClass(), INPUT_PARAM));
+                setColumnDesc.add(new ColumnDesc(card.getKey(), Object.class, INPUT_PARAM)); // TODO: HeaderCard.getBaseClass()
             }
         }
         
