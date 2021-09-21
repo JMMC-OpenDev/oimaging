@@ -19,6 +19,10 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     private static Preferences _singleton = null;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(Preferences.class.getName());
+    /** prefix for view columns (Results) */
+    public static final String VIEW_COLUMNS_RESULTS = "view.columns.results";
+    /** Default results columns order list, as of default */
+    private static final String RESULTS_DEFAULT = ""; // TODO: define interesting sets of columns
 
     /**
      * Private constructor that must be empty.
@@ -68,6 +72,8 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         setDefaultPreference(MODEL_IMAGE_LUT, ColorModels.COLOR_MODEL_HEAT);
         // Disable interpolation:
         setDefaultPreference(MODEL_IMAGE_INTERPOLATION, ImageInterpolation.None.toString());
+
+        setDefaultPreference(VIEW_COLUMNS_RESULTS, RESULTS_DEFAULT);
     }
 
     @Override

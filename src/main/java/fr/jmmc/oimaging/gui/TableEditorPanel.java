@@ -5,14 +5,14 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.oimaging.model.ColumnDesc;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
 
 /**
  * Panel to be added in a dialog box to edit the display of the table
- * TODO FIX: The headers are cleared if the user presses the close button
  *
  * @author martin
  */
@@ -20,40 +20,40 @@ public class TableEditorPanel extends javax.swing.JPanel {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
-    
+
     // Model and view for the list
     private final DefaultListModel<ColumnDesc> modelHidden = new DefaultListModel<>();
     private final DefaultListModel<ColumnDesc> modelDisplayed = new DefaultListModel<>();
 
     // Reference to the parent dialog box to handle its events
     private final JDialog dialog;
-    
-    /** true if the user clicked on OK, false if he clicked on cancel / closed the dialog */
-    private boolean processOK;
 
-    // Constructor used when an edition has already been done
+    /** editor result = true if the user validates the inputs */
+    private boolean result = false;
+    /** list of all columns (used by reset) */
+    private final List<ColumnDesc> allColumns;
+
     /**
-     * 
+     * Constructor
      * @param dialog Reference to the parent dialog box to handle its events
      * @param allColumns All available columns (currently displayed or not) 
      * @param displayedColumns Currently displayed columns
      */
     public TableEditorPanel(JDialog dialog, List<ColumnDesc> allColumns, List<ColumnDesc> displayedColumns) {
         initComponents();
-
         this.dialog = dialog;
-        this.processOK = false;
-        
+        this.allColumns = allColumns;
+
         // Fill with available columns, but remove the ones already displayed
         allColumns.forEach(modelHidden::addElement);
         displayedColumns.forEach(modelHidden::removeElement);
-        
+
         displayedColumns.forEach(modelDisplayed::addElement);
 
         jListHidden.setModel(modelHidden);
         jListDisplayed.setModel(modelDisplayed);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -74,6 +74,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
         jListHidden = new javax.swing.JList<>();
         jScrollPaneDisplayed = new javax.swing.JScrollPane();
         jListDisplayed = new javax.swing.JList<>();
+        jButtonReset = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(400, 250));
         setLayout(new java.awt.GridBagLayout());
@@ -87,12 +88,14 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jButtonAdd, gridBagConstraints);
 
         jLabelDisplayed.setText("Displayed columns");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jLabelDisplayed, gridBagConstraints);
 
         jButtonOk.setText("Ok");
@@ -104,12 +107,15 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jButtonOk, gridBagConstraints);
 
         jLabelHidden.setText("Hidden columns");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jLabelHidden, gridBagConstraints);
 
         jButtonCancel.setText("Cancel");
@@ -121,6 +127,9 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jButtonCancel, gridBagConstraints);
 
         jButtonRemove.setText("Remove");
@@ -132,6 +141,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jButtonRemove, gridBagConstraints);
 
         jListHidden.setToolTipText("");
@@ -140,10 +150,11 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
         add(jScrollPaneHidden, gridBagConstraints);
 
         jScrollPaneDisplayed.setViewportView(jListDisplayed);
@@ -151,15 +162,30 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
         add(jScrollPaneDisplayed, gridBagConstraints);
+
+        jButtonReset.setText("Reset");
+        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResetActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        add(jButtonReset, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-       jListHidden.getSelectedValuesList().forEach(columnDesc -> {
+        jListHidden.getSelectedValuesList().forEach(columnDesc -> {
             modelDisplayed.addElement(columnDesc);
             modelHidden.removeElement(columnDesc);
         });
@@ -173,7 +199,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
-        this.processOK = true;
+        this.result = true;
         dialog.dispose();
     }//GEN-LAST:event_jButtonOkActionPerformed
 
@@ -181,21 +207,34 @@ public class TableEditorPanel extends javax.swing.JPanel {
         dialog.dispose();
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
+    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
+        modelHidden.clear();
+        modelDisplayed.clear();
+        allColumns.forEach(modelDisplayed::addElement);
+    }//GEN-LAST:event_jButtonResetActionPerformed
+
     public List<ColumnDesc> getColumnsToDisplay() {
-        List<ColumnDesc> columnsToDisplay = new ArrayList<> ();
-        for (Enumeration<ColumnDesc> enu = modelDisplayed.elements(); enu.hasMoreElements();) {
-            columnsToDisplay.add(enu.nextElement());
+        List<ColumnDesc> columnsToDisplay = new ArrayList<>();
+        for (Enumeration<ColumnDesc> e = modelDisplayed.elements(); e.hasMoreElements();) {
+            columnsToDisplay.add(e.nextElement());
         }
         return columnsToDisplay;
     }
-    
-    public boolean getProcessOK () { return processOK; }
+
+    /**
+     * Return the editor result
+     * @return true if the user validated (ok button)
+     */
+    public boolean isResult() {
+        return result;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
     private javax.swing.JButton jButtonRemove;
+    private javax.swing.JButton jButtonReset;
     private javax.swing.JLabel jLabelDisplayed;
     private javax.swing.JLabel jLabelHidden;
     private javax.swing.JList<ColumnDesc> jListDisplayed;

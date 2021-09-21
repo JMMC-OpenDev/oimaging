@@ -4,9 +4,15 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.App;
+import fr.jmmc.jmcs.data.preference.PreferencesException;
+import fr.jmmc.jmcs.gui.component.BasicTableColumnMovedListener;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
+import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
+import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.gui.util.WindowUtils;
 import fr.jmmc.jmcs.util.NumberUtils;
+import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.model.ColumnDesc;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
@@ -17,9 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -30,25 +39,28 @@ import org.slf4j.LoggerFactory;
  *
  * @author martin
  */
-public class TablePanel extends javax.swing.JPanel {
+public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMovedListener {
 
     private static final long serialVersionUID = 1L;
 
     private static final Logger logger = LoggerFactory.getLogger(TablePanel.class);
-    
-    /**
-     * ResultSet table model
-     */
+
+    /** Table key to remember dialog dimensions */
+    private final static String TABLE_EDITOR_DIMENSION_KEY = "___OIMAGING_TABLE_EDITOR_DIMENSION";
+
+    /* members */
+    /** ResultSet table model */
     private final ResultSetTableModel resultSetTableModel;
-    
+    /** Sorter table model */
     private final BasicTableSorter resultSetTableSorter;
-    
-    /** object with rendering and editing responsabilities for column RATING. */
+    /** object handling rendering and editing for column RATING. */
     private final RatingCell ratingCell;
-    
+    /** object handling rendering for column Success. */
     private final SuccessCell successCell;
-    
+    /** custom number cell renderer */
     private final TableCellRenderer standardRenderer = new TableCellNumberRenderer();
+    /** preference singleton */
+    private final Preferences myPreferences = Preferences.getInstance();
 
     /**
      * Creates new form TablePanel
@@ -57,22 +69,42 @@ public class TablePanel extends javax.swing.JPanel {
 
         // Build ResultsTable
         resultSetTableModel = new ResultSetTableModel();
-        
+
         ratingCell = new RatingCell();
         successCell = new SuccessCell();
 
         initComponents();
 
+        // Configure table sorting
         // must come after initComponents()
         resultSetTableSorter = new BasicTableSorter(resultSetTableModel, jResultSetTable.getTableHeader());
 
+        // Process the listeners last to first, so register before jtable, not after:
+        resultSetTableSorter.addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(final TableModelEvent e) {
+                // If the table structure has changed, reapply the custom renderer/editor on columns + auto-fit
+                if ((e.getSource() != resultSetTableSorter)
+                        || (e.getFirstRow() == TableModelEvent.HEADER_ROW)) {
+
+                    updateTableRenderers();
+                }
+            }
+        });
+        resultSetTableSorter.setTableHeaderChangeListener(this);
+
         jResultSetTable.setModel(resultSetTableSorter);
+
+        // Fix row height:
         SwingUtils.adjustRowHeight(jResultSetTable);
-        
+
         // set default renderers
         jResultSetTable.setDefaultRenderer(Boolean.class, standardRenderer);
         jResultSetTable.setDefaultRenderer(Double.class, standardRenderer);
-        jResultSetTable.setDefaultRenderer(Float.class, standardRenderer);
+
+        // load user preference for columns:
+        resultSetTableSorter.setVisibleColumnNamesAsString(myPreferences.getPreference(Preferences.VIEW_COLUMNS_RESULTS));
     }
 
     /**
@@ -85,7 +117,7 @@ public class TablePanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jScrollPaneTable = new javax.swing.JScrollPane();
         jResultSetTable = new javax.swing.JTable();
         jPanelTableOptions = new javax.swing.JPanel();
         jButtonShowTableEditor = new javax.swing.JButton();
@@ -93,9 +125,10 @@ public class TablePanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
 
         jResultSetTable.setModel(resultSetTableModel);
-        jScrollPane1.setViewportView(jResultSetTable);
+        jResultSetTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jScrollPaneTable.setViewportView(jResultSetTable);
 
-        jSplitPane1.setRightComponent(jScrollPane1);
+        jSplitPane1.setRightComponent(jScrollPaneTable);
 
         jPanelTableOptions.setLayout(new javax.swing.BoxLayout(jPanelTableOptions, javax.swing.BoxLayout.PAGE_AXIS));
 
@@ -116,56 +149,136 @@ public class TablePanel extends javax.swing.JPanel {
      * Display the table keywords editor and set the new headers
      */
     private void jButtonShowTableEditorActionPerformed(java.awt.event.ActionEvent evt) {
-        // Set the dialog box
-        JDialog dialog = new JDialog(App.getFrame(), "Edit table headers", true);
-        TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog, new ArrayList<>(getTableModel().getListColumnDesc()), getTableModel().getListColumnDesc()); // TODO : fix displayed column
-        dialog.setContentPane(tableEditorPanel);
-        dialog.setMinimumSize(new Dimension(600, 500));
-        dialog.setLocationRelativeTo(null); // centering the dialog on the screen
+        // 1. Create the dialog
+        final JDialog dialog = new JDialog(App.getFrame(), "Edit table columns", true);
+
+        final Dimension dim = new Dimension(600, 500);
+        dialog.setMinimumSize(dim);
+        dialog.addComponentListener(new ComponentResizeAdapter(dim));
+
+        // 2. Optional: What happens when the dialog closes ?
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        // 3. Create components and put them in the dialog
+        final TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog,
+                getTableModel().getListColumnDesc(),
+                getUserListColumnDesc()
+        );
+        dialog.add(tableEditorPanel);
+
+        // 4. Size the dialog.
+        WindowUtils.setClosingKeyboardShortcuts(dialog);
+        dialog.pack();
+
+        // Restore, then automatically save window size changes:
+        WindowUtils.rememberWindowSize(dialog, TABLE_EDITOR_DIMENSION_KEY);
+
+        // Center it :
+        dialog.setLocationRelativeTo(dialog.getOwner());
+
+        // 5. Show it and waits until dialog is not visible or disposed :
         dialog.setResizable(true);
         dialog.setVisible(true);
-        
-        // when dialog returns we set the chosen columns by user
-        if (tableEditorPanel.getProcessOK()) setUserListColumnDesc(tableEditorPanel.getColumnsToDisplay());
-    }                                                      
 
-    /** find the columns to apply pretty renderers. 
+        // when dialog returns OK, set the chosen columns
+        if (tableEditorPanel.isResult()) {
+            setUserListColumnDesc(tableEditorPanel.getColumnsToDisplay());
+        }
+    }
+
+    /** 
+     * find the columns to apply pretty renderers. 
      * should  be called each time the columns change
-     * it is called in setResults() and setUserUnionColumnDesc().
      */
-    public void reTargetRenderers () {
-        // We must re-ask for rendering since the TableColumn object is different
+    public void updateTableRenderers() {
+        // update renderer since the TableColumn object is different
         try {
             final TableColumn columnRating = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumn.RATING.toString());
             columnRating.setCellRenderer(ratingCell);
             columnRating.setCellEditor(ratingCell);
-        } 
-        catch (IllegalArgumentException e) {
-            logger.debug("Missing RATING column, cannot set Renderer and Editor.");
+        } catch (IllegalArgumentException iae) {
+            logger.debug("Missing RATING column, cannot set Renderer and Editor.", iae);
         }
-        
+
         try {
             final TableColumn columnSuccess = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumn.SUCCESS.toString());
             columnSuccess.setCellRenderer(successCell);
-        } 
-        catch (IllegalArgumentException e) {
-            logger.debug("Missing SUCCESS column, cannot set Renderer.");
+        } catch (IllegalArgumentException iae) {
+            logger.debug("Missing SUCCESS column, cannot set Renderer.", iae);
         }
+
+        AutofitTableColumns.autoResizeTable(jResultSetTable, true, true); // include header width
     }
-    
+
     public void setResults(List<ServiceResult> results) {
         getTableModel().setResults(results);
-        reTargetRenderers();
     }
-    
-    /** modify the user selected columns in BasicTableSorter
+
+    @Override
+    public void tableColumnMoved(BasicTableSorter source) {
+        // save preference after resultSetTableSorter updated:
+        updateColumnUserPreferences();
+    }
+
+    /** 
+     * modify the user selected columns in BasicTableSorter
      * Used when Table Editor dialog returns and we must apply the user choices.
      * @param userListColumnDesc the new list of columns selected by user. Must be a (possibly reordered) sublist of ResultSetTableModel.getListColumnDesc()
      */
-    public void setUserListColumnDesc(List<ColumnDesc> userListColumnDesc) {
-        // TODO set UserListColumnDesc in BasicTableSorter
-        reTargetRenderers();
-   }
+    private void setUserListColumnDesc(final List<ColumnDesc> userListColumnDesc) {
+        logger.debug("setUserListColumnDesc: {}", userListColumnDesc);
+
+        final List<String> visibleColumnNames;
+        if (userListColumnDesc.isEmpty()) {
+            visibleColumnNames = null; // all columns
+        } else {
+            visibleColumnNames = new ArrayList<>(userListColumnDesc.size());
+            userListColumnDesc.forEach(columnDesc -> visibleColumnNames.add(columnDesc.getName()));
+        }
+
+        resultSetTableSorter.setVisibleColumnNames(visibleColumnNames);
+        // save preference after resultSetTableSorter updated:
+        updateColumnUserPreferences();
+    }
+
+    private List<ColumnDesc> getUserListColumnDesc() {
+        final List<ColumnDesc> allColumns = getTableModel().getListColumnDesc();
+        final List<String> visibleColumnNames = resultSetTableSorter.getVisibleColumnNames();
+
+        logger.debug("visibleColumnNames: {}", visibleColumnNames);
+
+        if (visibleColumnNames == null) {
+            return allColumns;
+        }
+        final List<ColumnDesc> userListColumnDesc = new ArrayList<>(visibleColumnNames.size());
+
+        for (String colName : visibleColumnNames) {
+            // traverse all columns to match its name:
+            for (ColumnDesc columnDesc : allColumns) {
+                if (columnDesc.getName().equals(colName)) {
+                    userListColumnDesc.add(columnDesc);
+                    break;
+                }
+            }
+        }
+        logger.debug("userListColumnDesc: {}", userListColumnDesc);
+        return userListColumnDesc;
+    }
+
+    private void updateColumnUserPreferences() {
+        String columnNames = resultSetTableSorter.getVisibleColumnNamesAsString();
+        if (columnNames == null) {
+            columnNames = ""; // all columns
+        }
+        logger.debug("updateColumnUserPreferences: [{}]", columnNames);
+        try {
+            myPreferences.setPreference(Preferences.VIEW_COLUMNS_RESULTS, columnNames);
+            // force persistence:
+            myPreferences.saveToFile();
+        } catch (PreferencesException pe) {
+            logger.error("Could not store preference:", pe);
+        }
+    }
 
     public ListSelectionModel getSelectionModel() {
         return getTable().getSelectionModel();
@@ -210,11 +323,11 @@ public class TablePanel extends javax.swing.JPanel {
     private javax.swing.JButton jButtonShowTableEditor;
     private javax.swing.JPanel jPanelTableOptions;
     private javax.swing.JTable jResultSetTable;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPaneTable;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 
-        /**
+    /**
      * Used to format numbers in cells.
      *
      * @warning: No trace log implemented as this is very often called (performance).
@@ -255,5 +368,5 @@ public class TablePanel extends javax.swing.JPanel {
             setText(text);
         }
     }
-    
+
 }
