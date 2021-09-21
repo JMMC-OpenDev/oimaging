@@ -4,7 +4,6 @@
 package fr.jmmc.oimaging.services;
 
 import fr.jmmc.jmcs.util.FileUtils;
-import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.nom.tam.fits.FitsException;
@@ -41,6 +40,13 @@ public final class ServiceResult {
     // Post process cached data
     private OIFitsFile oiFitsFile = null;
     private String executionLog = null;
+    
+    /** the extension for fits file */
+    public static final String FITS_FILE_EXT = ".fits";
+    /** the extenion for the result OIFits file */
+    public static final String RESULT_FILE_EXT = ".output.fits";
+    /** the extension for the log execution file */
+    public static final String LOG_FILE_EXT = ".log.txt";
 
     /**
      * Helper constructor that created result files using given inputfile name.
@@ -51,11 +57,8 @@ public final class ServiceResult {
     public ServiceResult(File inputFile) {
         String inputFilename = inputFile.getName();
         this.inputFile = inputFile;
-        this.oifitsResultFile = FileUtils.getTempFile(inputFilename + ".output.fits");
-        this.executionLogResultFile = FileUtils.getTempFile(inputFilename + ".log.txt");
-        
-        this.rating = 0;
-        this.comments = "No comments";
+        this.oifitsResultFile = FileUtils.getTempFile(inputFilename + RESULT_FILE_EXT);
+        this.executionLogResultFile = FileUtils.getTempFile(inputFilename + LOG_FILE_EXT);
         
         init();
     }
@@ -71,15 +74,14 @@ public final class ServiceResult {
         this.oifitsResultFile = oifitsResultFile;
         this.executionLogResultFile = executionLogResultFile;
         
-        logger.debug("new ServiceResult(" + inputFile + ", " + oifitsResultFile + ", " + executionLogResultFile + ")");
-        
-        this.rating = 0;
-        this.comments = "No comments";
+        logger.debug("new ServiceResult(", inputFile, ", ", oifitsResultFile, ", ", executionLogResultFile, ")");
         
         init();
     }
     
     private void init() {
+        this.rating = 0;
+        this.comments = "No comments";
         setStartTime(new Date());
     }
     
