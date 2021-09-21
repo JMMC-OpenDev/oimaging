@@ -238,6 +238,9 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
 
             // ignore standard FITS keywords:
             if (!columnDescMap.containsKey(key) && !FitsUtils.isStandardKeyword(key)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Column[{}] data class: {}", key, keyMeta.getBaseClass());
+                }
                 columnDescMap.put(key, new ColumnDesc(key, keyMeta.getBaseClass(), source, null, keyMeta.getDescription()));
             }
         }
@@ -247,11 +250,23 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
                 final String key = card.getKey();
 
                 // ignore standard FITS keywords:
-                if (!columnDescMap.containsKey(key) && !FitsUtils.isStandardKeyword(key)) {
-                    final Object value = card.parseValue();
-                    // TODO: fix ColumnDesc.dataClass (= Object.class) if this value is not null:
-                    final Class<?> dataClass = (value != null) ? value.getClass() : Object.class;
-                    columnDescMap.put(key, new ColumnDesc(key, dataClass, source, null, card.getComment()));
+                if (!FitsUtils.isStandardKeyword(key)) {
+                    ColumnDesc columnDesc = columnDescMap.get(key);
+                    if (columnDesc != null) {
+                        if (columnDesc.getDataClass() == Object.class) {
+                            // fix ColumnDesc.dataClass (= Object.class) if this value is not null:
+                            final Object value = card.parseValue();
+                            if (value != null) {
+                                logger.debug("Column[{}] set data class: {}", key, value.getClass());
+                                columnDesc.setDataClass(value.getClass());
+                            }
+                        }
+                    } else {
+                        final Object value = card.parseValue();
+                        final Class<?> dataClass = (value != null) ? value.getClass() : Object.class;
+                        logger.debug("Column[{}] data class: {}", key, dataClass);
+                        columnDescMap.put(key, new ColumnDesc(key, dataClass, source, null, card.getComment()));
+                    }
                 }
             }
         }

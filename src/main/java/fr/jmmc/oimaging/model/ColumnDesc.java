@@ -60,6 +60,12 @@ public class ColumnDesc {
     public Class<?> getDataClass() {
         return dataClass;
     }
+    
+    public void setDataClass(Class<?> dataClass) {
+        if (this.dataClass == Object.class) {
+            this.dataClass = dataClass;
+        }
+    }
 
     public String getLabel() {
         return label;
