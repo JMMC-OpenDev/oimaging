@@ -70,7 +70,7 @@ public final class OImaging extends App {
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OImaging.class.getName());
 
-    public final static boolean DEV_MODE = "true".equalsIgnoreCase(System.getProperty("fr.jmmc.oimaging.devMode", "false"));
+    public final static boolean DEV_MODE = "true".equalsIgnoreCase(System.getProperty("oimaging.devMode", "false"));
 
     /* members */
     /** main Panel */
@@ -182,6 +182,7 @@ public final class OImaging extends App {
 
                 // if devMode, load some ServiceResults from home folder .jmmc-devmode
                 if (DEV_MODE) {
+                    logger.info("OImaging dev mode: enabled !");
                     DevMode.searchAndCraftAllServiceResults();
                 }
             }
