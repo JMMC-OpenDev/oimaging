@@ -4,7 +4,6 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
-import fr.jmmc.jmcs.util.FormatterUtils;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.services.Service;
@@ -93,7 +92,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jideToggleSplitButton1 = new com.jidesoft.swing.JideToggleSplitButton();
         jPanelForm = new javax.swing.JPanel();
         jComboBoxSoftware = new javax.swing.JComboBox();
         jLabelInitImg = new javax.swing.JLabel();
@@ -117,8 +115,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jTableKeywordsEditor = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
         jPanelOptions = new javax.swing.JPanel();
         jTextAreaOptions = new javax.swing.JTextArea();
-
-        jideToggleSplitButton1.setText("jideToggleSplitButton1");
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Algorithm settings"));
         setLayout(new java.awt.GridBagLayout());
@@ -476,7 +472,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JSpinner jSpinnerMaxIter;
     private fr.jmmc.oimaging.gui.TableKeywordsEditor jTableKeywordsEditor;
     private javax.swing.JTextArea jTextAreaOptions;
-    private com.jidesoft.swing.JideToggleSplitButton jideToggleSplitButton1;
     // End of variables declaration//GEN-END:variables
 
     public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
