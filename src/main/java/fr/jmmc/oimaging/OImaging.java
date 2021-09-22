@@ -70,6 +70,8 @@ public final class OImaging extends App {
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OImaging.class.getName());
 
+    public final static boolean DEV_MODE = "true".equalsIgnoreCase(System.getProperty("fr.jmmc.oimaging.devMode", "false"));
+
     /* members */
     /** main Panel */
     private MainPanel mainPanel;
@@ -176,6 +178,11 @@ public final class OImaging extends App {
                 final JFrame appFrame = App.getExistingFrame();
                 if (appFrame != null) {
                     appFrame.setVisible(true);
+                }
+
+                // if devMode, load some ServiceResults from home folder .jmmc-devmode
+                if (DEV_MODE) {
+                    DevMode.searchAndCraftAllServiceResults();
                 }
             }
         });
@@ -354,7 +361,7 @@ public final class OImaging extends App {
                                     }
 
                                 } else {
-                                    IRModelManager.getInstance().loadOIFitsFile(new File(new URI(url)));                                    
+                                    IRModelManager.getInstance().loadOIFitsFile(new File(new URI(url)));
                                 }
                             } catch (IllegalArgumentException ex) {
                                 e = ex;
@@ -372,7 +379,7 @@ public final class OImaging extends App {
                 }
             }
         };
-        
+
         // Add handler to load one new oifits
         new SampMessageHandler(SampCapability.LOAD_FITS_IMAGE) {
             @Override
@@ -393,7 +400,7 @@ public final class OImaging extends App {
                                     final URI uri = new URI(url);
                                     File tmpFile = FileUtils.getTempFile(ResourceUtils.filenameFromResourcePath(url));
                                     if (Http.download(uri, tmpFile, false)) {
-                                        IRModelManager.getInstance().loadFitsImageFile(tmpFile);                                        
+                                        IRModelManager.getInstance().loadFitsImageFile(tmpFile);
                                     } else {
                                         e = new IOException();
                                     }
@@ -418,7 +425,6 @@ public final class OImaging extends App {
                 }
             }
         };
-        
     }
 
     /**
