@@ -71,7 +71,7 @@ public final class OImaging extends App {
     private static final Logger logger = LoggerFactory.getLogger(OImaging.class.getName());
 
     public final static boolean DEV_MODE = "true".equalsIgnoreCase(System.getProperty("fr.jmmc.oimaging.devMode", "false"));
-    
+
     /* members */
     /** main Panel */
     private MainPanel mainPanel;
@@ -83,7 +83,7 @@ public final class OImaging extends App {
     public static void main(final String[] args) {
 
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
-       
+
         // Start application with the command line arguments
         Bootstrapper.launchApp(new OImaging(args));
     }
@@ -179,14 +179,14 @@ public final class OImaging extends App {
                 if (appFrame != null) {
                     appFrame.setVisible(true);
                 }
-                 
+
                 // if devMode, load some ServiceResults from home folder .jmmc-devmode
-                if (DEV_MODE) DevMode.searchAndCraftAllServiceResults();
+                if (DEV_MODE) {
+                    DevMode.searchAndCraftAllServiceResults();
+                }
             }
         });
     }
-    
-    
 
     /**
      * Hook to handle operations before closing application.
@@ -361,7 +361,7 @@ public final class OImaging extends App {
                                     }
 
                                 } else {
-                                    IRModelManager.getInstance().loadOIFitsFile(new File(new URI(url)));                                    
+                                    IRModelManager.getInstance().loadOIFitsFile(new File(new URI(url)));
                                 }
                             } catch (IllegalArgumentException ex) {
                                 e = ex;
@@ -379,7 +379,7 @@ public final class OImaging extends App {
                 }
             }
         };
-        
+
         // Add handler to load one new oifits
         new SampMessageHandler(SampCapability.LOAD_FITS_IMAGE) {
             @Override
@@ -400,7 +400,7 @@ public final class OImaging extends App {
                                     final URI uri = new URI(url);
                                     File tmpFile = FileUtils.getTempFile(ResourceUtils.filenameFromResourcePath(url));
                                     if (Http.download(uri, tmpFile, false)) {
-                                        IRModelManager.getInstance().loadFitsImageFile(tmpFile);                                        
+                                        IRModelManager.getInstance().loadFitsImageFile(tmpFile);
                                     } else {
                                         e = new IOException();
                                     }
@@ -425,7 +425,6 @@ public final class OImaging extends App {
                 }
             }
         };
-        
     }
 
     /**

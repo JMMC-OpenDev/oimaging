@@ -5,7 +5,6 @@ package fr.jmmc.oimaging.services;
 
 import fr.jmmc.oimaging.services.software.SoftwareInputParam;
 import fr.jmmc.oitools.image.ImageOiInputParam;
-import fr.jmmc.oitools.model.OIFitsFile;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public final class Service {
         this.contact = contact;
         this.softwareInputParam = softwareInputParam;
     }
-       
+
     public boolean isCompatibleParams(final Service otherService) {
         return this.softwareInputParam == otherService.getSoftwareInputParam();
     }
