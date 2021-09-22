@@ -181,7 +181,7 @@ public final class OImaging extends App {
                 }
                  
                 // if devMode, load some ServiceResults from home folder .jmmc-devmode
-                if (DEV_MODE) DevMode.craftAllServiceResults();
+                if (DEV_MODE) DevMode.searchAndCraftAllServiceResults();
             }
         });
     }

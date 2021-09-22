@@ -38,11 +38,11 @@ public class DevMode {
     
     private static final Logger logger = LoggerFactory.getLogger(DevMode.class.getName());
     
-    private final static File FILEDIR = new File(SystemUtils.getUserHome() + "/.jmmc-devmode/");
+    private final static File FILE_DIR = new File(SystemUtils.getUserHome() + "/.jmmc-devmode/");
     
     /** search and craft service results. */
-    public static void craftAllServiceResults () {
-        List<ServiceResult> listSR = searchForFiles();
+    public static void searchAndCraftAllServiceResults () {
+        List<ServiceResult> listSR = searchForServiceResults();
         
         logger.info("Found ", listSR.size(), " ServiceResults to load.");
         
@@ -55,12 +55,12 @@ public class DevMode {
      * this execution log file is optional. A temporary file will be used in replacement.
      * @return list of ServiceResult
      */
-    private static List<ServiceResult> searchForFiles () {
+    private static List<ServiceResult> searchForServiceResults () {
         List<ServiceResult> listSR = new ArrayList<> ();
         
-        if (FILEDIR.isDirectory() && FILEDIR.canRead()) {
+        if (FILE_DIR.isDirectory() && FILE_DIR.canRead()) {
             // get all files
-            File[] files = FILEDIR.listFiles();
+            File[] files = FILE_DIR.listFiles();
 
             // extract the .fits files and the .log.txt files
             Map<String,File> fitsFiles = new HashMap<> (files.length);
@@ -99,7 +99,7 @@ public class DevMode {
                 else logger.info("Could not find or read file: ", fitsFile.getAbsolutePath());
             });
         }
-        else logger.info("Could not find or read FILEDIR: ", FILEDIR.getAbsolutePath());
+        else logger.info("Could not find or read FILEDIR: ", FILE_DIR.getAbsolutePath());
         
         return listSR;
     }
@@ -141,7 +141,7 @@ public class DevMode {
         
         FitsTable inputFitsTable = oiFitsFile.getImageOiData().getInputParam();
         FitsTable outputFitsTable = oiFitsFile.getImageOiData().getOutputParam();
-        
+ 
         // Attempt 1: looking for a ALGORITHM output param
         // TODO: there will be a ResultSetTableModel.getKeywordValue method in a future merge, maybe use it here
         if (outputFitsTable.hasKeywordMeta("ALGORITHM")) {
@@ -164,7 +164,7 @@ public class DevMode {
                 }
             }
         }
-         
+        
         // guessing BSMEM program from presence of INITFLUX input header card
         if (inputFitsTable.hasHeaderCards()) {
             FitsHeaderCard card = inputFitsTable.findFirstHeaderCard("INITFLUX");
