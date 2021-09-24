@@ -298,19 +298,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
 
     private void jButtonUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpActionPerformed
 
-        // selecting the good list and model so we write one function for both list
-
-        JList<String> jList =
-                jListAvailable.getSelectedIndices().length > 0
-                ? jListAvailable
-                : jListHidden ;
-
-        DefaultListModel<String> model =
-                jListAvailable.getSelectedIndices().length > 0
-                ? modelAvailable
-                : modelHidden;
-
-        int[] indexes = jList.getSelectedIndices();
+        int[] indexes = jListAvailable.getSelectedIndices();
 
         // - 1 so the index 0 cannot be moved up
         int lastIndex = -1;
@@ -321,10 +309,10 @@ public class TableEditorPanel extends javax.swing.JPanel {
             // we cannot move up if the last index is immediately above
             if (lastIndex < index - 1) {
                 // we switch the values
-                String a = model.getElementAt(index - 1);
-                String b = model.getElementAt(index);
-                model.setElementAt(b, index - 1);
-                model.setElementAt(a, index);
+                String a = modelAvailable.getElementAt(index - 1);
+                String b = modelAvailable.getElementAt(index);
+                modelAvailable.setElementAt(b, index - 1);
+                modelAvailable.setElementAt(a, index);
                 // we decrement the index
                 index --;
                 // also in the indexes table (to keep selection GUI correct)
@@ -335,27 +323,15 @@ public class TableEditorPanel extends javax.swing.JPanel {
         }
 
         // we update the selection GUI because the values have moved but not the selection indexes
-        jList.setSelectedIndices(indexes);
+        jListAvailable.setSelectedIndices(indexes);
     }//GEN-LAST:event_jButtonUpActionPerformed
 
     private void jButtonDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDownActionPerformed
 
-        // selecting the good list and model so we write one function for both list
-
-        JList<String> jList =
-                jListAvailable.getSelectedIndices().length > 0
-                ? jListAvailable
-                : jListHidden ;
-
-        DefaultListModel<String> model =
-                jListAvailable.getSelectedIndices().length > 0
-                ? modelAvailable
-                : modelHidden;
-
-        int[] indexes = jList.getSelectedIndices();
+        int[] indexes = jListAvailable.getSelectedIndices();
 
         // size() so the index (size - 1) cannot be moved down
-        int lastIndex = model.getSize();
+        int lastIndex = modelAvailable.getSize();
 
         for (int i = indexes.length - 1; i >= 0; i --) {
             int index = indexes[i];
@@ -363,10 +339,10 @@ public class TableEditorPanel extends javax.swing.JPanel {
             // we cannot move down if the last index is immediately below
             if (lastIndex > index + 1) {
                 // we switch the values
-                String a = model.getElementAt(index);
-                String b = model.getElementAt(index + 1);
-                model.setElementAt(b, index);
-                model.setElementAt(a, index + 1);
+                String a = modelAvailable.getElementAt(index);
+                String b = modelAvailable.getElementAt(index + 1);
+                modelAvailable.setElementAt(b, index);
+                modelAvailable.setElementAt(a, index + 1);
                 // we increment the index
                 index ++;
                 // also in the indexes table (to keep selection GUI correct)
@@ -377,7 +353,7 @@ public class TableEditorPanel extends javax.swing.JPanel {
         }
 
         // we update the selection GUI because the values have moved but not the selection indexes
-        jList.setSelectedIndices(indexes);
+        jListAvailable.setSelectedIndices(indexes);
     }//GEN-LAST:event_jButtonDownActionPerformed
 
     private void jListHiddenFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jListHiddenFocusGained
