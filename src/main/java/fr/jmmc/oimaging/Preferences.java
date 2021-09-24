@@ -6,6 +6,10 @@ package fr.jmmc.oimaging;
 import fr.jmmc.jmal.image.ColorModels;
 import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
+import fr.jmmc.jmcs.util.StringUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +23,12 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     private static Preferences _singleton = null;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(Preferences.class.getName());
-    /** prefix for view columns (Results) */
-    public static final String VIEW_COLUMNS_RESULTS = "view.columns.results";
+    /** prefix for all results columns */
+    public static final String RESULTS_COLUMNS_ALL = "results.columns.all";
+    /** prefix for visible results columns */
+    public static final String RESULTS_COLUMNS_VISIBLE = "results.columns.visible";
     /** Default results columns order list, as of default */
-    private static final String RESULTS_DEFAULT = ""; // TODO: define interesting sets of columns
+    private static final String COLUMNS_DEFAULT = ""; // TODO: define interesting sets of columns
 
     /**
      * Private constructor that must be empty.
@@ -73,7 +79,8 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         // Disable interpolation:
         setDefaultPreference(MODEL_IMAGE_INTERPOLATION, ImageInterpolation.None.toString());
 
-        setDefaultPreference(VIEW_COLUMNS_RESULTS, RESULTS_DEFAULT);
+        setDefaultPreference(RESULTS_COLUMNS_ALL, COLUMNS_DEFAULT);
+        setDefaultPreference(RESULTS_COLUMNS_VISIBLE, COLUMNS_DEFAULT);
     }
 
     @Override
@@ -86,4 +93,57 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         return 1;
     }
 
+    public List<String> getResultsAllColumns() {
+        return Preferences.stringToColumnsList(getPreference(Preferences.RESULTS_COLUMNS_ALL));
+    }
+
+    public List<String> getResultsVisibleColumns() {
+        return Preferences.stringToColumnsList(getPreference(Preferences.RESULTS_COLUMNS_VISIBLE));
+    }
+
+    public void setResultsAllColumns(List<String> allColumns) {
+        logger.debug("setPreferenceAllColumns: [{}]", allColumns);
+        try {
+            setPreference(Preferences.RESULTS_COLUMNS_ALL, Preferences.columnsListToString(allColumns));
+            // force persistence:
+            saveToFile();
+        } catch (PreferencesException pe) {
+            logger.error("Could not store all columns preference:", pe);
+        }
+    }
+
+    public void setResultsVisibleColumns(List<String> visibleColumns) {
+        logger.debug("setPreferenceVisibleColumns: [{}]", visibleColumns);
+        try {
+            setPreference(Preferences.RESULTS_COLUMNS_VISIBLE, Preferences.columnsListToString(visibleColumns));
+            // force persistence:
+            saveToFile();
+        } catch (PreferencesException pe) {
+            logger.error("Could not store visible columns preference:", pe);
+        }
+    }
+
+    /**
+     * @param columns list of strings columns names. required.
+     * @return visible column names (ordered) as String (| separator).
+     */
+    private static String columnsListToString(List<String> columns) {
+        final StringBuilder sb = new StringBuilder(256);
+        for (String c : columns) {
+            sb.append(c).append('|');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Defines the visible column names (ordered)
+     * @param strColumns visible column names (ordered) as String (| separator). required.
+     * @return list of columns names.
+     */
+    private static List<String> stringToColumnsList(final String strColumns) {
+        if (StringUtils.isEmpty(strColumns)) {
+            return new ArrayList<>(0);
+        }
+        return new ArrayList<>(Arrays.asList(strColumns.split("\\|")));
+    }
 }

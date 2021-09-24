@@ -4,7 +4,6 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.App;
-import fr.jmmc.jmcs.data.preference.PreferencesException;
 import fr.jmmc.jmcs.gui.component.BasicTableColumnMovedListener;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
@@ -13,13 +12,14 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.gui.util.WindowUtils;
 import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.oimaging.Preferences;
-import fr.jmmc.oimaging.model.ColumnDesc;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
 import java.awt.Dimension;
+import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -102,9 +102,10 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
         // set default renderers
         jResultSetTable.setDefaultRenderer(Boolean.class, standardRenderer);
         jResultSetTable.setDefaultRenderer(Double.class, standardRenderer);
+        jResultSetTable.setDefaultRenderer(Date.class, standardRenderer);
 
         // load user preference for columns:
-        resultSetTableSorter.setVisibleColumnNamesAsString(myPreferences.getPreference(Preferences.VIEW_COLUMNS_RESULTS));
+        resultSetTableSorter.setVisibleColumnNames(myPreferences.getResultsVisibleColumns());
     }
 
     /**
@@ -160,10 +161,12 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // 3. Create components and put them in the dialog
-        final TableEditorPanel tableEditorPanel = new TableEditorPanel(dialog,
-                getTableModel().getListColumnDesc(),
-                getUserListColumnDesc()
-        );
+        List<String> availableColumns = resultSetTableSorter.getVisibleColumnNames();
+        List<String> hiddenColumns = getTableModel().getColumnNames();
+        hiddenColumns.removeAll(availableColumns);
+        
+        final TableEditorPanel tableEditorPanel = new TableEditorPanel(
+                dialog, hiddenColumns, availableColumns);
         dialog.add(tableEditorPanel);
 
         // 4. Size the dialog.
@@ -182,7 +185,7 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
 
         // when dialog returns OK, set the chosen columns
         if (tableEditorPanel.isResult()) {
-            setUserListColumnDesc(tableEditorPanel.getColumnsToDisplay());
+            setVisibleColumnNames(tableEditorPanel.getAvailableColumns());
         }
     }
 
@@ -211,73 +214,50 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
     }
 
     public void setResults(List<ServiceResult> results) {
-        getTableModel().setResults(results);
+        final List<String> prevAllColumns = myPreferences.getResultsAllColumns();
+        getTableModel().setResults(results, prevAllColumns);
+        
+        // Update all columns if needed:
+        final List<String> newAllColumns = getTableModel().getColumnNames();
+        if (!prevAllColumns.equals(newAllColumns)) {
+            updateAllColumnsPreferences(newAllColumns);
+            // show new columns:
+            prevAllColumns.forEach(newAllColumns::remove);
+            logger.debug("setResults: new columns : {}", prevAllColumns);
+            final List<String> newVisibleColumns = resultSetTableSorter.getVisibleColumnNames();
+            newAllColumns.forEach(newVisibleColumns::add);
+            setVisibleColumnNames(newVisibleColumns);
+        }
     }
 
     @Override
     public void tableColumnMoved(BasicTableSorter source) {
         // save preference after resultSetTableSorter updated:
-        updateColumnUserPreferences();
+        updateVisibleColumnsPreferences();
     }
 
     /** 
      * modify the user selected columns in BasicTableSorter
      * Used when Table Editor dialog returns and we must apply the user choices.
-     * @param userListColumnDesc the new list of columns selected by user. Must be a (possibly reordered) sublist of ResultSetTableModel.getListColumnDesc()
+     * @param visibleColumnNames the new list of columns selected by user.
      */
-    private void setUserListColumnDesc(final List<ColumnDesc> userListColumnDesc) {
-        logger.debug("setUserListColumnDesc: {}", userListColumnDesc);
-
-        final List<String> visibleColumnNames;
-        if (userListColumnDesc.isEmpty()) {
-            visibleColumnNames = null; // all columns
-        } else {
-            visibleColumnNames = new ArrayList<>(userListColumnDesc.size());
-            userListColumnDesc.forEach(columnDesc -> visibleColumnNames.add(columnDesc.getName()));
-        }
+    private void setVisibleColumnNames(final List<String> visibleColumnNames) {
+        logger.debug("setVisibleColumnNames: {}", visibleColumnNames);
 
         resultSetTableSorter.setVisibleColumnNames(visibleColumnNames);
         // save preference after resultSetTableSorter updated:
-        updateColumnUserPreferences();
+        updateVisibleColumnsPreferences();
     }
 
-    private List<ColumnDesc> getUserListColumnDesc() {
-        final List<ColumnDesc> allColumns = getTableModel().getListColumnDesc();
+    private void updateVisibleColumnsPreferences() {
         final List<String> visibleColumnNames = resultSetTableSorter.getVisibleColumnNames();
-
-        logger.debug("visibleColumnNames: {}", visibleColumnNames);
-
-        if (visibleColumnNames == null) {
-            return allColumns;
-        }
-        final List<ColumnDesc> userListColumnDesc = new ArrayList<>(visibleColumnNames.size());
-
-        for (String colName : visibleColumnNames) {
-            // traverse all columns to match its name:
-            for (ColumnDesc columnDesc : allColumns) {
-                if (columnDesc.getName().equals(colName)) {
-                    userListColumnDesc.add(columnDesc);
-                    break;
-                }
-            }
-        }
-        logger.debug("userListColumnDesc: {}", userListColumnDesc);
-        return userListColumnDesc;
+        logger.debug("updateVisibleColumnsPreferences: {}", visibleColumnNames);
+        myPreferences.setResultsVisibleColumns(visibleColumnNames);
     }
 
-    private void updateColumnUserPreferences() {
-        String columnNames = resultSetTableSorter.getVisibleColumnNamesAsString();
-        if (columnNames == null) {
-            columnNames = ""; // all columns
-        }
-        logger.debug("updateColumnUserPreferences: [{}]", columnNames);
-        try {
-            myPreferences.setPreference(Preferences.VIEW_COLUMNS_RESULTS, columnNames);
-            // force persistence:
-            myPreferences.saveToFile();
-        } catch (PreferencesException pe) {
-            logger.error("Could not store preference:", pe);
-        }
+    private void updateAllColumnsPreferences(final List<String> allColumns) {
+        logger.debug("updateAllColumnsPreferences: {}", allColumns);
+        myPreferences.setResultsAllColumns(allColumns);
     }
 
     public ListSelectionModel getSelectionModel() {
@@ -337,6 +317,8 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
         /** default serial UID for Serializable interface */
         private static final long serialVersionUID = 1;
 
+        private final SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
         /**
          * Constructor
          */
@@ -361,6 +343,8 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
                     text = NumberUtils.format(((Double) value));
                 } else if (value instanceof Boolean) {
                     text = ((Boolean) value) ? "T" : "F";
+                } else if (value instanceof Date) {
+                    text = tf.format((Date) value);
                 } else {
                     text = value.toString();
                 }

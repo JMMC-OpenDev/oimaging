@@ -790,7 +790,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         final IRModel irModel = IRModelManager.getInstance().getIRModel();
         currentModel = irModel;
 
-        final ImageOiInputParam inputParam = irModel.getImageOiData().getInputParam();
+        final ImageOiInputParam params = irModel.getImageOiData().getInputParam();
 
         // specific params must be updated
         irModel.initSpecificParams(false);
@@ -802,51 +802,51 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         boolean mFlag, wFlag;
 
         // Target
-        mString = inputParam.getTarget();
+        mString = params.getTarget();
         wString = (String) jComboBoxTarget.getSelectedItem();
         if ((mString != null && !mString.equals(wString)) || (wString != null && !wString.equals(mString))) {
-            inputParam.setTarget(wString);
+            params.setTarget(wString);
             changed = true;
         }
 
         // wavelength
-        mDouble = inputParam.getWaveMin();
+        mDouble = params.getWaveMin();
         if (jFormattedTextFieldWaveMin.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldWaveMin.getValue()).doubleValue() * MICRO_METER;
             if (mDouble != wDouble) {
-                inputParam.setWaveMin(wDouble);
+                params.setWaveMin(wDouble);
                 changed = true;
             }
         }
 
-        mDouble = inputParam.getWaveMax();
+        mDouble = params.getWaveMax();
         if (jFormattedTextFieldWaveMax.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldWaveMax.getValue()).doubleValue() * MICRO_METER;
             if (mDouble != wDouble) {
-                inputParam.setWaveMax(wDouble);
+                params.setWaveMax(wDouble);
                 changed = true;
             }
         }
 
         // observables
-        mFlag = inputParam.useVis();
+        mFlag = params.useVis();
         wFlag = jCheckBoxUseVis.isSelected();
         if (mFlag != wFlag) {
-            inputParam.useVis(wFlag);
+            params.useVis(wFlag);
             changed = true;
         }
 
-        mFlag = inputParam.useVis2();
+        mFlag = params.useVis2();
         wFlag = jCheckBoxUseVis2.isSelected();
         if (mFlag != wFlag) {
-            inputParam.useVis2(wFlag);
+            params.useVis2(wFlag);
             changed = true;
         }
 
-        mFlag = inputParam.useT3();
+        mFlag = params.useT3();
         wFlag = jCheckBoxUseT3.isSelected();
         if (mFlag != wFlag) {
-            inputParam.useT3(wFlag);
+            params.useT3(wFlag);
             changed = true;
         }
 

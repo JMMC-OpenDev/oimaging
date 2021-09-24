@@ -3,7 +3,10 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.model;
 
-import fr.jmmc.jmcs.gui.component.BasicTableColumnModel;
+import fr.jmmc.jmcs.model.ColumnDesc;
+import static fr.jmmc.jmcs.model.ColumnDesc.CMP_COLUMNS;
+import fr.jmmc.jmcs.model.ColumnDescTableModel;
+import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.fits.FitsTable;
@@ -12,12 +15,10 @@ import fr.jmmc.oitools.image.ImageOiOutputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import java.util.Map;
  *
  * @author martin
  */
-public class ResultSetTableModel extends AbstractTableModel implements BasicTableColumnModel {
+public class ResultSetTableModel extends ColumnDescTableModel {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,44 +37,21 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
     public static final int OUTPUT_PARAM = 1;
     public static final int INPUT_PARAM = 2;
 
-    /** ColumnDesc comparator based on Source first, Name second */
-    private static final Comparator<ColumnDesc> CMP_COLUMNS = new Comparator<ColumnDesc>() {
-        @Override
-        public int compare(ColumnDesc a, ColumnDesc b) {
-            int res = a.getSource() - b.getSource();
-            if (res != 0) {
-                return res;
-            }
-            return a.getName().compareTo(b.getName());
-        }
-    };
     /* members */
     /** results (another list copy) */
     private final List<ServiceResult> results;
 
-    /** the list of ColumnDesc. Uniques by getName().
-     * When there is two equals getName(), we choose by following priority : OutputParam > InputParam > HardCoded column
-     */
-    private final List<ColumnDesc> listColumnDesc;
-    /** temporary buffer */
-    protected final StringBuilder sbTmp = new StringBuilder(256);
-
     public ResultSetTableModel() {
         super();
         results = new ArrayList<>();
-        listColumnDesc = new ArrayList<>();
-    }
-
-    /** @return read only of listColumnDesc */
-    public List<ColumnDesc> getListColumnDesc() {
-        return Collections.unmodifiableList(listColumnDesc);
     }
 
     /** 
      * Update results, then also updates columns (they depend on results)
      * @param results list of results
+     * @param allColumnNames all column names
      */
-    public void setResults(List<ServiceResult> results) {
+    public void setResults(List<ServiceResult> results, final List<String> allColumnNames) {
         // update results
         this.results.clear();
         this.results.addAll(results);
@@ -100,7 +78,16 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
 
         // 4. we add hardcoded columns to the set
         for (HardCodedColumn hcc : HardCodedColumn.values()) {
-            columnDescMap.put(hcc.name(), hcc.getColumnDesc());
+            if (!columnDescMap.containsKey(hcc.name())) {
+                columnDescMap.put(hcc.name(), hcc.getColumnDesc());
+            }
+        }
+
+        // 5. we add missing columns (from all known columns) to the set
+        for (String columnName : allColumnNames) {
+            if (!columnDescMap.containsKey(columnName)) {
+                columnDescMap.put(columnName, new ColumnDesc(columnName, Object.class));
+            }
         }
 
         // 6. we clear the list
@@ -111,6 +98,8 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
 
         // 8. sort the list
         listColumnDesc.sort(CMP_COLUMNS);
+        
+        logger.debug("setResults: listColumnDesc: {}", listColumnDesc);
 
         // notify changes
         fireTableStructureChanged();
@@ -121,48 +110,9 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
         return this.results.get(rowIndex);
     }
 
-    public ColumnDesc getColumnDesc(final int columnIndex) {
-        return this.listColumnDesc.get(columnIndex);
-    }
-
     @Override
     public int getRowCount() {
         return results.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return listColumnDesc.size();
-    }
-
-    @Override
-    public String getColumnName(int columnIndex) {
-        return getColumnDesc(columnIndex).getName();
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return getColumnDesc(columnIndex).getDataClass();
-    }
-
-    // BasicTableColumnModel impl    
-    @Override
-    public String getColumnLabel(final int columnIndex) {
-        return getColumnDesc(columnIndex).getLabel();
-    }
-
-    @Override
-    public String getColumnTooltipText(final int columnIndex) {
-        final ColumnDesc columnDesc = getColumnDesc(columnIndex);
-        sbTmp.setLength(0);
-        if (columnDesc.getLabel() != null) {
-            sbTmp.append(columnDesc.getLabel()).append(' ');
-        }
-        sbTmp.append('[').append(columnDesc.getName()).append("] ");
-        if (columnDesc.getDescription() != null) {
-            sbTmp.append(columnDesc.getDescription());
-        }
-        return sbTmp.toString();
     }
 
     @Override
@@ -201,8 +151,14 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
                         return getRowCount() - rowIndex;
                     case FILE:
                         return result.getInputFile().getName();
-                    case TIMESTAMP_RECONSTRUCTION:
-                        return result.getEndTime();
+                    case TIMESTAMP:
+                        return (result.getEndTime() != null) ? result.getEndTime() : result.getStartTime();
+                    case DURATION:
+                        if (result.getEndTime() != null) {
+                            final long duration = (result.getEndTime().getTime() - result.getStartTime().getTime());
+                            return NumberUtils.trimTo3Digits(duration / 1000.0);
+                        }
+                        break;
                     case ALGORITHM:
                         return result.getService().getProgram();
                     case SUCCESS:
@@ -296,16 +252,18 @@ public class ResultSetTableModel extends AbstractTableModel implements BasicTabl
         return null;
     }
 
-    /** Some HardCoded Columns. 
-     * It does not extends ColumnDesc because it already extends Enum */
+    /** 
+     * Enum for HardCoded Columns wrapping ColumnDesc
+     */
     public enum HardCodedColumn {
-        INDEX(Integer.class, "Index"),
-        FILE(String.class, "Name"),
-        TIMESTAMP_RECONSTRUCTION(String.class, "Timestamp reconstruction"),
         ALGORITHM(String.class, "Algorithm"),
-        SUCCESS(Boolean.class, "Success"),
+        COMMENTS(String.class, "Comments"),
+        FILE(String.class, "File"),
+        INDEX(Integer.class, "Index"),
+        DURATION(Double.class, "Job duration"),
+        TIMESTAMP(Date.class, "Job timestamp"),
         RATING(Integer.class, "Rating"),
-        COMMENTS(String.class, "Comments");
+        SUCCESS(Boolean.class, "Success");
 
         private final ColumnDesc columnDesc;
 

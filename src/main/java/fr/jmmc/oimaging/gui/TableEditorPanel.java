@@ -3,13 +3,13 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.gui;
 
-import fr.jmmc.oimaging.model.ColumnDesc;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
+import javax.swing.JList;
 
 /**
  * Panel to be added in a dialog box to edit the display of the table
@@ -22,36 +22,30 @@ public class TableEditorPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1;
 
     // Model and view for the list
-    private final DefaultListModel<ColumnDesc> modelHidden = new DefaultListModel<>();
-    private final DefaultListModel<ColumnDesc> modelDisplayed = new DefaultListModel<>();
+    private final DefaultListModel<String> modelHidden = new DefaultListModel<>();
+    private final DefaultListModel<String> modelAvailable = new DefaultListModel<>();
 
     // Reference to the parent dialog box to handle its events
     private final JDialog dialog;
 
     /** editor result = true if the user validates the inputs */
     private boolean result = false;
-    /** list of all columns (used by reset) */
-    private final List<ColumnDesc> allColumns;
 
     /**
      * Constructor
      * @param dialog Reference to the parent dialog box to handle its events
-     * @param allColumns All available columns (currently displayed or not) 
-     * @param displayedColumns Currently displayed columns
+     * @param hiddenColumns required
+     * @param availableColumns required
      */
-    public TableEditorPanel(JDialog dialog, List<ColumnDesc> allColumns, List<ColumnDesc> displayedColumns) {
+    public TableEditorPanel(JDialog dialog, List<String> hiddenColumns, List<String> availableColumns) {
         initComponents();
         this.dialog = dialog;
-        this.allColumns = allColumns;
 
-        // Fill with available columns, but remove the ones already displayed
-        allColumns.forEach(modelHidden::addElement);
-        displayedColumns.forEach(modelHidden::removeElement);
-
-        displayedColumns.forEach(modelDisplayed::addElement);
+        hiddenColumns.forEach(modelHidden::addElement);
+        availableColumns.forEach(modelAvailable::addElement);
 
         jListHidden.setModel(modelHidden);
-        jListDisplayed.setModel(modelDisplayed);
+        jListAvailable.setModel(modelAvailable);
     }
 
     /**
@@ -73,8 +67,10 @@ public class TableEditorPanel extends javax.swing.JPanel {
         jScrollPaneHidden = new javax.swing.JScrollPane();
         jListHidden = new javax.swing.JList<>();
         jScrollPaneDisplayed = new javax.swing.JScrollPane();
-        jListDisplayed = new javax.swing.JList<>();
+        jListAvailable = new javax.swing.JList<>();
         jButtonReset = new javax.swing.JButton();
+        jButtonUp = new javax.swing.JButton();
+        jButtonDown = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(400, 250));
         setLayout(new java.awt.GridBagLayout());
@@ -87,7 +83,8 @@ public class TableEditorPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jButtonAdd, gridBagConstraints);
 
@@ -140,29 +137,39 @@ public class TableEditorPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jButtonRemove, gridBagConstraints);
 
         jListHidden.setToolTipText("");
+        jListHidden.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jListHiddenFocusGained(evt);
+            }
+        });
         jScrollPaneHidden.setViewportView(jListHidden);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.gridheight = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
         add(jScrollPaneHidden, gridBagConstraints);
 
-        jScrollPaneDisplayed.setViewportView(jListDisplayed);
+        jListAvailable.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jListAvailableFocusGained(evt);
+            }
+        });
+        jScrollPaneDisplayed.setViewportView(jListAvailable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.gridheight = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
@@ -182,19 +189,36 @@ public class TableEditorPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jButtonReset, gridBagConstraints);
+
+        jButtonUp.setText("Up");
+        jButtonUp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonUpActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(jButtonUp, gridBagConstraints);
+
+        jButtonDown.setText("Down");
+        jButtonDown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDownActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(jButtonDown, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-        jListHidden.getSelectedValuesList().forEach(columnDesc -> {
-            modelDisplayed.addElement(columnDesc);
-            modelHidden.removeElement(columnDesc);
-        });
-    }//GEN-LAST:event_jButtonAddActionPerformed
-
     private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
-        jListDisplayed.getSelectedValuesList().forEach(columnDesc -> {
-            modelHidden.addElement(columnDesc);
-            modelDisplayed.removeElement(columnDesc);
+        jListAvailable.getSelectedValuesList().forEach(column -> {
+            modelHidden.addElement(column);
+            modelAvailable.removeElement(column);
         });
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
@@ -208,17 +232,117 @@ public class TableEditorPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
+        for (Enumeration<String> e = modelHidden.elements(); e.hasMoreElements();) {
+            modelAvailable.addElement(e.nextElement());
+        }
         modelHidden.clear();
-        modelDisplayed.clear();
-        allColumns.forEach(modelDisplayed::addElement);
     }//GEN-LAST:event_jButtonResetActionPerformed
 
-    public List<ColumnDesc> getColumnsToDisplay() {
-        List<ColumnDesc> columnsToDisplay = new ArrayList<>();
-        for (Enumeration<ColumnDesc> e = modelDisplayed.elements(); e.hasMoreElements();) {
-            columnsToDisplay.add(e.nextElement());
+    private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
+        jListHidden.getSelectedValuesList().forEach(column -> {
+            modelAvailable.addElement(column);
+            modelHidden.removeElement(column);
+        });
+    }//GEN-LAST:event_jButtonAddActionPerformed
+
+    private void jButtonUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpActionPerformed
+
+        // selecting the good list and model so we write one function for both list
+
+        JList<String> jList =
+                jListAvailable.getSelectedIndices().length > 0
+                ? jListAvailable
+                : jListHidden ;
+
+        DefaultListModel<String> model =
+                jListAvailable.getSelectedIndices().length > 0
+                ? modelAvailable
+                : modelHidden;
+
+        int[] indexes = jList.getSelectedIndices();
+
+        // - 1 so the index 0 cannot be moved up
+        int lastIndex = -1;
+
+        for (int i = 0; i < indexes.length; i ++) {
+            int index = indexes[i];
+
+            // we cannot move up if the last index is immediately above
+            if (lastIndex < index - 1) {
+                // we switch the values
+                String a = model.getElementAt(index - 1);
+                String b = model.getElementAt(index);
+                model.setElementAt(b, index - 1);
+                model.setElementAt(a, index);
+                // we decrement the index
+                index --;
+                // also in the indexes table (to keep selection GUI correct)
+                indexes[i] --;
+            }
+
+            lastIndex = index;
         }
-        return columnsToDisplay;
+
+        // we update the selection GUI because the values have moved but not the selection indexes
+        jList.setSelectedIndices(indexes);
+    }//GEN-LAST:event_jButtonUpActionPerformed
+
+    private void jButtonDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDownActionPerformed
+
+        // selecting the good list and model so we write one function for both list
+
+        JList<String> jList =
+                jListAvailable.getSelectedIndices().length > 0
+                ? jListAvailable
+                : jListHidden ;
+
+        DefaultListModel<String> model =
+                jListAvailable.getSelectedIndices().length > 0
+                ? modelAvailable
+                : modelHidden;
+
+        int[] indexes = jList.getSelectedIndices();
+
+        // size() so the index (size - 1) cannot be moved down
+        int lastIndex = model.getSize();
+
+        for (int i = indexes.length - 1; i >= 0; i --) {
+            int index = indexes[i];
+
+            // we cannot move down if the last index is immediately below
+            if (lastIndex > index + 1) {
+                // we switch the values
+                String a = model.getElementAt(index);
+                String b = model.getElementAt(index + 1);
+                model.setElementAt(b, index);
+                model.setElementAt(a, index + 1);
+                // we increment the index
+                index ++;
+                // also in the indexes table (to keep selection GUI correct)
+                indexes[i] ++;
+            }
+
+            lastIndex = index;
+        }
+
+        // we update the selection GUI because the values have moved but not the selection indexes
+        jList.setSelectedIndices(indexes);
+    }//GEN-LAST:event_jButtonDownActionPerformed
+
+    private void jListHiddenFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jListHiddenFocusGained
+        jListAvailable.clearSelection();
+    }//GEN-LAST:event_jListHiddenFocusGained
+
+    private void jListAvailableFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jListAvailableFocusGained
+        jListHidden.clearSelection();
+    }//GEN-LAST:event_jListAvailableFocusGained
+
+    public List<String> getAvailableColumns() {
+        List<String> availableColumns = new ArrayList<>(modelAvailable.getSize());
+        for (Enumeration<String> e = modelAvailable.elements(); e.hasMoreElements();) {
+            availableColumns.add(e.nextElement());
+        }
+        return availableColumns;
     }
 
     /**
@@ -232,13 +356,15 @@ public class TableEditorPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonCancel;
+    private javax.swing.JButton jButtonDown;
     private javax.swing.JButton jButtonOk;
     private javax.swing.JButton jButtonRemove;
     private javax.swing.JButton jButtonReset;
+    private javax.swing.JButton jButtonUp;
     private javax.swing.JLabel jLabelDisplayed;
     private javax.swing.JLabel jLabelHidden;
-    private javax.swing.JList<ColumnDesc> jListDisplayed;
-    private javax.swing.JList<ColumnDesc> jListHidden;
+    private javax.swing.JList<String> jListAvailable;
+    private javax.swing.JList<String> jListHidden;
     private javax.swing.JScrollPane jScrollPaneDisplayed;
     private javax.swing.JScrollPane jScrollPaneHidden;
     // End of variables declaration//GEN-END:variables
