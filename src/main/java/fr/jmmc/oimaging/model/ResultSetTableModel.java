@@ -98,7 +98,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
 
         // 8. sort the list
         listColumnDesc.sort(CMP_COLUMNS);
-        
+
         logger.debug("setResults: listColumnDesc: {}", listColumnDesc);
 
         // notify changes
@@ -113,6 +113,54 @@ public class ResultSetTableModel extends ColumnDescTableModel {
     @Override
     public int getRowCount() {
         return results.size();
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        final ServiceResult result = getServiceResult(rowIndex);
+        final ColumnDesc columnDesc = getColumnDesc(columnIndex);
+
+        switch (columnDesc.getSource()) {
+            case HARD_CODED:
+                switch (HardCodedColumn.valueOf(columnDesc.getName())) {
+                    case ALGORITHM:
+                        return result.getService().getProgram();
+                    case COMMENTS:
+                        return result.getComments();
+                    case FILE:
+                        return result.getInputFile().getName();
+                    case INDEX:
+                        return getRowCount() - rowIndex;
+                    case JOB_DURATION:
+                        if (result.getEndTime() != null) {
+                            final long duration = (result.getEndTime().getTime() - result.getStartTime().getTime());
+                            return NumberUtils.trimTo3Digits(duration / 1000.0);
+                        }
+                        break;
+                    case JOB_TIMESTAMP:
+                        return (result.getEndTime() != null) ? result.getEndTime() : result.getStartTime();
+                    case RATING:
+                        return result.getRating();
+                    case SUCCESS:
+                        return result.isValid();
+                }
+                break;
+            case INPUT_PARAM:
+                if (result.getOifitsFile() != null) {
+                    final FitsTable inputParam = result.getOifitsFile().getImageOiData().getInputParam();
+                    return getKeywordValue(inputParam, columnDesc.getName());
+                }
+                break;
+            case OUTPUT_PARAM:
+                if (result.getOifitsFile() != null) {
+                    final FitsTable outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
+                    return getKeywordValue(outputParam, columnDesc.getName());
+                }
+                break;
+            default:
+        }
+        // if nothing was found
+        return null;
     }
 
     @Override
@@ -137,54 +185,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         } else if (columnDesc.equals(HardCodedColumn.RATING.getColumnDesc())) {
             result.setRating((int) value);
         }
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        final ServiceResult result = getServiceResult(rowIndex);
-        final ColumnDesc columnDesc = getColumnDesc(columnIndex);
-
-        switch (columnDesc.getSource()) {
-            case HARD_CODED:
-                switch (HardCodedColumn.valueOf(columnDesc.getName())) {
-                    case INDEX:
-                        return getRowCount() - rowIndex;
-                    case FILE:
-                        return result.getInputFile().getName();
-                    case TIMESTAMP:
-                        return (result.getEndTime() != null) ? result.getEndTime() : result.getStartTime();
-                    case DURATION:
-                        if (result.getEndTime() != null) {
-                            final long duration = (result.getEndTime().getTime() - result.getStartTime().getTime());
-                            return NumberUtils.trimTo3Digits(duration / 1000.0);
-                        }
-                        break;
-                    case ALGORITHM:
-                        return result.getService().getProgram();
-                    case SUCCESS:
-                        return result.isValid();
-                    case RATING:
-                        return result.getRating();
-                    case COMMENTS:
-                        return result.getComments();
-                }
-                break;
-            case INPUT_PARAM:
-                if (result.getOifitsFile() != null) {
-                    final FitsTable inputParam = result.getOifitsFile().getImageOiData().getInputParam();
-                    return getKeywordValue(inputParam, columnDesc.getName());
-                }
-                break;
-            case OUTPUT_PARAM:
-                if (result.getOifitsFile() != null) {
-                    final FitsTable outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
-                    return getKeywordValue(outputParam, columnDesc.getName());
-                }
-                break;
-            default:
-        }
-        // if nothing was found
-        return null;
     }
 
     private static void processKeywordTable(final Map<String, ColumnDesc> columnDescMap, final FitsTable fitsTable, final int source) {
@@ -260,8 +260,8 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         COMMENTS(String.class, "Comments"),
         FILE(String.class, "File"),
         INDEX(Integer.class, "Index"),
-        DURATION(Double.class, "Job duration"),
-        TIMESTAMP(Date.class, "Job timestamp"),
+        JOB_DURATION(Double.class, "Job duration"),
+        JOB_TIMESTAMP(Date.class, "Job timestamp"),
         RATING(Integer.class, "Rating"),
         SUCCESS(Boolean.class, "Success");
 

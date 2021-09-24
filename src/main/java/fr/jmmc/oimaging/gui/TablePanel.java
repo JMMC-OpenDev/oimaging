@@ -7,20 +7,27 @@ import fr.jmmc.jmcs.gui.component.BasicTableColumnMovedListener;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.model.TableEditorPanel;
 import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -33,7 +40,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author martin
  */
-public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMovedListener {
+public final class TablePanel extends javax.swing.JPanel implements BasicTableColumnMovedListener, ListSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,12 +62,13 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
     private final TableCellRenderer customCellRenderer = new TableCellNumberRenderer();
     /** preference singleton */
     private final Preferences myPreferences = Preferences.getInstance();
+    /** previous selected result */
+    private ServiceResult prevSelectedResult = null;
 
     /**
      * Creates new form TablePanel
      */
     public TablePanel() {
-
         // Build ResultsTable
         resultSetTableModel = new ResultSetTableModel();
 
@@ -84,6 +92,10 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
 
                     updateTableRenderers();
                 }
+                if (e.getSource() == resultSetTableSorter) {
+                    // sorting changed, restore selection:
+                    restoreSelection();
+                }
             }
         });
         resultSetTableSorter.setTableHeaderChangeListener(this);
@@ -100,6 +112,18 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
 
         // load user preference for columns:
         resultSetTableSorter.setVisibleColumnNames(myPreferences.getResultsVisibleColumns());
+
+        // Decorate scrollpane corner:
+        final JButton cornerButton = new JButton();
+        cornerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jButtonShowTableEditorActionPerformed(e);
+            }
+        });
+        jScrollPaneTable.setCorner(JScrollPane.LOWER_RIGHT_CORNER, cornerButton);
+
+        jResultSetTable.getSelectionModel().addListSelectionListener(this);
     }
 
     /**
@@ -118,6 +142,9 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
         jButtonShowTableEditor = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
+
+        jScrollPaneTable.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        jScrollPaneTable.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jResultSetTable.setModel(resultSetTableModel);
         jResultSetTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
@@ -144,22 +171,19 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
      * Display the table keywords editor and set the new headers
      */
     private void jButtonShowTableEditorActionPerformed(java.awt.event.ActionEvent evt) {
+        final List<String> prevVisibleColumns = resultSetTableSorter.getVisibleColumnNames();
 
-        // show the table editor dialog to select displayed columns:
-	final List<String> availableColumns = resultSetTableSorter.getVisibleColumnNames();
-        final List<String> hiddenColumns = getTableModel().getColumnNames();
-        hiddenColumns.removeAll(availableColumns);
-
-	final List<String> newAvailableColumns = TableEditorPanel.showEditor(
-                hiddenColumns,
-                availableColumns,
+        // show the table editor dialog to select visible columns:
+        final List<String> newVisibleColumns = TableEditorPanel.showEditor(
+                getTableModel().getColumnNames(),
+                prevVisibleColumns,
                 TABLE_EDITOR_DIMENSION_KEY
         );
 
-        if (newAvailableColumns != null) {
+        if (newVisibleColumns != null) {
             // Update visible columns if needed:
-            if (!availableColumns.equals(newAvailableColumns)) {
-                setVisibleColumnNames(newAvailableColumns);
+            if (!prevVisibleColumns.equals(newVisibleColumns)) {
+                setVisibleColumnNames(newVisibleColumns);
             }
         }
     }
@@ -235,6 +259,33 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
         myPreferences.setResultsAllColumns(allColumns);
     }
 
+    void restoreSelection() {
+        if (prevSelectedResult != null) {
+            logger.debug("restoreSelection: prevSelectedResult {}", prevSelectedResult);
+            setSelectedRow(prevSelectedResult);
+        }
+    }
+
+    /**
+     * Listen for list selection changes
+     *
+     * @param e list selection event
+     */
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        // Skip events when the user selection is adjusting :
+        if (e.getValueIsAdjusting()) {
+            return;
+        }
+        if (e.getSource() == getSelectionModel()) {
+            // only keep non empty selection (used by restoreSelection())
+            if (getSelectedRowsCount() > 0) {
+                prevSelectedResult = getSelectedRow();
+                logger.debug("valueChanged: prevSelectedResult {}", prevSelectedResult);
+            }
+        }
+    }
+
     public ListSelectionModel getSelectionModel() {
         return getTable().getSelectionModel();
     }
@@ -244,9 +295,9 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
     }
 
     public List<ServiceResult> getSelectedRows() {
-        List<ServiceResult> results = new ArrayList<>();
-
-        for (int index : getTable().getSelectedRows()) {
+        final int[] selectedRows = getTable().getSelectedRows();
+        final List<ServiceResult> results = new ArrayList<>(selectedRows.length);
+        for (int index : selectedRows) {
             results.add(resultSetTableModel.getServiceResult(resultSetTableSorter.modelIndex(index)));
         }
         return results;
@@ -260,6 +311,21 @@ public class TablePanel extends javax.swing.JPanel implements BasicTableColumnMo
     public void setSelectedRow(final int rowIndex) {
         final int index = resultSetTableSorter.viewIndex(rowIndex);
         getTable().setRowSelectionInterval(index, index);
+    }
+
+    public void setSelectedRow(final ServiceResult result) {
+        if (result != null) {
+            int modelIndex = -1;
+            for (int i = 0, len = resultSetTableModel.getRowCount(); i < len; i++) {
+                if (result == resultSetTableModel.getServiceResult(i)) {
+                    modelIndex = i;
+                    break;
+                }
+            }
+            if (modelIndex != -1) {
+                setSelectedRow(modelIndex);
+            }
+        }
     }
 
     private JTable getTable() {
