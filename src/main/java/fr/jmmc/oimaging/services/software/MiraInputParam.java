@@ -100,7 +100,7 @@ public class MiraInputParam extends SoftwareInputParam {
         // for our first implementation, just add to params if not TOTVAR
         if (params.getRglName().startsWith("compactness")) {
             params.addKeyword(RGL_GAMM);
-            params.setKeywordDefaultDouble(KEYWORD_RGL_GAMM, 
+            params.setKeywordDefaultDouble(KEYWORD_RGL_GAMM,
                     FitsUnit.ANGLE_MILLI_ARCSEC.convert(20.0, FitsUnit.ANGLE_DEG)); // 20 mas
         } else if (params.getRglName().startsWith("hyperbolic")) {
             params.addKeyword(RGL_TAU);

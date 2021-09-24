@@ -49,5 +49,4 @@ public final class IRModelEvent extends GenericEvent<IRModelEventType, Object> {
     /* 
      * helper methods to get correct type depending on the event type 
      */
-    
 }

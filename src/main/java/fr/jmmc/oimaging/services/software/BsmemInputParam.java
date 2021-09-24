@@ -3,7 +3,6 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.services.software;
 
-import static fr.jmmc.oimaging.services.software.MiraInputParam.SUPPORTED_STD_KEYWORDS;
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;

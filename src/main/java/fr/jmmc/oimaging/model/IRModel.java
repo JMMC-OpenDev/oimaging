@@ -456,7 +456,7 @@ public class IRModel {
 
         return dataAdded;
     }
-    
+
     private void loadLog(final ServiceResult serviceResult) {
         try {
             serviceResult.loadExecutionLogFile();

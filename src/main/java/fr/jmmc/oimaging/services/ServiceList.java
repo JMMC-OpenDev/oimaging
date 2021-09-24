@@ -50,7 +50,7 @@ public final class ServiceList {
         // TODO define prefered service in a preference:
         preferedService = new Service(SERVICE_WISARD, CMD_WISARD, remoteExecutionMode, "", "", swParamWisard);
         availableServices.add(preferedService);
-        
+
         if (ENABLE_LOCAL_MODE) {
             final OImagingExecutionMode localExecutionMode = LocalExecutionMode.INSTANCE;
             availableServices.add(new Service(SERVICE_BSMEM + " (local)", CMD_BSMEM, localExecutionMode, "", "", swParamBsmem));

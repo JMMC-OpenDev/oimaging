@@ -7,7 +7,6 @@ import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.runner.LocalLauncher;
 import fr.jmmc.jmcs.util.runner.RootContext;
-import fr.jmmc.jmcs.util.runner.RunContext;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
