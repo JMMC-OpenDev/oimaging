@@ -7,7 +7,6 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
-import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
@@ -59,8 +58,6 @@ import org.slf4j.LoggerFactory;
  * @author mella
  */
 public class MainPanel extends javax.swing.JPanel implements IRModelEventListener, ListSelectionListener {
-
-    private static final boolean USE_LIST = true;
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
@@ -154,11 +151,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         IRModelManager.getInstance().bindIRModelChangedEvent(this);
 
-        if (USE_LIST) {
-            jListResults.setCellRenderer(new OiCellRenderer());
-        }
-        jScrollPaneResults.setVisible(USE_LIST);
-
         jLabelWaveMin.setText("WAVE_MIN [" + SpecialChars.UNIT_MICRO_METER + ']');
         jLabelWaveMax.setText("WAVE_MAX [" + SpecialChars.UNIT_MICRO_METER + ']');
 
@@ -167,9 +159,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         fieldSliderAdapterWaveMax = new FieldSliderAdapter(jSliderWaveMax, jFormattedTextFieldWaveMax, 0, 1, 0);
 
         // become widget listener
-        if (USE_LIST) {
-            jListResults.addListSelectionListener(this);
-        }
         jTablePanel.getSelectionModel().addListSelectionListener(this);
 
         // init viewer Panel
@@ -335,10 +324,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonExportOIFits = new javax.swing.JButton();
         jScrollPaneEditor = new javax.swing.JScrollPane();
         jEditorPane = new javax.swing.JEditorPane();
-        jPanelResults = new javax.swing.JPanel();
-        jScrollPaneResults = new javax.swing.JScrollPane();
-        jListResults = createCustomList();
-        jResultsTableShowButton = new javax.swing.JButton();
         jTablePanel = new fr.jmmc.oimaging.gui.ResultSetTablePanel();
 
         jButtonCompare.setText("Compare");
@@ -360,7 +345,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSplitPane.setRightComponent(viewerPanel);
 
         jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane.setViewportView(jPanelLeft);
 
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
@@ -584,41 +568,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.weighty = 0.2;
         jPanelLeft.add(jPanelExecutionLog, gridBagConstraints);
 
-        jPanelResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Result sets"));
-        jPanelResults.setPreferredSize(new java.awt.Dimension(100, 100));
-        jPanelResults.setLayout(new java.awt.BorderLayout());
-
-        jScrollPaneResults.setMinimumSize(new java.awt.Dimension(100, 200));
-        jScrollPaneResults.setPreferredSize(new java.awt.Dimension(100, 200));
-
-        jScrollPaneResults.setViewportView(jListResults);
-
-        jPanelResults.add(jScrollPaneResults, java.awt.BorderLayout.CENTER);
-
-        jResultsTableShowButton.setText("Hide details");
-        jResultsTableShowButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jResultsTableShowButtonActionPerformed(evt);
-            }
-        });
-        jPanelResults.add(jResultsTableShowButton, java.awt.BorderLayout.PAGE_END);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.5;
-        jPanelLeft.add(jPanelResults, gridBagConstraints);
-
         jScrollPane.setViewportView(jPanelLeft);
 
         jSplitPane.setLeftComponent(jScrollPane);
 
-        jSplitPaneGlobal.setLeftComponent(jSplitPane);
+        jSplitPaneGlobal.setTopComponent(jSplitPane);
 
         jTablePanel.setPreferredSize(new java.awt.Dimension(900, 100));
-        jSplitPaneGlobal.setRightComponent(jTablePanel);
+        jSplitPaneGlobal.setBottomComponent(jTablePanel);
 
         add(jSplitPaneGlobal, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -650,10 +607,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         updateModel();
     }//GEN-LAST:event_jFormattedTextFieldPropertyChange
 
-    private void jResultsTableShowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResultsTableShowButtonActionPerformed
-        showTablePanel(!this.jTablePanel.isVisible());
-    }//GEN-LAST:event_jResultsTableShowButtonActionPerformed
-
     private void showTablePanel(final boolean visible) {
         if (this.jTablePanel.isVisible() != visible) {
             if (visible) {
@@ -661,7 +614,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 this.jSplitPaneGlobal.setDividerLocation(0.9);
             }
             this.jTablePanel.setVisible(visible);
-            this.jResultsTableShowButton.setText(visible ? "Hide details" : "Show details");
         }
     }
 
@@ -704,16 +656,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // enable delete action if the result table has rows selected:
         deleteSelectionAction.setEnabled(jTablePanel.getSelectedRowsCount() != 0);
-
-        if (e.getSource() == jListResults) {
-            if (USE_LIST) {
-                viewerPanel.displayResult((ServiceResult) jListResults.getSelectedValue());
-            }
-        } else if (e.getSource() == jTablePanel.getSelectionModel()) {
-            viewerPanel.displayResult(jTablePanel.getSelectedRow());
-        } else {
-            logger.warn("valueChanged: Unsupported component : {}", e.getSource());
-        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -733,15 +675,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JLabel jLabelTarget;
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
-    private javax.swing.JList jListResults;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
     private javax.swing.JPanel jPanelLeft;
-    private javax.swing.JPanel jPanelResults;
-    private javax.swing.JButton jResultsTableShowButton;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPaneEditor;
-    private javax.swing.JScrollPane jScrollPaneResults;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
     private javax.swing.JSplitPane jSplitPane;
@@ -913,11 +851,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             // model result list:
             final List<ServiceResult> modelResults = currentModel.getResultSets();
 
-            // resultSet List
-            if (USE_LIST) {
-                jListResults.setModel(new GenericListModel<ServiceResult>(modelResults));
-            }
-
             // resultSet Table
             jTablePanel.setResults(modelResults);
 
@@ -970,9 +903,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             if (event.getType() == IRModelEventType.IRMODEL_CHANGED || modelResults.isEmpty()) {
                 viewerPanel.displayModel(currentModel);
             } else {
-                if (USE_LIST) {
-                    jListResults.setSelectedIndex(0);
-                }
                 showTablePanel(true);
                 jTablePanel.setSelectedRow(0);
             }
