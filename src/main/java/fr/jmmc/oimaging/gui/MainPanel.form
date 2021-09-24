@@ -458,7 +458,7 @@
             </Container>
           </SubComponents>
         </Container>
-        <Container class="fr.jmmc.oimaging.gui.TablePanel" name="jTablePanel">
+        <Container class="fr.jmmc.oimaging.gui.ResultSetTablePanel" name="jTablePanel">
           <Properties>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[900, 100]"/>

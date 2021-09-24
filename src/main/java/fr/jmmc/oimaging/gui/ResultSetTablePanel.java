@@ -40,11 +40,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author martin
  */
-public final class TablePanel extends javax.swing.JPanel implements BasicTableColumnMovedListener, ListSelectionListener {
+public final class ResultSetTablePanel extends javax.swing.JPanel implements BasicTableColumnMovedListener, ListSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger logger = LoggerFactory.getLogger(TablePanel.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResultSetTablePanel.class);
 
     /** Table key to remember dialog dimensions */
     private final static String TABLE_EDITOR_DIMENSION_KEY = "___OIMAGING_TABLE_EDITOR_DIMENSION";
@@ -68,7 +68,7 @@ public final class TablePanel extends javax.swing.JPanel implements BasicTableCo
     /**
      * Creates new form TablePanel
      */
-    public TablePanel() {
+    public ResultSetTablePanel() {
         // Build ResultsTable
         resultSetTableModel = new ResultSetTableModel();
 

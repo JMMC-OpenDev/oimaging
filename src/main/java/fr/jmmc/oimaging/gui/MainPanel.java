@@ -339,7 +339,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jScrollPaneResults = new javax.swing.JScrollPane();
         jListResults = createCustomList();
         jResultsTableShowButton = new javax.swing.JButton();
-        jTablePanel = new fr.jmmc.oimaging.gui.TablePanel();
+        jTablePanel = new fr.jmmc.oimaging.gui.ResultSetTablePanel();
 
         jButtonCompare.setText("Compare");
         jButtonCompare.addActionListener(new java.awt.event.ActionListener() {
@@ -746,7 +746,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JSlider jSliderWaveMin;
     private javax.swing.JSplitPane jSplitPane;
     private javax.swing.JSplitPane jSplitPaneGlobal;
-    private fr.jmmc.oimaging.gui.TablePanel jTablePanel;
+    private fr.jmmc.oimaging.gui.ResultSetTablePanel jTablePanel;
     private fr.jmmc.oimaging.gui.SoftwareSettingsPanel softwareSettingsPanel;
     private fr.jmmc.oimaging.gui.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
