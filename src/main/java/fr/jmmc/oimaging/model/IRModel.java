@@ -16,7 +16,9 @@ import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
+import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
@@ -61,6 +63,8 @@ public class IRModel {
     private final GenericListModel<String> targetListModel = new GenericListModel<String>(new ArrayList<String>(10), true);
     /** List of results */
     private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
+
+    public static final KeywordMeta KEYWORD_RATING = new KeywordMeta("RATING", "user rating of the result", Types.TYPE_INT);
 
     /** status flag : set by RunAction */
     private boolean running;
@@ -479,6 +483,27 @@ public class IRModel {
 
         if (serviceResult.isValid()) {
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
+        }
+
+        // add OImaging keywords if they are not present
+
+        ImageOiInputParam inputParams = serviceResult.getOifitsFile().getImageOiData().getInputParam();
+
+        String key = KEYWORD_RATING.getName();
+        if (! inputParams.hasKeywordMeta(key)) {
+
+            // if it existed as an header card
+            if (inputParams.hasHeaderCards() && inputParams.findFirstHeaderCard(key) != null) {
+                if (logger.isDebugEnabled()) logger.debug("Found RATING headercard.");
+            }
+            else {
+                inputParams.setKeywordInt(key, 0);
+                if (logger.isDebugEnabled()) logger.debug("Missing RATING keyword, added it with value 0.");
+            }
+
+            // add meta and convert headercard to keyword
+            // convert is mandatory to edit the value correctly
+            inputParams.addKeyword(KEYWORD_RATING);
         }
 
         // notify model update

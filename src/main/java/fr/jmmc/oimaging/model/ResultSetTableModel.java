@@ -18,6 +18,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
+import fr.jmmc.oitools.model.OIFitsFile;
+import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.nom.tam.fits.FitsException;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +50,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         results = new ArrayList<>();
     }
 
-    /** 
+    /**
      * Update results, then also updates columns (they depend on results)
      * @param results list of results
      * @param allColumnNames all column names
@@ -139,8 +143,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
                         break;
                     case JOB_TIMESTAMP:
                         return (result.getEndTime() != null) ? result.getEndTime() : result.getStartTime();
-                    case RATING:
-                        return result.getRating();
                     case SUCCESS:
                         return result.isValid();
                 }
@@ -172,7 +174,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         }
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
         return columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())
-                || columnDesc.equals(HardCodedColumn.RATING.getColumnDesc());
+                || columnDesc.getName().equals(IRModel.KEYWORD_RATING.getName());
     }
 
     @Override
@@ -182,9 +184,31 @@ public class ResultSetTableModel extends ColumnDescTableModel {
 
         if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
             result.setComments((String) value);
-        } else if (columnDesc.equals(HardCodedColumn.RATING.getColumnDesc())) {
-            result.setRating((int) value);
+        } else if (columnDesc.getName().equals(IRModel.KEYWORD_RATING.getName())) {
+            setKeywordInt(result, INPUT_PARAM, IRModel.KEYWORD_RATING.getName(), (int) value);
+            // TODO: the following should not be written here
+            try {
+                OIFitsWriter.writeOIFits(result.getOifitsResultFile().getAbsolutePath(), result.getOifitsFile());
+            }
+            catch (IOException | FitsException e) {
+                logger.info("Could not overwrite OIFits result file: {}", e);
+            }
         }
+    }
+
+    private static void setKeywordInt (final ServiceResult result, int source, String keyword, int value) {
+
+        OIFitsFile oIFitsFile = result.getOifitsFile();
+        if (oIFitsFile == null) return;
+
+        FitsTable fitsTable = null;
+        switch (source) {
+            case INPUT_PARAM: fitsTable = oIFitsFile.getImageOiData().getInputParam(); break;
+            case OUTPUT_PARAM: fitsTable = oIFitsFile.getImageOiData().getOutputParam(); break;
+            case HARD_CODED: return;
+        }
+
+        fitsTable.setKeywordInt(keyword, value);
     }
 
     private static void processKeywordTable(final Map<String, ColumnDesc> columnDescMap, final FitsTable fitsTable, final int source) {
@@ -252,7 +276,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         return null;
     }
 
-    /** 
+    /**
      * Enum for HardCoded Columns wrapping ColumnDesc
      */
     public enum HardCodedColumn {
@@ -262,7 +286,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         INDEX(Integer.class, "Index"),
         JOB_DURATION(Double.class, "Job duration"),
         JOB_TIMESTAMP(Date.class, "Job timestamp"),
-        RATING(Integer.class, "Rating"),
         SUCCESS(Boolean.class, "Success");
 
         private final ColumnDesc columnDesc;
