@@ -222,8 +222,10 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
             updateAllColumnsPreferences(newAllColumns);
             // show new columns:
             prevAllColumns.forEach(newAllColumns::remove);
-            logger.debug("setResults: new columns : {}", prevAllColumns);
-            final List<String> newVisibleColumns = resultSetTableSorter.getVisibleColumnNames();
+            logger.debug("setResults: new columns : {}", newAllColumns);
+
+            // make list copy (can be unmodifiable)
+            final List<String> newVisibleColumns = new ArrayList<String>(resultSetTableSorter.getVisibleColumnNames());
             newAllColumns.forEach(newVisibleColumns::add);
             setVisibleColumnNames(newVisibleColumns);
         }
