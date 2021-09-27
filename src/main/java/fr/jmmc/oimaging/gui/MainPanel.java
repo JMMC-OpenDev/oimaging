@@ -656,6 +656,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // enable delete action if the result table has rows selected:
         deleteSelectionAction.setEnabled(jTablePanel.getSelectedRowsCount() != 0);
+
+        if (e.getSource() == jTablePanel.getSelectionModel()) {
+            viewerPanel.displayResult(jTablePanel.getSelectedRow());
+        } else {
+            logger.warn("valueChanged: Unsupported component : {}", e.getSource());
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
