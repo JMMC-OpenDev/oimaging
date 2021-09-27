@@ -10,6 +10,7 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.model.TableEditorPanel;
 import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.oimaging.Preferences;
+import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -195,7 +196,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
     public void updateTableRenderers() {
         // update renderer since the TableColumn object is different
         try {
-            final TableColumn columnRating = jResultSetTable.getColumn(ResultSetTableModel.HardCodedColumn.RATING.toString());
+            final TableColumn columnRating = jResultSetTable.getColumn(IRModel.KEYWORD_RATING.getName());
             columnRating.setCellRenderer(ratingCell);
             columnRating.setCellEditor(ratingCell);
         } catch (IllegalArgumentException iae) {

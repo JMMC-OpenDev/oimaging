@@ -32,7 +32,6 @@ public final class ServiceResult {
     private Date endTime;
 
     // User appreciation attribute
-    private int rating;
     private String comments;
 
     private Service service;
@@ -60,7 +59,7 @@ public final class ServiceResult {
                 FileUtils.getTempFile(inputFile.getName() + LOG_FILE_EXT));
     }
 
-    /** 
+    /**
      * Constructor where Result and Log files are given by caller.
      * thus they are not necessarily temp files.
      */
@@ -77,7 +76,6 @@ public final class ServiceResult {
     }
 
     private void init() {
-        this.rating = 0;
         this.comments = "No comments";
         setStartTime(new Date());
     }
@@ -117,10 +115,6 @@ public final class ServiceResult {
 
     public String getExecutionLog() {
         return executionLog;
-    }
-
-    public int getRating() {
-        return rating;
     }
 
     public String getComments() {
@@ -173,10 +167,6 @@ public final class ServiceResult {
 
     public void setService(Service service) {
         this.service = service;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
     }
 
     public void setComments(String comments) {
