@@ -72,7 +72,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private final OIFitsViewPanel oifitsViewPanel;
 
     /** Slider panel */
-    private SliderPanel sliderPanel;
+    private final SliderPanel sliderPanel;
 
     private final Action exportOiFitsAction;
     private final Action sendOiFitsAction;
@@ -487,11 +487,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer = new javax.swing.JPanel();
         jPanelImageSelector = new javax.swing.JPanel();
         jComboBoxImage = new javax.swing.JComboBox();
-        jPanelImage = new javax.swing.JPanel();
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
         jButtonRescale = new javax.swing.JButton();
         jLabelImageDebug = new javax.swing.JLabel();
+        jPanelImage = new javax.swing.JPanel();
         jPanelLogViewer = new javax.swing.JPanel();
         jScrollPaneLog = new javax.swing.JScrollPane();
         jEditorPaneExecutionLog = new javax.swing.JEditorPane();
@@ -508,7 +508,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelOIFitsViewer.setLayout(new java.awt.GridBagLayout());
 
-        jPanelOIFits.setLayout(new javax.swing.BoxLayout(jPanelOIFits, javax.swing.BoxLayout.LINE_AXIS));
+        jPanelOIFits.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -523,7 +523,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelImageSelector.setLayout(new java.awt.GridBagLayout());
 
-        jComboBoxImage.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxImage.setPrototypeDisplayValue("XXXX");
         jComboBoxImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxImageActionPerformed(evt);
@@ -542,16 +542,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jPanelImageSelector, gridBagConstraints);
-
-        jPanelImage.setLayout(new javax.swing.BoxLayout(jPanelImage, javax.swing.BoxLayout.LINE_AXIS));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.weighty = 1.0;
-        jPanelImageViewer.add(jPanelImage, gridBagConstraints);
 
         jButtonViewport.setText("Viewport");
         jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
@@ -593,14 +583,24 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jLabelImageDebug.setText("Debug");
         jPanelImageViewer.add(jLabelImageDebug, new java.awt.GridBagConstraints());
 
+        jPanelImage.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanelImageViewer.add(jPanelImage, gridBagConstraints);
+
         jTabbedPaneVizualizations.addTab("Images", jPanelImageViewer);
 
-        jPanelLogViewer.setLayout(new javax.swing.BoxLayout(jPanelLogViewer, javax.swing.BoxLayout.LINE_AXIS));
+        jPanelLogViewer.setLayout(new java.awt.BorderLayout());
 
         jEditorPaneExecutionLog.setEditable(false);
         jScrollPaneLog.setViewportView(jEditorPaneExecutionLog);
 
-        jPanelLogViewer.add(jScrollPaneLog);
+        jPanelLogViewer.add(jScrollPaneLog, java.awt.BorderLayout.CENTER);
 
         jTabbedPaneVizualizations.addTab("Execution log", jPanelLogViewer);
 
