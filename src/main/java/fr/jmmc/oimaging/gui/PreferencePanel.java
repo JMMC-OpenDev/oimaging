@@ -7,10 +7,8 @@ import fr.jmmc.jmal.image.ColorModels;
 import fr.jmmc.jmal.image.ColorScale;
 import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
-import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.oiexplorer.core.gui.IconComboBoxRenderer;
 import fr.jmmc.oimaging.Preferences;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.util.Observable;
 import java.util.Observer;
@@ -63,10 +61,6 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
                 return ColorModels.getColorModelImage(name);
             }
         });
-
-        final Dimension dim = new Dimension(500, 500);
-        setMinimumSize(dim);
-        addComponentListener(new ComponentResizeAdapter(dim));
     }
 
     /**
