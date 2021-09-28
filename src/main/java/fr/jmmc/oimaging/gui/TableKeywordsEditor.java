@@ -39,7 +39,7 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
 
     private static final long serialVersionUID = 1L;
 
-    private final static Insets INSETS = new Insets(2, 6, 2, 6);
+    private final static Insets INSETS = new Insets(2, 2, 2, 2);
 
     // members
     private SoftwareSettingsPanel notifiedParent = null;
@@ -96,6 +96,7 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
                         component = new JTextField((value == null) ? "" : value.toString());
                     } else {
                         JComboBox comboBox = new JComboBox(new GenericListModel(Arrays.asList(meta.getStringAcceptedValues()), true));
+                        comboBox.setPrototypeDisplayValue("XXXX");
                         if (value != null) {
                             comboBox.setSelectedItem(value);
                         }
@@ -159,7 +160,6 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = gridy;
             gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.weighty = 0.1;
             gridBagConstraints.insets = INSETS;
             gridBagConstraints.anchor = GridBagConstraints.LINE_END;
             add(jLabel, gridBagConstraints);
@@ -170,7 +170,6 @@ public final class TableKeywordsEditor extends javax.swing.JPanel implements Act
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.gridwidth = 5;
             gridBagConstraints.weightx = 0.8;
-            gridBagConstraints.weighty = 0.1;
             gridBagConstraints.insets = INSETS;
             gridBagConstraints.anchor = GridBagConstraints.CENTER;
 

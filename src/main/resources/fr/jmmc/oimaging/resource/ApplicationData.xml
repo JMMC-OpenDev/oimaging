@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.4 beta 3"/>
-    <compilation date="24/09/2021" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.5.4 beta 4"/>
+    <compilation date="28/09/2021" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -155,7 +155,10 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Fri, 24 Sep 2021 16:00:00 GMT</pubDate>
+            <pubDate>Tue, 28 Sep 2021 14:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 4">
+                <change type="FEATURE">Fixed layout issues (left panel and view panels)</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 3">
                 <change type="FEATURE">Improved the result table with all input / output keywords, order and visible columns can be set using drag and drop or the new table editor</change>
             </prerelease>

@@ -122,6 +122,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.setLayout(new java.awt.GridBagLayout());
 
         jComboBoxSoftware.setModel(ServiceList.getAvailableServices());
+        jComboBoxSoftware.setPrototypeDisplayValue("XXXX");
         jComboBoxSoftware.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSoftwareActionPerformed(evt);
@@ -130,9 +131,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxSoftware, gridBagConstraints);
 
         jLabelInitImg.setText("INIT_IMG");
@@ -141,10 +142,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelInitImg, gridBagConstraints);
 
         jComboBoxImage.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_INIT_IMG));
+        jComboBoxImage.setPrototypeDisplayValue("XXXX");
         jComboBoxImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxImageActionPerformed(evt);
@@ -153,10 +155,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxImage, gridBagConstraints);
 
         jLabelMaxIter.setText("MAXITER");
@@ -166,7 +168,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelMaxIter, gridBagConstraints);
 
         jSpinnerMaxIter.setModel(new javax.swing.SpinnerNumberModel(50, 0, 1000, 5));
@@ -179,9 +181,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jSpinnerMaxIter, gridBagConstraints);
 
         jLabelRglName.setText("RGL_NAME");
@@ -191,11 +193,12 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 4;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelRglName, gridBagConstraints);
 
         jComboBoxRglName.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "mem_prior" }));
         jComboBoxRglName.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_NAME));
+        jComboBoxRglName.setPrototypeDisplayValue("XXXX");
         jComboBoxRglName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxRglNameActionPerformed(evt);
@@ -204,9 +207,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxRglName, gridBagConstraints);
 
         jLabelAutoWgt.setText("AUTO_WGT");
@@ -216,7 +219,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelAutoWgt, gridBagConstraints);
 
         jLabelRglWgt.setText("RGL_WGT");
@@ -226,9 +229,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 6;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelRglWgt, gridBagConstraints);
 
+        jFormattedTextFieldRglWgt.setColumns(6);
         jFormattedTextFieldRglWgt.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldRglWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_WGT));
         jFormattedTextFieldRglWgt.addActionListener(new java.awt.event.ActionListener() {
@@ -244,10 +248,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jFormattedTextFieldRglWgt, gridBagConstraints);
 
         jLabelFlux.setText("FLUX");
@@ -257,9 +261,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 7;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelFlux, gridBagConstraints);
 
+        jFormattedTextFieldFlux.setColumns(6);
         jFormattedTextFieldFlux.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldFlux.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUX));
         jFormattedTextFieldFlux.addActionListener(new java.awt.event.ActionListener() {
@@ -275,9 +280,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jFormattedTextFieldFlux, gridBagConstraints);
 
         jLabelFluxErr.setText("FLUXERR");
@@ -287,9 +292,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 8;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelFluxErr, gridBagConstraints);
 
+        jFormattedTextFieldFluxErr.setColumns(6);
         jFormattedTextFieldFluxErr.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldFluxErr.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUXERR));
         jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
@@ -305,9 +311,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jFormattedTextFieldFluxErr, gridBagConstraints);
 
         jLabelRglPrio.setText("RGL_PRIO");
@@ -317,27 +323,32 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 9;
         gridBagConstraints.ipadx = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jLabelRglPrio, gridBagConstraints);
 
         jComboBoxRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
         jComboBoxRglPrio.setEnabled(false);
+        jComboBoxRglPrio.setPrototypeDisplayValue("XXXX");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 9;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxRglPrio, gridBagConstraints);
 
         jButtonLoadFitsImage.setText("+");
+        jButtonLoadFitsImage.setMargin(new java.awt.Insets(0, 0, 0, 0));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jButtonLoadFitsImage, gridBagConstraints);
 
         jButtonRemoveFitsImage.setText("-");
         jButtonRemoveFitsImage.setEnabled(false);
+        jButtonRemoveFitsImage.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jButtonRemoveFitsImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRemoveFitsImageActionPerformed(evt);
@@ -346,6 +357,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jButtonRemoveFitsImage, gridBagConstraints);
 
         jCheckBoxAutoWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_AUTO_WGT));
@@ -357,8 +370,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jCheckBoxAutoWgt, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
