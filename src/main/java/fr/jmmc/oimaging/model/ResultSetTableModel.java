@@ -18,6 +18,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RATING;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
@@ -174,7 +175,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         }
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
         return columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())
-                || columnDesc.getName().equals(IRModel.KEYWORD_RATING.getName());
+                || columnDesc.getName().equals(KEYWORD_RATING);
     }
 
     @Override
@@ -187,8 +188,8 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
             result.setComments((String) value);
         }
-        else if (columnDesc.getName().equals(IRModel.KEYWORD_RATING.getName())) {
-            setKeywordValue(result, INPUT_PARAM, IRModel.KEYWORD_RATING.getName(), (Integer) value);
+        else if (columnDesc.getName().equals(KEYWORD_RATING)) {
+            setKeywordValue(result, OUTPUT_PARAM, KEYWORD_RATING, (Integer) value);
             fileMustBeOverwritten = true;
         }
 

@@ -16,9 +16,7 @@ import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
-import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
-import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
@@ -63,8 +61,6 @@ public class IRModel {
     private final GenericListModel<String> targetListModel = new GenericListModel<String>(new ArrayList<String>(10), true);
     /** List of results */
     private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
-
-    public static final KeywordMeta KEYWORD_RATING = new KeywordMeta("RATING", "user rating of the result", Types.TYPE_INT);
 
     /** status flag : set by RunAction */
     private boolean running;
@@ -485,14 +481,6 @@ public class IRModel {
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
         }
 
-        // add OImaging keywords if they are not present
-
-        ImageOiInputParam inputParams = serviceResult.getOifitsFile().getImageOiData().getInputParam();
-
-        // addKeyword will also convert headercard to keyword
-        inputParams.addKeyword(KEYWORD_RATING);
-        inputParams.setKeywordDefault(KEYWORD_RATING.getName(), 0);
-        
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
     }
