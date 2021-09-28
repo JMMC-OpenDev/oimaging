@@ -182,13 +182,21 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         final ServiceResult result = getServiceResult(rowIndex);
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
 
+        boolean fileMustBeOverwritten = false ;
+
         if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
             result.setComments((String) value);
-        } else if (columnDesc.getName().equals(IRModel.KEYWORD_RATING.getName())) {
-            setKeywordInt(result, INPUT_PARAM, IRModel.KEYWORD_RATING.getName(), (int) value);
-            // TODO: the following should not be written here
+        }
+        else if (columnDesc.getName().equals(IRModel.KEYWORD_RATING.getName())) {
+            setKeywordValue(result, INPUT_PARAM, IRModel.KEYWORD_RATING.getName(), (Integer) value);
+            fileMustBeOverwritten = true;
+        }
+
+        // write changes to the OIFits result file
+        if (fileMustBeOverwritten) {
             try {
                 OIFitsWriter.writeOIFits(result.getOifitsResultFile().getAbsolutePath(), result.getOifitsFile());
+                logger.debug("Overwritten file from ResultSetTableMode.setValueAt function.");
             }
             catch (IOException | FitsException e) {
                 logger.info("Could not overwrite OIFits result file: {}", e);
@@ -196,19 +204,24 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         }
     }
 
-    private static void setKeywordInt (final ServiceResult result, int source, String keyword, int value) {
+    private static void setKeywordValue (final ServiceResult result, int source, String keyword, Object value) {
 
         OIFitsFile oIFitsFile = result.getOifitsFile();
-        if (oIFitsFile == null) return;
+        if (oIFitsFile == null) {
+            logger.info("Could not find the OiFitsFile in the ServiceResult.");
+            return;
+        }
 
         FitsTable fitsTable = null;
         switch (source) {
             case INPUT_PARAM: fitsTable = oIFitsFile.getImageOiData().getInputParam(); break;
             case OUTPUT_PARAM: fitsTable = oIFitsFile.getImageOiData().getOutputParam(); break;
-            case HARD_CODED: return;
+            case HARD_CODED:
+                logger.info("Cannot update HardCoded param.");
+                return;
         }
 
-        fitsTable.setKeywordInt(keyword, value);
+        fitsTable.setKeywordValue(keyword, value);
     }
 
     private static void processKeywordTable(final Map<String, ColumnDesc> columnDescMap, final FitsTable fitsTable, final int source) {

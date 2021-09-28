@@ -489,23 +489,10 @@ public class IRModel {
 
         ImageOiInputParam inputParams = serviceResult.getOifitsFile().getImageOiData().getInputParam();
 
-        String key = KEYWORD_RATING.getName();
-        if (! inputParams.hasKeywordMeta(key)) {
-
-            // if it existed as an header card
-            if (inputParams.hasHeaderCards() && inputParams.findFirstHeaderCard(key) != null) {
-                if (logger.isDebugEnabled()) logger.debug("Found RATING headercard.");
-            }
-            else {
-                inputParams.setKeywordInt(key, 0);
-                if (logger.isDebugEnabled()) logger.debug("Missing RATING keyword, added it with value 0.");
-            }
-
-            // add meta and convert headercard to keyword
-            // convert is mandatory to edit the value correctly
-            inputParams.addKeyword(KEYWORD_RATING);
-        }
-
+        // addKeyword will also convert headercard to keyword
+        inputParams.addKeyword(KEYWORD_RATING);
+        inputParams.setKeywordDefault(KEYWORD_RATING.getName(), 0);
+        
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
     }
