@@ -227,14 +227,8 @@ public class IRModel {
                         // TODO propose here to replace the previous loaded HDU
                         hdusToAdd.remove(hdu);
                     } else {
-                        if (MessagePane.showConfirmMessage("'" + tryName + "' HDU already exists in the available init images.\n "
-                                + "Do you agree to rename it '" + newName + "' ? \nElse it will be ignored.")) {
-                            logger.info("hduname '{}' already used, user accepted to rename to '{}'  ", hdu.getHduName(), newName);
-                            hdu.setHduName(newName);
-                        } else {
-                            hdusToAdd.remove(hdu);
-                            logger.info("hduname '{}' already used : user skip prefer to skip it ", hdu.getHduName());
-                        }
+                        logger.info("hduname '{}' already used, automatically renamed to '{}'.", hdu.getHduName(), newName);
+                        hdu.setHduName(newName);
                     }
                     break;
                 }
