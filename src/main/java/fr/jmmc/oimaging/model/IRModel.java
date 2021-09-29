@@ -16,7 +16,9 @@ import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
+import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
@@ -42,6 +44,8 @@ public class IRModel {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(IRModel.class);
+
+    public final static KeywordMeta KEYWORD_RATING = new KeywordMeta("RATING", "User rating of the result", Types.TYPE_INT);
 
     /* Members */
     /** Selected algorithm */
@@ -478,11 +482,19 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
+            postProcessOIFitsFile(serviceResult.getOifitsFile());
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
         }
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    /** Add some OIMaging specific keywords in the OIFitsFile.
+     * @param oiFitsFile required.
+     */
+    private static void postProcessOIFitsFile (final OIFitsFile oiFitsFile) {
+        oiFitsFile.getImageOiData().getOutputParam().addKeyword(KEYWORD_RATING);
     }
 
     public void removeServiceResult(ServiceResult serviceResultToDelete) {

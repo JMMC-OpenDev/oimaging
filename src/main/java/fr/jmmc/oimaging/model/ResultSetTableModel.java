@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.model.ColumnDesc;
 import static fr.jmmc.jmcs.model.ColumnDesc.CMP_COLUMNS;
 import fr.jmmc.jmcs.model.ColumnDescTableModel;
 import fr.jmmc.jmcs.util.NumberUtils;
+import static fr.jmmc.oimaging.model.IRModel.KEYWORD_RATING;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.fits.FitsTable;
@@ -18,11 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
-import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RATING;
 import fr.jmmc.oitools.model.OIFitsFile;
-import fr.jmmc.oitools.model.OIFitsWriter;
-import fr.nom.tam.fits.FitsException;
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -175,7 +172,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         }
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
         return columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())
-                || columnDesc.getName().equals(KEYWORD_RATING);
+                || columnDesc.getName().equals(KEYWORD_RATING.getName());
     }
 
     @Override
@@ -183,25 +180,11 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         final ServiceResult result = getServiceResult(rowIndex);
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
 
-        boolean fileMustBeOverwritten = false ;
-
         if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
             result.setComments((String) value);
         }
-        else if (columnDesc.getName().equals(KEYWORD_RATING)) {
-            setKeywordValue(result, OUTPUT_PARAM, KEYWORD_RATING, (Integer) value);
-            fileMustBeOverwritten = true;
-        }
-
-        // write changes to the OIFits result file
-        if (fileMustBeOverwritten) {
-            try {
-                OIFitsWriter.writeOIFits(result.getOifitsResultFile().getAbsolutePath(), result.getOifitsFile());
-                logger.debug("Overwritten file from ResultSetTableMode.setValueAt function.");
-            }
-            catch (IOException | FitsException e) {
-                logger.info("Could not overwrite OIFits result file: {}", e);
-            }
+        else if (columnDesc.getName().equals(KEYWORD_RATING.getName())) {
+            setKeywordValue(result, OUTPUT_PARAM, KEYWORD_RATING.getName(), (Integer) value);
         }
     }
 

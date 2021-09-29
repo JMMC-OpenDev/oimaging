@@ -10,10 +10,10 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.model.TableEditorPanel;
 import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.oimaging.Preferences;
+import static fr.jmmc.oimaging.model.IRModel.KEYWORD_RATING;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
-import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RATING;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
@@ -196,7 +196,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
     public void updateTableRenderers() {
         // update renderer since the TableColumn object is different
         try {
-            final TableColumn columnRating = jResultSetTable.getColumn(KEYWORD_RATING);
+            final TableColumn columnRating = jResultSetTable.getColumn(KEYWORD_RATING.getName());
             columnRating.setCellRenderer(ratingCell);
             columnRating.setCellEditor(ratingCell);
         } catch (IllegalArgumentException iae) {
