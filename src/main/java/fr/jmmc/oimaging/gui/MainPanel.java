@@ -84,6 +84,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private IRModel currentModel;
 
     private JSlider jSliderResults;
+    /** last slider index */
+    private int sliderResultLastIndex = -1;
 
     /**
      * Creates new form MainPanel
@@ -540,17 +542,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         add(jSplitPaneGlobal, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private int sliderResultLastIndex = -1;
-
     private void jSliderResultsStateChanged(ChangeEvent evt) {
         if (!syncingUI && jSliderResults.getValue() != -1) {
-            final int index = jSliderResults.getMaximum() - jSliderResults.getValue();
+            // get index in [0; n - 1]
+            final int index = jSliderResults.getValue() - 1;
 
             if (index != sliderResultLastIndex) {
                 sliderResultLastIndex = index;
-                // TODO: use table order, not result order ?
-                viewerPanel.displayResult(currentModel.getResultSets().get(index));
-                jTablePanel.setSelectedRow(index);
+                // changing selection will display the corresponding result image:
+                // note: use table order:
+                jTablePanel.setSelectedViewRow(index);
             }
         }
     }
@@ -581,8 +582,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         final int selected = jTablePanel.getSelectedRowsCount();
 
         if (selected == 0) {
-            // TODO: use table order, not result order ?
-            viewerPanel.displayGrid(currentModel.getResultSets());
+            // select all results in table:
+            jTablePanel.setSelectedViewAll();
+            // note: use table order:
+            viewerPanel.displayGrid(jTablePanel.getSelectedRows());
         } else if (selected == 1) {
             viewerPanel.displayResult(jTablePanel.getSelectedRow());
         } else {
@@ -818,6 +821,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
             // model result list:
             final List<ServiceResult> modelResults = currentModel.getResultSets();
+            final ServiceResult lastResult = currentModel.getLastResultSet();
 
             // resultSet Table
             jTablePanel.setResults(modelResults);
@@ -872,7 +876,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 viewerPanel.displayModel(currentModel);
             } else {
                 showTablePanel(true);
-                jTablePanel.setSelectedRow(0);
+                jTablePanel.setSelectedRow(lastResult);
             }
         } finally {
             syncingUI = false;

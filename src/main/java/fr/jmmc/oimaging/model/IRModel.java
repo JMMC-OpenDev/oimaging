@@ -476,6 +476,11 @@ public class IRModel {
         MessagePane.showErrorMessage((executionLog != null) ? (prefixMessage + "\n\n" + executionLog) : prefixMessage, e);
     }
 
+    public ServiceResult getLastResultSet() {
+        // last results is added at the beginning:
+        return (getResultSets().isEmpty()) ? null : getResultSets().get(0);
+    }
+
     public void addServiceResult(ServiceResult serviceResult) {
         loadLog(serviceResult);
         // Load result:
@@ -486,6 +491,7 @@ public class IRModel {
         } catch (IOException ioe) {
             logger.error("Can't get imageHDU from result oifile", ioe);
         }
+        // last results is added at the beginning:
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {

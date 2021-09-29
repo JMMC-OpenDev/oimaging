@@ -309,12 +309,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
         final List<ServiceResult> results = getSelectedRows();
         return (results.isEmpty()) ? null : results.get(0);
     }
-
-    public void setSelectedRow(final int rowIndex) {
-        final int index = resultSetTableSorter.viewIndex(rowIndex);
-        getTable().setRowSelectionInterval(index, index);
-    }
-
+    
     public void setSelectedRow(final ServiceResult result) {
         if (result != null) {
             int modelIndex = -1;
@@ -325,8 +320,24 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
                 }
             }
             if (modelIndex != -1) {
-                setSelectedRow(modelIndex);
+                setSelectedModelRow(modelIndex);
             }
+        }
+    }
+
+    private void setSelectedModelRow(final int modelIndex) {
+        final int viewIndex = resultSetTableSorter.viewIndex(modelIndex);
+        setSelectedViewRow(viewIndex);
+    }
+
+    public void setSelectedViewRow(final int viewIndex) {
+        getTable().setRowSelectionInterval(viewIndex, viewIndex);
+    }
+
+    public void setSelectedViewAll() {
+        final int length = resultSetTableModel.getRowCount();
+        if (length > 0) {
+            getTable().setRowSelectionInterval(0, length - 1);
         }
     }
 
