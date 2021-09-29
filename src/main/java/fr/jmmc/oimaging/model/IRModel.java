@@ -133,12 +133,23 @@ public class IRModel {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName());
         }
 
-        // avoid null service
-        if (getSelectedService() == null) {
-            // Note: setSelectedService() calls initSpecificParams():
-            setSelectedService(ServiceList.getPreferedService());
+        // try to guess and set service
+        Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
+        if (service == null) {
+            // avoid null service
+            if (getSelectedService() == null) {
+                // Note: setSelectedService() calls initSpecificParams():
+                setSelectedService(ServiceList.getPreferedService());
+            } else {
+                initSpecificParams(false);
+            }
         } else {
-            initSpecificParams(false);
+            if ((getSelectedService() == null) || (!service.getProgram().equals(getSelectedService().getProgram()))) {
+                // Note: setSelectedService() calls initSpecificParams():
+                setSelectedService(service);
+            } else {
+                initSpecificParams(false);
+            }
         }
     }
 
