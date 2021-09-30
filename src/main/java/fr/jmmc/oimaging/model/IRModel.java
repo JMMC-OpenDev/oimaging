@@ -16,6 +16,7 @@ import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import fr.jmmc.oitools.image.ImageOiOutputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.meta.Types;
@@ -494,7 +495,9 @@ public class IRModel {
      * @param oiFitsFile required.
      */
     private static void postProcessOIFitsFile (final OIFitsFile oiFitsFile) {
-        oiFitsFile.getImageOiData().getOutputParam().addKeyword(KEYWORD_RATING);
+        ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
+        outputParams.addKeyword(KEYWORD_RATING);
+        outputParams.setKeywordDefault(KEYWORD_RATING.getName(), 0);
     }
 
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
