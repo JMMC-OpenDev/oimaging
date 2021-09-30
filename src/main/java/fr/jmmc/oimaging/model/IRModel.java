@@ -47,6 +47,8 @@ public class IRModel {
     private static final Logger logger = LoggerFactory.getLogger(IRModel.class);
 
     public final static KeywordMeta KEYWORD_RATING = new KeywordMeta("RATING", "User rating of the result", Types.TYPE_INT);
+    public final static KeywordMeta KEYWORD_START_DATE = new KeywordMeta("STRTDATE", "Starting date of the run", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_END_DATE = new KeywordMeta("ENDDATE", "Ending date of the run", Types.TYPE_CHAR);
 
     /* Members */
     /** Selected algorithm */
@@ -483,7 +485,7 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
-            postProcessOIFitsFile(serviceResult.getOifitsFile());
+            postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
         }
 
@@ -492,12 +494,21 @@ public class IRModel {
     }
 
     /** Add some OIMaging specific keywords in the OIFitsFile.
-     * @param oiFitsFile required.
+     * @param serviceResult required. serviceResult.getOiFitsFile() must not return null.
      */
-    private static void postProcessOIFitsFile (final OIFitsFile oiFitsFile) {
+    private static void postProcessOIFitsFile (final ServiceResult serviceResult) {
+        final OIFitsFile oiFitsFile = serviceResult.getOifitsFile();
+
         ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
+
         outputParams.addKeyword(KEYWORD_RATING);
-        outputParams.setKeywordDefault(KEYWORD_RATING.getName(), 0);
+        outputParams.setKeywordDefaultInt(KEYWORD_RATING.getName(), 0);
+
+        outputParams.addKeyword(KEYWORD_START_DATE);
+        outputParams.setKeywordDefault(KEYWORD_START_DATE.getName(), serviceResult.getStartTime().toInstant().toString());
+
+        outputParams.addKeyword(KEYWORD_END_DATE);
+        outputParams.setKeywordDefault(KEYWORD_END_DATE.getName(), serviceResult.getEndTime().toInstant().toString());
     }
 
     public void removeServiceResult(ServiceResult serviceResultToDelete) {

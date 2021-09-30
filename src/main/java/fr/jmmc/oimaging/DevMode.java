@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging;
 
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
@@ -17,10 +18,12 @@ import static fr.jmmc.oimaging.services.ServiceResult.LOG_FILE_EXT;
 import static fr.jmmc.oimaging.services.ServiceResult.RESULT_FILE_EXT;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.fits.FitsTable;
+import fr.jmmc.oitools.image.ImageOiOutputParam;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,7 +33,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Activate tools for easier developing. 
+/** Activate tools for easier developing.
  * example add ServiceResults without needing to launch run.
  */
 public class DevMode {
@@ -48,7 +51,7 @@ public class DevMode {
         listSR.forEach(DevMode::craftServiceResult);
     }
 
-    /** 
+    /**
      * Search in directory (currently ~/.jmmc-devmode/) the ServiceResult files.
      * Files with extension .fits are all read
      * if "file1.output.fits" exists, "file1.log.txt" is searched as execution log file
@@ -105,8 +108,8 @@ public class DevMode {
         return listSR;
     }
 
-    /** 
-     * Craft a ServiceResult that is got not from a run but from files, and add the ServiceResult 
+    /**
+     * Craft a ServiceResult that is got not from a run but from files, and add the ServiceResult
      * @param serviceResult required
      */
     private static void craftServiceResult(ServiceResult serviceResult) {
@@ -135,11 +138,28 @@ public class DevMode {
 
         IRModelManager.getInstance().getIRModel().addServiceResult(serviceResult);
 
+        // must be called AFTER IRModel.addServiceResult().
+        // that function will update keywords used here
+        OIFitsFile oiFitsFile = serviceResult.getOifitsFile();
+        if (oiFitsFile != null) {
+            ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
+
+            String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
+            if (strStartDate != null) {
+                serviceResult.setStartTime(Date.from(Instant.parse(strStartDate)));
+            }
+
+            String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
+            if (strEndDate != null) {
+                serviceResult.setEndTime(Date.from(Instant.parse(strEndDate)));
+            }
+        }
+
         logger.info("Added one ServiceResult for '{}'", serviceResult.getOifitsResultFile());
     }
 
-    /** 
-     * Find the Service program from information in an OIFitsFile 
+    /**
+     * Find the Service program from information in an OIFitsFile
      * @param oiFitsFile required
      * @return the program or null if could not find information
      */
@@ -157,7 +177,7 @@ public class DevMode {
                 }
             }
 
-            // Attempt 2: looking for known specific keywords 
+            // Attempt 2: looking for known specific keywords
             // guessing WISARD program from SOFTWARE=WISARD output header card
             if (outputFitsTable.hasHeaderCards()) {
                 FitsHeaderCard card = outputFitsTable.findFirstHeaderCard("SOFTWARE");
