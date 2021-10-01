@@ -8,23 +8,16 @@ import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
-import static fr.jmmc.oimaging.services.ServiceList.SERVICE_BSMEM;
-import static fr.jmmc.oimaging.services.ServiceList.SERVICE_MIRA;
-import static fr.jmmc.oimaging.services.ServiceList.SERVICE_SPARCO;
-import static fr.jmmc.oimaging.services.ServiceList.SERVICE_WISARD;
 import fr.jmmc.oimaging.services.ServiceResult;
 import static fr.jmmc.oimaging.services.ServiceResult.FITS_FILE_EXT;
 import static fr.jmmc.oimaging.services.ServiceResult.LOG_FILE_EXT;
 import static fr.jmmc.oimaging.services.ServiceResult.RESULT_FILE_EXT;
-import fr.jmmc.oitools.fits.FitsHeaderCard;
-import fr.jmmc.oitools.fits.FitsTable;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
-import static fr.jmmc.oitools.image.ImageOiParam.keywordDateFormat;
 import fr.jmmc.oitools.model.OIFitsFile;
+import fr.nom.tam.fits.FitsDate;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -146,86 +139,22 @@ public class DevMode {
 
             String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
             if (strStartDate != null) {
-                try { serviceResult.setStartTime(keywordDateFormat.parse(strStartDate)); }
-                catch (ParseException e) {
+                try { serviceResult.setStartTime(new FitsDate(strStartDate).toDate()); }
+                catch (FitsException e) {
                     logger.info("Could not parse the date {}.", strStartDate);
                 }
             }
 
             String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
             if (strEndDate != null) {
-                try { serviceResult.setEndTime(keywordDateFormat.parse(strEndDate)); }
-                catch (ParseException e) {
+                try { serviceResult.setEndTime(new FitsDate(strEndDate).toDate()); }
+                catch (FitsException e) {
                     logger.info("Could not parse the date {}.", strEndDate);
                 }
             }
         }
 
         logger.info("Added one ServiceResult for '{}'", serviceResult.getOifitsResultFile());
-    }
-
-    /**
-     * Find the Service program from information in an OIFitsFile
-     * @param oiFitsFile required
-     * @return the program or null if could not find information
-     */
-    private static String getProgramFromOiFitsFile(OIFitsFile oiFitsFile) {
-        if (oiFitsFile != null) {
-            FitsTable inputFitsTable = oiFitsFile.getImageOiData().getInputParam();
-            FitsTable outputFitsTable = oiFitsFile.getImageOiData().getOutputParam();
-
-            // Attempt 1: looking for a ALGORITHM output param
-            // TODO: there will be a ResultSetTableModel.getKeywordValue method in a future merge, maybe use it here
-            if (outputFitsTable.hasKeywordMeta("ALGORITHM")) {
-                Object algoValue = outputFitsTable.getKeywordValue("ALGORITHM");
-                if (algoValue instanceof String) {
-                    return (String) algoValue;
-                }
-            }
-
-            // Attempt 2: looking for known specific keywords
-            // guessing WISARD program from SOFTWARE=WISARD output header card
-            if (outputFitsTable.hasHeaderCards()) {
-                FitsHeaderCard card = outputFitsTable.findFirstHeaderCard("SOFTWARE");
-                if (card != null) {
-                    Object softwareValue = card.parseValue();
-                    if (softwareValue instanceof String) {
-                        String softwareStr = (String) softwareValue;
-                        if (softwareStr.equals(SERVICE_WISARD)) {
-                            return SERVICE_WISARD;
-                        }
-                    }
-                }
-            }
-
-            // guessing BSMEM program from presence of INITFLUX input header card
-            if (inputFitsTable.hasHeaderCards()) {
-                FitsHeaderCard card = inputFitsTable.findFirstHeaderCard("INITFLUX");
-                if (card != null) {
-                    return SERVICE_BSMEM;
-                }
-            }
-
-            // guessing SPARCO program from presence of SPEC0 input header card
-            if (inputFitsTable.hasHeaderCards()) {
-                FitsHeaderCard card = inputFitsTable.findFirstHeaderCard("SPEC0");
-                if (card != null) {
-                    return SERVICE_SPARCO;
-                }
-            }
-
-            // guessing MIRA program from presence of SMEAR_FN input header card and absence of SPEC0
-            if (inputFitsTable.hasHeaderCards()) {
-                FitsHeaderCard card = inputFitsTable.findFirstHeaderCard("SMEAR_FN");
-                if (card != null) {
-                    card = inputFitsTable.findFirstHeaderCard("SPEC0");
-                    if (card == null) {
-                        return SERVICE_MIRA;
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     private DevMode() {

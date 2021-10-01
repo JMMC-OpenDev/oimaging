@@ -17,7 +17,6 @@ import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
-import static fr.jmmc.oitools.image.ImageOiParam.keywordDateFormat;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.meta.Types;
@@ -26,6 +25,7 @@ import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.jmmc.oitools.model.range.Range;
+import fr.nom.tam.fits.FitsDate;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
@@ -523,10 +523,14 @@ public class IRModel {
         outputParams.setKeywordDefaultInt(KEYWORD_RATING.getName(), 0);
 
         outputParams.addKeyword(KEYWORD_START_DATE);
-        outputParams.setKeywordDefault(KEYWORD_START_DATE.getName(), keywordDateFormat.format(serviceResult.getStartTime()));
+        if (outputParams.getKeyword(KEYWORD_START_DATE.getName()) == null) {
+            outputParams.setKeyword(KEYWORD_START_DATE.getName(), FitsDate.getFitsDateString(serviceResult.getStartTime()));
+        }
 
         outputParams.addKeyword(KEYWORD_END_DATE);
-        outputParams.setKeywordDefault(KEYWORD_END_DATE.getName(), keywordDateFormat.format(serviceResult.getEndTime()));
+        if (outputParams.getKeyword(KEYWORD_END_DATE.getName()) == null) {
+            outputParams.setKeyword(KEYWORD_END_DATE.getName(), FitsDate.getFitsDateString(serviceResult.getEndTime()));
+        }
     }
 
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
