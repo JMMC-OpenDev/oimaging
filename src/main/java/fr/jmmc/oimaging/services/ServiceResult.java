@@ -31,9 +31,6 @@ public final class ServiceResult {
     private Date startTime;
     private Date endTime;
 
-    // User appreciation attribute
-    private String comments;
-
     private Service service;
 
     // Post process cached data
@@ -76,7 +73,6 @@ public final class ServiceResult {
     }
 
     private void init() {
-        this.comments = "No comments";
         setStartTime(new Date());
     }
 
@@ -115,10 +111,6 @@ public final class ServiceResult {
 
     public String getExecutionLog() {
         return executionLog;
-    }
-
-    public String getComments() {
-        return comments;
     }
 
     public boolean isCancelled() {
@@ -167,10 +159,6 @@ public final class ServiceResult {
 
     public void setService(Service service) {
         this.service = service;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
     }
 
 }

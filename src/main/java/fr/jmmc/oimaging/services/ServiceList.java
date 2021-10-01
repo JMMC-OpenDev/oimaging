@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging.services;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.services.software.SoftwareInputParam;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.fits.FitsTable;
@@ -101,8 +102,8 @@ public final class ServiceList {
         return null;
     }
 
-    /** 
-     * Find the Service program from information in an OIFitsFile 
+    /**
+     * Find the Service program from information in an OIFitsFile
      * @param oiFitsFile required
      * @return the program or null if could not find information
      */
@@ -112,14 +113,14 @@ public final class ServiceList {
 
             // Attempt 1: looking for a ALGORITHM output param
             // TODO: there will be a ResultSetTableModel.getKeywordValue method in a future merge, maybe use it here
-            if (outputFitsTable.hasKeywordMeta("ALGORITHM")) {
-                Object algoValue = outputFitsTable.getKeywordValue("ALGORITHM");
+            if (outputFitsTable.hasKeywordMeta(IRModel.KEYWORD_ALGORITHM.getName())) {
+                Object algoValue = outputFitsTable.getKeywordValue(IRModel.KEYWORD_ALGORITHM.getName());
                 if (algoValue instanceof String) {
                     return (String) algoValue;
                 }
             }
 
-            // Attempt 2: looking for known specific keywords 
+            // Attempt 2: looking for known specific keywords
             // guessing WISARD program from SOFTWARE=WISARD output header card
             if (outputFitsTable.hasHeaderCards()) {
                 FitsHeaderCard card = outputFitsTable.findFirstHeaderCard("SOFTWARE");

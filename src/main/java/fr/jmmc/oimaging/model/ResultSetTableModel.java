@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.model.ColumnDesc;
 import static fr.jmmc.jmcs.model.ColumnDesc.CMP_COLUMNS;
 import fr.jmmc.jmcs.model.ColumnDescTableModel;
 import fr.jmmc.jmcs.util.NumberUtils;
+import static fr.jmmc.oimaging.model.IRModel.KEYWORD_OIMAGING_COMMENT;
 import static fr.jmmc.oimaging.model.IRModel.KEYWORD_RATING;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
@@ -125,10 +126,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         switch (columnDesc.getSource()) {
             case HARD_CODED:
                 switch (HardCodedColumn.valueOf(columnDesc.getName())) {
-                    case ALGORITHM:
-                        return result.getService().getProgram();
-                    case COMMENTS:
-                        return result.getComments();
                     case FILE:
                         return result.getInputFile().getName();
                     case INDEX:
@@ -171,7 +168,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
             return false;
         }
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
-        return columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())
+        return columnDesc.getName().equals(KEYWORD_OIMAGING_COMMENT.getName())
                 || columnDesc.getName().equals(KEYWORD_RATING.getName());
     }
 
@@ -180,8 +177,11 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         final ServiceResult result = getServiceResult(rowIndex);
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
 
-        if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
-            result.setComments((String) value);
+        if (columnDesc.getName().equals(KEYWORD_OIMAGING_COMMENT.getName())) {
+            String str = (String) value;
+            setKeywordValue(
+                    result, OUTPUT_PARAM, KEYWORD_OIMAGING_COMMENT.getName(),
+                    str.substring(0, Math.min(70, str.length())));
         }
         else if (columnDesc.getName().equals(KEYWORD_RATING.getName())) {
             setKeywordValue(result, OUTPUT_PARAM, KEYWORD_RATING.getName(), (Integer) value);
@@ -277,8 +277,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
      * Enum for HardCoded Columns wrapping ColumnDesc
      */
     public enum HardCodedColumn {
-        ALGORITHM(String.class, "Algorithm"),
-        COMMENTS(String.class, "Comments"),
         FILE(String.class, "File"),
         INDEX(Integer.class, "Index"),
         JOB_DURATION(Double.class, "Job duration"),
