@@ -129,8 +129,7 @@ public class DevMode {
         serviceResult.setEndTime(new Date());
 
         // try to guess and set service
-        String serviceName = getProgramFromOiFitsFile(serviceResult.getOifitsFile());
-        Service service = ServiceList.getAvailableService(serviceName);
+        final Service service = ServiceList.getServiceFromOIFitsFile(serviceResult.getOifitsFile());
         if (service == null) {
             serviceResult.setService(ServiceList.getPreferedService());
         } else {

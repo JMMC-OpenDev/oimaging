@@ -141,12 +141,23 @@ public class IRModel {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName());
         }
 
-        // avoid null service
-        if (getSelectedService() == null) {
-            // Note: setSelectedService() calls initSpecificParams():
-            setSelectedService(ServiceList.getPreferedService());
+        // try to guess and set service
+        Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
+        if (service == null) {
+            // avoid null service
+            if (getSelectedService() == null) {
+                // Note: setSelectedService() calls initSpecificParams():
+                setSelectedService(ServiceList.getPreferedService());
+            } else {
+                initSpecificParams(false);
+            }
         } else {
-            initSpecificParams(false);
+            if ((getSelectedService() == null) || (!service.getProgram().equals(getSelectedService().getProgram()))) {
+                // Note: setSelectedService() calls initSpecificParams():
+                setSelectedService(service);
+            } else {
+                initSpecificParams(false);
+            }
         }
     }
 
@@ -473,6 +484,11 @@ public class IRModel {
         MessagePane.showErrorMessage((executionLog != null) ? (prefixMessage + "\n\n" + executionLog) : prefixMessage, e);
     }
 
+    public ServiceResult getLastResultSet() {
+        // last results is added at the beginning:
+        return (getResultSets().isEmpty()) ? null : getResultSets().get(0);
+    }
+
     public void addServiceResult(ServiceResult serviceResult) {
         loadLog(serviceResult);
         // Load result:
@@ -483,6 +499,7 @@ public class IRModel {
         } catch (IOException ioe) {
             logger.error("Can't get imageHDU from result oifile", ioe);
         }
+        // last results is added at the beginning:
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {

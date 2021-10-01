@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.FeedbackReport;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.FileChooser;
+import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
@@ -189,6 +190,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // init Param Tables
             ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getOutputParam());
             ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(imageOiData.getInputParam());
+            
+            AutofitTableColumns.autoResizeTable(jTableOutputParamKeywords, true, true); // include header width
+            AutofitTableColumns.autoResizeTable(jTableInputParamKeywords, true, true); // include header width
+            
         } else {
             jPanelOIFits.remove(oifitsViewPanel);
             // reset Param Tables
@@ -615,7 +620,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelOutputParamViewer.add(jLabelOutput, gridBagConstraints);
 
+        jScrollPaneTableOutput.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
         jTableOutputParamKeywords.setModel(new KeywordsTableModel());
+        jTableOutputParamKeywords.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jScrollPaneTableOutput.setViewportView(jTableOutputParamKeywords);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -635,7 +643,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelOutputParamViewer.add(jLabelInput, gridBagConstraints);
 
+        jScrollPaneTableInput.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
         jTableInputParamKeywords.setModel(new KeywordsTableModel());
+        jTableInputParamKeywords.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jScrollPaneTableInput.setViewportView(jTableInputParamKeywords);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

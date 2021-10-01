@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.4 beta 4"/>
-    <compilation date="28/09/2021" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.5.4 beta 5"/>
+    <compilation date="30/09/2021" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -155,7 +155,11 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Tue, 28 Sep 2021 14:00:00 GMT</pubDate>
+            <pubDate>Wed, 29 Sep 2021 14:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 5">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1065">Fixed loading OIFits file to guess the service and restore input parameters</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/946">Always rename HDU without asking the user when several images have the same HDU_NAME keyword</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 4">
                 <change type="FEATURE">Fixed layout issues (left panel and view panels)</change>
             </prerelease>
