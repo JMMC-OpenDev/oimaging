@@ -19,11 +19,12 @@ import static fr.jmmc.oimaging.services.ServiceResult.RESULT_FILE_EXT;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.fits.FitsTable;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
+import static fr.jmmc.oitools.image.ImageOiParam.keywordDateFormat;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -146,12 +147,18 @@ public class DevMode {
 
             String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
             if (strStartDate != null) {
-                serviceResult.setStartTime(Date.from(Instant.parse(strStartDate)));
+                try { serviceResult.setStartTime(keywordDateFormat.parse(strStartDate)); }
+                catch (ParseException e) {
+                    logger.info("Could not parse the date {}.", strStartDate);
+                }
             }
 
             String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
             if (strEndDate != null) {
-                serviceResult.setEndTime(Date.from(Instant.parse(strEndDate)));
+                try { serviceResult.setEndTime(keywordDateFormat.parse(strEndDate)); }
+                catch (ParseException e) {
+                    logger.info("Could not parse the date {}.", strEndDate);
+                }
             }
         }
 

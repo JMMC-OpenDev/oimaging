@@ -17,6 +17,7 @@ import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
+import static fr.jmmc.oitools.image.ImageOiParam.keywordDateFormat;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.meta.Types;
@@ -505,10 +506,10 @@ public class IRModel {
         outputParams.setKeywordDefaultInt(KEYWORD_RATING.getName(), 0);
 
         outputParams.addKeyword(KEYWORD_START_DATE);
-        outputParams.setKeywordDefault(KEYWORD_START_DATE.getName(), serviceResult.getStartTime().toInstant().toString());
+        outputParams.setKeywordDefault(KEYWORD_START_DATE.getName(), keywordDateFormat.format(serviceResult.getStartTime()));
 
         outputParams.addKeyword(KEYWORD_END_DATE);
-        outputParams.setKeywordDefault(KEYWORD_END_DATE.getName(), serviceResult.getEndTime().toInstant().toString());
+        outputParams.setKeywordDefault(KEYWORD_END_DATE.getName(), keywordDateFormat.format(serviceResult.getEndTime()));
     }
 
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
