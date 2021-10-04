@@ -118,9 +118,6 @@ public class DevMode {
         }
         // note: serviceResult may be invalid
 
-        // Temporary hack: the timestamp will have little meaning but it is better than no value
-        serviceResult.setEndTime(new Date());
-
         // try to guess and set service
         final Service service = ServiceList.getServiceFromOIFitsFile(serviceResult.getOifitsFile());
         if (service == null) {
@@ -137,24 +134,32 @@ public class DevMode {
         if (oiFitsFile != null) {
             ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
 
-            String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
-            if (strStartDate != null) {
-                try { serviceResult.setStartTime(new FitsDate(strStartDate).toDate()); }
-                catch (FitsException e) {
-                    logger.info("Could not parse the date {}.", strStartDate);
-                }
-            }
+            final String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
+            final Date startDate = parseKeywordDate(strStartDate);
+            if (startDate != null) serviceResult.setStartTime(startDate);
 
-            String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
-            if (strEndDate != null) {
-                try { serviceResult.setEndTime(new FitsDate(strEndDate).toDate()); }
-                catch (FitsException e) {
-                    logger.info("Could not parse the date {}.", strEndDate);
-                }
-            }
+            final String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
+            final Date endDate = parseKeywordDate(strEndDate);
+            if (endDate != null) serviceResult.setEndTime(endDate);
         }
 
         logger.info("Added one ServiceResult for '{}'", serviceResult.getOifitsResultFile());
+    }
+
+    /** Parse the date contained in a keyword (and supposedly stored in FitsDate format).
+     *
+     * @param keywordDate optional. content can be unparsable.
+     * @return Date if parsing successful. null if parsing failed or keywordDate null.
+     */
+    private static Date parseKeywordDate (String keywordDate) {
+        if (keywordDate == null) return null;
+        try {
+            return new FitsDate(keywordDate).toDate();
+        }
+        catch (FitsException e) {
+            logger.info("Could not parse the date {}.", keywordDate);
+            return null;
+        }
     }
 
     private DevMode() {

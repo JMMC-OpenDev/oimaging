@@ -111,10 +111,10 @@ public final class ServiceList {
         if (oiFitsFile != null) {
             final FitsTable outputFitsTable = oiFitsFile.getImageOiData().getOutputParam();
 
-            // Attempt 1: looking for a ALGORITHM output param
+            // Attempt 1: looking for a SOFTWARE output param
             // TODO: there will be a ResultSetTableModel.getKeywordValue method in a future merge, maybe use it here
-            if (outputFitsTable.hasKeywordMeta(IRModel.KEYWORD_ALGORITHM.getName())) {
-                Object algoValue = outputFitsTable.getKeywordValue(IRModel.KEYWORD_ALGORITHM.getName());
+            if (outputFitsTable.hasKeywordMeta(IRModel.KEYWORD_SOFTWARE.getName())) {
+                Object algoValue = outputFitsTable.getKeywordValue(IRModel.KEYWORD_SOFTWARE.getName());
                 if (algoValue instanceof String) {
                     return (String) algoValue;
                 }

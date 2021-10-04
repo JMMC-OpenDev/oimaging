@@ -28,8 +28,17 @@ public final class ServiceResult {
     private boolean cancelled = false;
     private boolean valid = false;
     private String errorMessage = null;
+    /** must be kept in sync with STRTDATE keyword in the OIFitsFile. */
     private Date startTime;
+    /** must be kept in sync with ENDDATE keyword in the OIFitsFile. */
     private Date endTime;
+
+    /** computed property : endTime - startTime.
+     * To avoid computing it every UI refresh.
+     * Must be recomputed if startTime/endTime changes.
+     * Unit is second.
+     */
+    private double jobDuration;
 
     private Service service;
 
@@ -61,19 +70,12 @@ public final class ServiceResult {
      * thus they are not necessarily temp files.
      */
     public ServiceResult(File inputFile, File oifitsResultFile, File executionLogResultFile) {
-
-        // we cannot call this(inputFile) because oiFitsResultFile is final thus we cannot assign it twice
         this.inputFile = inputFile;
         this.oifitsResultFile = oifitsResultFile;
         this.executionLogResultFile = executionLogResultFile;
-
+        this.startTime = new Date();
+        this.jobDuration = 0;
         logger.debug("new ServiceResult({}, {}, {})", inputFile, oifitsResultFile, executionLogResultFile);
-
-        init();
-    }
-
-    private void init() {
-        setStartTime(new Date());
     }
 
     public File getInputFile() {
@@ -147,10 +149,19 @@ public final class ServiceResult {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+        computeJobDuration();
     }
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+        computeJobDuration();
+    }
+
+    public double getJobDuration () { return jobDuration; }
+
+    private void computeJobDuration () {
+        if (startTime == null || endTime == null) jobDuration = 0;
+        else jobDuration = (endTime.getTime() - startTime.getTime()) / 1000D;
     }
 
     public Service getService() {

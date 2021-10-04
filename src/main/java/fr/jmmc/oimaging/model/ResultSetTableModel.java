@@ -6,11 +6,8 @@ package fr.jmmc.oimaging.model;
 import fr.jmmc.jmcs.model.ColumnDesc;
 import static fr.jmmc.jmcs.model.ColumnDesc.CMP_COLUMNS;
 import fr.jmmc.jmcs.model.ColumnDescTableModel;
-import fr.jmmc.jmcs.util.NumberUtils;
-import static fr.jmmc.oimaging.model.IRModel.KEYWORD_END_DATE;
 import static fr.jmmc.oimaging.model.IRModel.KEYWORD_OIMAGING_COMMENT;
 import static fr.jmmc.oimaging.model.IRModel.KEYWORD_RATING;
-import static fr.jmmc.oimaging.model.IRModel.KEYWORD_START_DATE;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.fits.FitsTable;
@@ -23,9 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
 import fr.jmmc.oitools.model.OIFitsFile;
-import fr.nom.tam.fits.FitsDate;
-import fr.nom.tam.fits.FitsException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -128,7 +122,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
 
         final FitsTable inputParam, outputParam;
-        final String strStartTime, strEndTime;
 
         switch (columnDesc.getSource()) {
             case HARD_CODED:
@@ -138,23 +131,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
                     case INDEX:
                         return getRowCount() - rowIndex;
                     case JOB_DURATION:
-                        outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
-                        strStartTime = (String) getKeywordValue(outputParam, KEYWORD_START_DATE.getName());
-                        strEndTime = (String) getKeywordValue(outputParam, KEYWORD_END_DATE.getName());
-                        try {
-                            long endTime = new FitsDate(strEndTime).toDate().toInstant().toEpochMilli();
-                            long startTime = new FitsDate(strStartTime).toDate().toInstant().toEpochMilli();
-                            return NumberUtils.trimTo3Digits((endTime - startTime) / 1000.0);
-                        }
-                        catch (FitsException e) { logger.info("Could not parse date found in keyword."); }
-                        break;
-                    case JOB_TIMESTAMP:
-                        outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
-                        strEndTime = (String) getKeywordValue(outputParam, KEYWORD_END_DATE.getName());
-                        try {
-                            return new FitsDate(strEndTime).toDate();
-                        }
-                        catch (FitsException e) { logger.info("Could not parse date found in keyword."); }
+                        return result.getJobDuration();
                     case SUCCESS:
                         return result.isValid();
                 }
@@ -297,7 +274,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         FILE(String.class, "File"),
         INDEX(Integer.class, "Index"),
         JOB_DURATION(Double.class, "Job duration"),
-        JOB_TIMESTAMP(Date.class, "Job timestamp"),
         SUCCESS(Boolean.class, "Success");
 
         private final ColumnDesc columnDesc;
