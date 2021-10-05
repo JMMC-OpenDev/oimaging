@@ -4,6 +4,8 @@
 package fr.jmmc.oimaging;
 
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.jmcs.util.StringUtils;
+import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
@@ -11,6 +13,9 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import static fr.jmmc.oimaging.services.ServiceResult.FITS_FILE_EXT;
 import static fr.jmmc.oimaging.services.ServiceResult.LOG_FILE_EXT;
 import static fr.jmmc.oimaging.services.ServiceResult.RESULT_FILE_EXT;
+import fr.jmmc.oitools.image.ImageOiOutputParam;
+import fr.jmmc.oitools.model.OIFitsFile;
+import fr.nom.tam.fits.FitsDate;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +28,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Activate tools for easier developing. 
+/** Activate tools for easier developing.
  * example add ServiceResults without needing to launch run.
  */
 public class DevMode {
@@ -41,7 +46,7 @@ public class DevMode {
         listSR.forEach(DevMode::craftServiceResult);
     }
 
-    /** 
+    /**
      * Search in directory (currently ~/.jmmc-devmode/) the ServiceResult files.
      * Files with extension .fits are all read
      * if "file1.output.fits" exists, "file1.log.txt" is searched as execution log file
@@ -98,8 +103,8 @@ public class DevMode {
         return listSR;
     }
 
-    /** 
-     * Craft a ServiceResult that is got not from a run but from files, and add the ServiceResult 
+    /**
+     * Craft a ServiceResult that is got not from a run but from files, and add the ServiceResult
      * @param serviceResult required
      */
     private static void craftServiceResult(ServiceResult serviceResult) {
@@ -114,9 +119,6 @@ public class DevMode {
         }
         // note: serviceResult may be invalid
 
-        // Temporary hack: the timestamp will have little meaning but it is better than no value
-        serviceResult.setEndTime(new Date());
-
         // try to guess and set service
         final Service service = ServiceList.getServiceFromOIFitsFile(serviceResult.getOifitsFile());
         if (service == null) {
@@ -127,7 +129,36 @@ public class DevMode {
 
         IRModelManager.getInstance().getIRModel().addServiceResult(serviceResult);
 
+        // must be called AFTER IRModel.addServiceResult().
+        // that function will update keywords used here
+        OIFitsFile oiFitsFile = serviceResult.getOifitsFile();
+        if (oiFitsFile != null) {
+            ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
+
+            final String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
+            serviceResult.setStartTime(parseKeywordDate(strStartDate));
+
+            final String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
+            serviceResult.setEndTime(parseKeywordDate(strEndDate));
+        }
+
         logger.info("Added one ServiceResult for '{}'", serviceResult.getOifitsResultFile());
+    }
+
+    /** Parse the date contained in a keyword (and supposedly stored in FitsDate format).
+     *
+     * @param keywordDate optional. content can be unparsable.
+     * @return Date if parsing successful. null if parsing failed or keywordDate null.
+     */
+    private static Date parseKeywordDate(String keywordDate) {
+        if (!StringUtils.isEmpty(keywordDate)) {
+            try {
+                return new FitsDate(keywordDate).toDate();
+            } catch (FitsException e) {
+                logger.info("Could not parse the date {}.", keywordDate);
+            }
+        }
+        return null;
     }
 
     private DevMode() {

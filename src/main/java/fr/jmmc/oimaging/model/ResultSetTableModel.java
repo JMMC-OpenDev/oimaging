@@ -6,7 +6,8 @@ package fr.jmmc.oimaging.model;
 import fr.jmmc.jmcs.model.ColumnDesc;
 import static fr.jmmc.jmcs.model.ColumnDesc.CMP_COLUMNS;
 import fr.jmmc.jmcs.model.ColumnDescTableModel;
-import fr.jmmc.jmcs.util.NumberUtils;
+import static fr.jmmc.oimaging.model.IRModel.KEYWORD_OIMAGING_COMMENT;
+import static fr.jmmc.oimaging.model.IRModel.KEYWORD_RATING;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
 import fr.jmmc.oitools.fits.FitsTable;
@@ -18,7 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.oitools.fits.FitsUtils;
-import java.util.Date;
+import fr.jmmc.oitools.model.OIFitsFile;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         results = new ArrayList<>();
     }
 
-    /** 
+    /**
      * Update results, then also updates columns (they depend on results)
      * @param results list of results
      * @param allColumnNames all column names
@@ -120,40 +121,30 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         final ServiceResult result = getServiceResult(rowIndex);
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
 
+        final FitsTable inputParam, outputParam;
+
         switch (columnDesc.getSource()) {
             case HARD_CODED:
                 switch (HardCodedColumn.valueOf(columnDesc.getName())) {
-                    case ALGORITHM:
-                        return result.getService().getProgram();
-                    case COMMENTS:
-                        return result.getComments();
                     case FILE:
                         return result.getInputFile().getName();
                     case INDEX:
                         return getRowCount() - rowIndex;
                     case JOB_DURATION:
-                        if (result.getEndTime() != null) {
-                            final long duration = (result.getEndTime().getTime() - result.getStartTime().getTime());
-                            return NumberUtils.trimTo3Digits(duration / 1000.0);
-                        }
-                        break;
-                    case JOB_TIMESTAMP:
-                        return (result.getEndTime() != null) ? result.getEndTime() : result.getStartTime();
-                    case RATING:
-                        return result.getRating();
+                        return result.getJobDuration();
                     case SUCCESS:
                         return result.isValid();
                 }
                 break;
             case INPUT_PARAM:
                 if (result.getOifitsFile() != null) {
-                    final FitsTable inputParam = result.getOifitsFile().getImageOiData().getInputParam();
+                    inputParam = result.getOifitsFile().getImageOiData().getInputParam();
                     return getKeywordValue(inputParam, columnDesc.getName());
                 }
                 break;
             case OUTPUT_PARAM:
                 if (result.getOifitsFile() != null) {
-                    final FitsTable outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
+                    outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
                     return getKeywordValue(outputParam, columnDesc.getName());
                 }
                 break;
@@ -171,8 +162,8 @@ public class ResultSetTableModel extends ColumnDescTableModel {
             return false;
         }
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
-        return columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())
-                || columnDesc.equals(HardCodedColumn.RATING.getColumnDesc());
+        return columnDesc.getName().equals(KEYWORD_OIMAGING_COMMENT.getName())
+                || columnDesc.getName().equals(KEYWORD_RATING.getName());
     }
 
     @Override
@@ -180,10 +171,38 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         final ServiceResult result = getServiceResult(rowIndex);
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
 
-        if (columnDesc.equals(HardCodedColumn.COMMENTS.getColumnDesc())) {
-            result.setComments((String) value);
-        } else if (columnDesc.equals(HardCodedColumn.RATING.getColumnDesc())) {
-            result.setRating((int) value);
+        if (columnDesc.getName().equals(KEYWORD_OIMAGING_COMMENT.getName())) {
+            String str = (String) value;
+            setKeywordValue(
+                    result, OUTPUT_PARAM, KEYWORD_OIMAGING_COMMENT.getName(),
+                    str.substring(0, Math.min(68, str.length())));
+        } else if (columnDesc.getName().equals(KEYWORD_RATING.getName())) {
+            setKeywordValue(result, OUTPUT_PARAM, KEYWORD_RATING.getName(), (Integer) value);
+        }
+    }
+
+    private static void setKeywordValue(final ServiceResult result, int source, String keyword, Object value) {
+        final OIFitsFile oIFitsFile = result.getOifitsFile();
+        
+        if (oIFitsFile == null) {
+            logger.info("Could not find the OiFitsFile in the ServiceResult.");
+            return;
+        }
+
+        FitsTable fitsTable = null;
+        switch (source) {
+            case INPUT_PARAM:
+                fitsTable = oIFitsFile.getImageOiData().getInputParam();
+                break;
+            case OUTPUT_PARAM:
+                fitsTable = oIFitsFile.getImageOiData().getOutputParam();
+                break;
+            case HARD_CODED:
+                logger.info("Cannot update HardCoded param.");
+                break;
+        }
+        if (fitsTable != null) {
+            fitsTable.setKeywordValue(keyword, value);
         }
     }
 
@@ -252,17 +271,13 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         return null;
     }
 
-    /** 
+    /**
      * Enum for HardCoded Columns wrapping ColumnDesc
      */
     public enum HardCodedColumn {
-        ALGORITHM(String.class, "Algorithm"),
-        COMMENTS(String.class, "Comments"),
         FILE(String.class, "File"),
         INDEX(Integer.class, "Index"),
         JOB_DURATION(Double.class, "Job duration"),
-        JOB_TIMESTAMP(Date.class, "Job timestamp"),
-        RATING(Integer.class, "Rating"),
         SUCCESS(Boolean.class, "Success");
 
         private final ColumnDesc columnDesc;

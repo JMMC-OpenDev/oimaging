@@ -3,9 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui;
 
-import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageHDU;
-import java.awt.Color;
 import java.awt.Component;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,13 +26,6 @@ public final class OiCellRenderer extends DefaultListCellRenderer {
 
         if (value == null) {
             setText("");
-        } else if (value instanceof ServiceResult) {
-            final ServiceResult serviceResult = (ServiceResult) value;
-            setText(serviceResult.getService().getName() + " run " + (serviceResult.isValid() ? "ok" : "ko")
-                    + " @ " + timeFormat.format(serviceResult.getStartTime()));
-            if (!serviceResult.isValid()) {
-                setForeground(Color.RED);
-            }
         } else if (value instanceof FitsImageHDU) {
             FitsImageHDU fitsImageHDU = (FitsImageHDU) value;
             setText(fitsImageHDU.getHduName());

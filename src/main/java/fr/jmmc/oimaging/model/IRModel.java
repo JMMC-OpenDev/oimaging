@@ -16,12 +16,16 @@ import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import fr.jmmc.oitools.image.ImageOiOutputParam;
+import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
+import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.jmmc.oitools.model.range.Range;
+import fr.nom.tam.fits.FitsDate;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +46,12 @@ public class IRModel {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(IRModel.class);
+
+    public final static KeywordMeta KEYWORD_RATING = new KeywordMeta("RATING", "User rating of the result", Types.TYPE_INT);
+    public final static KeywordMeta KEYWORD_SOFTWARE = new KeywordMeta("SOFTWARE", "Software used to produce the result", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_START_DATE = new KeywordMeta("JOB_START", "Starting timestamp of the run", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_END_DATE = new KeywordMeta("JOB_END", "Ending timestamp of the run", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_OIMAGING_COMMENT = new KeywordMeta("USERNOTE", "User comment written by OImaging GUI", Types.TYPE_CHAR);
 
     /* Members */
     /** Selected algorithm */
@@ -495,11 +505,42 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
+            postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
         }
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    /** Add some OIMaging specific keywords in the OIFitsFile.
+     * @param serviceResult required. serviceResult.getOiFitsFile() must not return null.
+     */
+    private static void postProcessOIFitsFile(final ServiceResult serviceResult) {
+        final OIFitsFile oiFitsFile = serviceResult.getOifitsFile();
+
+        ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
+
+        outputParams.addKeyword(KEYWORD_RATING);
+        // set KEYWORD_RATING if missing
+        outputParams.setKeywordDefaultInt(KEYWORD_RATING.getName(), 0);
+
+        outputParams.addKeyword(KEYWORD_SOFTWARE);
+        // set KEYWORD_SOFTWARE if missing
+        outputParams.setKeywordDefault(KEYWORD_SOFTWARE.getName(), serviceResult.getService().getName());
+
+        outputParams.addKeyword(KEYWORD_START_DATE);
+        // set KEYWORD_START_DATE if missing
+        outputParams.setKeywordDefault(
+                KEYWORD_START_DATE.getName(), FitsDate.getFitsDateString(serviceResult.getStartTime()));
+
+        outputParams.addKeyword(KEYWORD_END_DATE);
+        // set KEYWORD_END_DATE if missing
+        outputParams.setKeywordDefault(KEYWORD_END_DATE.getName(), FitsDate.getFitsDateString(serviceResult.getEndTime()));
+
+        outputParams.addKeyword(KEYWORD_OIMAGING_COMMENT);
+        // set KEYWORD_OIMAGING_COMMENT if missing
+        outputParams.setKeywordDefault(KEYWORD_OIMAGING_COMMENT.getName(), "");
     }
 
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
