@@ -176,15 +176,14 @@ public class ResultSetTableModel extends ColumnDescTableModel {
             setKeywordValue(
                     result, OUTPUT_PARAM, KEYWORD_OIMAGING_COMMENT.getName(),
                     str.substring(0, Math.min(68, str.length())));
-        }
-        else if (columnDesc.getName().equals(KEYWORD_RATING.getName())) {
+        } else if (columnDesc.getName().equals(KEYWORD_RATING.getName())) {
             setKeywordValue(result, OUTPUT_PARAM, KEYWORD_RATING.getName(), (Integer) value);
         }
     }
 
-    private static void setKeywordValue (final ServiceResult result, int source, String keyword, Object value) {
-
-        OIFitsFile oIFitsFile = result.getOifitsFile();
+    private static void setKeywordValue(final ServiceResult result, int source, String keyword, Object value) {
+        final OIFitsFile oIFitsFile = result.getOifitsFile();
+        
         if (oIFitsFile == null) {
             logger.info("Could not find the OiFitsFile in the ServiceResult.");
             return;
@@ -192,14 +191,19 @@ public class ResultSetTableModel extends ColumnDescTableModel {
 
         FitsTable fitsTable = null;
         switch (source) {
-            case INPUT_PARAM: fitsTable = oIFitsFile.getImageOiData().getInputParam(); break;
-            case OUTPUT_PARAM: fitsTable = oIFitsFile.getImageOiData().getOutputParam(); break;
+            case INPUT_PARAM:
+                fitsTable = oIFitsFile.getImageOiData().getInputParam();
+                break;
+            case OUTPUT_PARAM:
+                fitsTable = oIFitsFile.getImageOiData().getOutputParam();
+                break;
             case HARD_CODED:
                 logger.info("Cannot update HardCoded param.");
-                return;
+                break;
         }
-
-        fitsTable.setKeywordValue(keyword, value);
+        if (fitsTable != null) {
+            fitsTable.setKeywordValue(keyword, value);
+        }
     }
 
     private static void processKeywordTable(final Map<String, ColumnDesc> columnDescMap, final FitsTable fitsTable, final int source) {

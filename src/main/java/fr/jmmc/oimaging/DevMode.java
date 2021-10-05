@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging;
 
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
@@ -135,12 +136,10 @@ public class DevMode {
             ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
 
             final String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
-            final Date startDate = parseKeywordDate(strStartDate);
-            if (startDate != null) serviceResult.setStartTime(startDate);
+            serviceResult.setStartTime(parseKeywordDate(strStartDate));
 
             final String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
-            final Date endDate = parseKeywordDate(strEndDate);
-            if (endDate != null) serviceResult.setEndTime(endDate);
+            serviceResult.setEndTime(parseKeywordDate(strEndDate));
         }
 
         logger.info("Added one ServiceResult for '{}'", serviceResult.getOifitsResultFile());
@@ -151,15 +150,15 @@ public class DevMode {
      * @param keywordDate optional. content can be unparsable.
      * @return Date if parsing successful. null if parsing failed or keywordDate null.
      */
-    private static Date parseKeywordDate (String keywordDate) {
-        if (keywordDate == null) return null;
-        try {
-            return new FitsDate(keywordDate).toDate();
+    private static Date parseKeywordDate(String keywordDate) {
+        if (!StringUtils.isEmpty(keywordDate)) {
+            try {
+                return new FitsDate(keywordDate).toDate();
+            } catch (FitsException e) {
+                logger.info("Could not parse the date {}.", keywordDate);
+            }
         }
-        catch (FitsException e) {
-            logger.info("Could not parse the date {}.", keywordDate);
-            return null;
-        }
+        return null;
     }
 
     private DevMode() {

@@ -516,7 +516,7 @@ public class IRModel {
     /** Add some OIMaging specific keywords in the OIFitsFile.
      * @param serviceResult required. serviceResult.getOiFitsFile() must not return null.
      */
-    private static void postProcessOIFitsFile (final ServiceResult serviceResult) {
+    private static void postProcessOIFitsFile(final ServiceResult serviceResult) {
         final OIFitsFile oiFitsFile = serviceResult.getOifitsFile();
 
         ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();

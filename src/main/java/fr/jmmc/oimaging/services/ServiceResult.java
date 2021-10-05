@@ -157,11 +157,16 @@ public final class ServiceResult {
         computeJobDuration();
     }
 
-    public double getJobDuration () { return jobDuration; }
+    public double getJobDuration() {
+        return jobDuration;
+    }
 
-    private void computeJobDuration () {
-        if (startTime == null || endTime == null) jobDuration = 0;
-        else jobDuration = (endTime.getTime() - startTime.getTime()) / 1000D;
+    private void computeJobDuration() {
+        if (startTime == null || endTime == null) {
+            jobDuration = 0;
+        } else {
+            jobDuration = (endTime.getTime() - startTime.getTime()) / 1000D;
+        }
     }
 
     public Service getService() {
