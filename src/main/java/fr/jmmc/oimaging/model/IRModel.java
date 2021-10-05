@@ -53,6 +53,8 @@ public class IRModel {
 
     /** Selected input image */
     private FitsImageHDU selectedInputImageHDU;
+    /** Selected RGL PRIO image. */
+    private FitsImageHDU selectedRglPrioImage;
     /** List of loaded imageHUDs */
     private final List<FitsImageHDU> fitsImageHDUs = new LinkedList<FitsImageHDU>();
     /** Mapping between FitsImageHDU and file names */
@@ -78,6 +80,7 @@ public class IRModel {
     private void reset() {
         this.cliOptions = null;
         this.selectedInputImageHDU = null;
+        this.selectedRglPrioImage = null;
         this.fitsImageHDUs.clear();
         this.fitsImageHduToFilenames.clear();
         this.serviceResults.clear();
@@ -277,6 +280,14 @@ public class IRModel {
     }
 
     /**
+     * Return the selected imageHDU for RGL Prio or first one.
+     * @return selected fitsImageHDU for RGL Prio
+     */
+    public FitsImageHDU getSelectedRglPrioImage() {
+        return selectedRglPrioImage;
+    }
+
+    /**
      * Set given fitsImageHDU as the selected one for input.
      * @param fitsImageHDU image to select (must be present in the previous list
      */
@@ -292,35 +303,42 @@ public class IRModel {
             }
         }
 
-        /* Prune OIFits images to keep ONLY ONE image */
-        final List<FitsImageHDU> imageHdus = oifitsFile.getFitsImageHDUs();
-        imageHdus.clear();
+        selectedInputImageHDU = fitsImageHDU;
+        oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
+        selectHDUs();
+        logger.info("Set new hdu '{}' as selectedInputImageHDU", hduName);
+    }
 
-        boolean match = false;
-        if (fitsImageHDU == null) {
-            match = true;
-        } else {
-            for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
-                if ((currentHDU == fitsImageHDU)
-                        || (currentHDU.getChecksum() == fitsImageHDU.getChecksum())) {
+    /** select HDUs that are targeted by input image or rgl prio. */
+    private void selectHDUs () {
+        oifitsFile.getFitsImageHDUs().clear();
+        if (selectedInputImageHDU != null) {
+            oifitsFile.getFitsImageHDUs().add(selectedInputImageHDU);
+        }
+        if (selectedRglPrioImage != null) {
+            oifitsFile.getFitsImageHDUs().add(selectedRglPrioImage);
+        }
+    }
 
-                    match = true;
+    /**
+     * Set given fitsImageHDU as the selected one for Rgl prio.
+     * @param selectedRglPrioImage image to select. optional.
+     */
+    public void setSelectedRglPrioImage(final FitsImageHDU selectedRglPrioImage) {
 
-                    // OIFITS2 are not supported (2017/09/08)
-                    imageHdus.add(fitsImageHDU);
-                    break;
-                }
-            }
+        final String hduName = selectedRglPrioImage == null ? "" : selectedRglPrioImage.getHduName();
+
+        if (hduName == null) {
+            // this imageHDU is probably not an image oi extension
+            throw new IllegalStateException("Can't select given image HDU with null HDUNAME");
         }
 
-        if (match) {
-            selectedInputImageHDU = fitsImageHDU;
-            oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
+        this.selectedRglPrioImage = selectedRglPrioImage;
+        selectHDUs();
+        oifitsFile.getImageOiData().getInputParam().setRglPrio(hduName);
 
-            logger.info("Set new hdu '{}' as selectedInputImageHDU", hduName);
-        } else {
-            throw new IllegalStateException(hduName + " HDU was not added !");
-        }
+        if (selectedRglPrioImage == null) logger.info("Did not set new hdu as selectedRglPrioImage.");
+        else logger.info("Set new hdu '{}' as selectedRglPrioImage.", hduName);
     }
 
     public List<FitsImageHDU> getFitsImageHDUs() {

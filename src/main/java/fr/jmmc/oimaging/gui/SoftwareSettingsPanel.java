@@ -53,6 +53,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private void postInit() {
         registerActions();
         jComboBoxImage.setRenderer(new OiCellRenderer());
+        jComboBoxRglPrio.setRenderer(new OiCellRenderer());
         jTableKeywordsEditor.setNotifiedParent(this);
 
         this.jTextAreaOptions.getDocument().addDocumentListener(new DocumentListener() {
@@ -108,7 +109,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jLabelFluxErr = new javax.swing.JLabel();
         jFormattedTextFieldFluxErr = new javax.swing.JFormattedTextField();
         jLabelRglPrio = new javax.swing.JLabel();
-        jComboBoxRglPrio = new javax.swing.JComboBox();
+        jComboBoxRglPrio = new javax.swing.JComboBox<>();
         jButtonLoadFitsImage = new javax.swing.JButton();
         jButtonRemoveFitsImage = new javax.swing.JButton();
         jCheckBoxAutoWgt = new javax.swing.JCheckBox();
@@ -328,7 +329,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         jComboBoxRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
         jComboBoxRglPrio.setEnabled(false);
-        jComboBoxRglPrio.setPrototypeDisplayValue("XXXX");
+        jComboBoxRglPrio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxRglPrioActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 9;
@@ -338,7 +343,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jComboBoxRglPrio, gridBagConstraints);
 
         jButtonLoadFitsImage.setText("+");
-        jButtonLoadFitsImage.setMargin(new java.awt.Insets(0, 0, 0, 0));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -348,7 +352,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         jButtonRemoveFitsImage.setText("-");
         jButtonRemoveFitsImage.setEnabled(false);
-        jButtonRemoveFitsImage.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jButtonRemoveFitsImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRemoveFitsImageActionPerformed(evt);
@@ -462,13 +465,17 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         updateModel();
     }//GEN-LAST:event_jCheckBoxAutoWgtActionPerformed
 
+    private void jComboBoxRglPrioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxRglPrioActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jComboBoxRglPrioActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonLoadFitsImage;
     private javax.swing.JButton jButtonRemoveFitsImage;
     private javax.swing.JCheckBox jCheckBoxAutoWgt;
     private javax.swing.JComboBox jComboBoxImage;
     private javax.swing.JComboBox jComboBoxRglName;
-    private javax.swing.JComboBox jComboBoxRglPrio;
+    private javax.swing.JComboBox<FitsImageHDU> jComboBoxRglPrio;
     private javax.swing.JComboBox jComboBoxSoftware;
     private javax.swing.JFormattedTextField jFormattedTextFieldFlux;
     private javax.swing.JFormattedTextField jFormattedTextFieldFluxErr;
@@ -520,6 +527,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         return new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getIntegerInstance()));
     }
 
+    /** Null Fits Image HDU.
+     * used for the "no value" item in selection list.
+     */
+    private static final FitsImageHDU NULL_IMAGE_HDU = new FitsImageHDU();
+    static {
+        NULL_IMAGE_HDU.setHduName("[No Image]");
+    }
+
     void syncUI(final MainPanel panel, final IRModel irModel, final List<String> failures) {
         mainPanel = panel;
         syncingUI = true;
@@ -553,6 +568,38 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 jComboBoxImage.getModel().setSelectedItem(selectedFitsImageHDU);
             } else if (!ignoreMissingInitImg) {
                 failures.add(irModel.getSelectedInputFitsImageError());
+            }
+
+            // RGL PRIO
+
+            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_PRIO);
+            jLabelRglPrio.setVisible(show);
+            jComboBoxRglPrio.setVisible(show);
+            jComboBoxRglPrio.setEnabled(show);
+
+            if (show) {
+                jComboBoxRglPrio.removeAllItems();
+
+                if (service.supportsMissingKeyword(ImageOiConstants.KEYWORD_RGL_PRIO)) {
+                    jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
+                }
+
+                irModel.getFitsImageHDUs().forEach(jComboBoxRglPrio::addItem);
+
+                FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImage();
+
+                // in case selectedRglPrioImage has never been set
+                if (rglPrioImage == null) {
+                    // if the keyword can be empty we select the NULL HDU
+                    if (service.supportsMissingKeyword(ImageOiConstants.KEYWORD_RGL_PRIO)) {
+                        jComboBoxRglPrio.getModel().setSelectedItem(NULL_IMAGE_HDU);
+                    }
+                    // else, the value should not have been null because keyword is mandatory
+                    else logger.error("Cannot select null item because the keyword is mandatory.");
+                }
+                else {
+                    jComboBoxRglPrio.getModel().setSelectedItem(rglPrioImage);
+                }
             }
 
             // Max iter:
@@ -591,15 +638,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUXERR);
             jLabelFluxErr.setVisible(show);
             jFormattedTextFieldFluxErr.setVisible(show);
-
-            // regulation Prior:
-            final String rglPrio = inputParam.getRglPrio();
-            if (rglPrio != null) {
-                jComboBoxRglPrio.setSelectedItem(rglPrio);
-            }
-            show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_PRIO);
-            jLabelRglPrio.setVisible(show);
-            jComboBoxRglPrio.setVisible(show);
 
             // validate
             service.validate(inputParam, failures);
@@ -661,6 +699,27 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             changed = true;
         }
 
+        // RGL PRIO Image Fits
+        final FitsImageHDU comboBoxRglPrioImage = (FitsImageHDU) jComboBoxRglPrio.getSelectedItem();
+        if (comboBoxRglPrioImage == null) {
+            if (modelSoftware.supportsMissingKeyword(ImageOiConstants.KEYWORD_RGL_PRIO)) {
+                logger.error("RGL PRIO should always have at least one selected item : [No Image].");
+            }
+            else logger.error("RGL PRIO should not be null because keyword is mandatory.");
+        }
+        else if (comboBoxRglPrioImage == NULL_IMAGE_HDU) {
+            if (irModel.getSelectedRglPrioImage() != null) {
+                irModel.setSelectedRglPrioImage(null);
+                changed = true;
+            }
+        }
+        else {
+            if (irModel.getSelectedRglPrioImage() != comboBoxRglPrioImage) {
+                irModel.setSelectedRglPrioImage(comboBoxRglPrioImage);
+                changed = true;
+            }
+        }
+
         // max iter
         try {
             // guarantee last user value
@@ -716,15 +775,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             wDouble = ((Number) jFormattedTextFieldFluxErr.getValue()).doubleValue();
             if (mDouble != wDouble) {
                 inputParam.setFluxErr(wDouble);
-                changed = true;
-            }
-        }
-
-        mString = inputParam.getRglPrio();
-        if (jComboBoxRglPrio.getSelectedItem() != null) {
-            wString = (String) jComboBoxRglPrio.getSelectedItem();
-            if (!wString.equals(mString)) {
-                inputParam.setRglPrio(wString);
                 changed = true;
             }
         }
