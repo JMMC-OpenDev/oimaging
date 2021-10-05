@@ -49,9 +49,9 @@ public class IRModel {
 
     public final static KeywordMeta KEYWORD_RATING = new KeywordMeta("RATING", "User rating of the result", Types.TYPE_INT);
     public final static KeywordMeta KEYWORD_SOFTWARE = new KeywordMeta("SOFTWARE", "Software used to produce the result", Types.TYPE_CHAR);
-    public final static KeywordMeta KEYWORD_START_DATE = new KeywordMeta("STRTDATE", "Starting date of the run", Types.TYPE_CHAR);
-    public final static KeywordMeta KEYWORD_END_DATE = new KeywordMeta("ENDDATE", "Ending date of the run", Types.TYPE_CHAR);
-    public final static KeywordMeta KEYWORD_OIMAGING_COMMENT = new KeywordMeta("OIM_COMM", "User comment written from OImaging GUI", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_START_DATE = new KeywordMeta("JOB_START", "Starting timestamp of the run", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_END_DATE = new KeywordMeta("JOB_END", "Ending timestamp of the run", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_OIMAGING_COMMENT = new KeywordMeta("USERNOTE", "User comment written by OImaging GUI", Types.TYPE_CHAR);
 
     /* Members */
     /** Selected algorithm */
