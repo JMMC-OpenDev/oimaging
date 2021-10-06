@@ -1,6 +1,6 @@
-/*******************************************************************************
+/** *****************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
- ******************************************************************************/
+ ***************************************************************************** */
 package fr.jmmc.oimaging.model;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
@@ -34,40 +34,65 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple model for Image Reconstruction based on top of observer/observable pattern.
+ * Simple model for Image Reconstruction based on top of observer/observable
+ * pattern.
  *
  * @author mellag
  */
 public class IRModel {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private static final Logger logger = LoggerFactory.getLogger(IRModel.class);
 
     /* Members */
-    /** Selected algorithm */
+    /**
+     * Selected algorithm
+     */
     private Service selectedService;
-    /** Model oifits File */
+    /**
+     * Model oifits File
+     */
     private OIFitsFile oifitsFile;
-    /** Optional cliOptions (null value is not fowarded to execution)*/
+    /**
+     * Optional cliOptions (null value is not fowarded to execution)
+     */
     private String cliOptions;
 
-    /** Selected input image */
+    /**
+     * Selected input image
+     */
     private FitsImageHDU selectedInputImageHDU;
-    /** Selected RGL PRIO image. */
+    /**
+     * Selected RGL PRIO image.
+     */
     private FitsImageHDU selectedRglPrioImage;
-    /** List of loaded imageHUDs */
+    /**
+     * List of loaded imageHUDs
+     */
     private final List<FitsImageHDU> fitsImageHDUs = new LinkedList<FitsImageHDU>();
-    /** Mapping between FitsImageHDU and file names */
+    /**
+     * Mapping between FitsImageHDU and file names
+     */
     private final Hashtable<FitsImageHDU, String> fitsImageHduToFilenames = new Hashtable<FitsImageHDU, String>(32);
-    /** List model of target names */
+    /**
+     * List model of target names
+     */
     private final GenericListModel<String> targetListModel = new GenericListModel<String>(new ArrayList<String>(10), true);
-    /** List of results */
+    /**
+     * List of results
+     */
     private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
 
-    /** status flag : set by RunAction */
+    /**
+     * status flag : set by RunAction
+     */
     private boolean running;
 
-    /** export counter */
+    /**
+     * export counter
+     */
     private int exportCount;
 
     public IRModel() {
@@ -97,6 +122,7 @@ public class IRModel {
 
     /**
      * Load the OiData tables of the model (oifits file, targets).
+     *
      * @param oifitsFile OIFitsFile to use
      */
     private void loadOIFits(final OIFitsFile oifitsFile) {
@@ -170,6 +196,7 @@ public class IRModel {
 
     /**
      * Get user input file with OIData.
+     *
      * @param userOifitsFile
      */
     public void loadOifitsFile(final OIFitsFile userOifitsFile) {
@@ -180,7 +207,9 @@ public class IRModel {
     }
 
     /**
-     * Add HDU to present ones and select the first new one as selected image input.
+     * Add HDU to present ones and select the first new one as selected image
+     * input.
+     *
      * @param hdus new hdus
      * @param filename filename of given hdu
      * @return true if some hdu have been added
@@ -273,6 +302,7 @@ public class IRModel {
 
     /**
      * Return the selected imageHDU for input or first one.
+     *
      * @return selected fitsImageHDU
      */
     public FitsImageHDU getSelectedInputImageHDU() {
@@ -281,6 +311,7 @@ public class IRModel {
 
     /**
      * Return the selected imageHDU for RGL Prio or first one.
+     *
      * @return selected fitsImageHDU for RGL Prio
      */
     public FitsImageHDU getSelectedRglPrioImage() {
@@ -289,6 +320,7 @@ public class IRModel {
 
     /**
      * Set given fitsImageHDU as the selected one for input.
+     *
      * @param fitsImageHDU image to select (must be present in the previous list
      */
     public void setSelectedInputImageHDU(final FitsImageHDU fitsImageHDU) {
@@ -303,14 +335,20 @@ public class IRModel {
             }
         }
 
-        selectedInputImageHDU = fitsImageHDU;
-        oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
-        selectHDUs();
-        logger.info("Set new hdu '{}' as selectedInputImageHDU", hduName);
+        if (fitsImageHDU == null || existsInImageLib(fitsImageHDU)) {
+            selectedInputImageHDU = fitsImageHDU;
+            oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
+            selectHDUs();
+            logger.info("Set new hdu '{}' as selectedInputImageHDU", hduName);
+        } else {
+            throw new IllegalStateException(hduName + " HDU was not added !");
+        }
     }
 
-    /** select HDUs that are targeted by input image or rgl prio. */
-    private void selectHDUs () {
+    /**
+     * select HDUs that are targeted by input image or rgl prio.
+     */
+    private void selectHDUs() {
         oifitsFile.getFitsImageHDUs().clear();
         if (selectedInputImageHDU != null) {
             oifitsFile.getFitsImageHDUs().add(selectedInputImageHDU);
@@ -322,23 +360,53 @@ public class IRModel {
 
     /**
      * Set given fitsImageHDU as the selected one for Rgl prio.
-     * @param selectedRglPrioImage image to select. optional.
+     *
+     * @param selectedRglPrioImage image to select. optional : null means we
+     * want no image.
      */
     public void setSelectedRglPrioImage(final FitsImageHDU selectedRglPrioImage) {
 
-        final String hduName = selectedRglPrioImage == null ? "" : selectedRglPrioImage.getHduName();
+        if (selectedRglPrioImage == null) {
+            this.selectedRglPrioImage = null;
+            selectHDUs();
+            oifitsFile.getImageOiData().getInputParam().setRglPrio("");
+            logger.info("Set selectedRglPrioImage to empty.");
+        } else {
 
-        if (hduName == null) {
-            // this imageHDU is probably not an image oi extension
-            throw new IllegalStateException("Can't select given image HDU with null HDUNAME");
+            if (selectedRglPrioImage.getHduName() == null) {
+                // this imageHDU is probably not an image oi extension
+                throw new IllegalStateException("Can't select given image HDU with null HDUNAME");
+            }
+
+            if (!existsInImageLib(selectedInputImageHDU)) {
+                throw new IllegalStateException(selectedRglPrioImage.getHduName() + " HDU was not added !");
+            }
+
+            this.selectedRglPrioImage = selectedRglPrioImage;
+            selectHDUs();
+            oifitsFile.getImageOiData().getInputParam().setRglPrio(selectedRglPrioImage.getHduName());
+            logger.info("Set new hdu '{}' as selectedRglPrioImage.", selectedRglPrioImage.getHduName());
         }
+    }
 
-        this.selectedRglPrioImage = selectedRglPrioImage;
-        selectHDUs();
-        oifitsFile.getImageOiData().getInputParam().setRglPrio(hduName);
-
-        if (selectedRglPrioImage == null) logger.info("Did not set new hdu as selectedRglPrioImage.");
-        else logger.info("Set new hdu '{}' as selectedRglPrioImage.", hduName);
+    /**
+     * tell if the target HDU is in the library of loaded images.
+     * this.getFitsImageHDUs() must not be null. this.getFitsImageHDUs() must
+     * not contain null elements.
+     *
+     * @param targetHDU required.
+     * @return true if targetHDU has same memory address than one loaded image,
+     * or true if targetHDU has same checkSum than one loaded image, or false
+     * otherwise.
+     */
+    private boolean existsInImageLib(final FitsImageHDU targetHDU) {
+        for (FitsImageHDU fitsImageHDU : getFitsImageHDUs()) {
+            if (fitsImageHDU == targetHDU
+                    || fitsImageHDU.getChecksum() == targetHDU.getChecksum()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<FitsImageHDU> getFitsImageHDUs() {
@@ -350,8 +418,10 @@ public class IRModel {
     }
 
     /**
-     * Add image HDU of given file and select first imageHDU if no input image was selected before.
-     * Each added HDU get HDUNAME set with original fits filename with suffixe # and extension index.
+     * Add image HDU of given file and select first imageHDU if no input image
+     * was selected before. Each added HDU get HDUNAME set with original fits
+     * filename with suffixe # and extension index.
+     *
      * @param fitsImageFile fitsImageFile to load for fitsImageHDU discover
      */
     public void addFitsImageFile(FitsImageFile fitsImageFile) {
@@ -366,6 +436,7 @@ public class IRModel {
 
     /**
      * Set cliOptions. Blank or null values avoid cli option passing.
+     *
      * @param cliOptions software options on command line or null
      */
     public void setCliOptions(String cliOptions) {
