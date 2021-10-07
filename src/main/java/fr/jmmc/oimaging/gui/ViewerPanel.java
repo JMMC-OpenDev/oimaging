@@ -190,10 +190,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // init Param Tables
             ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getOutputParam());
             ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(imageOiData.getInputParam());
-            
+
             AutofitTableColumns.autoResizeTable(jTableOutputParamKeywords, true, true); // include header width
             AutofitTableColumns.autoResizeTable(jTableInputParamKeywords, true, true); // include header width
-            
+
         } else {
             jPanelOIFits.remove(oifitsViewPanel);
             // reset Param Tables
@@ -240,12 +240,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     public void displayModel(IRModel irModel) {
         showMode = SHOW_MODE.MODEL;
         if (irModel != null) {
+            String lastImageChanged = irModel.getLastImageChanged();
             displayOiFitsAndParams(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
-            // show the input image
-            // TODO: how to show the prior image (depends on user state)
-
-            // only list image HDUs present in the input file: 
-            displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
+            // only list image HDUs present in the input file
+            // choose the image which was changed lastly
+            if (irModel.getLastImageChanged() != null) {
+                if (lastImageChanged.equals("initImg")) {
+                    displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
+                } else if (lastImageChanged.equals("rglPrio")) {
+                    // only list image HDUs present in the input file:
+                    displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedRglPrioImage());
+                }
+            }
         }
         setTabMode(SHOW_MODE.MODEL);
     }
@@ -355,7 +361,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                         panel.setFitsImage(image);
                     }
 
-                    // TODO FIX: not working !! 
+                    // TODO FIX: not working !!
                     // see JFreeChart listeners ?
                     panel.addMouseListener(new MouseAdapter() {
                         @Override

@@ -1,4 +1,4 @@
-/** *****************************************************************************
+/*******************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ***************************************************************************** */
 package fr.jmmc.oimaging.model;
@@ -68,6 +68,12 @@ public class IRModel {
      * Selected RGL PRIO image. Can be null.
      */
     private FitsImageHDU selectedRglPrioImage;
+    /**
+     * Which of the input images has been changed last : INIT_IMG or RGL_PRIO.
+     * Knowing this, viewerPanel can display the good one.
+     * Values: null, "initImage", "rglPrio"
+     */
+    private String lastImageChanged = null;
     /**
      * List of loaded imageHUDs
      */
@@ -335,6 +341,7 @@ public class IRModel {
             this.selectedInputImageHDU = selectedInitImage;
             selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setInitImg("");
+            this.setLastImageChanged(null);
             logger.info("Set selectedInputImageHDU to empty.");
         } else {
 
@@ -368,6 +375,7 @@ public class IRModel {
             this.selectedRglPrioImage = selectedRglPrioImage;
             selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setRglPrio("");
+            this.setLastImageChanged(null);
             logger.info("Set selectedRglPrioImage to empty.");
         } else {
 
@@ -614,5 +622,19 @@ public class IRModel {
         getResultSets().removeAll(selectedServicesList);
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    /**
+     * @return the lastImageChanged
+     */
+    public String getLastImageChanged() {
+        return lastImageChanged;
+    }
+
+    /**
+     * @param lastImageChanged the lastImageChanged to set
+     */
+    public void setLastImageChanged(String lastImageChanged) {
+        this.lastImageChanged = lastImageChanged;
     }
 }

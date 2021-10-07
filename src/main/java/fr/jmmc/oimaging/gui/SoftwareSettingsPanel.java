@@ -51,6 +51,15 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private boolean syncingUI = false;
 
     /**
+     * Which of the input images has been changed last : INIT_IMG or RGL_PRIO.
+     * Knowing this, viewerPanel can display the good one.
+     * Values: null, "initImage", "rglPrio".
+     * We need this field here because only here can we react to the event properly,
+     * IRModel does not have enough information to do it itself.
+     */
+    private String lastImageChanged = null;
+
+    /**
      * Creates new form AlgorithmSettinsPanel
      */
     public SoftwareSettingsPanel() {
@@ -435,6 +444,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBoxSoftwareActionPerformed
 
     private void jComboBoxImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxImageActionPerformed
+        this.lastImageChanged = "initImg";
         updateModel();
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
@@ -479,6 +489,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jCheckBoxAutoWgtActionPerformed
 
     private void jComboBoxRglPrioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxRglPrioActionPerformed
+        this.lastImageChanged = "rglPrio";
         updateModel();
     }//GEN-LAST:event_jComboBoxRglPrioActionPerformed
 
@@ -748,6 +759,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 }
             }
         }
+
+        // lastImageDisplay
+        irModel.setLastImageChanged(lastImageChanged);
 
         // max iter
         try {
