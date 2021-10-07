@@ -159,6 +159,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jLabelInitImg, gridBagConstraints);
 
         jComboBoxImage.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_INIT_IMG));
+        jComboBoxImage.setPrototypeDisplayValue(NULL_IMAGE_HDU);
         jComboBoxImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxImageActionPerformed(evt);
@@ -340,6 +341,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         jComboBoxRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
         jComboBoxRglPrio.setEnabled(false);
+        jComboBoxRglPrio.setPrototypeDisplayValue(NULL_IMAGE_HDU);
         jComboBoxRglPrio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxRglPrioActionPerformed(evt);
