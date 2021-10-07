@@ -1,6 +1,6 @@
-/** *****************************************************************************
+/*******************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
- ***************************************************************************** */
+ ******************************************************************************/
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
@@ -33,34 +33,25 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Logger
-     */
+    /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(SoftwareSettingsPanel.class);
 
 
     /* members */
-    /**
-     * associated mainPanel
-     */
+    /** associated mainPanel */
     private MainPanel mainPanel;
 
-    /**
-     * Flag set to true while the GUI is being updated by model else false.
-     */
+    /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
 
-    /**
-     * Creates new form AlgorithmSettinsPanel
-     */
+    /** Creates new form AlgorithmSettinsPanel */
     public SoftwareSettingsPanel() {
         initComponents();
         postInit();
     }
 
     /**
-     * This method is useful to set the models and specific features of
-     * initialized swing components :
+     * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
         registerActions();
@@ -588,7 +579,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             jComboBoxRglPrio.setEnabled(show);
 
             if (show) {
-
                 jComboBoxRglPrio.removeAllItems();
 
                 if (service.supportsMissingKeyword(KEYWORD_RGL_PRIO)) {
@@ -618,9 +608,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             // Max iter:
             jSpinnerMaxIter.setValue(inputParam.getMaxiter());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_MAXITER);
-
             jLabelMaxIter.setVisible(show);
-
             jSpinnerMaxIter.setVisible(show);
 
             // regulation Name:
@@ -630,54 +618,41 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             // regulation Weight:
             jCheckBoxAutoWgt.setSelected(inputParam.isAutoWgt());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_AUTO_WGT);
-
             jLabelAutoWgt.setVisible(show);
-
             jCheckBoxAutoWgt.setVisible(show);
 
             jFormattedTextFieldRglWgt.setValue(inputParam.getRglWgt());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
-
             jLabelRglWgt.setVisible(show);
-
             jFormattedTextFieldRglWgt.setVisible(show);
             // change visibility / enabled if RglWgt keyword exists (bsmem auto)
             final boolean enabled = inputParam.hasKeywordMeta(ImageOiConstants.KEYWORD_RGL_WGT);
-
             jLabelRglWgt.setEnabled(enabled);
-
             jFormattedTextFieldRglWgt.setEnabled(enabled);
 
             // flux:
             jFormattedTextFieldFlux.setValue(inputParam.getFlux());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUX);
-
             jLabelFlux.setVisible(show);
-
             jFormattedTextFieldFlux.setVisible(show);
 
             // flux Err:
             jFormattedTextFieldFluxErr.setValue(inputParam.getFluxErr());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUXERR);
-
             jLabelFluxErr.setVisible(show);
-
             jFormattedTextFieldFluxErr.setVisible(show);
 
             // validate
             service.validate(inputParam, failures);
 
             // identity check on singletons:
-            if (service
-                    != jComboBoxSoftware.getSelectedItem()) {
+            if (service != jComboBoxSoftware.getSelectedItem()) {
                 jComboBoxSoftware.setSelectedItem(service);
             }
 
             // CLI Options:
             final String cliOptions = irModel.getCliOptions();
-
-            if (!jTextAreaOptions.getText()
-                    .equals(cliOptions)) {
+            if (!jTextAreaOptions.getText().equals(cliOptions)) {
                 jTextAreaOptions.setText(cliOptions == null ? "" : cliOptions);
             }
         } finally {
@@ -733,7 +708,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         // RGL PRIO Image Fits
         if (modelSoftware.supportsStandardKeyword(KEYWORD_RGL_PRIO)) {
-
             final FitsImageHDU comboBoxRglPrioImage = (FitsImageHDU) jComboBoxRglPrio.getSelectedItem();
 
             if (!modelSoftware.supportsMissingKeyword(KEYWORD_RGL_PRIO)
@@ -763,9 +737,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         // regularization
         mString = inputParam.getRglName();
-
-        if (jComboBoxRglName.getSelectedItem()
-                != null) {
+        if (jComboBoxRglName.getSelectedItem() != null) {
             wString = (String) jComboBoxRglName.getSelectedItem();
             if (!wString.equals(mString)) {
                 inputParam.setRglName(wString);
@@ -775,17 +747,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         }
 
         // regulation Weight:
-        if (jCheckBoxAutoWgt.isSelected()
-                != inputParam.isAutoWgt()) {
+        if (jCheckBoxAutoWgt.isSelected() != inputParam.isAutoWgt()) {
             inputParam.setAutoWgt(jCheckBoxAutoWgt.isSelected());
             irModel.initSpecificParams(false); // update call required to apply on fly specific param handling
             changed = true;
         }
 
         mDouble = inputParam.getRglWgt();
-
-        if (jFormattedTextFieldRglWgt.getValue()
-                != null) {
+        if (jFormattedTextFieldRglWgt.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldRglWgt.getValue()).doubleValue();
             if (mDouble != wDouble) {
                 inputParam.setRglWgt(wDouble);
@@ -794,9 +763,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         }
 
         mDouble = inputParam.getFlux();
-
-        if (jFormattedTextFieldFlux.getValue()
-                != null) {
+        if (jFormattedTextFieldFlux.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldFlux.getValue()).doubleValue();
             if (mDouble != wDouble) {
                 inputParam.setFlux(wDouble);
@@ -805,9 +772,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         }
 
         mDouble = inputParam.getFluxErr();
-
-        if (jFormattedTextFieldFluxErr.getValue()
-                != null) {
+        if (jFormattedTextFieldFluxErr.getValue() != null) {
             wDouble = ((Number) jFormattedTextFieldFluxErr.getValue()).doubleValue();
             if (mDouble != wDouble) {
                 inputParam.setFluxErr(wDouble);
@@ -818,7 +783,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // cliOptions
         mString = irModel.getCliOptions();
         wString = jTextAreaOptions.getText();
-
         if (!wString.equals(mString)) {
             irModel.setCliOptions(wString);
             changed = true;
