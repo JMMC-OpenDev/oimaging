@@ -240,12 +240,9 @@ public class IRModel {
                 hdusToAdd.remove(hdu);
                 break;
             }
-            for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
-                if (currentHDU.getChecksum() == hdu.getChecksum()) {
-                    logger.info("skipping image hdu '{}' : already present ", hdu.getHduName());
-                    hdusToAdd.remove(hdu);
-                    break;
-                }
+            if (existsInImageLib(hdu)) {
+                logger.info("skipping image hdu '{}' : already present ", hdu.getHduName());
+                hdusToAdd.remove(hdu);
             }
         }
 
