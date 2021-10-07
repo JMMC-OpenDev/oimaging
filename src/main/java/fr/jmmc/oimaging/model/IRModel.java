@@ -1,6 +1,6 @@
 /*******************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
- ***************************************************************************** */
+ ******************************************************************************/
 package fr.jmmc.oimaging.model;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
@@ -16,12 +16,16 @@ import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import fr.jmmc.oitools.image.ImageOiOutputParam;
+import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
+import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.jmmc.oitools.model.range.Range;
+import fr.nom.tam.fits.FitsDate;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
@@ -34,76 +38,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple model for Image Reconstruction based on top of observer/observable
- * pattern.
+ * Simple model for Image Reconstruction based on top of observer/observable pattern.
  *
  * @author mellag
  */
 public class IRModel {
-
-    /**
-     * Logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(IRModel.class);
-
-    /* Members */
-    /**
-     * Selected algorithm
-     */
-    private Service selectedService;
-    /**
-     * Model oifits File
-     */
-    private OIFitsFile oifitsFile;
-    /**
-     * Optional cliOptions (null value is not fowarded to execution)
-     */
-    private String cliOptions;
-
-    /**
-     * Selected input image. Can be null.
-     */
-    private FitsImageHDU selectedInputImageHDU;
-    /**
-     * Selected RGL PRIO image. Can be null.
-     */
-    private FitsImageHDU selectedRglPrioImage;
-    /**
-     * Which of the input images has been changed last : INIT_IMG or RGL_PRIO.
-     * Knowing this, viewerPanel can display the good one.
-     * Values: null, "initImage", "rglPrio"
-     */
-    private String lastImageChanged = null;
-    /**
-     * List of loaded imageHUDs
-     */
-    private final List<FitsImageHDU> fitsImageHDUs = new LinkedList<FitsImageHDU>();
-    /**
-     * Mapping between FitsImageHDU and file names
-     */
-    private final Hashtable<FitsImageHDU, String> fitsImageHduToFilenames = new Hashtable<FitsImageHDU, String>(32);
-    /**
-     * List model of target names
-     */
-    private final GenericListModel<String> targetListModel = new GenericListModel<String>(new ArrayList<String>(10), true);
-    /**
-     * List of results
-     */
-    private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
-
-    /**
-     * status flag : set by RunAction
-     */
-    private boolean running;
-
-    /**
-     * export counter
-     */
-    private int exportCount;
-
-    public IRModel() {
-        reset();
-    }
 
     /**
      * Null Fits Image HDU. Used in HDU selection lists, as a null item.
@@ -112,6 +51,52 @@ public class IRModel {
 
     static {
         NULL_IMAGE_HDU.setHduName("[No Image]");
+    }
+
+    /** Logger */
+    private static final Logger logger = LoggerFactory.getLogger(IRModel.class);
+
+    public final static KeywordMeta KEYWORD_RATING = new KeywordMeta("RATING", "User rating of the result", Types.TYPE_INT);
+    public final static KeywordMeta KEYWORD_SOFTWARE = new KeywordMeta("SOFTWARE", "Software used to produce the result", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_START_DATE = new KeywordMeta("JOB_START", "Starting timestamp of the run", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_END_DATE = new KeywordMeta("JOB_END", "Ending timestamp of the run", Types.TYPE_CHAR);
+    public final static KeywordMeta KEYWORD_OIMAGING_COMMENT = new KeywordMeta("USERNOTE", "User comment written by OImaging GUI", Types.TYPE_CHAR);
+
+    /* Members */
+    /** Selected algorithm */
+    private Service selectedService;
+    /** Model oifits File */
+    private OIFitsFile oifitsFile;
+    /** Optional cliOptions (null value is not fowarded to execution)*/
+    private String cliOptions;
+
+    /** Selected input image */
+    private FitsImageHDU selectedInputImageHDU;
+    /** Selected RGL PRIO image. Can be null. */
+    private FitsImageHDU selectedRglPrioImage;
+    /**
+     * Which of the input images has been changed last : INIT_IMG or RGL_PRIO.
+     * Knowing this, viewerPanel can display the good one.
+     * Values: null, "initImage", "rglPrio"
+     */
+    private String lastImageChanged = null;
+    /** List of loaded imageHUDs */
+    private final List<FitsImageHDU> fitsImageHDUs = new LinkedList<FitsImageHDU>();
+    /** Mapping between FitsImageHDU and file names */
+    private final Hashtable<FitsImageHDU, String> fitsImageHduToFilenames = new Hashtable<FitsImageHDU, String>(32);
+    /** List model of target names */
+    private final GenericListModel<String> targetListModel = new GenericListModel<String>(new ArrayList<String>(10), true);
+    /** List of results */
+    private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
+
+    /** status flag : set by RunAction */
+    private boolean running;
+
+    /** export counter */
+    private int exportCount;
+
+    public IRModel() {
+        reset();
     }
 
     /**
@@ -137,7 +122,6 @@ public class IRModel {
 
     /**
      * Load the OiData tables of the model (oifits file, targets).
-     *
      * @param oifitsFile OIFitsFile to use
      */
     private void loadOIFits(final OIFitsFile oifitsFile) {
@@ -211,7 +195,6 @@ public class IRModel {
 
     /**
      * Get user input file with OIData.
-     *
      * @param userOifitsFile
      */
     public void loadOifitsFile(final OIFitsFile userOifitsFile) {
@@ -222,9 +205,7 @@ public class IRModel {
     }
 
     /**
-     * Add HDU to present ones and select the first new one as selected image
-     * input.
-     *
+     * Add HDU to present ones and select the first new one as selected image input.
      * @param hdus new hdus
      * @param filename filename of given hdu
      * @return true if some hdu have been added
@@ -314,7 +295,6 @@ public class IRModel {
 
     /**
      * Return the selected imageHDU for input or first one.
-     *
      * @return selected fitsImageHDU
      */
     public FitsImageHDU getSelectedInputImageHDU() {
@@ -323,7 +303,6 @@ public class IRModel {
 
     /**
      * Return the selected imageHDU for RGL Prio or first one.
-     *
      * @return selected fitsImageHDU for RGL Prio
      */
     public FitsImageHDU getSelectedRglPrioImage() {
@@ -332,7 +311,6 @@ public class IRModel {
 
     /**
      * Set given fitsImageHDU as the selected one for input.
-     *
      * @param fitsImageHDU image to select (must be present in the previous list
      */
     public void setSelectedInputImageHDU(final FitsImageHDU selectedInitImage) {
@@ -344,7 +322,6 @@ public class IRModel {
             this.setLastImageChanged(null);
             logger.info("Set selectedInputImageHDU to empty.");
         } else {
-
             String hduName = selectedInitImage.getHduName();
 
             if (hduName == null) {
@@ -365,7 +342,6 @@ public class IRModel {
 
     /**
      * Set given fitsImageHDU as the selected one for Rgl prio.
-     *
      * @param selectedRglPrioImage image to select. optional : null means we
      * want no image.
      */
@@ -378,7 +354,6 @@ public class IRModel {
             this.setLastImageChanged(null);
             logger.info("Set selectedRglPrioImage to empty.");
         } else {
-
             String hduName = selectedRglPrioImage.getHduName();
 
             if (hduName == null) {
@@ -439,10 +414,8 @@ public class IRModel {
     }
 
     /**
-     * Add image HDU of given file and select first imageHDU if no input image
-     * was selected before. Each added HDU get HDUNAME set with original fits
-     * filename with suffixe # and extension index.
-     *
+     * Add image HDU of given file and select first imageHDU if no input image was selected before.
+     * Each added HDU get HDUNAME set with original fits filename with suffixe # and extension index.
      * @param fitsImageFile fitsImageFile to load for fitsImageHDU discover
      */
     public void addFitsImageFile(FitsImageFile fitsImageFile) {
@@ -457,7 +430,6 @@ public class IRModel {
 
     /**
      * Set cliOptions. Blank or null values avoid cli option passing.
-     *
      * @param cliOptions software options on command line or null
      */
     public void setCliOptions(String cliOptions) {
@@ -605,11 +577,42 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
+            postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
         }
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    /** Add some OIMaging specific keywords in the OIFitsFile.
+     * @param serviceResult required. serviceResult.getOiFitsFile() must not return null.
+     */
+    private static void postProcessOIFitsFile(final ServiceResult serviceResult) {
+        final OIFitsFile oiFitsFile = serviceResult.getOifitsFile();
+
+        ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
+
+        outputParams.addKeyword(KEYWORD_RATING);
+        // set KEYWORD_RATING if missing
+        outputParams.setKeywordDefaultInt(KEYWORD_RATING.getName(), 0);
+
+        outputParams.addKeyword(KEYWORD_SOFTWARE);
+        // set KEYWORD_SOFTWARE if missing
+        outputParams.setKeywordDefault(KEYWORD_SOFTWARE.getName(), serviceResult.getService().getName());
+
+        outputParams.addKeyword(KEYWORD_START_DATE);
+        // set KEYWORD_START_DATE if missing
+        outputParams.setKeywordDefault(
+                KEYWORD_START_DATE.getName(), FitsDate.getFitsDateString(serviceResult.getStartTime()));
+
+        outputParams.addKeyword(KEYWORD_END_DATE);
+        // set KEYWORD_END_DATE if missing
+        outputParams.setKeywordDefault(KEYWORD_END_DATE.getName(), FitsDate.getFitsDateString(serviceResult.getEndTime()));
+
+        outputParams.addKeyword(KEYWORD_OIMAGING_COMMENT);
+        // set KEYWORD_OIMAGING_COMMENT if missing
+        outputParams.setKeywordDefault(KEYWORD_OIMAGING_COMMENT.getName(), "");
     }
 
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
