@@ -241,7 +241,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         showMode = SHOW_MODE.MODEL;
         if (irModel != null) {
             displayOiFitsAndParams(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
-            displayImage(irModel.getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
+            // show the input image
+            // TODO: how to show the prior image (depends on user state)
+
+            // only list image HDUs present in the input file: 
+            displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
         }
         setTabMode(SHOW_MODE.MODEL);
     }
