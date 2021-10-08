@@ -23,8 +23,14 @@ public final class BsmemInputParam extends SoftwareInputParam {
         ImageOiConstants.KEYWORD_AUTO_WGT,
         ImageOiConstants.KEYWORD_RGL_WGT,
         ImageOiConstants.KEYWORD_FLUX,
-        ImageOiConstants.KEYWORD_FLUXERR
+        ImageOiConstants.KEYWORD_FLUXERR,
+        ImageOiConstants.KEYWORD_RGL_PRIO
     }));
+
+    /** Parameters that can be missing. */
+    public static final Set<String> SUPPORTED_MISSING_KEYWORDS = new HashSet<>(Arrays.asList(
+        ImageOiConstants.KEYWORD_RGL_PRIO
+    ));
 
     public final static String KEYWORD_RGL_ALPH = "RGL_ALPH";
     public final static String KEYWORD_RGL_BETA = "RGL_BETA";
@@ -87,6 +93,6 @@ public final class BsmemInputParam extends SoftwareInputParam {
 
     @Override
     public boolean supportsMissingKeyword(final String keywordName) {
-        return false;
+        return SUPPORTED_MISSING_KEYWORDS.contains(keywordName);
     }
 }
