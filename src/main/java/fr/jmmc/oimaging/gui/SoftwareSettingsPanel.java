@@ -18,6 +18,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
+import javax.swing.ButtonModel;
 import javax.swing.JFormattedTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -43,15 +44,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
-
-    /**
-     * Which of the input images has been changed last : INIT_IMG or RGL_PRIO.
-     * Knowing this, viewerPanel can display the good one.
-     * Values: null, "initImage", "rglPrio".
-     * We need this field here because only here can we react to the event properly,
-     * IRModel does not have enough information to do it itself.
-     */
-    private String lastImageChanged = null;
 
     /** Creates new form AlgorithmSettinsPanel */
     public SoftwareSettingsPanel() {
@@ -105,6 +97,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonsView = new javax.swing.ButtonGroup();
         jPanelForm = new javax.swing.JPanel();
         jComboBoxSoftware = new javax.swing.JComboBox();
         jLabelInitImg = new javax.swing.JLabel();
@@ -125,6 +118,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jButtonLoadFitsImage = new javax.swing.JButton();
         jButtonRemoveFitsImage = new javax.swing.JButton();
         jCheckBoxAutoWgt = new javax.swing.JCheckBox();
+        jRadioButtonViewInitImg = new javax.swing.JRadioButton();
+        jRadioButtonViewRglPrio = new javax.swing.JRadioButton();
         jTableKeywordsEditor = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
         jPanelOptions = new javax.swing.JPanel();
         jTextAreaOptions = new javax.swing.JTextArea();
@@ -391,6 +386,36 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jCheckBoxAutoWgt, gridBagConstraints);
 
+        buttonsView.add(jRadioButtonViewInitImg);
+        jRadioButtonViewInitImg.setText("View INIT_IMG");
+        jRadioButtonViewInitImg.setActionCommand(KEYWORD_INIT_IMG);
+        jRadioButtonViewInitImg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonViewInitImgActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        jPanelForm.add(jRadioButtonViewInitImg, gridBagConstraints);
+
+        buttonsView.add(jRadioButtonViewRglPrio);
+        jRadioButtonViewRglPrio.setText("view RGL_PRIO");
+        jRadioButtonViewRglPrio.setActionCommand(KEYWORD_RGL_PRIO);
+        jRadioButtonViewRglPrio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonViewRglPrioActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm.add(jRadioButtonViewRglPrio, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -435,7 +460,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBoxSoftwareActionPerformed
 
     private void jComboBoxImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxImageActionPerformed
-        this.lastImageChanged = "initImg";
         updateModel();
     }//GEN-LAST:event_jComboBoxImageActionPerformed
 
@@ -480,11 +504,19 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jCheckBoxAutoWgtActionPerformed
 
     private void jComboBoxRglPrioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxRglPrioActionPerformed
-        this.lastImageChanged = "rglPrio";
         updateModel();
     }//GEN-LAST:event_jComboBoxRglPrioActionPerformed
 
+    private void jRadioButtonViewInitImgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonViewInitImgActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jRadioButtonViewInitImgActionPerformed
+
+    private void jRadioButtonViewRglPrioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonViewRglPrioActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jRadioButtonViewRglPrioActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonsView;
     private javax.swing.JButton jButtonLoadFitsImage;
     private javax.swing.JButton jButtonRemoveFitsImage;
     private javax.swing.JCheckBox jCheckBoxAutoWgt;
@@ -505,6 +537,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelRglWgt;
     private javax.swing.JPanel jPanelForm;
     private javax.swing.JPanel jPanelOptions;
+    private javax.swing.JRadioButton jRadioButtonViewInitImg;
+    private javax.swing.JRadioButton jRadioButtonViewRglPrio;
     private javax.swing.JSpinner jSpinnerMaxIter;
     private fr.jmmc.oimaging.gui.TableKeywordsEditor jTableKeywordsEditor;
     private javax.swing.JTextArea jTextAreaOptions;
@@ -618,6 +652,26 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 }
             }
 
+            // Input Image View
+
+            String inputImageView = irModel.getInputImageView();
+            if (inputImageView == null) {
+                buttonsView.clearSelection();
+            } else {
+                switch (inputImageView) {
+                    case KEYWORD_INIT_IMG:
+                        jRadioButtonViewInitImg.setSelected(true);
+                        break;
+                    case KEYWORD_RGL_PRIO:
+                        jRadioButtonViewRglPrio.setSelected(true);
+                        break;
+                }
+            }
+
+            boolean supportsRglPrio = service.supportsStandardKeyword(KEYWORD_RGL_PRIO);
+            jRadioButtonViewRglPrio.setEnabled(supportsRglPrio);
+            jRadioButtonViewRglPrio.setVisible(supportsRglPrio);
+
             // Max iter:
             jSpinnerMaxIter.setValue(inputParam.getMaxiter());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_MAXITER);
@@ -706,6 +760,15 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             changed = true;
         }
 
+        // Input Image View
+        ButtonModel selectedButton = this.buttonsView.getSelection();
+        String buttonAction = (selectedButton == null) ? null : selectedButton.getActionCommand();
+        final Service newService = (guiService == null) ? modelSoftware : guiService;
+        if (!newService.supportsStandardKeyword(buttonAction)) {
+            buttonAction = KEYWORD_INIT_IMG;
+        }
+        irModel.setInputImageView(buttonAction);
+
         // Init Image
         final FitsImageHDU comboBoxInitImage = (FitsImageHDU) jComboBoxImage.getSelectedItem();
 
@@ -715,6 +778,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         } else {
             if (irModel.getSelectedInputImageHDU() != comboBoxInitImage) {
                 irModel.setSelectedInputImageHDU(comboBoxInitImage);
+                irModel.setInputImageView(KEYWORD_INIT_IMG);
                 changed = true;
             }
         }
@@ -729,13 +793,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             } else {
                 if (irModel.getSelectedRglPrioImage() != comboBoxRglPrioImage) {
                     irModel.setSelectedRglPrioImage(comboBoxRglPrioImage);
+                    irModel.setInputImageView(KEYWORD_RGL_PRIO);
                     changed = true;
                 }
             }
         }
-
-        // lastImageDisplay
-        irModel.setLastImageChanged(lastImageChanged);
 
         // max iter
         try {

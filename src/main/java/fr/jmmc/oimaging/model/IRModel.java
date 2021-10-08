@@ -14,6 +14,7 @@ import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
@@ -74,12 +75,14 @@ public class IRModel {
     private FitsImageHDU selectedInputImageHDU;
     /** Selected RGL PRIO image. Can be null. */
     private FitsImageHDU selectedRglPrioImage;
+
     /**
      * Which of the input images has been changed last : INIT_IMG or RGL_PRIO.
      * Knowing this, viewerPanel can display the good one.
-     * Values: null, "initImage", "rglPrio"
+     * Values: null, "INIT_IMG", "RGL_PRIO"
      */
-    private String lastImageChanged = null;
+    private String inputImageView = null;
+
     /** List of loaded imageHUDs */
     private final List<FitsImageHDU> fitsImageHDUs = new LinkedList<FitsImageHDU>();
     /** Mapping between FitsImageHDU and file names */
@@ -106,6 +109,7 @@ public class IRModel {
         this.cliOptions = null;
         this.selectedInputImageHDU = null;
         this.selectedRglPrioImage = null;
+        this.inputImageView = KEYWORD_INIT_IMG;
         this.fitsImageHDUs.clear();
         this.fitsImageHduToFilenames.clear();
         this.serviceResults.clear();
@@ -319,7 +323,6 @@ public class IRModel {
             this.selectedInputImageHDU = selectedInitImage;
             selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setInitImg("");
-            this.setLastImageChanged(null);
             logger.info("Set selectedInputImageHDU to empty.");
         } else {
             String hduName = selectedInitImage.getHduName();
@@ -351,7 +354,6 @@ public class IRModel {
             this.selectedRglPrioImage = selectedRglPrioImage;
             selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setRglPrio("");
-            this.setLastImageChanged(null);
             logger.info("Set selectedRglPrioImage to empty.");
         } else {
             String hduName = selectedRglPrioImage.getHduName();
@@ -628,16 +630,16 @@ public class IRModel {
     }
 
     /**
-     * @return the lastImageChanged
+     * @return the inputImageView
      */
-    public String getLastImageChanged() {
-        return lastImageChanged;
+    public String getInputImageView() {
+        return inputImageView;
     }
 
     /**
-     * @param lastImageChanged the lastImageChanged to set
+     * @param inputImageView the inputImageView to set
      */
-    public void setLastImageChanged(String lastImageChanged) {
-        this.lastImageChanged = lastImageChanged;
+    public void setInputImageView(String inputImageView) {
+        this.inputImageView = inputImageView;
     }
 }

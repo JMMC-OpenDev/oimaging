@@ -25,6 +25,8 @@ import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.FitsImageWriter;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_PRIO;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
@@ -240,17 +242,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     public void displayModel(IRModel irModel) {
         showMode = SHOW_MODE.MODEL;
         if (irModel != null) {
-            String lastImageChanged = irModel.getLastImageChanged();
+            String inputImageView = irModel.getInputImageView();
             displayOiFitsAndParams(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
             // only list image HDUs present in the input file
             // choose the image which was changed lastly
-            if (irModel.getLastImageChanged() != null) {
-                if (lastImageChanged.equals("initImg")) {
-                    displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
-                } else if (lastImageChanged.equals("rglPrio")) {
-                    // only list image HDUs present in the input file:
-                    displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedRglPrioImage());
-                }
+            if (inputImageView == null || inputImageView.equals(KEYWORD_INIT_IMG)) {
+                displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
+            } else if (inputImageView.equals(KEYWORD_RGL_PRIO)) {
+                // only list image HDUs present in the input file:
+                displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedRglPrioImage());
             }
         }
         setTabMode(SHOW_MODE.MODEL);
