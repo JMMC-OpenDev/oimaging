@@ -183,7 +183,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
 
     private static void setKeywordValue(final ServiceResult result, int source, String keyword, Object value) {
         final OIFitsFile oIFitsFile = result.getOifitsFile();
-        
+
         if (oIFitsFile == null) {
             logger.info("Could not find the OiFitsFile in the ServiceResult.");
             return;

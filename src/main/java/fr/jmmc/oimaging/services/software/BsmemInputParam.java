@@ -29,7 +29,7 @@ public final class BsmemInputParam extends SoftwareInputParam {
 
     /** Parameters that can be missing. */
     public static final Set<String> SUPPORTED_MISSING_KEYWORDS = new HashSet<>(Arrays.asList(
-        ImageOiConstants.KEYWORD_RGL_PRIO
+            ImageOiConstants.KEYWORD_RGL_PRIO
     ));
 
     public final static String KEYWORD_RGL_ALPH = "RGL_ALPH";

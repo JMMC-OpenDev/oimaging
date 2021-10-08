@@ -310,7 +310,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
         final List<ServiceResult> results = getSelectedRows();
         return (results.isEmpty()) ? null : results.get(0);
     }
-    
+
     public void setSelectedRow(final ServiceResult result) {
         if (result != null) {
             int modelIndex = -1;
