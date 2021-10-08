@@ -118,6 +118,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jButtonLoadFitsImage = new javax.swing.JButton();
         jButtonRemoveFitsImage = new javax.swing.JButton();
         jCheckBoxAutoWgt = new javax.swing.JCheckBox();
+        jSeparatorView = new javax.swing.JSeparator();
+        jPanelView = new javax.swing.JPanel();
+        jLabelView = new javax.swing.JLabel();
         jRadioButtonViewInitImg = new javax.swing.JRadioButton();
         jRadioButtonViewRglPrio = new javax.swing.JRadioButton();
         jTableKeywordsEditor = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
@@ -145,6 +148,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jComboBoxSoftware, gridBagConstraints);
 
         jLabelInitImg.setText("INIT_IMG");
+        jLabelInitImg.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_INIT_IMG));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -385,9 +389,27 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jCheckBoxAutoWgt, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 2, 0);
+        jPanelForm.add(jSeparatorView, gridBagConstraints);
+
+        jPanelView.setLayout(new java.awt.GridBagLayout());
+
+        jLabelView.setText("View:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 4);
+        jPanelView.add(jLabelView, gridBagConstraints);
 
         buttonsView.add(jRadioButtonViewInitImg);
-        jRadioButtonViewInitImg.setText("View INIT_IMG");
+        jRadioButtonViewInitImg.setText("INIT_IMG");
         jRadioButtonViewInitImg.setActionCommand(KEYWORD_INIT_IMG);
         jRadioButtonViewInitImg.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -396,13 +418,15 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        jPanelForm.add(jRadioButtonViewInitImg, gridBagConstraints);
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 4);
+        jPanelView.add(jRadioButtonViewInitImg, gridBagConstraints);
 
         buttonsView.add(jRadioButtonViewRglPrio);
-        jRadioButtonViewRglPrio.setText("view RGL_PRIO");
+        jRadioButtonViewRglPrio.setText("RGL_PRIO");
+        jRadioButtonViewRglPrio.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_PRIO));
         jRadioButtonViewRglPrio.setActionCommand(KEYWORD_RGL_PRIO);
         jRadioButtonViewRglPrio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -410,11 +434,19 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelForm.add(jRadioButtonViewRglPrio, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
+        jPanelView.add(jRadioButtonViewRglPrio, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanelForm.add(jPanelView, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -535,10 +567,13 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelRglName;
     private javax.swing.JLabel jLabelRglPrio;
     private javax.swing.JLabel jLabelRglWgt;
+    private javax.swing.JLabel jLabelView;
     private javax.swing.JPanel jPanelForm;
     private javax.swing.JPanel jPanelOptions;
+    private javax.swing.JPanel jPanelView;
     private javax.swing.JRadioButton jRadioButtonViewInitImg;
     private javax.swing.JRadioButton jRadioButtonViewRglPrio;
+    private javax.swing.JSeparator jSeparatorView;
     private javax.swing.JSpinner jSpinnerMaxIter;
     private fr.jmmc.oimaging.gui.TableKeywordsEditor jTableKeywordsEditor;
     private javax.swing.JTextArea jTextAreaOptions;
@@ -653,7 +688,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             }
 
             // Input Image View
-
             String inputImageView = irModel.getInputImageView();
             if (inputImageView == null) {
                 buttonsView.clearSelection();
