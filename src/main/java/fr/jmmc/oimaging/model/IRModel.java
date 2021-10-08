@@ -8,6 +8,7 @@ import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.DateUtils;
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
@@ -34,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -435,7 +435,7 @@ public class IRModel {
      * @param cliOptions software options on command line or null
      */
     public void setCliOptions(String cliOptions) {
-        if (StringUtils.isBlank(cliOptions)) {
+        if (StringUtils.isEmpty(cliOptions)) {
             this.cliOptions = null;
         } else {
             this.cliOptions = cliOptions;

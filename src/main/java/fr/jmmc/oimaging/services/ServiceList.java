@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging.services;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.services.software.SoftwareInputParam;
 import fr.jmmc.oitools.fits.FitsHeaderCard;
@@ -11,7 +12,6 @@ import fr.jmmc.oitools.fits.FitsTable;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.util.ArrayList;
 import javax.swing.ComboBoxModel;
-import org.apache.commons.lang.StringUtils;
 
 /**
  *
