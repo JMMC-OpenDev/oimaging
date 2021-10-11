@@ -88,7 +88,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
 
-    private enum SHOW_MODE {
+    public enum SHOW_MODE {
         MODEL,
         RESULT,
         GRID;
@@ -745,7 +745,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             return;
         }
 
-        switch (showMode) {
+        switch (getShowMode()) {
             case MODEL:
                 lastModelPanel = jTabbedPaneVizualizations.getSelectedComponent();
                 break;
@@ -760,12 +760,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     private void restoreLastShownPanel() {
         // last panel refs may be null during program startup...
-        if (showMode == SHOW_MODE.MODEL && lastModelPanel != null) {
+        if (getShowMode() == SHOW_MODE.MODEL && lastModelPanel != null) {
             jTabbedPaneVizualizations.setSelectedComponent(lastModelPanel);
-        } else if (showMode == SHOW_MODE.RESULT & lastResultPanel != null) {
+        } else if (getShowMode() == SHOW_MODE.RESULT & lastResultPanel != null) {
             jTabbedPaneVizualizations.setSelectedComponent(lastResultPanel);
-        } else if (showMode == SHOW_MODE.GRID && lastGridPanel != null) {
+        } else if (getShowMode() == SHOW_MODE.GRID && lastGridPanel != null) {
             jTabbedPaneVizualizations.setSelectedComponent(lastGridPanel);
         }
+    }
+
+    /**
+     * @return the showMode
+     */
+    public SHOW_MODE getShowMode() {
+        return showMode;
     }
 }
