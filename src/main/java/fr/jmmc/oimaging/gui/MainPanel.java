@@ -25,6 +25,10 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsUnit;
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_T3_NONE;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_T3_VALUES;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_VIS_NONE;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_VIS_VALUES;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.range.Range;
 import java.awt.Cursor;
@@ -35,6 +39,7 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSlider;
@@ -240,9 +245,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jScrollPane = new javax.swing.JScrollPane();
         jPanelLeft = new javax.swing.JPanel();
         jPanelDataSelection = new javax.swing.JPanel();
-        jCheckBoxUseVis = new javax.swing.JCheckBox();
         jCheckBoxUseVis2 = new javax.swing.JCheckBox();
-        jCheckBoxUseT3 = new javax.swing.JCheckBox();
         jPanelTarget = new javax.swing.JPanel();
         jComboBoxTarget = new javax.swing.JComboBox();
         jLabelTarget = new javax.swing.JLabel();
@@ -255,6 +258,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jFormattedTextFieldWaveMin = new javax.swing.JFormattedTextField();
         jFormattedTextFieldWaveMax = new javax.swing.JFormattedTextField();
         jLabelOifitsFile = new javax.swing.JLabel();
+        jPanelUseVis = new javax.swing.JPanel();
+        jLabelUseVis = new javax.swing.JLabel();
+        jComboBoxUseVis = new javax.swing.JComboBox<>();
+        jPanelUseT3 = new javax.swing.JPanel();
+        jLabelUseT3 = new javax.swing.JLabel();
+        jComboBoxUseT3 = new javax.swing.JComboBox<>();
         softwareSettingsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
@@ -282,28 +291,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSplitPane.setMinimumSize(new java.awt.Dimension(900, 600));
 
         jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane.setViewportView(jPanelLeft);
 
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
         jPanelDataSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Data selection"));
         jPanelDataSelection.setLayout(new java.awt.GridBagLayout());
 
-        jCheckBoxUseVis.setText("VIS");
-        jCheckBoxUseVis.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_USE_VIS));
-        jCheckBoxUseVis.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.weightx = 0.1;
-        jPanelDataSelection.add(jCheckBoxUseVis, gridBagConstraints);
-
         jCheckBoxUseVis2.setText("VIS2");
         jCheckBoxUseVis2.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_USE_VIS2));
+        jCheckBoxUseVis2.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jCheckBoxUseVis2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxActionPerformed(evt);
@@ -314,19 +310,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 0.1;
         jPanelDataSelection.add(jCheckBoxUseVis2, gridBagConstraints);
-
-        jCheckBoxUseT3.setText("T3");
-        jCheckBoxUseT3.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_USE_T3));
-        jCheckBoxUseT3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.weightx = 0.1;
-        jPanelDataSelection.add(jCheckBoxUseT3, gridBagConstraints);
 
         jPanelTarget.setLayout(new java.awt.GridBagLayout());
 
@@ -351,7 +334,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelTarget.add(jLabelTarget, gridBagConstraints);
 
         jButtonLoadData.setText("L");
-        jButtonLoadData.setMargin(new java.awt.Insets(0, 0, 0, 0));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -462,6 +444,48 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         jPanelDataSelection.add(jLabelOifitsFile, gridBagConstraints);
+
+        jPanelUseVis.setLayout(new java.awt.GridBagLayout());
+
+        jLabelUseVis.setText("USE_VIS");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+        jPanelUseVis.add(jLabelUseVis, gridBagConstraints);
+
+        jComboBoxUseVis.setModel(new DefaultComboBoxModel(USE_VIS_VALUES));
+        jComboBoxUseVis.setPrototypeDisplayValue(USE_VIS_NONE);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        jPanelUseVis.add(jComboBoxUseVis, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        jPanelDataSelection.add(jPanelUseVis, gridBagConstraints);
+
+        jPanelUseT3.setLayout(new java.awt.GridBagLayout());
+
+        jLabelUseT3.setText("USE_VIS");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+        jPanelUseT3.add(jLabelUseT3, gridBagConstraints);
+
+        jComboBoxUseT3.setModel(new DefaultComboBoxModel(USE_T3_VALUES));
+        jComboBoxUseT3.setPrototypeDisplayValue(USE_T3_NONE);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        jPanelUseT3.add(jComboBoxUseT3, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        jPanelDataSelection.add(jPanelUseT3, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -633,21 +657,25 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;
     private javax.swing.JButton jButtonRun;
-    private javax.swing.JCheckBox jCheckBoxUseT3;
-    private javax.swing.JCheckBox jCheckBoxUseVis;
     private javax.swing.JCheckBox jCheckBoxUseVis2;
     private javax.swing.JComboBox jComboBoxTarget;
+    private javax.swing.JComboBox<String> jComboBoxUseT3;
+    private javax.swing.JComboBox<String> jComboBoxUseVis;
     private javax.swing.JEditorPane jEditorPane;
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMax;
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMin;
     private javax.swing.JLabel jLabelOifitsFile;
     private javax.swing.JLabel jLabelTarget;
+    private javax.swing.JLabel jLabelUseT3;
+    private javax.swing.JLabel jLabelUseVis;
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
     private javax.swing.JPanel jPanelLeft;
     private javax.swing.JPanel jPanelTarget;
+    private javax.swing.JPanel jPanelUseT3;
+    private javax.swing.JPanel jPanelUseVis;
     private javax.swing.JPanel jPanelWL;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPaneEditor;
@@ -738,10 +766,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // observables
-        mFlag = params.useVis();
-        wFlag = jCheckBoxUseVis.isSelected();
-        if (mFlag != wFlag) {
-            params.useVis(wFlag);
+        mString = params.useVis();
+        wString = (String) jComboBoxUseVis.getSelectedItem();
+        if (!mString.equals(wString)) {
+            params.useVis(wString);
             changed = true;
         }
 
@@ -752,10 +780,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             changed = true;
         }
 
-        mFlag = params.useT3();
-        wFlag = jCheckBoxUseT3.isSelected();
-        if (mFlag != wFlag) {
-            params.useT3(wFlag);
+        mString = params.useT3();
+        wString = (String) jComboBoxUseT3.getSelectedItem();
+        if (!mString.equals(wString)) {
+            params.useT3(wString);
             changed = true;
         }
 
@@ -812,12 +840,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jFormattedTextFieldWaveMax.setValue(inputParam.getWaveMax() / MICRO_METER);
 
             // arrange observable checkboxes
-            jCheckBoxUseVis.setEnabled(hasOIData && oifitsFile.hasOiVis());
+            jComboBoxUseVis.setEnabled(hasOIData && oifitsFile.hasOiVis());
             jCheckBoxUseVis2.setEnabled(hasOIData && oifitsFile.hasOiVis2());
-            jCheckBoxUseT3.setEnabled(hasOIData && oifitsFile.hasOiT3());
-            jCheckBoxUseVis.setSelected(hasOIData && inputParam.useVis());
+            jComboBoxUseT3.setEnabled(hasOIData && oifitsFile.hasOiT3());
+            jComboBoxUseVis.setSelectedItem(inputParam.useVis());
             jCheckBoxUseVis2.setSelected(hasOIData && inputParam.useVis2());
-            jCheckBoxUseT3.setSelected(hasOIData && inputParam.useT3());
+            jComboBoxUseT3.setSelectedItem(inputParam.useT3());
 
             // model result list:
             final List<ServiceResult> modelResults = currentModel.getResultSets();

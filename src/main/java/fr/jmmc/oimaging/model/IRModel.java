@@ -18,6 +18,10 @@ import fr.jmmc.oitools.image.FitsImageHDU;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_T3_ALL;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_T3_NONE;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_VIS_ALL;
+import static fr.jmmc.oitools.image.ImageOiInputParam.USE_VIS_NONE;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
@@ -155,9 +159,19 @@ public class IRModel {
         inputParam.setWaveMax(effWaveRange.getMax());
 
         // Reset observable use according available tables
-        inputParam.useVis(oifitsFile.hasOiVis());
+        if (oifitsFile.hasOiVis()) {
+            inputParam.useVis(USE_VIS_ALL);
+        } else {
+            inputParam.useVis(USE_VIS_NONE);
+        }
+
         inputParam.useVis2(oifitsFile.hasOiVis2());
-        inputParam.useT3(oifitsFile.hasOiT3());
+
+        if (oifitsFile.hasOiT3()) {
+            inputParam.useT3(USE_T3_ALL);
+        } else {
+            inputParam.useT3(USE_T3_NONE);
+        }
 
         // load fits Image HDU data if any present
         // Select first image as selected one if not yet initialized
