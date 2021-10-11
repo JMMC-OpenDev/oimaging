@@ -456,6 +456,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jComboBoxUseVis.setModel(new DefaultComboBoxModel(USE_VIS_VALUES));
         jComboBoxUseVis.setPrototypeDisplayValue(USE_VIS_NONE);
+        jComboBoxUseVis.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxUseVisActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -477,6 +482,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jComboBoxUseT3.setModel(new DefaultComboBoxModel(USE_T3_VALUES));
         jComboBoxUseT3.setPrototypeDisplayValue(USE_T3_NONE);
+        jComboBoxUseT3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxUseT3ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -616,6 +626,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             viewerPanel.displayGrid(jTablePanel.getSelectedRows());
         }
     }//GEN-LAST:event_jButtonCompareActionPerformed
+
+    private void jComboBoxUseVisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxUseVisActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jComboBoxUseVisActionPerformed
+
+    private void jComboBoxUseT3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxUseT3ActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jComboBoxUseT3ActionPerformed
 
     public void deleteSelectedRows() {
         final int nSelected = jTablePanel.getSelectedRowsCount();
