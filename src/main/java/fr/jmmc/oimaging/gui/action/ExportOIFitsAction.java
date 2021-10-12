@@ -5,10 +5,10 @@ package fr.jmmc.oimaging.gui.action;
 
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
+import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.oimaging.OImaging;
 import fr.jmmc.oimaging.gui.ViewerPanel;
 import java.awt.event.ActionEvent;
-import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +45,7 @@ public final class ExportOIFitsAction extends RegisteredAction {
         logger.debug("actionPerformed");
         ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanel();
         if (viewerPanel.getShowMode() == ViewerPanel.SHOW_MODE.GRID) {
-            JOptionPane.showMessageDialog(null,
-                    "Error: Cannot export while in GRID mode. Please select one single result.");
+            MessagePane.showErrorMessage("Error: Cannot export while in GRID mode. Please select one single result.");
         } else {
             viewerPanel.exportOIFits(true);
         }
