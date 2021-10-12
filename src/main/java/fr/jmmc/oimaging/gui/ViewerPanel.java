@@ -734,9 +734,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     private void enableActions() {
-        exportOiFitsAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelOIFitsViewer && oifitsViewPanel.getOIFitsData() != null);
+        exportOiFitsAction.setEnabled(oifitsViewPanel.getOIFitsData() != null);
         sendOiFitsAction.setEnabled(exportOiFitsAction.isEnabled());
-        exportFitsImageAction.setEnabled(jTabbedPaneVizualizations.getSelectedComponent() == jPanelImageViewer && fitsImagePanel.getFitsImage() != null);
+        exportFitsImageAction.setEnabled(fitsImagePanel.getFitsImage() != null);
         sendFitsAction.setEnabled(exportFitsImageAction.isEnabled());
     }
 
