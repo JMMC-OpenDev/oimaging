@@ -12,7 +12,6 @@ import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
-import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
@@ -72,7 +71,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private DeleteSelectionAction deleteSelectionAction;
     private RunAction runAction;
     private Action exportOiFitsAction;
-    private Action exportFitsImageAction;
 
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
@@ -205,15 +203,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         deleteSelectionAction = (DeleteSelectionAction) ActionRegistrar.getInstance().get(DeleteSelectionAction.className, DeleteSelectionAction.actionName);
         runAction = (RunAction) ActionRegistrar.getInstance().get(RunAction.className, RunAction.actionName);
         jButtonRun.setAction(runAction);
-        //  TODO fix next call      jButtonRun.setText((String) runAction.getValue(Action.SHORT_DESCRIPTION));
-        jButtonRun.setText("Run");
 
         exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
         jButtonExportOIFits.setAction(exportOiFitsAction);
-
-        exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
-        jButtonExportImage.setAction(exportFitsImageAction);
-
     }
 
     @Override
@@ -258,7 +250,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         softwareSettingsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
-        jButtonExportImage = new javax.swing.JButton();
         jButtonExportOIFits = new javax.swing.JButton();
         jScrollPaneEditor = new javax.swing.JScrollPane();
         jEditorPane = new javax.swing.JEditorPane();
@@ -351,7 +342,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelTarget.add(jLabelTarget, gridBagConstraints);
 
         jButtonLoadData.setText("L");
-        jButtonLoadData.setMargin(new java.awt.Insets(0, 0, 0, 0));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -478,29 +468,17 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
         jPanelExecutionLog.setLayout(new java.awt.GridBagLayout());
 
-        jButtonRun.setText("Run");
+        jButtonRun.setText("[Run]");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
 
-        jButtonExportImage.setText("Save image");
-        jButtonExportImage.setEnabled(false);
+        jButtonExportOIFits.setText("[Save]");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jButtonExportImage, gridBagConstraints);
-
-        jButtonExportOIFits.setText("Save Oifits");
-        jButtonExportOIFits.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
@@ -516,7 +494,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -629,7 +606,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCompare;
-    private javax.swing.JButton jButtonExportImage;
     private javax.swing.JButton jButtonExportOIFits;
     private javax.swing.JButton jButtonLoadData;
     private javax.swing.JButton jButtonRun;
