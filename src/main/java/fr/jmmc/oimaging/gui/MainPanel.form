@@ -60,6 +60,9 @@
             <Container class="javax.swing.JScrollPane" name="jScrollPane">
               <Properties>
                 <Property name="verticalScrollBarPolicy" type="int" value="22"/>
+                <Property name="viewportView" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="jPanelLeft"/>
+                </Property>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -338,7 +341,7 @@
                       <SubComponents>
                         <Component class="javax.swing.JButton" name="jButtonRun">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Run"/>
+                            <Property name="text" type="java.lang.String" value="[Run]"/>
                           </Properties>
                           <Constraints>
                             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -348,7 +351,7 @@
                         </Component>
                         <Component class="javax.swing.JButton" name="jButtonExportOIFits">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Save Oifits file"/>
+                            <Property name="text" type="java.lang.String" value="[Save]"/>
                           </Properties>
                           <Constraints>
                             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

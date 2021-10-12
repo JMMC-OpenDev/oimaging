@@ -203,8 +203,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         deleteSelectionAction = (DeleteSelectionAction) ActionRegistrar.getInstance().get(DeleteSelectionAction.className, DeleteSelectionAction.actionName);
         runAction = (RunAction) ActionRegistrar.getInstance().get(RunAction.className, RunAction.actionName);
         jButtonRun.setAction(runAction);
-        //  TODO fix next call      jButtonRun.setText((String) runAction.getValue(Action.SHORT_DESCRIPTION));
-        jButtonRun.setText("Run");
 
         exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
         jButtonExportOIFits.setAction(exportOiFitsAction);
@@ -275,6 +273,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSplitPane.setMinimumSize(new java.awt.Dimension(900, 600));
 
         jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane.setViewportView(jPanelLeft);
 
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
@@ -469,7 +468,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
         jPanelExecutionLog.setLayout(new java.awt.GridBagLayout());
 
-        jButtonRun.setText("Run");
+        jButtonRun.setText("[Run]");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -477,7 +476,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
 
-        jButtonExportOIFits.setText("Save Oifits file");
+        jButtonExportOIFits.setText("[Save]");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
