@@ -734,7 +734,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     private void enableActions() {
-        exportOiFitsAction.setEnabled(oifitsViewPanel.getOIFitsData() != null);
+        final OIFitsFile oiFitsFile = oifitsViewPanel.getOIFitsData();
+        final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
+        exportOiFitsAction.setEnabled(enableExportOiFits);
         sendOiFitsAction.setEnabled(exportOiFitsAction.isEnabled());
         exportFitsImageAction.setEnabled(fitsImagePanel.getFitsImage() != null);
         sendFitsAction.setEnabled(exportFitsImageAction.isEnabled());
