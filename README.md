@@ -5,7 +5,7 @@ This module contains the OImaging java application developed by the JMMC technic
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 
-See [OImaging](https://jmmc.fr/oimaging)
+See [OImaging](https://www.jmmc.fr/oimaging)
 See [JMMC releases](https://www.jmmc.fr/releases/)
 See [JMMC OpenDev @ github](https://github.com/JMMC-OpenDev/)
 
