@@ -385,19 +385,23 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final OIFitsFile oifitsFile = oifitsViewPanel.getOIFitsData();
         // store original filename
         final String originalAbsoluteFilePath = oifitsFile.getAbsoluteFilePath();
+        String name = oifitsFile.getFileName();
+        // name can not be null below:
+        if (name == null) {
+            name = "";
+        }
         final File file;
 
         if (useFileChooser) {
-            final File dir = FileUtils.getDirectory(oifitsFile.getAbsoluteFilePath());
-            String name = oifitsFile.getFileName();
+            final File dir = FileUtils.getDirectory(originalAbsoluteFilePath); // may be null
 
-            if (!name.contains(".image-oi")) {
+            if (!name.isEmpty() && !name.contains(".image-oi")) {
                 name = FileUtils.getFileNameWithoutExtension(name) + ".image-oi." + FileUtils.getExtension(oifitsFile.getFileName());
             }
 
             file = FileChooser.showSaveFileChooser("Choose destination to write the OIFits file", dir, MimeType.OIFITS, name);
         } else {
-            file = FileUtils.getTempFile(oifitsFile.getFileName(), FITS_EXTENSION);
+            file = FileUtils.getTempFile(name, FITS_EXTENSION);
         }
 
         // Cancel
@@ -407,14 +411,14 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         try {
             OIFitsWriter.writeOIFits(file.getAbsolutePath(), oifitsFile);
-        } catch (IOException ex) {
+        } catch (IOException ioe) {
             // Show the feedback report (modal) :
-            FeedbackReport.openDialog(true, ex);
-        } catch (FitsException ex) {
+            FeedbackReport.openDialog(true, ioe);
+        } catch (FitsException fe) {
             // Show the feedback report (modal) :
-            FeedbackReport.openDialog(true, ex);
+            FeedbackReport.openDialog(true, fe);
         } finally {
-            if (!useFileChooser) {
+            if (!useFileChooser && !StringUtils.isEmpty(originalAbsoluteFilePath)) {
                 // restore filename
                 oifitsFile.setAbsoluteFilePath(originalAbsoluteFilePath);
             }
@@ -446,15 +450,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             fits.getFitsImageHDUs().add(fitsImage.getFitsImageHDU());
 
             FitsImageWriter.write(file.getAbsolutePath(), fits);
-        } catch (IOException ex) {
+        } catch (IOException ioe) {
             // Show the feedback report (modal) :
-            FeedbackReport.openDialog(true, ex);
-        } catch (FitsException ex) {
+            FeedbackReport.openDialog(true, ioe);
+        } catch (FitsException fe) {
             // Show the feedback report (modal) :
-            FeedbackReport.openDialog(true, ex);
+            FeedbackReport.openDialog(true, fe);
         } finally {
-            // restore identifier
-            fitsImage.setFitsImageIdentifier(originalImageIdentifier);
+            if (!StringUtils.isEmpty(originalImageIdentifier)) {
+                // restore identifier
+                fitsImage.setFitsImageIdentifier(originalImageIdentifier);
+            }
         }
         return file;
     }
@@ -737,9 +743,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final OIFitsFile oiFitsFile = oifitsViewPanel.getOIFitsData();
         final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
         exportOiFitsAction.setEnabled(enableExportOiFits);
-        sendOiFitsAction.setEnabled(exportOiFitsAction.isEnabled());
-        exportFitsImageAction.setEnabled(fitsImagePanel.getFitsImage() != null);
-        sendFitsAction.setEnabled(exportFitsImageAction.isEnabled());
+        sendOiFitsAction.setEnabled(enableExportOiFits);
+
+        final boolean enableExportImage = (fitsImagePanel.getFitsImage() != null);
+        exportFitsImageAction.setEnabled(enableExportImage);
+        sendFitsAction.setEnabled(enableExportImage);
     }
 
     private void storeLastPanel() {
