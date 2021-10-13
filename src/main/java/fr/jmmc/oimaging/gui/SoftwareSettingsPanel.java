@@ -279,6 +279,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jFormattedTextFieldFlux.setColumns(6);
         jFormattedTextFieldFlux.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldFlux.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUX));
+        jFormattedTextFieldFlux.setEnabled(false);
         jFormattedTextFieldFlux.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldFluxActionPerformed(evt);
@@ -310,6 +311,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jFormattedTextFieldFluxErr.setColumns(6);
         jFormattedTextFieldFluxErr.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldFluxErr.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUXERR));
+        jFormattedTextFieldFluxErr.setEnabled(false);
         jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldFluxErrActionPerformed(evt);
@@ -734,14 +736,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             // flux:
             jFormattedTextFieldFlux.setValue(inputParam.getFlux());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUX);
-            jLabelFlux.setVisible(show);
-            jFormattedTextFieldFlux.setVisible(show);
+            jLabelFlux.setVisible(false && show); // purposely hidden
+            jFormattedTextFieldFlux.setVisible(false && show); // purposely hidden
 
             // flux Err:
             jFormattedTextFieldFluxErr.setValue(inputParam.getFluxErr());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUXERR);
-            jLabelFluxErr.setVisible(show);
-            jFormattedTextFieldFluxErr.setVisible(show);
+            jLabelFluxErr.setVisible(false && show); // purposely hidden
+            jFormattedTextFieldFluxErr.setVisible(false && show); // purposely hidden
 
             // validate
             service.validate(inputParam, failures);
