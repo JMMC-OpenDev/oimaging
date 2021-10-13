@@ -17,6 +17,9 @@ See the [OImaging Board](https://github.com/orgs/JMMC-OpenDev/projects/3) to see
 
 ## Documentation
 
+See [OI-Interface standard](https://github.com/JMMC-OpenDev/OI-Imaging-JRA)
+
+
 This module contains the source code of the JMMC OImaging Graphical interface.
 See the `pom.xml` file to get all dependencies, including other JMMC OpenDev modules:
 - [oiexplorer-core](https://github.com/JMMC-OpenDev/oiexplorer-core)
