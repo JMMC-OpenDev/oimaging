@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.4 beta 6"/>
-    <compilation date="08/10/2021" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.5.4 beta 7"/>
+    <compilation date="15/10/2021" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -155,7 +155,12 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Fri, 08 Oct 2021 15:00:00 GMT</pubDate>
+            <pubDate>Fri, 15 Oct 2021 16:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 7">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/17">Keep only 1 'Save OIFits file' button in the main panel</change>
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/26">Hide keywords FLUX and FLUXERR in GUI</change>
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/29">Hide the keyword THRESHOLD for WISARD</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 6">
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/10">Added support for BSMEM prior image (RGL_PRIOR)</change>
             </prerelease>
