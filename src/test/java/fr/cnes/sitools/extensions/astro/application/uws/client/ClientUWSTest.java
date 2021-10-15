@@ -52,7 +52,7 @@ public class ClientUWSTest {
     }
 
     @Test
-    public void testMain() throws Exception {
+    public void testMain() {
         File inputFile = new File("src/test/resources/Bin_Ary--MIRC_H_with_img.fits");
 
         logger.info("submit input file : " + inputFile.getAbsolutePath());
@@ -70,17 +70,22 @@ public class ClientUWSTest {
         FormData fdFile = new FormData("inputfile", entity);
         fds.getEntries().add(fdFile);
 
-        // Create job
-        String jobId = instance.createJob(fds);
-        logger.warn("new jobid: " + jobId);
+        try {
+            // Create job
+            String jobId = instance.createJob(fds);
+            logger.warn("new jobid: " + jobId);
 
-        // Get job info
-        System.out.println("JobInfo:" + instance.getJobInfo(jobId));
+            // Get job info
+            System.out.println("JobInfo:" + instance.getJobInfo(jobId));
 
-        // Start jobs (if not previously autostarted)
-        //instance.setStartJob(jobId);
-        // List jobs
-        Jobs result = instance.getJobs();
-        System.out.println("result = " + result.getJobref());
+            // Start jobs (if not previously autostarted)
+            //instance.setStartJob(jobId);
+            // List jobs
+            Jobs result = instance.getJobs();
+            System.out.println("result = " + result.getJobref());
+        } catch (Exception e) {
+            System.err.println("Exception caught: ");
+            e.printStackTrace();
+        }
     }
 }
