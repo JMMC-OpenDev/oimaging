@@ -185,6 +185,7 @@
                             <Component class="javax.swing.JButton" name="jButtonLoadData">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="L"/>
+                                <Property name="name" type="java.lang.String" value="jButtonLoadData" noResource="true"/>
                               </Properties>
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -342,6 +343,7 @@
                         <Component class="javax.swing.JButton" name="jButtonRun">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="[Run]"/>
+                            <Property name="name" type="java.lang.String" value="jButtonRun" noResource="true"/>
                           </Properties>
                           <Constraints>
                             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -352,6 +354,7 @@
                         <Component class="javax.swing.JButton" name="jButtonExportOIFits">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="[Save]"/>
+                            <Property name="name" type="java.lang.String" value="jButtonExportOIFits" noResource="true"/>
                           </Properties>
                           <Constraints>
                             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

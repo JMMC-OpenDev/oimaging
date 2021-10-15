@@ -1,4 +1,7 @@
-/target/
+/failed-gui-tests/
+/fest-screenshots/
 /test/
 /nbactions.xml
 /nb-configuration.xml
+/target/
+

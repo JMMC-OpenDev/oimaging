@@ -41,6 +41,7 @@
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="ServiceList.getAvailableServices()" type="code"/>
             </Property>
+            <Property name="name" type="java.lang.String" value="jComboBoxSoftware" noResource="true"/>
             <Property name="prototypeDisplayValue" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="&quot;XXXX&quot;" type="code"/>
             </Property>

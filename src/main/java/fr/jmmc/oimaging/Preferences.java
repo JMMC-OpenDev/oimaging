@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging;
 
 import fr.jmmc.jmal.image.ColorModels;
+import fr.jmmc.jmal.image.ColorScale;
 import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
 import java.util.List;
@@ -73,6 +74,7 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
 
         // Use GD's prefered value for a better image viewing that isophot...
         setDefaultPreference(MODEL_IMAGE_LUT, ColorModels.COLOR_MODEL_HEAT);
+        setDefaultPreference(MODEL_IMAGE_SCALE, ColorScale.LOGARITHMIC.toString());
         // Disable interpolation:
         setDefaultPreference(MODEL_IMAGE_INTERPOLATION, ImageInterpolation.None.toString());
 

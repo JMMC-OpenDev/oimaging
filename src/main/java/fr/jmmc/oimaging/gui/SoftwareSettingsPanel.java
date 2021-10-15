@@ -133,6 +133,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.setLayout(new java.awt.GridBagLayout());
 
         jComboBoxSoftware.setModel(ServiceList.getAvailableServices());
+        jComboBoxSoftware.setName("jComboBoxSoftware"); // NOI18N
         jComboBoxSoftware.setPrototypeDisplayValue("XXXX");
         jComboBoxSoftware.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

@@ -342,6 +342,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelTarget.add(jLabelTarget, gridBagConstraints);
 
         jButtonLoadData.setText("L");
+        jButtonLoadData.setName("jButtonLoadData"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -469,6 +470,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelExecutionLog.setLayout(new java.awt.GridBagLayout());
 
         jButtonRun.setText("[Run]");
+        jButtonRun.setName("jButtonRun"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -477,6 +479,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
 
         jButtonExportOIFits.setText("[Save]");
+        jButtonExportOIFits.setName("jButtonExportOIFits"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -849,6 +852,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
             if (event.getType() == IRModelEventType.IRMODEL_CHANGED || modelResults.isEmpty()) {
+                // to ensure jsplit pane will be given 90% once it becomes visible:
+                showTablePanel(false);
                 viewerPanel.displayModel(currentModel);
             } else {
                 showTablePanel(true);
