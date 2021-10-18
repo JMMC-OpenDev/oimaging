@@ -26,6 +26,7 @@
     <Container class="javax.swing.JTabbedPane" name="jTabbedPaneVizualizations">
       <Properties>
         <Property name="selectedIndex" type="int" value="1"/>
+        <Property name="name" type="java.lang.String" value="jTabbedPaneVizualizations" noResource="true"/>
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

@@ -527,6 +527,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
         setLayout(new java.awt.GridBagLayout());
 
+        jTabbedPaneVizualizations.setName("jTabbedPaneVizualizations"); // NOI18N
+
         jPanelOIFitsViewer.setLayout(new java.awt.GridBagLayout());
 
         jPanelOIFits.setLayout(new java.awt.BorderLayout());

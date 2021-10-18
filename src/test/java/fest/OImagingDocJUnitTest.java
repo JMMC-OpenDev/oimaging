@@ -88,7 +88,6 @@ public final class OImagingDocJUnitTest extends JmcsFestSwingJUnitTestCase {
 
         // Set special system properties:
         System.setProperty("oimaging.devMode", "false");
-        System.setProperty("RemoteExecutionMode.local", "false");
 
         // Start application:
         JmcsFestSwingJUnitTestCase.startApplication(
@@ -143,6 +142,7 @@ public final class OImagingDocJUnitTest extends JmcsFestSwingJUnitTestCase {
 
         pauseMedium();
 
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab("Image");
         saveScreenshot(window, "OImaging-output-" + algorithm + ".png");
 
         if (small) {
@@ -160,6 +160,15 @@ public final class OImagingDocJUnitTest extends JmcsFestSwingJUnitTestCase {
             final BufferedImage rescaledImage = resampleOp.filter(image, null);
             saveImage(rescaledImage, "OImaging-output-" + algorithm + "-small.png");
         }
+
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab("OIFits");
+        saveScreenshot(window, "OImaging-output-" + algorithm + "-oifits.png");
+
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab("Parameters");
+        saveScreenshot(window, "OImaging-output-" + algorithm + "-parameters.png");
+
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab("Execution log");
+        saveScreenshot(window, "OImaging-output-" + algorithm + "-log.png");
     }
 
     /**

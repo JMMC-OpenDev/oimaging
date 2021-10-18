@@ -26,6 +26,17 @@
         <maven.test.skip>true</maven.test.skip>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=128m -DRemoteExecutionMode.local=false</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <repositories>
         <repository>
             <id>maven-restlet</id>
