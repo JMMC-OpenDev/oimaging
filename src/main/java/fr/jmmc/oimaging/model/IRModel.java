@@ -92,6 +92,11 @@ public class IRModel {
     /** List of results */
     private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
 
+    /** counter of results since startup.
+     *  is used as INDEX each time a result is added.
+     *  then is incremented. */
+    private int resultCounter;
+
     /** status flag : set by RunAction */
     private boolean running;
 
@@ -579,6 +584,8 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
+            resultCounter++;
+            serviceResult.setIndex(resultCounter);
             postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
         }

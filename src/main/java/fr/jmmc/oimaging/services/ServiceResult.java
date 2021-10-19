@@ -28,6 +28,8 @@ public final class ServiceResult {
     private boolean cancelled = false;
     private boolean valid = false;
     private String errorMessage = null;
+    /** number received when added to the list of results */
+    private int index;
     /** must be kept in sync with STRTDATE keyword in the OIFitsFile. */
     private Date startTime;
     /** must be kept in sync with ENDDATE keyword in the OIFitsFile. */
@@ -75,6 +77,7 @@ public final class ServiceResult {
         this.executionLogResultFile = executionLogResultFile;
         this.startTime = new Date();
         this.jobDuration = 0;
+        this.index = 0; // temporary value that is to be overwrited by IRModel
         logger.debug("new ServiceResult({}, {}, {})", inputFile, oifitsResultFile, executionLogResultFile);
     }
 
@@ -175,6 +178,20 @@ public final class ServiceResult {
 
     public void setService(Service service) {
         this.service = service;
+    }
+
+    /**
+     * @return the index
+     */
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * @param index the index to set
+     */
+    public void setIndex(int index) {
+        this.index = index;
     }
 
 }
