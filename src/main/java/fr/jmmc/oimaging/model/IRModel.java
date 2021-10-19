@@ -13,6 +13,7 @@ import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
+import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
@@ -588,6 +589,20 @@ public class IRModel {
             serviceResult.setIndex(resultCounter);
             postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
+            // setting the images names with the INDEX
+            // this needs tobe done after the call addFitsImageHDUs()
+            // so it uses the (possible) new name
+            int hduIndex = 0;
+            for (FitsImageHDU fitsImageHDU : serviceResult.getOifitsFile().getFitsImageHDUs()) {
+                for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
+                    String name = serviceResult.getIndex() + "#" + hduIndex + "-" + fitsImageHDU.getHduName();
+                    if (fitsImage.getImageCount() > 1) {
+                        name += "-" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
+                    }
+                    fitsImage.setFitsImageIdentifier(name);
+                }
+                hduIndex++;
+            }
         }
 
         // notify model update
