@@ -14,7 +14,6 @@ import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceResult;
-import fr.jmmc.oitools.model.DataModel;
 import fr.nom.tam.fits.FitsException;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -62,16 +61,7 @@ public class RunAction extends RegisteredAction {
                 StatusBar.show("Spawn " + irModel.getSelectedService() + " process");
                 // change model state to lock it and extract its snapshot
                 setRunningState(irModel, true);
-
-                // prepare temp input file 
-                // but disable renaming of FitsImageIdentifier 
-                // to avoid renaming images belonging to other results (would be confusing)
-                boolean flagSave = DataModel.isUpdateFitsImageIdentifierOnWrite();
-                DataModel.setUpdateFitsImageIdentifierOnWrite(false);
-                File inputFile = irModel.prepareTempFile();
-                DataModel.setUpdateFitsImageIdentifierOnWrite(flagSave); // restore flag
-
-                new RunFitActionWorker(irModel.getCliOptions(), inputFile, irModel, this).executeTask();
+                new RunFitActionWorker(irModel.getCliOptions(), irModel.prepareTempFile(), irModel, this).executeTask();
             } catch (FitsException ex) {
                 setRunningState(irModel, false);
                 logger.error("Can't prepare temporary file before running process", ex);

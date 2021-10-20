@@ -164,27 +164,15 @@ public class IRModel {
         inputParam.useVis(oifitsFile.hasOiVis());
         inputParam.useVis2(oifitsFile.hasOiVis2());
         inputParam.useT3(oifitsFile.hasOiT3());
-
         // load fits Image HDU data if any present
         // Select first image as selected one if not yet initialized
         if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName());
         }
 
-        // setting the images names with FILENAME#HDU_INDEX-HDU_NAME
         // this needs tobe done after the call addFitsImageHDUs()
         // so it uses the (possible) new name
-        int hduIndex = 0;
-        for (FitsImageHDU fitsImageHDU : oifitsFile.getFitsImageHDUs()) {
-            for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
-                String name = oifitsFile.getFileName() + "#" + hduIndex + "-" + fitsImageHDU.getHduName();
-                if (fitsImage.getImageCount() > 1) {
-                    name += "-" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
-                }
-                fitsImage.setFitsImageIdentifier(name);
-            }
-            hduIndex++;
-        }
+        updateImageIdentifiers(oifitsFile);
 
         // try to guess and set service
         Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
@@ -449,20 +437,9 @@ public class IRModel {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
         }
-        // setting the images names with FILENAME#HDU_INDEX-HDU_NAME
         // this needs tobe done after the call addFitsImageHDUs()
         // so it uses the (possible) new name
-        int hduIndex = 0;
-        for (FitsImageHDU fitsImageHDU : hdus) {
-            for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
-                String name = fitsImageFile.getFileName() + "#" + hduIndex + "-" + fitsImageHDU.getHduName();
-                if (fitsImage.getImageCount() > 1) {
-                    name += "-" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
-                }
-                fitsImage.setFitsImageIdentifier(name);
-            }
-            hduIndex++;
-        }
+        updateImageIdentifiers(fitsImageFile);
     }
 
     /**
@@ -618,24 +595,41 @@ public class IRModel {
             serviceResult.setIndex(resultCounter);
             postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
-            // setting the images names with the INDEX
             // this needs tobe done after the call addFitsImageHDUs()
             // so it uses the (possible) new name
-            int hduIndex = 0;
-            for (FitsImageHDU fitsImageHDU : serviceResult.getOifitsFile().getFitsImageHDUs()) {
-                for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
-                    String name = serviceResult.getIndex() + "#" + hduIndex + "-" + fitsImageHDU.getHduName();
-                    if (fitsImage.getImageCount() > 1) {
-                        name += "-" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
-                    }
-                    fitsImage.setFitsImageIdentifier(name);
-                }
-                hduIndex++;
-            }
+            updateImageIdentifiers(serviceResult);
         }
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    /** updates fitsImageIdentifier to be more user friendly in the GUI
+     * @param fitsImageHDUs list of HDU to rename. the order will be used as the number so be exhaustive.
+     * @param source where do the image come from. if from a run, it will be an index number. if not, the file name.
+     */
+    private void updateImageIdentifiers(List<FitsImageHDU> fitsImageHDUs, String source) {
+        int hduIndex = 0;
+        for (FitsImageHDU fitsImageHDU : fitsImageHDUs) {
+            for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
+                String name = fitsImageHDU.getHduName() + " " + source + " hdu#" + hduIndex;
+                if (fitsImage.getImageCount() > 1) {
+                    name += " img#" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
+                }
+                fitsImage.setFitsImageIdentifier(name);
+            }
+            hduIndex++;
+        }
+    }
+
+    /** updates fitsImageIdentifier with the index as source */
+    private void updateImageIdentifiers(ServiceResult serviceResult) {
+        updateImageIdentifiers(serviceResult.getOifitsFile().getFitsImageHDUs(), "result#" + serviceResult.getIndex());
+    }
+
+    /** updates fitsImageIdentifier with the index as source */
+    private void updateImageIdentifiers(FitsImageFile fitsImageFile) {
+        updateImageIdentifiers(fitsImageFile.getFitsImageHDUs(), fitsImageFile.getFileName());
     }
 
     /** Add some OIMaging specific keywords in the OIFitsFile.

@@ -35,6 +35,7 @@ import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oitools.image.FitsImageWriter;
 import fr.jmmc.oitools.model.DataModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -124,6 +125,9 @@ public final class OImaging extends App {
 
         // Early initialisation of the default Plot preset:
         PlotDefinitionFactory.getInstance().setPlotDefault("OIMG_DATA_MODEL/SPATIAL_FREQ");
+
+        // disable update of fitsImage identifiers when writing oiFitsFile
+        FitsImageWriter.setUpdateFitsImageIdentifierOnWrite(false);
     }
 
     /**
