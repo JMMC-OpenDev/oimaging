@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eux
+
 DIR=`pwd`
 # 1. Dependencies:
 cd $DIR/build
@@ -15,7 +17,7 @@ MVN_OPTS="-Djarsigner.skip=true -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
 
 # set -ux
 
-for mod in jmcs oitools jmal oiexplorer-core
+for mod in jmcs jmcs/testgui oitools jmal oiexplorer-core
 do
   cd $mod
   mvn process-resources
