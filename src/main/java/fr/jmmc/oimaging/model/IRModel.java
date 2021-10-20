@@ -449,6 +449,20 @@ public class IRModel {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
         }
+        // setting the images names with FILENAME#HDU_INDEX-HDU_NAME
+        // this needs tobe done after the call addFitsImageHDUs()
+        // so it uses the (possible) new name
+        int hduIndex = 0;
+        for (FitsImageHDU fitsImageHDU : hdus) {
+            for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
+                String name = fitsImageFile.getFileName() + "#" + hduIndex + "-" + fitsImageHDU.getHduName();
+                if (fitsImage.getImageCount() > 1) {
+                    name += "-" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
+                }
+                fitsImage.setFitsImageIdentifier(name);
+            }
+            hduIndex++;
+        }
     }
 
     /**
