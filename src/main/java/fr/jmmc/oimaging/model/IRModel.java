@@ -171,6 +171,21 @@ public class IRModel {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName());
         }
 
+        // setting the images names with FILENAME#HDU_INDEX-HDU_NAME
+        // this needs tobe done after the call addFitsImageHDUs()
+        // so it uses the (possible) new name
+        int hduIndex = 0;
+        for (FitsImageHDU fitsImageHDU : oifitsFile.getFitsImageHDUs()) {
+            for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
+                String name = oifitsFile.getFileName() + "#" + hduIndex + "-" + fitsImageHDU.getHduName();
+                if (fitsImage.getImageCount() > 1) {
+                    name += "-" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
+                }
+                fitsImage.setFitsImageIdentifier(name);
+            }
+            hduIndex++;
+        }
+
         // try to guess and set service
         Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
         if (service == null) {
