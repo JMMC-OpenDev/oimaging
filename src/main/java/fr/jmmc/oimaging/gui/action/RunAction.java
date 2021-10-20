@@ -66,10 +66,10 @@ public class RunAction extends RegisteredAction {
                 // prepare temp input file 
                 // but disable renaming of FitsImageIdentifier 
                 // to avoid renaming images belonging to other results (would be confusing)
-                boolean flagSave = DataModel.isRenameFitsImageIdentifierDuringWrite();
-                DataModel.setRenameFitsImageIdentifierDuringWrite(false);
+                boolean flagSave = DataModel.isUpdateFitsImageIdentifierOnWrite();
+                DataModel.setUpdateFitsImageIdentifierOnWrite(false);
                 File inputFile = irModel.prepareTempFile();
-                DataModel.setRenameFitsImageIdentifierDuringWrite(flagSave); // restore flag
+                DataModel.setUpdateFitsImageIdentifierOnWrite(flagSave); // restore flag
 
                 new RunFitActionWorker(irModel.getCliOptions(), inputFile, irModel, this).executeTask();
             } catch (FitsException ex) {
