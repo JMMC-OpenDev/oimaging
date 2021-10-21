@@ -2,7 +2,6 @@
 
 <!-- Application specific configuration -->
 <included>
-
     <!-- OITools -->
     <!--
     <logger name="fr.jmmc.oitools" level="INFO"/>

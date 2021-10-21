@@ -814,8 +814,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             logger.error("INIT_IMG should not be null because keyword is mandatory.");
         } else {
             if (irModel.getSelectedInputImageHDU() != comboBoxInitImage) {
+                irModel.setInitImgParam(comboBoxInitImage.getHduName());
+                irModel.getOifitsFile().getFitsImageHDUs().add(comboBoxInitImage);
                 irModel.setSelectedInputImageHDU(comboBoxInitImage);
-                irModel.setInputImageView(KEYWORD_INIT_IMG);
                 changed = true;
             }
         }
@@ -829,12 +830,16 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 logger.error("RGL PRIO should not be null because keyword is mandatory.");
             } else {
                 if (irModel.getSelectedRglPrioImage() != comboBoxRglPrioImage) {
-                    irModel.setSelectedRglPrioImage(comboBoxRglPrioImage);
-                    irModel.setInputImageView(KEYWORD_RGL_PRIO);
+                    irModel.setRglPrioParam(comboBoxRglPrioImage.getHduName());
+                    irModel.getOifitsFile().getFitsImageHDUs().add(comboBoxRglPrioImage);
+                    irModel.setSelectedRglPrioHDU(comboBoxRglPrioImage);
                     changed = true;
                 }
             }
         }
+
+        // remove unused HDUs after adding initImg and rglPrio hdus
+        irModel.removeUnusedHDUs();
 
         // max iter
         try {
