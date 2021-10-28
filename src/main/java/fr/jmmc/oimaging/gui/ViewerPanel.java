@@ -483,6 +483,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
+    public void resampleFitsImageV2() {
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+        if (fitsImage != null) {
+            if (fitsImagePanel.resampleFitsImageV2()) {
+                displaySelection(fitsImage.getFitsImageHDU());
+            }
+        }
+    }
+
     public void rescaleFitsImage() {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
         if (fitsImage != null) {
@@ -510,6 +519,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage = new javax.swing.JComboBox();
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
+        jButtonResampleV2 = new javax.swing.JButton();
         jButtonRescale = new javax.swing.JButton();
         jLabelImageDebug = new javax.swing.JLabel();
         jPanelImage = new javax.swing.JPanel();
@@ -590,6 +600,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
 
+        jButtonResampleV2.setText("Resample");
+        jButtonResampleV2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResampleV2ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelImageViewer.add(jButtonResampleV2, gridBagConstraints);
+
         jButtonRescale.setText("Rescale");
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -604,7 +626,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jLabelImageDebug.setForeground(java.awt.Color.red);
         jLabelImageDebug.setText("Debug");
-        jPanelImageViewer.add(jLabelImageDebug, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        jPanelImageViewer.add(jLabelImageDebug, gridBagConstraints);
 
         jPanelImage.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -707,8 +732,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         resampleFitsImage();
     }//GEN-LAST:event_jButtonResampleActionPerformed
 
+    private void jButtonResampleV2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResampleV2ActionPerformed
+        resampleFitsImageV2();
+    }//GEN-LAST:event_jButtonResampleV2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonResample;
+    private javax.swing.JButton jButtonResampleV2;
     private javax.swing.JButton jButtonRescale;
     private javax.swing.JButton jButtonViewport;
     private javax.swing.JComboBox jComboBoxImage;
