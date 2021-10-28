@@ -214,7 +214,7 @@ public class IRModel {
      * @param filename filename of given hdu
      * @return true if some hdu have been added
      */
-    private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
+    public boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
         try {

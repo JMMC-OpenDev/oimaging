@@ -20,6 +20,7 @@ import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModel;
+import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
@@ -39,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.Action;
@@ -485,10 +487,33 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     public void resampleFitsImageV2() {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
+
+        // some checks
+        if (fitsImage == null || fitsImage.getFitsImageHDU() == null) {
+            return;
+        }
+
+        final FitsImageHDU oldFitsImageHDU = fitsImage.getFitsImageHDU();
+
+        try {
+            final FitsImageHDU clonedFitsImageHDU = oldFitsImageHDU.clone();
+            clonedFitsImageHDU.setHduName("resampled-" + clonedFitsImageHDU.getHduName());
+
+            displayImage(Arrays.asList(clonedFitsImageHDU), clonedFitsImageHDU);
+
             if (fitsImagePanel.resampleFitsImageV2()) {
-                displaySelection(fitsImage.getFitsImageHDU());
+                // TODO: fix this dirty hack ; the checksum does not update itself
+                clonedFitsImageHDU.setChecksum(clonedFitsImageHDU.getChecksum() + 1);
+
+                displayImage(Arrays.asList(clonedFitsImageHDU), clonedFitsImageHDU);
+
+                IRModelManager.getInstance().getIRModel().addFitsImageHDUs(Arrays.asList(clonedFitsImageHDU), "resampled-image");
+                IRModelManager.getInstance().fireIRModelChanged(this, null);
+            } else {
+                displaySelection(oldFitsImageHDU);
             }
+        } catch (CloneNotSupportedException e) {
+            logger.info("Could not clone: {}", e.getMessage());
         }
     }
 
