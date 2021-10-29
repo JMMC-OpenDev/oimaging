@@ -40,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -503,7 +504,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
             if (fitsImagePanel.resampleFitsImageV2()) {
                 // TODO: fix this dirty hack ; the checksum does not update itself
-                clonedFitsImageHDU.setChecksum(clonedFitsImageHDU.getChecksum() + 1);
+                clonedFitsImageHDU.setChecksum(clonedFitsImageHDU.getChecksum() + Instant.now().getEpochSecond());
 
                 displayImage(Arrays.asList(clonedFitsImageHDU), clonedFitsImageHDU);
 
