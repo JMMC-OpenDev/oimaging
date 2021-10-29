@@ -507,7 +507,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
                 displayImage(Arrays.asList(clonedFitsImageHDU), clonedFitsImageHDU);
 
-                IRModelManager.getInstance().getIRModel().addFitsImageHDUs(Arrays.asList(clonedFitsImageHDU), "resampled-image");
+                IRModelManager.getInstance().getIRModel().addFitsImageHDU(clonedFitsImageHDU);
                 IRModelManager.getInstance().fireIRModelChanged(this, null);
             } else {
                 displaySelection(oldFitsImageHDU);

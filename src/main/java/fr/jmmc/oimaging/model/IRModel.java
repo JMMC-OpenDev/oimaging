@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,13 +209,109 @@ public class IRModel {
         loadOIFits(userOifitsFile);
     }
 
+    /** iterate over the library to find one with same HDUname.
+    @param targetHDUName required.
+    @return FitsImageHDU if found one with the name, null otherwise.
+     */
+    private FitsImageHDU findFitsImageHduInLibrary(final String targetHDUName) {
+
+        ListIterator<FitsImageHDU> iterFitsImageHDUs = this.fitsImageHDUs.listIterator();
+
+        while (iterFitsImageHDUs.hasNext()) {
+            FitsImageHDU fitsImageHDU = iterFitsImageHDUs.next();
+
+            // if there is another with same name
+            if (targetHDUName.equals(fitsImageHDU.getHduName())) {
+
+                return fitsImageHDU;
+            }
+        }
+
+        // if nothing found
+        return null;
+    }
+
+    /** add FitsImageHDU to this.fitsImageHDUs.
+     * not added when: 
+     *    - the list already contains a HDU with same object reference or same checksum.
+     *    - the new hdu has empty or null hduName, or has no images
+     *    - FitsImageUtils.prepareImage has failed on one image
+     * Caution, this function renames the hduName to make it unique in the library.
+     * Also if no input image is selected, the first one of the new hdu added is selected.
+    @param newFitsImageHDU required.
+    @return true if added succesfully. false otherwise.
+     */
+    public boolean addFitsImageHDU(final FitsImageHDU newFitsImageHDU) {
+
+        // we don't accept a HDU with null or empty HDUname
+        if (newFitsImageHDU.getHduName() == null || newFitsImageHDU.getHduName().isEmpty()) {
+            logger.info("FitsImageHDU with null or empty HDUName is not added.");
+            return false;
+        }
+
+        // we don't accept a HDU with no images
+        if (newFitsImageHDU.getImageCount() <= 0) {
+            logger.info("FitsImageHDU {} with no images is not added.", newFitsImageHDU.getHduName());
+            return false;
+        }
+
+        // some treatment on images
+        try {
+            // prepare images (negative values, padding, orientation):
+            newFitsImageHDU.getFitsImages().forEach(FitsImageUtils::prepareImage);
+        } catch (IllegalArgumentException e) {
+            MessagePane.showErrorMessage("Problem preparing FitsImage from FitsImageHDU {}, error: {}",
+                    newFitsImageHDU.getHduName(), e);
+            return false;
+        }
+
+        // if FitsImageHDU is already in the list (by reference or checksum) we don't add it again
+        if (existsInImageLib(newFitsImageHDU)) {
+            logger.info("FitsImageHDU {} is already in the library and is not added again.{}",
+                    newFitsImageHDU.getHduName(), newFitsImageHDU.getChecksum());
+            return false;
+        }
+
+        // rename the FitsImageHDU if there exist another with same name
+        boolean loopCheckUniqueName = true;
+        while (loopCheckUniqueName) {
+
+            boolean uniqueName = (findFitsImageHduInLibrary(newFitsImageHDU.getHduName()) == null);
+
+            if (uniqueName) {
+                // we can stop looping
+                loopCheckUniqueName = false;
+            } else {
+                // we rename our FitsImageHDU
+                final String newHDUName = newFitsImageHDU.getHduName() + "-" + DateUtils.now().substring(0, 19);
+                newFitsImageHDU.setHduName(newHDUName);
+                // we will make another loop of check, the new name is maybe not unique
+            }
+        }
+
+        // we add the HDU to the library
+        this.fitsImageHDUs.add(newFitsImageHDU);
+
+        // we don't update fitsImageHduToFilenames but this field seems unused anyway
+
+        // if nothing is selected as input image, we select the first image 
+	// TODO: this should not be done here, but for now we mimic this.addFitsImageHDUs()
+        if (selectedInputImageHDU == null) {
+            setSelectedInputImageHDU(newFitsImageHDU);
+        }
+
+        // if we reach here it means we added it successfully
+        logger.info("Added FitsImageHDU {}.", newFitsImageHDU.getHduName());
+        return true;
+    }
+
     /**
      * Add HDU to present ones and select the first new one as selected image input.
      * @param hdus new hdus
      * @param filename filename of given hdu
      * @return true if some hdu have been added
      */
-    public boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
+    private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
         try {
