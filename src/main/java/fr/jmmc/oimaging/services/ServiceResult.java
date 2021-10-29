@@ -55,6 +55,8 @@ public final class ServiceResult {
     /** the extension for the log execution file */
     public static final String LOG_FILE_EXT = ".log.txt";
 
+    private static final int UNDEFINED_INDEX = -1;
+
     /**
      * Helper constructor that created result files using given inputfile name.
      * inputFile must be a temporary filename.
@@ -77,7 +79,7 @@ public final class ServiceResult {
         this.executionLogResultFile = executionLogResultFile;
         this.startTime = new Date();
         this.jobDuration = 0;
-        this.index = 0; // temporary value that is to be overwrited by IRModel
+        this.index = UNDEFINED_INDEX; // undefined value that will be set by IRModel.addServiceResult()
         logger.debug("new ServiceResult({}, {}, {})", inputFile, oifitsResultFile, executionLogResultFile);
     }
 

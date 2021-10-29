@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,8 +96,10 @@ public class IRModel {
 
     /** counter of results since startup.
      *  is used as INDEX each time a result is added.
-     *  then is incremented. */
-    private int resultCounter;
+     *  then is incremented.
+     * is reset in IRModel.reset().
+     */
+    private AtomicInteger resultCounter = new AtomicInteger(0);
 
     /** status flag : set by RunAction */
     private boolean running;
@@ -119,6 +122,7 @@ public class IRModel {
         this.fitsImageHDUs.clear();
         this.fitsImageHduToFilenames.clear();
         this.serviceResults.clear();
+        this.resultCounter.set(0);
 
         this.running = false;
         this.exportCount = 0;
@@ -591,8 +595,7 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
-            resultCounter++;
-            serviceResult.setIndex(resultCounter);
+            serviceResult.setIndex(resultCounter.incrementAndGet());
             postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
             // this needs tobe done after the call addFitsImageHDUs()
