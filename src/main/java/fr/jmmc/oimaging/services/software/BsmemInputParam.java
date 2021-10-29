@@ -64,7 +64,6 @@ public final class BsmemInputParam extends SoftwareInputParam {
             // specific default values for BSMEM:
             params.setAutoWgt(true);
             params.setRglWgt(0.0);
-            params.setFluxErr(0.01);
         }
         params.setKeywordDefaultDouble(KEYWORD_RGL_ALPH, 1.0);
         params.setKeywordDefaultDouble(KEYWORD_RGL_BETA, 0.01); // 1% error on VIS2

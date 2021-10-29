@@ -74,11 +74,6 @@ public final class WisardInputParam extends SoftwareInputParam {
             params.setKeywordDefaultDouble(KEYWORD_SCALE, 0.0001);
             params.setKeywordDefaultDouble(KEYWORD_DELTA, 1);
         }
-
-        // default values:
-        if (applyDefaults) {
-            params.setFluxErr(0.01);
-        }
     }
 
     @Override
