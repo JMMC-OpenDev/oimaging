@@ -496,25 +496,21 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         final FitsImageHDU oldFitsImageHDU = fitsImage.getFitsImageHDU();
 
-        try {
-            final FitsImageHDU clonedFitsImageHDU = oldFitsImageHDU.clone();
-            clonedFitsImageHDU.setHduName("resampled-" + clonedFitsImageHDU.getHduName());
+        final FitsImageHDU copyFitsImageHDU = new FitsImageHDU(oldFitsImageHDU);
+        copyFitsImageHDU.setHduName("resampled-" + copyFitsImageHDU.getHduName());
 
-            displayImage(Arrays.asList(clonedFitsImageHDU), clonedFitsImageHDU);
+        displayImage(Arrays.asList(copyFitsImageHDU), copyFitsImageHDU);
 
-            if (fitsImagePanel.resampleFitsImageV2()) {
-                // TODO: fix this dirty hack ; the checksum does not update itself
-                clonedFitsImageHDU.setChecksum(clonedFitsImageHDU.getChecksum() + Instant.now().getEpochSecond());
+        if (fitsImagePanel.resampleFitsImageV2()) {
+            // TODO: fix this dirty hack ; the checksum does not update itself
+            copyFitsImageHDU.setChecksum(copyFitsImageHDU.getChecksum() + Instant.now().getEpochSecond());
 
-                displayImage(Arrays.asList(clonedFitsImageHDU), clonedFitsImageHDU);
+            displayImage(Arrays.asList(copyFitsImageHDU), copyFitsImageHDU);
 
-                IRModelManager.getInstance().getIRModel().addFitsImageHDU(clonedFitsImageHDU);
-                IRModelManager.getInstance().fireIRModelChanged(this, null);
-            } else {
-                displaySelection(oldFitsImageHDU);
-            }
-        } catch (CloneNotSupportedException e) {
-            logger.info("Could not clone: {}", e.getMessage());
+            IRModelManager.getInstance().getIRModel().addFitsImageHDU(copyFitsImageHDU);
+            IRModelManager.getInstance().fireIRModelChanged(this, null);
+        } else {
+            displaySelection(oldFitsImageHDU);
         }
     }
 
