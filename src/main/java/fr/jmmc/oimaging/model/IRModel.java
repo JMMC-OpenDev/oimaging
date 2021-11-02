@@ -13,6 +13,7 @@ import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
+import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,13 @@ public class IRModel {
     /** List of results */
     private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
 
+    /** counter of results since startup.
+     *  is used as INDEX each time a result is added.
+     *  then is incremented.
+     * is reset in IRModel.reset().
+     */
+    private AtomicInteger resultCounter = new AtomicInteger(0);
+
     /** status flag : set by RunAction */
     private boolean running;
 
@@ -113,6 +122,7 @@ public class IRModel {
         this.fitsImageHDUs.clear();
         this.fitsImageHduToFilenames.clear();
         this.serviceResults.clear();
+        this.resultCounter.set(0);
 
         this.running = false;
         this.exportCount = 0;
@@ -158,12 +168,15 @@ public class IRModel {
         inputParam.useVis(oifitsFile.hasOiVis());
         inputParam.useVis2(oifitsFile.hasOiVis2());
         inputParam.useT3(oifitsFile.hasOiT3());
-
         // load fits Image HDU data if any present
         // Select first image as selected one if not yet initialized
         if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName());
         }
+
+        // this needs tobe done after the call addFitsImageHDUs()
+        // so it uses the (possible) new name
+        updateImageIdentifiers(oifitsFile);
 
         // try to guess and set service
         Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
@@ -428,6 +441,9 @@ public class IRModel {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
         }
+        // this needs tobe done after the call addFitsImageHDUs()
+        // so it uses the (possible) new name
+        updateImageIdentifiers(fitsImageFile);
     }
 
     /**
@@ -579,12 +595,44 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
+            serviceResult.setIndex(resultCounter.incrementAndGet());
             postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
+            // this needs tobe done after the call addFitsImageHDUs()
+            // so it uses the (possible) new name
+            updateImageIdentifiers(serviceResult);
         }
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    /** updates fitsImageIdentifier to be more user friendly in the GUI
+     * @param fitsImageHDUs list of HDU to rename. the order will be used as the number so be exhaustive.
+     * @param source where do the image come from. if from a run, it will be an index number. if not, the file name.
+     */
+    private void updateImageIdentifiers(List<FitsImageHDU> fitsImageHDUs, String source) {
+        int hduIndex = 0;
+        for (FitsImageHDU fitsImageHDU : fitsImageHDUs) {
+            for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
+                String name = fitsImageHDU.getHduName() + " " + source + " hdu#" + hduIndex;
+                if (fitsImage.getImageCount() > 1) {
+                    name += " img#" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
+                }
+                fitsImage.setFitsImageIdentifier(name);
+            }
+            hduIndex++;
+        }
+    }
+
+    /** updates fitsImageIdentifier with the index as source */
+    private void updateImageIdentifiers(ServiceResult serviceResult) {
+        updateImageIdentifiers(serviceResult.getOifitsFile().getFitsImageHDUs(), "result#" + serviceResult.getIndex());
+    }
+
+    /** updates fitsImageIdentifier with the index as source */
+    private void updateImageIdentifiers(FitsImageFile fitsImageFile) {
+        updateImageIdentifiers(fitsImageFile.getFitsImageHDUs(), fitsImageFile.getFileName());
     }
 
     /** Add some OIMaging specific keywords in the OIFitsFile.

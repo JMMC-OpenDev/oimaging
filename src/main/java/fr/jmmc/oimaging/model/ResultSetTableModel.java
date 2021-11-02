@@ -129,7 +129,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
                     case FILE:
                         return result.getInputFile().getName();
                     case INDEX:
-                        return getRowCount() - rowIndex;
+                        return result.getIndex();
                     case JOB_DURATION:
                         return result.getJobDuration();
                     case SUCCESS:
