@@ -168,6 +168,7 @@ public class IRModel {
         inputParam.useVis(oifitsFile.hasOiVis());
         inputParam.useVis2(oifitsFile.hasOiVis2());
         inputParam.useT3(oifitsFile.hasOiT3());
+
         // load fits Image HDU data if any present
         // Select first image as selected one if not yet initialized
         if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
@@ -196,6 +197,10 @@ public class IRModel {
                 initSpecificParams(false);
             }
         }
+        
+        // TODO: should restore INIT_IMG & RGL_PRIOR ?
+        this.selectedInputImageHDU = null;
+        this.selectedRglPrioImage = null;
     }
 
     public boolean isRunning() {
@@ -294,15 +299,18 @@ public class IRModel {
             this.fitsImageHduToFilenames.put(hdu, filename);
         }
 
-        // select first added as selected input
         final boolean added = !hdusToAdd.isEmpty();
-        if (added) {
-            setSelectedInputImageHDU(hdusToAdd.get(0));
-        } else if (selectedInputImageHDU != null) {
-            // restore selected image to fix current OifitsFile:
-            setSelectedInputImageHDU(selectedInputImageHDU);
-        }
 
+        // avoid modifying input file while loading OIFits (reentrance):
+        if (hdus != oifitsFile.getFitsImageHDUs()) {
+            // select first added as selected input
+            if (added) {
+                setSelectedInputImageHDU(hdusToAdd.get(0));
+            } else if (selectedInputImageHDU != null) {
+                // restore selected image to fix current OifitsFile:
+                setSelectedInputImageHDU(selectedInputImageHDU);
+            }
+        }
         return added;
     }
 
@@ -333,8 +341,6 @@ public class IRModel {
     public void setSelectedInputImageHDU(final FitsImageHDU selectedInitImage) {
 
         if (selectedInitImage == null || selectedInitImage == NULL_IMAGE_HDU) {
-            this.selectedInputImageHDU = selectedInitImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setInitImg("");
             logger.info("Set selectedInputImageHDU to empty.");
         } else {
@@ -349,11 +355,12 @@ public class IRModel {
                 throw new IllegalStateException(hduName + " HDU was not added !");
             }
 
-            this.selectedInputImageHDU = selectedInitImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
             logger.info("Set new hdu '{}' as selectedInputImageHDU.", hduName);
         }
+        
+        this.selectedInputImageHDU = selectedInitImage;
+        selectHDUs(); // alter input OIFits in memory
     }
 
     /**
@@ -364,8 +371,6 @@ public class IRModel {
     public void setSelectedRglPrioImage(final FitsImageHDU selectedRglPrioImage) {
 
         if (selectedRglPrioImage == null || selectedRglPrioImage == NULL_IMAGE_HDU) {
-            this.selectedRglPrioImage = selectedRglPrioImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setRglPrio("");
             logger.info("Set selectedRglPrioImage to empty.");
         } else {
@@ -380,11 +385,12 @@ public class IRModel {
                 throw new IllegalStateException(hduName + " HDU was not added !");
             }
 
-            this.selectedRglPrioImage = selectedRglPrioImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setRglPrio(hduName);
             logger.info("Set new hdu '{}' as selectedRglPrioImage.", hduName);
         }
+        
+        this.selectedRglPrioImage = selectedRglPrioImage;
+        selectHDUs(); // alter input OIFits in memory
     }
 
     /**
