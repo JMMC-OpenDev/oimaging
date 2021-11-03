@@ -486,7 +486,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
-    public void resampleFitsImageV2() {
+    public void modifyFitsImage() {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
 
         // some checks
@@ -494,14 +494,14 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             return;
         }
 
-        final FitsImageHDU oldFitsImageHDU = fitsImage.getFitsImageHDU();
+        final FitsImageHDU fitsImageHDU = fitsImage.getFitsImageHDU();
 
-        final FitsImageHDU copyFitsImageHDU = new FitsImageHDU(oldFitsImageHDU);
+        final FitsImageHDU copyFitsImageHDU = new FitsImageHDU(fitsImageHDU);
         copyFitsImageHDU.setHduName("resampled-" + copyFitsImageHDU.getHduName());
 
         displayImage(Arrays.asList(copyFitsImageHDU), copyFitsImageHDU);
 
-        if (fitsImagePanel.resampleFitsImageV2()) {
+        if (fitsImagePanel.dialogModifyImage()) {
             // TODO: fix this dirty hack ; the checksum does not update itself
             copyFitsImageHDU.setChecksum(copyFitsImageHDU.getChecksum() + Instant.now().getEpochSecond());
 
@@ -510,7 +510,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             IRModelManager.getInstance().getIRModel().addFitsImageHDU(copyFitsImageHDU);
             IRModelManager.getInstance().fireIRModelChanged(this, null);
         } else {
-            displaySelection(oldFitsImageHDU);
+            displaySelection(fitsImageHDU);
         }
     }
 
@@ -541,7 +541,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage = new javax.swing.JComboBox();
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
-        jButtonResampleV2 = new javax.swing.JButton();
+        jButtonModifyImage = new javax.swing.JButton();
         jButtonRescale = new javax.swing.JButton();
         jLabelImageDebug = new javax.swing.JLabel();
         jPanelImage = new javax.swing.JPanel();
@@ -622,17 +622,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
 
-        jButtonResampleV2.setText("Resample");
-        jButtonResampleV2.addActionListener(new java.awt.event.ActionListener() {
+        jButtonModifyImage.setText("Modify image");
+        jButtonModifyImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonResampleV2ActionPerformed(evt);
+                jButtonModifyImageActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelImageViewer.add(jButtonResampleV2, gridBagConstraints);
+        jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
 
         jButtonRescale.setText("Rescale");
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
@@ -754,13 +754,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         resampleFitsImage();
     }//GEN-LAST:event_jButtonResampleActionPerformed
 
-    private void jButtonResampleV2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResampleV2ActionPerformed
-        resampleFitsImageV2();
-    }//GEN-LAST:event_jButtonResampleV2ActionPerformed
+    private void jButtonModifyImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyImageActionPerformed
+        modifyFitsImage();
+    }//GEN-LAST:event_jButtonModifyImageActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonModifyImage;
     private javax.swing.JButton jButtonResample;
-    private javax.swing.JButton jButtonResampleV2;
     private javax.swing.JButton jButtonRescale;
     private javax.swing.JButton jButtonViewport;
     private javax.swing.JComboBox jComboBoxImage;
