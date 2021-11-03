@@ -1,0 +1,30 @@
+<html>
+<body>
+<h2 id="mira">MiRA</h2>
+<p><a href="https://github.com/emmt/MiRA">Multi-aperture Image Reconstruction Algorithm: MiRA: a Multi-aperture Image Reconstruction Algorithm</a></p>
+<ul>
+<li><p><code>INIT_IMG</code> : initial image</p>
+</li>
+<li><p><code>RGL_WGT</code> : hyper-parameter tuning the strength of the regularization</p>
+</li>
+<li><p><strong>Regularization functions</strong></p>
+<ul>
+<li><p><u>Compactness</u>: (aka soft support) favors compact solutions where images structures are concentrated within a region of full-width at half maximum <code>RGL_GAMM</code> (in mas).</p>
+</li>
+<li><p><u>hyperbolic</u> (aka Edge-preserving smoothness) favors smooth solutions while allowing sharp edges significantly higher than<code>RGL_TAU</code>. Using a very small <code>RGL_TAU</code> compared to the norm of the local gradients, mimics the effects of <em>total variation</em> (TV) regularizations.Conversely, using a very small edge threshold yields a regularization comparable to <em>quadratic smoothness</em>.</p>
+</li>
+</ul>
+</li>
+<li><p><strong>Bandwidth smearing</strong> (chromatic aberration caused by the finite width of the spectral bandwidth)</p>
+<ul>
+<li><p><code>SMEAR_FN</code> : function modeling the effects of the spectral bandwidth smearing. Can be <code>none</code> if there is no bandwidth smearing, <code>sinc</code> for a cardinal sine or <code>gauss</code> for Gaussian (whose full-width at half-maximum matches that of the cardinal sine)</p>
+</li>
+<li><p><code>SMEAR_FC</code> : strictly positive factor to scale the effects of the spectral bandwidth smearing. The full-width at half-maximum of the effective spectral bandwidth is assumed to be equal to <code>SMEAR_FC</code> times <code>EFF_BAND</code> parameter in the data. The default is <code>1.0</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="reference">Reference</h3>
+<p>Thiébaut, É.: <em>&quot;MiRA: an effective imaging algorithm for optical interferometry&quot;</em> in SPIE Proc. Astronomical Telescopes and Instrumentation <strong>7013</strong>, 70131I-1-70131I-12 (2008) <a href="http://dx.doi.org/10.1117/12.788822">DOI</a>.</p>
+</body>
+</html>
