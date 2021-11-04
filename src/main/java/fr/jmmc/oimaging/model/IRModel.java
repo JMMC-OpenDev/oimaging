@@ -249,78 +249,82 @@ public class IRModel {
         return null;
     }
 
-    /** add FitsImageHDU to this.fitsImageHDUs.
-     * not added when: 
-     *    - the list already contains a HDU with same object reference or same checksum.
-     *    - the new hdu has empty or null hduName, or has no images
-     *    - FitsImageUtils.prepareImage has failed on one image
-     * Caution, this function renames the hduName to make it unique in the library.
-     * Also if no input image is selected, the first one of the new hdu added is selected.
-    @param newFitsImageHDU required.
-    @return true if added succesfully. false otherwise.
+    /** Add FitsImageHDU to library (provided it passes some checks).
+    @param fitsImageHDU (required)
+    @param filename (can be null)
+    @return true if added successfully. false otherwise.
      */
-    public boolean addFitsImageHDU(final FitsImageHDU newFitsImageHDU) {
-
-        // we don't accept a HDU with null or empty HDUname
-        if (newFitsImageHDU.getHduName() == null || newFitsImageHDU.getHduName().isEmpty()) {
-            logger.info("FitsImageHDU with null or empty HDUName is not added.");
-            return false;
-        }
-
-        // we don't accept a HDU with no images
-        if (newFitsImageHDU.getImageCount() <= 0) {
-            logger.info("FitsImageHDU {} with no images is not added.", newFitsImageHDU.getHduName());
-            return false;
-        }
-
-        // some treatment on images
+    public boolean addFitsImageHDU(final FitsImageHDU hdu, final String filename) {
         try {
             // prepare images (negative values, padding, orientation):
-            newFitsImageHDU.getFitsImages().forEach(FitsImageUtils::prepareImage);
-        } catch (IllegalArgumentException e) {
-            MessagePane.showErrorMessage("Problem preparing FitsImage from FitsImageHDU {}, error: {}",
-                    newFitsImageHDU.getHduName(), e);
+            FitsImageUtils.prepareImages(hdu);
+        } catch (IllegalArgumentException iae) {
+            MessagePane.showErrorMessage("Unable to load image from file '{}'",
+                    (filename != null) ? filename : "null", iae);
             return false;
         }
 
-        // if FitsImageHDU is already in the list (by reference or checksum) we don't add it again
-        if (existsInImageLib(newFitsImageHDU)) {
-            logger.info("FitsImageHDU {} is already in the library and is not added again.{}",
-                    newFitsImageHDU.getHduName(), newFitsImageHDU.getChecksum());
+        if (!hdu.hasImages()) {
             return false;
         }
 
-        // rename the FitsImageHDU if there exist another with same name
-        boolean loopCheckUniqueName = true;
-        while (loopCheckUniqueName) {
+        // Remove duplicates and skip hdu with hduname present in current input oifits
+        if ((getSelectedInputImageHDU() != null) && (hdu.getHduName() != null) && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
+            return false;
+        }
+        if (existsInImageLib(hdu)) {
+            logger.info("skipping image hdu '{}' : already present ", hdu.getHduName());
+            return false;
+        }
 
-            boolean uniqueName = (findFitsImageHduInLibrary(newFitsImageHDU.getHduName()) == null);
+        final String now = DateUtils.now().substring(0, 19);
 
-            if (uniqueName) {
-                // we can stop looping
-                loopCheckUniqueName = false;
-            } else {
-                // we rename our FitsImageHDU
-                final String newHDUName = newFitsImageHDU.getHduName() + "-" + DateUtils.now().substring(0, 19);
-                newFitsImageHDU.setHduName(newHDUName);
-                // we will make another loop of check, the new name is maybe not unique
+
+        final String tryName
+                = (hdu.getHduName() != null) ? hdu.getHduName()
+                : (hdu.getExtName() != null) ? hdu.getExtName()
+                : (filename != null) ? filename.substring(0, Math.min(50, filename.length()))
+                        : "UNNAMED";
+
+        hdu.setHduName(tryName);
+
+        for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
+            if (currentHDU.getHduName() == null) {
+                currentHDU.setHduName("UNDEFINED_" + currentHDU.getChecksum());
+                logger.warn("Hdu has no hduName {}", currentHDU);
+            } else if (currentHDU.getHduName().equals(tryName)) {
+                final String newName = tryName + "-" + now;
+
+                if (hdu.getHduName().equals(newName)) {
+                    // TODO check if this branch can be reached
+                    MessagePane.showErrorMessage("HDU already loaded with hduname='" + newName + "', skipping");
+                    // TODO propose here to replace the previous loaded HDU
+                    return false;
+                } else {
+                    logger.info("hduname '{}' already used, automatically renamed to '{}'.", hdu.getHduName(), newName);
+                    hdu.setHduName(newName);
+                }
+                break;
             }
         }
 
-        // we add the HDU to the library
-        this.fitsImageHDUs.add(newFitsImageHDU);
-
-        // we don't update fitsImageHduToFilenames but this field seems unused anyway
-
-        // if nothing is selected as input image, we select the first image 
-	// TODO: this should not be done here, but for now we mimic this.addFitsImageHDUs()
-        if (selectedInputImageHDU == null) {
-            setSelectedInputImageHDU(newFitsImageHDU);
+        // Move FitsImageHDU into model:
+        this.fitsImageHDUs.add(hdu);
+        if (filename != null) {
+            this.fitsImageHduToFilenames.put(hdu, filename);
         }
 
-        // if we reach here it means we added it successfully
-        logger.info("Added FitsImageHDU {}.", newFitsImageHDU.getHduName());
+        // avoid modifying input file while loading OIFits (reentrance):
+        if (hdu != oifitsFile.getFitsImageHDUs()) {
+            // select first added as selected input
+            setSelectedInputImageHDU(hdu);
+        }
         return true;
+    }
+
+    /** version without filename */
+    public boolean addFitsImageHDU(final FitsImageHDU hdu) {
+        return addFitsImageHDU(hdu, null);
     }
 
     /**
@@ -329,80 +333,25 @@ public class IRModel {
      * @param filename filename of given hdu
      * @return true if some hdu have been added
      */
-    private boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
+    public boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
-        try {
-            // prepare images (negative values, padding, orientation):
-            FitsImageUtils.prepareAllImages(hdus);
-        } catch (IllegalArgumentException iae) {
-            MessagePane.showErrorMessage("Unable to load image from file '{}'", filename, iae);
-            return false;
-        }
+        List<FitsImageHDU> addedHdus = new LinkedList<>();
 
-        // Start with all hdus
-        final List<FitsImageHDU> hdusToAdd = new LinkedList<FitsImageHDU>();
-
-        for (FitsImageHDU fitsImageHDU : hdus) {
-            if (fitsImageHDU.hasImages()) {
-                hdusToAdd.add(fitsImageHDU);
+        hdus.forEach(hdu -> {
+            final boolean hduAdded = addFitsImageHDU(hdu, filename);
+            if (hduAdded) {
+                addedHdus.add(hdu);
             }
-        }
+        });
 
-        // Remove duplicates and skip hdu with hduname present in current input oifits
-        for (FitsImageHDU hdu : hdus) {
-            if ((getSelectedInputImageHDU() != null) && (hdu.getHduName() != null) && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
-                hdusToAdd.remove(hdu);
-                break;
-            }
-            if (existsInImageLib(hdu)) {
-                logger.info("skipping image hdu '{}' : already present ", hdu.getHduName());
-                hdusToAdd.remove(hdu);
-            }
-        }
-
-        final String now = DateUtils.now().substring(0, 19);
-
-        // And continue with remaining ones to find proper name
-        for (FitsImageHDU hdu : hdusToAdd) {
-            final String tryName = (hdu.getHduName() != null) ? hdu.getHduName()
-                    : ((hdu.getExtName() != null) ? hdu.getExtName() : (filename.substring(0, Math.min(50, filename.length()))));
-            hdu.setHduName(tryName);
-
-            for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
-                if (currentHDU.getHduName() == null) {
-                    currentHDU.setHduName("UNDEFINED_" + currentHDU.getChecksum());
-                    logger.warn("Hdu has no hduName {}", currentHDU);
-                } else if (currentHDU.getHduName().equals(tryName)) {
-                    final String newName = tryName + "-" + now;
-
-                    if (hdu.getHduName().equals(newName)) {
-                        // TODO check if this branch can be reached
-                        MessagePane.showErrorMessage("HDU already loaded with hduname='" + newName + "', skipping");
-                        // TODO propose here to replace the previous loaded HDU
-                        hdusToAdd.remove(hdu);
-                    } else {
-                        logger.info("hduname '{}' already used, automatically renamed to '{}'.", hdu.getHduName(), newName);
-                        hdu.setHduName(newName);
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Move all FitsImageHDUs into model:
-        this.fitsImageHDUs.addAll(hdusToAdd);
-        for (FitsImageHDU hdu : hdusToAdd) {
-            this.fitsImageHduToFilenames.put(hdu, filename);
-        }
-
-        final boolean added = !hdusToAdd.isEmpty();
+        final boolean added = (addedHdus.size() > 0);
 
         // avoid modifying input file while loading OIFits (reentrance):
         if (hdus != oifitsFile.getFitsImageHDUs()) {
             // select first added as selected input
             if (added) {
-                setSelectedInputImageHDU(hdusToAdd.get(0));
+                setSelectedInputImageHDU(addedHdus.get(0));
             } else if (selectedInputImageHDU != null) {
                 // restore selected image to fix current OifitsFile:
                 setSelectedInputImageHDU(selectedInputImageHDU);
