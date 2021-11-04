@@ -467,37 +467,47 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void changeViewportFitsImage() {
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            if (fitsImagePanel.changeViewportFitsImage()) {
-                displaySelection(fitsImage.getFitsImageHDU());
-            }
-        }
+        processFitsImage(ProcessOperations.changeViewport);
     }
 
     public void resampleFitsImage() {
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            if (fitsImagePanel.resampleFitsImage()) {
-                displaySelection(fitsImage.getFitsImageHDU());
-            }
-        }
+        processFitsImage(ProcessOperations.resample);
     }
 
     public void rescaleFitsImage() {
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            if (fitsImagePanel.rescaleFitsImage()) {
-                displaySelection(fitsImage.getFitsImageHDU());
-            }
-        }
+        processFitsImage(ProcessOperations.rescale);
     }
 
     public void modifyFitsImage() {
+        processFitsImage(ProcessOperations.modifyFitsImage);
+    }
+
+    private enum ProcessOperations {
+        changeViewport,
+        resample,
+        rescale,
+        modifyFitsImage;
+
+        public boolean action(final FitsImagePanel fitsImagePanel) {
+            switch (this) {
+                case changeViewport:
+                    return fitsImagePanel.changeViewportFitsImage();
+                case resample:
+                    return fitsImagePanel.resampleFitsImage();
+                case rescale:
+                    return fitsImagePanel.rescaleFitsImage();
+                case modifyFitsImage:
+                    return fitsImagePanel.dialogModifyImage();
+                default:
+            }
+            return false;
+        }
+    }
+
+    private void processFitsImage(final ProcessOperations operation) {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
 
-        // some checks
-        if (fitsImage == null || fitsImage.getFitsImageHDU() == null) {
+        if ((fitsImage == null) || (fitsImage.getFitsImageHDU() == null)) {
             return;
         }
 
@@ -515,7 +525,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         // switch image to copied HDU in the fitsImagePanel to be modified in-place:
         displaySelection(copyFitsImageHDU);
 
-        if (fitsImagePanel.dialogModifyImage()) {
+        if (operation.action(fitsImagePanel)) {
             try {
                 // update checksum:
                 copyFitsImageHDU.updateChecksum();
