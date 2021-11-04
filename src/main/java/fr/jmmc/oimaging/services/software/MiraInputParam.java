@@ -113,6 +113,7 @@ public class MiraInputParam extends SoftwareInputParam {
         // default values:
         if (applyDefaults) {
             // specific default values for MiRA:
+            params.setFluxErr(0);
             params.setRglWgt(1E6); // -mu=1E6
         }
         params.setKeywordDefaultDouble(KEYWORD_SMEAR_FC, 1.0);

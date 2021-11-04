@@ -28,6 +28,8 @@ public final class ServiceResult {
     private boolean cancelled = false;
     private boolean valid = false;
     private String errorMessage = null;
+    /** number received when added to the list of results */
+    private int index;
     /** must be kept in sync with STRTDATE keyword in the OIFitsFile. */
     private Date startTime;
     /** must be kept in sync with ENDDATE keyword in the OIFitsFile. */
@@ -53,6 +55,8 @@ public final class ServiceResult {
     /** the extension for the log execution file */
     public static final String LOG_FILE_EXT = ".log.txt";
 
+    private static final int UNDEFINED_INDEX = -1;
+
     /**
      * Helper constructor that created result files using given inputfile name.
      * inputFile must be a temporary filename.
@@ -75,6 +79,7 @@ public final class ServiceResult {
         this.executionLogResultFile = executionLogResultFile;
         this.startTime = new Date();
         this.jobDuration = 0;
+        this.index = UNDEFINED_INDEX; // undefined value that will be set by IRModel.addServiceResult()
         logger.debug("new ServiceResult({}, {}, {})", inputFile, oifitsResultFile, executionLogResultFile);
     }
 
@@ -175,6 +180,20 @@ public final class ServiceResult {
 
     public void setService(Service service) {
         this.service = service;
+    }
+
+    /**
+     * @return the index
+     */
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * @param index the index to set
+     */
+    public void setIndex(int index) {
+        this.index = index;
     }
 
 }

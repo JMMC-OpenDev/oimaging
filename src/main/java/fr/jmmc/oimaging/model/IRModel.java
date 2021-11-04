@@ -13,6 +13,7 @@ import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
+import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
@@ -36,6 +37,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +95,13 @@ public class IRModel {
     /** List of results */
     private final List<ServiceResult> serviceResults = new LinkedList<ServiceResult>();
 
+    /** counter of results since startup.
+     *  is used as INDEX each time a result is added.
+     *  then is incremented.
+     * is reset in IRModel.reset().
+     */
+    private AtomicInteger resultCounter = new AtomicInteger(0);
+
     /** status flag : set by RunAction */
     private boolean running;
 
@@ -114,6 +123,7 @@ public class IRModel {
         this.fitsImageHDUs.clear();
         this.fitsImageHduToFilenames.clear();
         this.serviceResults.clear();
+        this.resultCounter.set(0);
 
         this.running = false;
         this.exportCount = 0;
@@ -166,6 +176,10 @@ public class IRModel {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName());
         }
 
+        // this needs tobe done after the call addFitsImageHDUs()
+        // so it uses the (possible) new name
+        updateImageIdentifiers(oifitsFile);
+
         // try to guess and set service
         Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
         if (service == null) {
@@ -184,6 +198,10 @@ public class IRModel {
                 initSpecificParams(false);
             }
         }
+        
+        // TODO: should restore INIT_IMG & RGL_PRIOR ?
+        this.selectedInputImageHDU = null;
+        this.selectedRglPrioImage = null;
     }
 
     public boolean isRunning() {
@@ -378,15 +396,18 @@ public class IRModel {
             this.fitsImageHduToFilenames.put(hdu, filename);
         }
 
-        // select first added as selected input
         final boolean added = !hdusToAdd.isEmpty();
-        if (added) {
-            setSelectedInputImageHDU(hdusToAdd.get(0));
-        } else if (selectedInputImageHDU != null) {
-            // restore selected image to fix current OifitsFile:
-            setSelectedInputImageHDU(selectedInputImageHDU);
-        }
 
+        // avoid modifying input file while loading OIFits (reentrance):
+        if (hdus != oifitsFile.getFitsImageHDUs()) {
+            // select first added as selected input
+            if (added) {
+                setSelectedInputImageHDU(hdusToAdd.get(0));
+            } else if (selectedInputImageHDU != null) {
+                // restore selected image to fix current OifitsFile:
+                setSelectedInputImageHDU(selectedInputImageHDU);
+            }
+        }
         return added;
     }
 
@@ -417,8 +438,6 @@ public class IRModel {
     public void setSelectedInputImageHDU(final FitsImageHDU selectedInitImage) {
 
         if (selectedInitImage == null || selectedInitImage == NULL_IMAGE_HDU) {
-            this.selectedInputImageHDU = selectedInitImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setInitImg("");
             logger.info("Set selectedInputImageHDU to empty.");
         } else {
@@ -433,11 +452,12 @@ public class IRModel {
                 throw new IllegalStateException(hduName + " HDU was not added !");
             }
 
-            this.selectedInputImageHDU = selectedInitImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
             logger.info("Set new hdu '{}' as selectedInputImageHDU.", hduName);
         }
+        
+        this.selectedInputImageHDU = selectedInitImage;
+        selectHDUs(); // alter input OIFits in memory
     }
 
     /**
@@ -448,8 +468,6 @@ public class IRModel {
     public void setSelectedRglPrioImage(final FitsImageHDU selectedRglPrioImage) {
 
         if (selectedRglPrioImage == null || selectedRglPrioImage == NULL_IMAGE_HDU) {
-            this.selectedRglPrioImage = selectedRglPrioImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setRglPrio("");
             logger.info("Set selectedRglPrioImage to empty.");
         } else {
@@ -464,11 +482,12 @@ public class IRModel {
                 throw new IllegalStateException(hduName + " HDU was not added !");
             }
 
-            this.selectedRglPrioImage = selectedRglPrioImage;
-            selectHDUs();
             oifitsFile.getImageOiData().getInputParam().setRglPrio(hduName);
             logger.info("Set new hdu '{}' as selectedRglPrioImage.", hduName);
         }
+        
+        this.selectedRglPrioImage = selectedRglPrioImage;
+        selectHDUs(); // alter input OIFits in memory
     }
 
     /**
@@ -525,6 +544,9 @@ public class IRModel {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
         }
+        // this needs tobe done after the call addFitsImageHDUs()
+        // so it uses the (possible) new name
+        updateImageIdentifiers(fitsImageFile);
     }
 
     /**
@@ -676,12 +698,44 @@ public class IRModel {
         getResultSets().add(0, serviceResult);
 
         if (serviceResult.isValid()) {
+            serviceResult.setIndex(resultCounter.incrementAndGet());
             postProcessOIFitsFile(serviceResult);
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName());
+            // this needs tobe done after the call addFitsImageHDUs()
+            // so it uses the (possible) new name
+            updateImageIdentifiers(serviceResult);
         }
 
         // notify model update
         IRModelManager.getInstance().fireIRModelUpdated(this, null);
+    }
+
+    /** updates fitsImageIdentifier to be more user friendly in the GUI
+     * @param fitsImageHDUs list of HDU to rename. the order will be used as the number so be exhaustive.
+     * @param source where do the image come from. if from a run, it will be an index number. if not, the file name.
+     */
+    private void updateImageIdentifiers(List<FitsImageHDU> fitsImageHDUs, String source) {
+        int hduIndex = 0;
+        for (FitsImageHDU fitsImageHDU : fitsImageHDUs) {
+            for (FitsImage fitsImage : fitsImageHDU.getFitsImages()) {
+                String name = fitsImageHDU.getHduName() + " " + source + " hdu#" + hduIndex;
+                if (fitsImage.getImageCount() > 1) {
+                    name += " img#" + fitsImage.getImageIndex() + "/" + fitsImage.getImageCount();
+                }
+                fitsImage.setFitsImageIdentifier(name);
+            }
+            hduIndex++;
+        }
+    }
+
+    /** updates fitsImageIdentifier with the index as source */
+    private void updateImageIdentifiers(ServiceResult serviceResult) {
+        updateImageIdentifiers(serviceResult.getOifitsFile().getFitsImageHDUs(), "result#" + serviceResult.getIndex());
+    }
+
+    /** updates fitsImageIdentifier with the index as source */
+    private void updateImageIdentifiers(FitsImageFile fitsImageFile) {
+        updateImageIdentifiers(fitsImageFile.getFitsImageHDUs(), fitsImageFile.getFileName());
     }
 
     /** Add some OIMaging specific keywords in the OIFitsFile.

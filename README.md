@@ -9,6 +9,8 @@ See [OImaging](https://www.jmmc.fr/oimaging)
 See [JMMC releases](https://www.jmmc.fr/releases/)
 See [JMMC OpenDev @ github](https://github.com/JMMC-OpenDev/)
 
+See [CI nightly builds](https://github.com/JMMC-OpenDev/jmmc-java-build/actions/workflows/build.yml)
+
 
 ## Issues / Board
 
@@ -39,3 +41,22 @@ Requirements:
 - Maven 3.6+
 
 See [JMMC Java Build](https://github.com/JMMC-OpenDev/jmmc-java-build)
+See [CI nightly builds](https://github.com/JMMC-OpenDev/jmmc-java-build/actions/workflows/build.yml)
+
+Instructions:
+
+- Cleanup dependencies:
+`./clean.sh`
+
+- Get dependencies on the first time:
+`./get_modules.sh`
+
+- Update dependencies:
+`./update_modules.sh`
+
+- Build dependencies and this module:
+`./build_gui.sh`
+
+- Run OImaging GUI:
+`./run_OImaging-gui.sh`
+
