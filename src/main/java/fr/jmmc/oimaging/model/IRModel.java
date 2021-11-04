@@ -75,7 +75,7 @@ public class IRModel {
     /** Selected input image */
     private FitsImageHDU selectedInputImageHDU;
     /** Selected RGL PRIO image. Can be null. */
-    private FitsImageHDU selectedRglPrioImage;
+    private FitsImageHDU selectedRglPrioImageHdu;
 
     /**
      * Which of the input images has been changed last : INIT_IMG or RGL_PRIO.
@@ -114,7 +114,7 @@ public class IRModel {
     private void reset() {
         this.cliOptions = null;
         this.selectedInputImageHDU = null;
-        this.selectedRglPrioImage = null;
+        this.selectedRglPrioImageHdu = null;
         this.inputImageView = KEYWORD_INIT_IMG;
         this.fitsImageHDUs.clear();
         this.serviceResults.clear();
@@ -196,7 +196,7 @@ public class IRModel {
 
         // TODO: should restore INIT_IMG & RGL_PRIOR ?
         this.selectedInputImageHDU = null;
-        this.selectedRglPrioImage = null;
+        this.selectedRglPrioImageHdu = null;
     }
 
     public boolean isRunning() {
@@ -246,7 +246,7 @@ public class IRModel {
         if (hdus != oifitsFile.getFitsImageHDUs()) {
             final FitsImageHDU selectedInitImage;
             if (added) {
-                // select first added as selected input
+                // select first added hdu as selected input
                 selectedInitImage = addedHdus.get(0);
             } else {
                 // restore selected image (even null) to fix current OifitsFile:
@@ -271,11 +271,12 @@ public class IRModel {
         updateImageIdentifiers(hdu);
 
         if (added) {
-            // change selected image according if the source image reference:
-            if (selectedInputImageHDU == srcHdu) {
+            // change selected image according to the given source reference:
+            if (selectedRglPrioImageHdu == srcHdu) {
+                setSelectedRglPrioImageHdu(hdu);
+            } else {
+                // select first added hdu as selected input
                 setSelectedInputImageHDU(hdu);
-            } else if (selectedRglPrioImage == srcHdu) {
-                setSelectedRglPrioImage(hdu);
             }
         }
     }
@@ -361,8 +362,8 @@ public class IRModel {
      * Return the selected imageHDU for RGL Prio or first one.
      * @return selected fitsImageHDU for RGL Prio
      */
-    public FitsImageHDU getSelectedRglPrioImage() {
-        return selectedRglPrioImage;
+    public FitsImageHDU getSelectedRglPrioImageHdu() {
+        return selectedRglPrioImageHdu;
     }
 
     /**
@@ -375,7 +376,7 @@ public class IRModel {
             oifitsFile.getImageOiData().getInputParam().setInitImg("");
             logger.info("Set selectedInputImageHDU to empty.");
         } else {
-            String hduName = selectedInitImage.getHduName();
+            final String hduName = selectedInitImage.getHduName();
 
             if (hduName == null) {
                 // this imageHDU is probably not an image oi extension
@@ -396,23 +397,23 @@ public class IRModel {
 
     /**
      * Set given fitsImageHDU as the selected one for Rgl prio.
-     * @param selectedRglPrioImage image to select. optional : null means we
+     * @param selectedRglPrioImageHdu image to select. optional : null means we
      * want no image.
      */
-    public void setSelectedRglPrioImage(final FitsImageHDU selectedRglPrioImage) {
+    public void setSelectedRglPrioImageHdu(final FitsImageHDU selectedRglPrioImageHdu) {
 
-        if (selectedRglPrioImage == null || selectedRglPrioImage == NULL_IMAGE_HDU) {
+        if (selectedRglPrioImageHdu == null || selectedRglPrioImageHdu == NULL_IMAGE_HDU) {
             oifitsFile.getImageOiData().getInputParam().setRglPrio("");
             logger.info("Set selectedRglPrioImage to empty.");
         } else {
-            String hduName = selectedRglPrioImage.getHduName();
+            final String hduName = selectedRglPrioImageHdu.getHduName();
 
             if (hduName == null) {
                 // this imageHDU is probably not an image oi extension
                 throw new IllegalStateException("Can't select given image HDU with null HDUNAME");
             }
 
-            if (!existInImageLib(selectedRglPrioImage)) {
+            if (!existInImageLib(selectedRglPrioImageHdu)) {
                 throw new IllegalStateException(hduName + " HDU was not added !");
             }
 
@@ -420,7 +421,7 @@ public class IRModel {
             logger.info("Set new hdu '{}' as selectedRglPrioImage.", hduName);
         }
 
-        this.selectedRglPrioImage = selectedRglPrioImage;
+        this.selectedRglPrioImageHdu = selectedRglPrioImageHdu;
         selectHDUs(); // alter input OIFits in memory
     }
 
@@ -432,8 +433,8 @@ public class IRModel {
         if (selectedInputImageHDU != null) {
             oifitsFile.getFitsImageHDUs().add(selectedInputImageHDU);
         }
-        if (selectedRglPrioImage != null && selectedRglPrioImage != NULL_IMAGE_HDU) {
-            oifitsFile.getFitsImageHDUs().add(selectedRglPrioImage);
+        if (selectedRglPrioImageHdu != null && selectedRglPrioImageHdu != NULL_IMAGE_HDU) {
+            oifitsFile.getFitsImageHDUs().add(selectedRglPrioImageHdu);
         }
     }
 

@@ -672,7 +672,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
                 irModel.getFitsImageHDUs().forEach(jComboBoxRglPrio::addItem);
 
-                FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImage();
+                FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
 
                 if (service.supportsMissingKeyword(KEYWORD_RGL_PRIO)) {
                     if (rglPrioImage == null) {
@@ -828,8 +828,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                     && (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU)) {
                 logger.error("RGL PRIO should not be null because keyword is mandatory.");
             } else {
-                if (irModel.getSelectedRglPrioImage() != comboBoxRglPrioImage) {
-                    irModel.setSelectedRglPrioImage(comboBoxRglPrioImage);
+                if (irModel.getSelectedRglPrioImageHdu() != comboBoxRglPrioImage) {
+                    irModel.setSelectedRglPrioImageHdu(comboBoxRglPrioImage);
                     irModel.setInputImageView(KEYWORD_RGL_PRIO);
                     changed = true;
                 }

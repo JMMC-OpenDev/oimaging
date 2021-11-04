@@ -251,7 +251,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
             } else if (inputImageView.equals(KEYWORD_RGL_PRIO)) {
                 // only list image HDUs present in the input file:
-                displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedRglPrioImage());
+                displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedRglPrioImageHdu());
             }
         }
         setTabMode(SHOW_MODE.MODEL);
@@ -535,7 +535,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
             // notify model update
-            IRModelManager.getInstance().fireIRModelUpdated(this, null);
+            IRModelManager.getInstance().fireIRModelChanged(this, null);
 
         } else {
             displaySelection(fitsImageHDU);
