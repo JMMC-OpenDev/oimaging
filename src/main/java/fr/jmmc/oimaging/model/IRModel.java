@@ -402,12 +402,15 @@ public class IRModel {
             oifitsFile.getFitsImageHDUs().add(selectedInputImageHDU);
         }
         if (selectedRglPrioImage != null && selectedRglPrioImage != NULL_IMAGE_HDU) {
+
+            // copying and renaming rgl_prio's hdu if it is the same of init_img
             if (selectedInputImageHDU == selectedRglPrioImage) {
                 selectedRglPrioImage = new FitsImageHDU(selectedInputImageHDU);
                 final String newHduName = "PRIO_" + selectedInputImageHDU.getHduName();
                 selectedRglPrioImage.setHduName(newHduName);
                 oifitsFile.getImageOiData().getInputParam().setRglPrio(newHduName);
             }
+
             oifitsFile.getFitsImageHDUs().add(selectedRglPrioImage);
         }
     }
