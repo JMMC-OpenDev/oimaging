@@ -40,8 +40,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.Action;
@@ -486,6 +484,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
+    public void rescaleFitsImage() {
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+        if (fitsImage != null) {
+            if (fitsImagePanel.rescaleFitsImage()) {
+                displaySelection(fitsImage.getFitsImageHDU());
+            }
+        }
+    }
+
     public void modifyFitsImage() {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
 
@@ -496,30 +503,32 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         final FitsImageHDU fitsImageHDU = fitsImage.getFitsImageHDU();
 
+        // create a shallow-copy of the current image:
         final FitsImageHDU copyFitsImageHDU = new FitsImageHDU(fitsImageHDU);
-        copyFitsImageHDU.setHduName("resampled-" + copyFitsImageHDU.getHduName());
 
-        displayImage(Arrays.asList(copyFitsImageHDU), copyFitsImageHDU);
+        String hduName = copyFitsImageHDU.getHduName();
+        if (!hduName.startsWith("modified-")) {
+            hduName = "modified-" + hduName;
+        }
+        copyFitsImageHDU.setHduName(hduName);
+
+        // switch image to copied HDU in the fitsImagePanel to be modified in-place:
+        displaySelection(copyFitsImageHDU);
 
         if (fitsImagePanel.dialogModifyImage()) {
-            // TODO: fix this dirty hack ; the checksum does not update itself
-            copyFitsImageHDU.setChecksum(copyFitsImageHDU.getChecksum() + Instant.now().getEpochSecond());
+            try {
+                // update checksum:
+                copyFitsImageHDU.updateChecksum();
+            } catch (FitsException fe) {
+                logger.info("unable to update checksum on {}", copyFitsImageHDU, fe);
+            }
+            // add modified image into image library and select it if appropriate:
+            IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
+            // notify model update
+            IRModelManager.getInstance().fireIRModelUpdated(this, null);
 
-            displayImage(Arrays.asList(copyFitsImageHDU), copyFitsImageHDU);
-
-            IRModelManager.getInstance().getIRModel().addFitsImageHDU(copyFitsImageHDU);
-            IRModelManager.getInstance().fireIRModelChanged(this, null);
         } else {
             displaySelection(fitsImageHDU);
-        }
-    }
-
-    public void rescaleFitsImage() {
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            if (fitsImagePanel.rescaleFitsImage()) {
-                displaySelection(fitsImage.getFitsImageHDU());
-            }
         }
     }
 
