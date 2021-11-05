@@ -534,9 +534,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
-            // notify model update
-            IRModelManager.getInstance().fireIRModelChanged(this, null);
-
         } else {
             displaySelection(fitsImageHDU);
         }

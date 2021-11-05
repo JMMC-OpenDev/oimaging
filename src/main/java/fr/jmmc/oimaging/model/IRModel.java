@@ -5,7 +5,6 @@ package fr.jmmc.oimaging.model;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.component.MessagePane;
-import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.DateUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
@@ -25,7 +24,6 @@ import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
-import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.jmmc.oitools.model.range.Range;
 import fr.nom.tam.fits.FitsDate;
@@ -279,6 +277,8 @@ public class IRModel {
                 setSelectedInputImageHDU(hdu);
             }
         }
+        // notify model change (to display model):
+        IRModelManager.getInstance().fireIRModelChanged(this, null);
     }
 
     /** 
@@ -304,6 +304,7 @@ public class IRModel {
                 && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
             return false;
         }
+        // Remove duplicates based on identity check and checksum:
         if (existInImageLib(hdu)) {
             logger.info("skipping image hdu '{}' : already present ", hdu.getHduName());
             return false;
@@ -344,6 +345,33 @@ public class IRModel {
 
         // note: do not alter selected input
         return true;
+    }
+
+    /**
+     * Remove the given image from the image library and cleanup references if needed
+     * @param hdu image to remove
+     * @return true if removed; false otherwise
+     */
+    public boolean removeFitsImageHDU(final FitsImageHDU hdu) {
+        // check if image is used ?
+        final boolean removed = this.fitsImageHDUs.remove(hdu);
+
+        if (removed) {
+            // cleanup references:
+            if (selectedInputImageHDU == hdu) {
+                selectedInputImageHDU = null;
+            }
+            if (selectedRglPrioImageHdu == hdu) {
+                selectedRglPrioImageHdu = null;
+            }
+            // notify model change (to display model):
+            IRModelManager.getInstance().fireIRModelChanged(this, null);
+        }
+        return removed;
+    }
+
+    public List<FitsImageHDU> getFitsImageHDUs() {
+        return this.fitsImageHDUs;
     }
 
     public GenericListModel<String> getTargetListModel() {
@@ -456,10 +484,6 @@ public class IRModel {
         return false;
     }
 
-    public List<FitsImageHDU> getFitsImageHDUs() {
-        return this.fitsImageHDUs;
-    }
-
     public List<ServiceResult> getResultSets() {
         return this.serviceResults;
     }
@@ -528,6 +552,9 @@ public class IRModel {
         final String originalAbsoluteFilePath = oifitsFile.getAbsoluteFilePath();
 
         File tmpFile = FileUtils.getTempFile(oifitsFile.getFileName(), ".export-" + exportCount + ".fits");
+
+        // Pre-processing:
+        // Ensure OIFITS File is correct.
         OIFitsWriter.writeOIFits(tmpFile.getAbsolutePath(), oifitsFile);
 
         //restore filename
@@ -555,43 +582,6 @@ public class IRModel {
 
     public ImageOiData getImageOiData() {
         return oifitsFile.getImageOiData();
-    }
-
-    public boolean updateWithNewModel(final ServiceResult serviceResult) {
-        boolean dataAdded = false;
-
-        final File resultFile = serviceResult.getOifitsResultFile();
-
-        // the file does exist (checked previously):
-        Exception e = null;
-        try {
-            OIFitsFile result = OIFitsLoader.loadOIFits(OIFitsStandard.VERSION_1, resultFile.getAbsolutePath());
-
-            // TODO 1 - show plot for oidata part
-            // 2 - show result images
-            dataAdded = addFitsImageHDUs(result.getFitsImageHDUs(), result.getAbsoluteFilePath());
-
-        } catch (IOException ioe) {
-            e = ioe;
-        } catch (FitsException fe) {
-            e = fe;
-        }
-        // TODO enhance user messages with details... button e.g.
-        if (e != null) {
-            showLog("Can't recover result data", serviceResult, e);
-        }
-
-        // TODO put this off using high level object for results
-        if (dataAdded) {
-            StatusBar.show("GUI updated with results ");
-        } else {
-            StatusBar.show("Image result unchanged");
-        }
-
-        // notify model change
-        IRModelManager.getInstance().fireIRModelChanged(this, null);
-
-        return dataAdded;
     }
 
     private void loadLog(final ServiceResult serviceResult) {
