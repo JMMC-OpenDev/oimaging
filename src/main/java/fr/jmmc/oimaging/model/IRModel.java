@@ -169,7 +169,7 @@ public class IRModel {
         // Select first image as selected one if not yet initialized
         if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName(),
-                    getInputImageRefs(oifitsFile));
+                    getInputImageRefs(oifitsFile), false);
         }
         // this needs to be done after the call addFitsImageHDUs()
         // so it uses the (possible) new name
@@ -245,18 +245,6 @@ public class IRModel {
      * @param hdus new hdus
      * @param filename filename of given hdu
      * @param inputImageRefs HDU names of input images (to check)
-     * @return true if some hdu have been added
-     */
-    public boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
-            final Set<String> inputImageRefs) {
-        return addFitsImageHDUs(hdus, filename, inputImageRefs, false);
-    }
-
-    /**
-     * Add many HDUs to present ones and select the first new one as input image.
-     * @param hdus new hdus
-     * @param filename filename of given hdu
-     * @param inputImageRefs HDU names of input images (to check)
      * @param addAndSelectFirstHDU always add and select the first hdu in `hdus`
      * @return true if some hdu have been added
      */
@@ -266,6 +254,8 @@ public class IRModel {
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
         final List<FitsImageHDU> addedHdus = new ArrayList<>(hdus.size());
+
+        boolean firstHduAdded = false;
 
         for (int i = 0; i < hdus.size(); i++) {
             final FitsImageHDU hdu = hdus.get(i);
@@ -280,6 +270,9 @@ public class IRModel {
             final boolean hduAdded = addFitsImageHDU(hdu, filename, checkSelectedImageHDUs);
             if (hduAdded) {
                 addedHdus.add(hdu);
+                if (i == 0) {
+                    firstHduAdded = true;
+                }
             }
         }
 
@@ -289,14 +282,13 @@ public class IRModel {
         if (hdus != oifitsFile.getFitsImageHDUs()) {
             final FitsImageHDU selectedInitImage;
             if (added) {
-                if (addAndSelectFirstHDU && hdus.get(0) != addedHdus.get(0)) {
-                    logger.debug("First HDU {} have not been added whereas addAndSelectFirstHDU option was true.",
+                // select first added hdu as selected input
+                selectedInitImage = addedHdus.get(0);
+
+                // logging if first HDU should have been added
+                if (addAndSelectFirstHDU && !firstHduAdded) {
+                    logger.debug("First HDU {} should have been added.",
                             hdus.get(0).getHduName());
-                    // defaulting to previous selected HDU
-                    selectedInitImage = selectedInputImageHDU;
-                } else {
-                    // select first added hdu as selected input
-                    selectedInitImage = addedHdus.get(0);
                 }
             } else {
                 // restore selected image (even null) to fix current OifitsFile:
@@ -555,7 +547,7 @@ public class IRModel {
     public void addFitsImageFile(FitsImageFile fitsImageFile) {
         final List<FitsImageHDU> hdus = fitsImageFile.getFitsImageHDUs();
         if (!hdus.isEmpty()) {
-            addFitsImageHDUs(hdus, fitsImageFile.getFileName(), null);
+            addFitsImageHDUs(hdus, fitsImageFile.getFileName(), null, false);
         } else {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
