@@ -652,12 +652,27 @@ public class IRModel {
             serviceResult.setIndex(resultCounter.incrementAndGet());
             postProcessOIFitsFile(serviceResult);
 
-            addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName(),
-                    getInputImageRefs(serviceResult.getOifitsFile()));
+            final List<FitsImageHDU> resultHDUs = serviceResult.getOifitsFile().getFitsImageHDUs();
+            final int sizeResultHDUs = resultHDUs.size();
+            final String filename = serviceResult.getInputFile().getName();
 
-            // this needs to be done after the call addFitsImageHDUs()
-            // so it uses the (possible) new name
-            updateImageIdentifiers(serviceResult);
+            logger.info("Service result with {} FitsImageHDUs.", sizeResultHDUs);
+
+            if (sizeResultHDUs > 0) {
+
+                // adding first HDU whithout checks
+
+                addFitsImageHDU(resultHDUs.get(0), filename, false);
+
+                // adding other HDUs with checks
+                for (int i = 1; i < sizeResultHDUs; i++) {
+                    addFitsImageHDU(resultHDUs.get(i), filename, true);
+                }
+
+                // this needs to be done after the call addFitsImageHDUs()
+                // so it uses the (possible) new name
+                updateImageIdentifiers(serviceResult);
+            }
         }
 
         // notify model update
