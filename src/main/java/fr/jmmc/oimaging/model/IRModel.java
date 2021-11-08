@@ -248,20 +248,40 @@ public class IRModel {
      * @return true if some hdu have been added
      */
     public boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
-                                    final Set<String> inputImageRefs) {
+            final Set<String> inputImageRefs) {
+        return addFitsImageHDUs(hdus, filename, inputImageRefs, false);
+    }
+
+    /**
+     * Add many HDUs to present ones and select the first new one as input image.
+     * @param hdus new hdus
+     * @param filename filename of given hdu
+     * @param inputImageRefs HDU names of input images (to check)
+     * @param addAndSelectFirstHDU always add and select the first hdu in `hdus`
+     * @return true if some hdu have been added
+     */
+    public boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
+            final Set<String> inputImageRefs, final boolean addAndSelectFirstHDU) {
 
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
         final List<FitsImageHDU> addedHdus = new ArrayList<>(hdus.size());
 
-        hdus.forEach(hdu -> {
-            final boolean checkSelectedImageHDUs = (inputImageRefs == null) || inputImageRefs.contains(hdu.getHduName());
+        for (int i = 0; i < hdus.size(); i++) {
+            final FitsImageHDU hdu = hdus.get(i);
+
+            final boolean checkSelectedImageHDUs;
+            if (addAndSelectFirstHDU && i == 0) {
+                checkSelectedImageHDUs = false;
+            } else {
+                checkSelectedImageHDUs = (inputImageRefs == null) || inputImageRefs.contains(hdu.getHduName());
+            }
 
             final boolean hduAdded = addFitsImageHDU(hdu, filename, checkSelectedImageHDUs);
             if (hduAdded) {
                 addedHdus.add(hdu);
             }
-        });
+        }
 
         final boolean added = !addedHdus.isEmpty();
 
@@ -269,8 +289,15 @@ public class IRModel {
         if (hdus != oifitsFile.getFitsImageHDUs()) {
             final FitsImageHDU selectedInitImage;
             if (added) {
-                // select first added hdu as selected input
-                selectedInitImage = addedHdus.get(0);
+                if (addAndSelectFirstHDU && hdus.get(0) != addedHdus.get(0)) {
+                    logger.debug("First HDU {} have not been added whereas addAndSelectFirstHDU option was true.",
+                            hdus.get(0).getHduName());
+                    // defaulting to previous selected HDU
+                    selectedInitImage = selectedInputImageHDU;
+                } else {
+                    // select first added hdu as selected input
+                    selectedInitImage = addedHdus.get(0);
+                }
             } else {
                 // restore selected image (even null) to fix current OifitsFile:
                 selectedInitImage = selectedInputImageHDU;
@@ -652,27 +679,12 @@ public class IRModel {
             serviceResult.setIndex(resultCounter.incrementAndGet());
             postProcessOIFitsFile(serviceResult);
 
-            final List<FitsImageHDU> resultHDUs = serviceResult.getOifitsFile().getFitsImageHDUs();
-            final int sizeResultHDUs = resultHDUs.size();
-            final String filename = serviceResult.getInputFile().getName();
+            addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName(),
+                    getInputImageRefs(serviceResult.getOifitsFile()), true);
 
-            logger.info("Service result with {} FitsImageHDUs.", sizeResultHDUs);
-
-            if (sizeResultHDUs > 0) {
-
-                // adding first HDU whithout checks
-
-                addFitsImageHDU(resultHDUs.get(0), filename, false);
-
-                // adding other HDUs with checks
-                for (int i = 1; i < sizeResultHDUs; i++) {
-                    addFitsImageHDU(resultHDUs.get(i), filename, true);
-                }
-
-                // this needs to be done after the call addFitsImageHDUs()
-                // so it uses the (possible) new name
-                updateImageIdentifiers(serviceResult);
-            }
+            // this needs to be done after the call addFitsImageHDUs()
+            // so it uses the (possible) new name
+            updateImageIdentifiers(serviceResult);
         }
 
         // notify model update
