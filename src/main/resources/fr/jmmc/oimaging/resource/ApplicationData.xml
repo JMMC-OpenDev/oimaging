@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.4 beta 7"/>
-    <compilation date="15/10/2021" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.5.4 beta 8"/>
+    <compilation date="04/11/2021" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -141,8 +141,8 @@
         <menu label="Processing">
             <menu label="Run" classpath="fr.jmmc.oimaging.gui.action.RunAction" action="run" description="Run the image reconstruction using the current input OIFITS file"/>
             <menu/> <!-- menu separator -->
-            <menu label="Resample image" classpath="fr.jmmc.oimaging.gui.action.ResampleImageAction" action="resample"
-                  description="Resample the current image (pixels) using advanced image filters"/>
+            <menu label="Modify image" classpath="fr.jmmc.oimaging.gui.action.ModifyImageAction" action="modify"
+                  description="Modify the current image (change fov and resample according to the pixel increments)"/>
         </menu>
 
         <menu label="Interop">
@@ -155,7 +155,10 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Fri, 15 Oct 2021 16:00:00 GMT</pubDate>
+            <pubDate>Thu, 04 Nov 2021 14:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 8">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/17">Added the new 'Modify Image' action to change both FOV and increments</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 7">
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/17">Keep only 1 'Save OIFits file' button in the main panel</change>
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/26">Hide keywords FLUX and FLUXERR in GUI</change>

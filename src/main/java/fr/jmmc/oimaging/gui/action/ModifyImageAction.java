@@ -10,23 +10,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Resample the current FITS image.
+ * Modify the current FITS image.
  */
-public final class ResampleImageAction extends RegisteredAction {
+public final class ModifyImageAction extends RegisteredAction {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
     /** Class name. This name is used to register to the ActionRegistrar */
-    public final static String className = ResampleImageAction.class.getName();
+    public final static String className = ModifyImageAction.class.getName();
     /** Action name. This name is used to register to the ActionRegistrar */
-    public final static String actionName = "resample";
+    public final static String actionName = "modify";
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(className);
 
     /**
      * Public constructor that automatically register the action in RegisteredAction.
      */
-    public ResampleImageAction() {
+    public ModifyImageAction() {
         super(className, actionName);
     }
 
@@ -37,7 +37,7 @@ public final class ResampleImageAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        OImaging.getInstance().getMainPanel().getViewerPanel().resampleFitsImage();
+        OImaging.getInstance().getMainPanel().getViewerPanel().modifyFitsImage();
     }
 
 }

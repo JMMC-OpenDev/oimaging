@@ -261,7 +261,7 @@ public final class IRModelManager {
      * @throws IOException if a fits file can not be loaded
      */
     private static FitsImageFile loadFitsImage(final String fileLocation) throws IOException {
-        //@todo test if file has already been loaded before going further ??
+        final boolean firstOnly = false;
 
         final FitsImageFile fitsImageFile;
         try {
@@ -276,7 +276,7 @@ public final class IRModelManager {
                     // TODO: remove StatusBar !
                     StatusBar.show("loading file: " + fileLocation + " ( local copy: " + localCopy.getAbsolutePath() + " )");
 
-                    fitsImageFile = FitsImageLoader.load(localCopy.getAbsolutePath(), true, true);
+                    fitsImageFile = FitsImageLoader.load(localCopy.getAbsolutePath(), firstOnly, true);
                 } else {
                     // download failed:
                     fitsImageFile = null;
@@ -285,7 +285,7 @@ public final class IRModelManager {
                 // TODO: remove StatusBar !
                 StatusBar.show("loading file: " + fileLocation);
 
-                fitsImageFile = FitsImageLoader.load(fileLocation, true, true);
+                fitsImageFile = FitsImageLoader.load(fileLocation, firstOnly, true);
             }
         } catch (AuthenticationException ae) {
             throw new IOException("Could not load the file : " + fileLocation, ae);

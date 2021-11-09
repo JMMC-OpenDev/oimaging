@@ -674,7 +674,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             return;
         }
 
-        // TODO may be a copy dedicated to this class
         final IRModel irModel = IRModelManager.getInstance().getIRModel();
         currentModel = irModel;
 

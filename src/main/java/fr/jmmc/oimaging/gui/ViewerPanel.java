@@ -20,6 +20,7 @@ import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModel;
+import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
@@ -250,7 +251,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedInputImageHDU());
             } else if (inputImageView.equals(KEYWORD_RGL_PRIO)) {
                 // only list image HDUs present in the input file:
-                displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedRglPrioImage());
+                displayImage(irModel.getOifitsFile().getFitsImageHDUs(), irModel.getSelectedRglPrioImageHdu());
             }
         }
         setTabMode(SHOW_MODE.MODEL);
@@ -466,29 +467,75 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void changeViewportFitsImage() {
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            if (fitsImagePanel.changeViewportFitsImage()) {
-                displaySelection(fitsImage.getFitsImageHDU());
-            }
-        }
+        processFitsImage(ProcessOperations.changeViewport);
     }
 
     public void resampleFitsImage() {
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            if (fitsImagePanel.resampleFitsImage()) {
-                displaySelection(fitsImage.getFitsImageHDU());
-            }
-        }
+        processFitsImage(ProcessOperations.resample);
     }
 
     public void rescaleFitsImage() {
-        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
-        if (fitsImage != null) {
-            if (fitsImagePanel.rescaleFitsImage()) {
-                displaySelection(fitsImage.getFitsImageHDU());
+        processFitsImage(ProcessOperations.rescale);
+    }
+
+    public void modifyFitsImage() {
+        processFitsImage(ProcessOperations.modifyFitsImage);
+    }
+
+    private enum ProcessOperations {
+        changeViewport,
+        resample,
+        rescale,
+        modifyFitsImage;
+
+        public boolean action(final FitsImagePanel fitsImagePanel) {
+            switch (this) {
+                case changeViewport:
+                    return fitsImagePanel.changeViewportFitsImage();
+                case resample:
+                    return fitsImagePanel.resampleFitsImage();
+                case rescale:
+                    return fitsImagePanel.rescaleFitsImage();
+                case modifyFitsImage:
+                    return fitsImagePanel.dialogModifyImage();
+                default:
             }
+            return false;
+        }
+    }
+
+    private void processFitsImage(final ProcessOperations operation) {
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+
+        if ((fitsImage == null) || (fitsImage.getFitsImageHDU() == null)) {
+            return;
+        }
+
+        final FitsImageHDU fitsImageHDU = fitsImage.getFitsImageHDU();
+
+        // create a shallow-copy of the current image:
+        final FitsImageHDU copyFitsImageHDU = new FitsImageHDU(fitsImageHDU);
+
+        String hduName = copyFitsImageHDU.getHduName();
+        if (!hduName.startsWith("modified-")) {
+            hduName = "modified-" + hduName;
+        }
+        copyFitsImageHDU.setHduName(hduName);
+
+        // switch image to copied HDU in the fitsImagePanel to be modified in-place:
+        displaySelection(copyFitsImageHDU);
+
+        if (operation.action(fitsImagePanel)) {
+            try {
+                // update checksum:
+                copyFitsImageHDU.updateChecksum();
+            } catch (FitsException fe) {
+                logger.info("unable to update checksum on {}", copyFitsImageHDU, fe);
+            }
+            // add modified image into image library and select it if appropriate:
+            IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
+        } else {
+            displaySelection(fitsImageHDU);
         }
     }
 
@@ -510,6 +557,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage = new javax.swing.JComboBox();
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
+        jButtonModifyImage = new javax.swing.JButton();
         jButtonRescale = new javax.swing.JButton();
         jLabelImageDebug = new javax.swing.JLabel();
         jPanelImage = new javax.swing.JPanel();
@@ -590,6 +638,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
 
+        jButtonModifyImage.setText("Modify image");
+        jButtonModifyImage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonModifyImageActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
+
         jButtonRescale.setText("Rescale");
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -604,7 +664,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jLabelImageDebug.setForeground(java.awt.Color.red);
         jLabelImageDebug.setText("Debug");
-        jPanelImageViewer.add(jLabelImageDebug, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        jPanelImageViewer.add(jLabelImageDebug, gridBagConstraints);
 
         jPanelImage.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -707,7 +770,12 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         resampleFitsImage();
     }//GEN-LAST:event_jButtonResampleActionPerformed
 
+    private void jButtonModifyImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyImageActionPerformed
+        modifyFitsImage();
+    }//GEN-LAST:event_jButtonModifyImageActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonModifyImage;
     private javax.swing.JButton jButtonResample;
     private javax.swing.JButton jButtonRescale;
     private javax.swing.JButton jButtonViewport;
