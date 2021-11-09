@@ -169,7 +169,7 @@ public class IRModel {
         // Select first image as selected one if not yet initialized
         if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName(),
-                    getInputImageRefs(oifitsFile), false);
+                    null, false);
         }
         // this needs to be done after the call addFitsImageHDUs()
         // so it uses the (possible) new name
