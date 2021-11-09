@@ -264,7 +264,7 @@ public class IRModel {
             if (addAndSelectFirstHDU && i == 0) {
                 checkSelectedImageHDUs = false;
             } else {
-                checkSelectedImageHDUs = (inputImageRefs == null) || inputImageRefs.contains(hdu.getHduName());
+                checkSelectedImageHDUs = (inputImageRefs != null) && inputImageRefs.contains(hdu.getHduName());
             }
 
             final boolean hduAdded = addFitsImageHDU(hdu, filename, checkSelectedImageHDUs);
