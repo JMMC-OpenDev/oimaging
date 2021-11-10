@@ -31,6 +31,7 @@ import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,8 +85,11 @@ public class IRModel {
      */
     private String inputImageView = null;
 
-    /** List of loaded imageHUDs */
-    private final List<FitsImageHDU> fitsImageHDUs = new LinkedList<FitsImageHDU>();
+    /** Global list of FitsImageHDUs.
+     * is used in the GUI for selecting an initial image or a regulation image.
+     * unicity of HDU_NAME among the library.
+     */
+    private final List<FitsImageHDU> imageLibrary = new LinkedList<FitsImageHDU>();
     /** List model of target names */
     private final GenericListModel<String> targetListModel = new GenericListModel<String>(new ArrayList<String>(10), true);
     /** List of results */
@@ -116,7 +120,7 @@ public class IRModel {
         this.selectedInputImageHDU = null;
         this.selectedRglPrioImageHdu = null;
         this.inputImageView = KEYWORD_INIT_IMG;
-        this.fitsImageHDUs.clear();
+        this.imageLibrary.clear();
         this.serviceResults.clear();
         this.resultCounter.set(0);
 
@@ -300,11 +304,11 @@ public class IRModel {
     }
 
     /** 
-     * Add one HDU to the image library and select as input image or rgl prior. (modify image)
-     * @param srcHdu (required) not null
-     * @param hdu (required)
+     * Add one HDU to the image library and replace the previous input image HDU or rgl prior HDU. (modify image)
+     * @param hduToReplace a library HDU that is to be replaced by the copy of hdu. (required)
+     * @param hdu the HDU to add to the library. (required)
      */
-    public void addFitsImageHDUAndSelect(final FitsImageHDU srcHdu, final FitsImageHDU hdu) {
+    public void addFitsImageHDUAndSelect(final FitsImageHDU hduToReplace, final FitsImageHDU hdu) {
         // do not checkSelectedImageHDUs (hduName):
         final boolean added = addFitsImageHDU(hdu, null, false);
 
@@ -314,7 +318,7 @@ public class IRModel {
 
         if (added) {
             // change selected image according to the given source reference:
-            if (selectedRglPrioImageHdu == srcHdu) {
+            if (selectedRglPrioImageHdu == hduToReplace) {
                 setSelectedRglPrioImageHdu(hdu);
             } else {
                 // select first added hdu as selected input
@@ -326,7 +330,7 @@ public class IRModel {
     }
 
     /** 
-     * Add one HDU to the image library
+     * Add one HDU to the image library.
      * @param hdu (required)
      * @param filename (can be null)
      * @param checkSelectedImageHDUs true to skip HDU whose hduname is present in current input oifits
@@ -356,8 +360,8 @@ public class IRModel {
             }
         }
         // Remove duplicates based on identity check and checksum:
-        if (existInImageLib(hdu)) {
-            logger.info("skipping image hdu '{}' : already present in image lib (checksum)", hdu.getHduName());
+        if (existInImageLibrary(hdu)) {
+            logger.info("skipping image hdu '{}' : already present in image lib (by reference or checksum)", hdu.getHduName());
             return false;
         }
 
@@ -374,8 +378,8 @@ public class IRModel {
         // Fix duplicated hduName in the image library:
         final String now = DateUtils.now().substring(0, 19);
 
-        for (FitsImageHDU currentHDU : getFitsImageHDUs()) {
-            if (currentHDU.getHduName().equals(tryHduName)) {
+        for (FitsImageHDU libraryHDU : imageLibrary) {
+            if (libraryHDU.getHduName().equals(tryHduName)) {
                 final String newName = tryHduName + "-" + now;
 
                 if (hdu.getHduName().equals(newName)) {
@@ -392,10 +396,9 @@ public class IRModel {
         }
 
         // Add FitsImageHDU into model:
-        this.fitsImageHDUs.add(hdu);
+        final boolean added = addToImageLibrary(hdu);
 
-        // note: do not alter selected input
-        return true;
+        return added;
     }
 
     /**
@@ -405,7 +408,7 @@ public class IRModel {
      */
     public boolean removeFitsImageHDU(final FitsImageHDU hdu) {
         // check if image is used ?
-        final boolean removed = this.fitsImageHDUs.remove(hdu);
+        final boolean removed = this.imageLibrary.remove(hdu);
 
         if (removed) {
             // cleanup references:
@@ -421,8 +424,11 @@ public class IRModel {
         return removed;
     }
 
-    public List<FitsImageHDU> getFitsImageHDUs() {
-        return this.fitsImageHDUs;
+    /** Get a read-only access to the image library.
+     * @return imageLibrary read-only (all write will throw an exception).
+     */
+    public List<FitsImageHDU> getImageLibrary() {
+        return Collections.unmodifiableList(imageLibrary);
     }
 
     public GenericListModel<String> getTargetListModel() {
@@ -447,92 +453,135 @@ public class IRModel {
 
     /**
      * Set given fitsImageHDU as the selected one for input.
-     * @param selectedInitImage image to select (must be present in the previous list
+     * Modify this.oifitsFile params accordingly.
+     * Also remove unused HDUs in this.oifitsFile.
+     * @param selectedInitImage image to select (must belong to imageLibrary to be selected)
+     * @throws IllegalStateException when HDU is not in the library.
      */
     public void setSelectedInputImageHDU(final FitsImageHDU selectedInitImage) {
 
         if (selectedInitImage == null || selectedInitImage == NULL_IMAGE_HDU) {
             oifitsFile.getImageOiData().getInputParam().setInitImg("");
-            logger.info("Set selectedInputImageHDU to empty.");
+            logger.info("Select no hdu for selectedInputImageHDU.");
         } else {
+
             final String hduName = selectedInitImage.getHduName();
 
-            if (hduName == null) {
-                // this imageHDU is probably not an image oi extension
-                throw new IllegalStateException("Can't select given image HDU with null HDUNAME");
-            }
-
-            if (!existInImageLib(selectedInitImage)) {
-                throw new IllegalStateException(hduName + " HDU was not added !");
+            if (!existInImageLibrary(selectedInitImage)) {
+                throw new IllegalStateException(
+                        "Cannot select hdu " + hduName + " because it is not in imageLibrary.");
             }
 
             oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
-            logger.info("Set new hdu '{}' as selectedInputImageHDU.", hduName);
+            logger.info("Select hdu '{}' for selectedInputImageHDU.", hduName);
         }
 
         this.selectedInputImageHDU = selectedInitImage;
-        selectHDUs(); // alter input OIFits in memory
+        updateOifitsFileHDUs(); // alter input OIFits in memory
     }
 
     /**
      * Set given fitsImageHDU as the selected one for Rgl prio.
-     * @param selectedRglPrioImageHdu image to select. optional : null means we
-     * want no image.
+     * Modify this.oifitsFile params accordingly.
+     * Also remove unused HDUs in this.oifitsFile.
+     * @param selectedRglPrioImageHdu image to select. (must belong to imageLibrary to be selected)
+     * @throws IllegalStateException when HDU is not in the library.
      */
     public void setSelectedRglPrioImageHdu(final FitsImageHDU selectedRglPrioImageHdu) {
 
         if (selectedRglPrioImageHdu == null || selectedRglPrioImageHdu == NULL_IMAGE_HDU) {
             oifitsFile.getImageOiData().getInputParam().setRglPrio("");
-            logger.info("Set selectedRglPrioImage to empty.");
+            logger.info("Select no hdu for selectedRglPrioImage.");
         } else {
             final String hduName = selectedRglPrioImageHdu.getHduName();
 
-            if (hduName == null) {
-                // this imageHDU is probably not an image oi extension
-                throw new IllegalStateException("Can't select given image HDU with null HDUNAME");
-            }
-
-            if (!existInImageLib(selectedRglPrioImageHdu)) {
-                throw new IllegalStateException(hduName + " HDU was not added !");
+            if (!existInImageLibrary(selectedRglPrioImageHdu)) {
+                throw new IllegalStateException(
+                        "Cannot select hdu " + hduName + " because it is not in imageLibrary.");
             }
 
             oifitsFile.getImageOiData().getInputParam().setRglPrio(hduName);
-            logger.info("Set new hdu '{}' as selectedRglPrioImage.", hduName);
+            logger.info("Select hdu '{}' for selectedRglPrioImage.", hduName);
         }
 
         this.selectedRglPrioImageHdu = selectedRglPrioImageHdu;
-        selectHDUs(); // alter input OIFits in memory
+        updateOifitsFileHDUs(); // alter input OIFits in memory
     }
 
     /**
-     * select HDUs that are targeted by input image or rgl prio.
+     * Look at the selected HDUs in the input form, and reference them in this.oifitsFile.
+     * Do not reference them if they are null or NULL_IMAGE_HDU.
      */
-    private void selectHDUs() {
-        oifitsFile.getFitsImageHDUs().clear();
-        if (selectedInputImageHDU != null) {
-            oifitsFile.getFitsImageHDUs().add(selectedInputImageHDU);
+    private void updateOifitsFileHDUs() {
+        final List<FitsImageHDU> oifitsFileHDUs = oifitsFile.getFitsImageHDUs();
+
+        oifitsFileHDUs.clear();
+
+        // init image
+        if (selectedInputImageHDU != null && selectedRglPrioImageHdu != NULL_IMAGE_HDU) {
+            oifitsFileHDUs.add(selectedInputImageHDU);
         }
+
+        // rgl image
         if (selectedRglPrioImageHdu != null && selectedRglPrioImageHdu != NULL_IMAGE_HDU) {
-            oifitsFile.getFitsImageHDUs().add(selectedRglPrioImageHdu);
+            oifitsFileHDUs.add(selectedRglPrioImageHdu);
         }
     }
 
-    /**
-     * Return true if the given HDU is in the image library.
-     *
-     * @param targetHDU hdu to look up (required)
-     * @return true if targetHDU is the same reference than one loaded image,
-     * or true if targetHDU has the same checkSum than one loaded image, or false
-     * otherwise.
+    /** Identity function to be used for HDUs in imageLibrary.
+     * @param first HDU to compare to second. (optional)
+     * @param second HDU to compare to first. (optional)
+     * @return true if both contains same reference,
+     * or if both are null, or if both have same checksum. false otherwise.
      */
-    private boolean existInImageLib(final FitsImageHDU targetHDU) {
-        for (FitsImageHDU fitsImageHDU : getFitsImageHDUs()) {
-            if ((fitsImageHDU == targetHDU)
-                    || (fitsImageHDU.getChecksum() == targetHDU.getChecksum())) {
-                return true;
+    private boolean hduEquals(final FitsImageHDU first, final FitsImageHDU second) {
+        if (first == second) {
+            return true; // when they are the same reference or both null
+        } else if (first == null || second == null) {
+            return false; // when only one of them is null
+        } else {
+            return first.getChecksum() == second.getChecksum(); // compare the checksums
+        }
+    }
+
+    /** find an equivalent HDU in imageLibrary.
+     * @param hdu we want to find an equivalent to this HDU. (optional)
+     * @return an equivalent HDU from imageLibrary
+     * return null when no equivalent HDU has been found, or when hdu is null.
+     */
+    private FitsImageHDU findInImageLibrary(final FitsImageHDU hdu) {
+        // no need to search if hdu is null
+        if (hdu == null) {
+            return null;
+        }
+        // traverses the library until an equivalent HDU is found
+        for (FitsImageHDU libraryHDU : imageLibrary) {
+            if (hduEquals(libraryHDU, hdu)) {
+                return libraryHDU; // return the HDU from the library, not the target one !
             }
         }
-        return false;
+        // when no equivalent HDU is found, return null
+        return null;
+    }
+
+    /**
+     * Return true if the given HDU is in imageLibrary.
+     * @param hdu hdu to look up
+     */
+    private boolean existInImageLibrary(final FitsImageHDU hdu) {
+        return (findInImageLibrary(hdu) != null);
+    }
+
+    /** add a HDU to the library.
+     * @param hdu hdu to add to imageLibrary. not added if null. must never be NULL_IMAGE_HDU.
+     * @return true if added. false otherwise.
+     */
+    private boolean addToImageLibrary(final FitsImageHDU hdu) {
+        if (hdu == null) {
+            return false;
+        } else {
+            return this.imageLibrary.add(hdu);
+        }
     }
 
     public List<ServiceResult> getResultSets() {
@@ -588,7 +637,7 @@ public class IRModel {
     }
 
     public String toString() {
-        return "IRModel [" + oifitsFile + ", " + fitsImageHDUs + ", " + selectedService + "]";
+        return "IRModel [" + oifitsFile + ", " + imageLibrary + ", " + selectedService + "]";
     }
 
     public File prepareTempFile() throws FitsException, IOException {

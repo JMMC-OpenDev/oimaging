@@ -645,7 +645,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 jComboBoxImage.addItem(NULL_IMAGE_HDU);
             }
 
-            irModel.getFitsImageHDUs().forEach(jComboBoxImage::addItem);
+            irModel.getImageLibrary().forEach(jComboBoxImage::addItem);
 
             final FitsImageHDU initImage = irModel.getSelectedInputImageHDU();
 
@@ -678,7 +678,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                     jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
                 }
 
-                irModel.getFitsImageHDUs().forEach(jComboBoxRglPrio::addItem);
+                irModel.getImageLibrary().forEach(jComboBoxRglPrio::addItem);
 
                 FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
 
