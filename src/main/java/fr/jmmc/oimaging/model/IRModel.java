@@ -32,10 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,10 +169,11 @@ public class IRModel {
 
         // load fits Image HDU data if any present
         // Select first image as selected one if not yet initialized
-        // disabling modifying of input file to avoid conflicts
+	// disabled early skipping so no null roles
+        // disabled modifying of input file to avoid conflicts
         if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
             addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName(),
-                    null, false);
+                    null, false, false);
         }
         // this needs to be done after the call addFitsImageHDUs()
         // so it uses the (possible) new name
@@ -204,55 +203,71 @@ public class IRModel {
         this.selectedRglPrioImageHdu = null;
     }
 
-    /** Look for a hdu by its hduName among a list of hdus.
-    @param hdus list of hdus
-    @param hduName hduName to be looked for
-    @return first hdu found with hduName, or null if params were wrong, or if no hdu found.
+    /** Role of a HDU */
+    private enum Role {
+        RESULT, INIT, RGL, NO_ROLE
+    };
+
+    /** return the role associated to each hdu in the oifitsfile
+    @param oifitsFile the oifitsfile where we take the list of hdus
+    @return the list of roles, each hdu gets a role (if no special role, get NO_ROLE)
      */
-    private static FitsImageHDU findHDUByHduName(final List<FitsImageHDU> hdus, final String hduName) {
+    private static List<Role> getHdusRoles(final OIFitsFile oifitsFile) {
 
-        if (hdus == null) {
-            return null;
+        final List<FitsImageHDU> hdus = new ArrayList<>(oifitsFile.getFitsImageHDUs());
+
+        final List<Role> roles = new ArrayList<>(hdus.size());
+
+        // early return when there is no hdus
+        if (hdus.isEmpty()) {
+            return roles;
         }
-
-        for (FitsImageHDU hdu : hdus) {
-            if (hdu.getHduName().equals(hduName)) {
-                return hdu;
-            }
-        }
-
-        return null;
-    }
-
-    private static Set<FitsImageHDU> getInputHdus(final OIFitsFile oifitsFile) {
-
-        final Set<FitsImageHDU> inputHdus = new HashSet<>(2);
 
         final ImageOiInputParam inputParam = oifitsFile.getImageOiData().getInputParam();
+        final ImageOiOutputParam outputParam = oifitsFile.getImageOiData().getOutputParam();
 
-        final List<FitsImageHDU> hdus = oifitsFile.getFitsImageHDUs();
+        // result image
+        // the output param LAST_IMG contains the HDU_NAME.
+        // the result image is always in the first HDU.
 
-        final String initImg = inputParam.getInitImg();
-        if (!StringUtils.isEmpty(initImg)) {
+        final String lastImgParam = outputParam.getLastImg();
 
-            final FitsImageHDU initImgHdu = findHDUByHduName(hdus, initImg);
-
-            if (initImgHdu != null) {
-                inputHdus.add(initImgHdu);
+        if (lastImgParam != null && !lastImgParam.isEmpty()) {
+            // if the first HDU_NAME is equal to LAST_IMG
+            if (lastImgParam.equals(hdus.get(0).getHduName())) {
+                roles.add(Role.RESULT);
+                hdus.remove(0);
             }
         }
 
-        final String rglPrio = inputParam.getRglPrio();
-        if (!StringUtils.isEmpty(rglPrio)) {
+        // the init image and the rgl image
+        // we use the first hdu that correspond to INIT_IMG
+        // then the first hdu that correspond to RGL_PRIO
+        // the rest of the hdus are marked with NO_ROLE
 
-            final FitsImageHDU rglImgHdu = findHDUByHduName(hdus, rglPrio);
+        final String initImgParam = inputParam.getInitImg();
+        final String rglImgParam = inputParam.getRglPrio();
 
-            if (rglImgHdu != null) {
-                inputHdus.add(rglImgHdu);
+        boolean foundInitImg = false, foundRglImg = false;
+
+        for (FitsImageHDU hdu : hdus) {
+
+            if (!foundInitImg && initImgParam != null && initImgParam.equals(hdu.getHduName())) {
+                // init image
+                roles.add(Role.INIT);
+                foundInitImg = true;
+            } else if (!foundRglImg && rglImgParam != null && rglImgParam.equals(hdu.getHduName())) {
+		// rgl image
+		roles.add(Role.RGL);
+                foundRglImg = true;
+            } else {
+                roles.add(Role.NO_ROLE);
             }
         }
-        logger.debug("getInputHdus[{}] : {}", oifitsFile.getAbsoluteFilePath(), inputHdus);
-        return inputHdus;
+
+
+        logger.debug("getHdusRoles[{}] : {}", oifitsFile.getAbsoluteFilePath(), roles);
+        return roles;
     }
 
     public boolean isRunning() {
@@ -282,45 +297,61 @@ public class IRModel {
      * Add many HDUs to present ones and select the first new one as input image.
      * @param hdus new hdus
      * @param filename filename of given hdu
-     * @param earlySkipList HDUs to early check for skipping (used for initial image and rgl prior image) (optional)
+     * @param roles the role of each HDU (used if earlySkipInitRgl is enabled)
+     * @param earlySkipInitRgl enable early skip for INIT and RGL hdus
      * @param modifyInputFile enable modifying input file (disabled when loading oifitsfile to avoid conflicts)
-     * @return true if some hdu have been added
      */
-    public boolean addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
-            final Set<FitsImageHDU> earlySkipList, final boolean modifyInputFile) {
+    public void addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
+            final List<Role> roles,
+            final boolean earlySkipInitRgl, final boolean modifyInputFile) {
 
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
-        final List<FitsImageHDU> addedHdus = new ArrayList<>(hdus.size());
+        hdus.forEach(hdu -> {
+            // prepare images (negative values, padding, orientation):
+            try {
+                FitsImageUtils.prepareImages(hdu);
+            } catch (IllegalArgumentException iae) {
+                MessagePane.showErrorMessage("Unable to prepare images from HDU \"{}\", error: {}", hdu.getHduName(), iae);
+            }
+        });
+
+        final List<FitsImageHDU> libraryHdus = new ArrayList<>(hdus.size());
 
         for (int i = 0; i < hdus.size(); i++) {
             final FitsImageHDU hdu = hdus.get(i);
 
-            final boolean earlySkip = (earlySkipList != null) && earlySkipList.contains(hdu);
+            // if earlySkipInitRgl enabled, we early skip when role is INIT or RGL
+            if (earlySkipInitRgl && (roles.get(i) == Role.INIT || roles.get(i) == Role.RGL)) {
 
-            final boolean hduAdded = addFitsImageHDU(hdu, filename, earlySkip);
-
-            if (hduAdded) {
-                addedHdus.add(hdu);
+                // skip hdu with hduname present in current input oifits
+                if (hdu.getHduName() != null) {
+                    if ((getSelectedInputImageHDU() != null) && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
+                        logger.info("skipping image hdu '{}' : already present (InputImage)", hdu.getHduName());
+                        continue;
+                    }
+                    if ((getSelectedRglPrioImageHdu() != null) && hdu.getHduName().equals(getSelectedRglPrioImageHdu().getHduName())) {
+                        logger.info("skipping image hdu '{}' : already present (RglPrioImage)", hdu.getHduName());
+                        continue;
+                    }
+                }
             }
-        }
 
-        final boolean added = !addedHdus.isEmpty();
+            libraryHdus.add(addToImageLibrary(hdu, filename));
+        }
 
         // avoid modifying input file while loading OIFits (reentrance)
         if (modifyInputFile) {
             final FitsImageHDU selectedInitImage;
-            if (added) {
+            if (libraryHdus.get(0) != null) {
                 // select first added hdu as selected input
-                selectedInitImage = addedHdus.get(0);
+                selectedInitImage = libraryHdus.get(0);
             } else {
                 // restore selected image (even null) to fix current OifitsFile:
                 selectedInitImage = selectedInputImageHDU;
             }
             setSelectedInputImageHDU(selectedInitImage);
         }
-
-        return added;
     }
 
     /** 
@@ -329,61 +360,31 @@ public class IRModel {
      * @param hdu the HDU to add to the library. (required)
      */
     public void addFitsImageHDUAndSelect(final FitsImageHDU hduToReplace, final FitsImageHDU hdu) {
-        // do not checkSelectedImageHDUs (hduName):
-        final boolean added = addFitsImageHDU(hdu, null, false);
-
-        // this needs to be done after the call addFitsImageHDU()
-        // so it uses the (possible) new name
-        updateImageIdentifiers(hdu);
-
-        if (added) {
-            // change selected image according to the given source reference:
-            if (selectedRglPrioImageHdu == hduToReplace) {
-                setSelectedRglPrioImageHdu(hdu);
-            } else {
-                // select first added hdu as selected input
-                setSelectedInputImageHDU(hdu);
-            }
-        }
-        // notify model change (to display model):
-        IRModelManager.getInstance().fireIRModelChanged(this, null);
-    }
-
-    /** 
-     * Add one HDU to the image library.
-     * @param hdu (required)
-     * @param filename (can be null)
-     * @param earlySkip true to skip HDU whose hduname is present in current input oifits
-     * @return true if added successfully. false otherwise.
-     */
-    private boolean addFitsImageHDU(final FitsImageHDU hdu, final String filename, final boolean earlySkip) {
 
         // prepare images (negative values, padding, orientation):
         try {
             FitsImageUtils.prepareImages(hdu);
         } catch (IllegalArgumentException iae) {
             MessagePane.showErrorMessage("Unable to prepare images from HDU \"{}\", error: {}", hdu.getHduName(), iae);
-            logger.info("HDU \"{}\" not added to image library because unable to prepare images, error: {}",
-                    hdu.getHduName(), iae.getMessage());
-            return false;
         }
 
-        // Remove duplicates and skip hdu with hduname present in current input oifits
-        if (earlySkip && (hdu.getHduName() != null)) {
-            if ((getSelectedInputImageHDU() != null) && hdu.getHduName().equals(getSelectedInputImageHDU().getHduName())) {
-                logger.info("skipping image hdu '{}' : already present (InputImage)", hdu.getHduName());
-                return false;
-            }
-            if ((getSelectedRglPrioImageHdu() != null) && hdu.getHduName().equals(getSelectedRglPrioImageHdu().getHduName())) {
-                logger.info("skipping image hdu '{}' : already present (RglPrioImage)", hdu.getHduName());
-                return false;
+        final FitsImageHDU libraryHdu = addToImageLibrary(hdu, null);
+
+        // this needs to be done after the call addFitsImageHDU()
+        // so it uses the (possible) new name
+        updateImageIdentifiers(hdu);
+
+        if (libraryHdu != null) {
+            // change selected image according to the given source reference:
+            if (selectedRglPrioImageHdu == hduToReplace) {
+                setSelectedRglPrioImageHdu(libraryHdu);
+            } else {
+                // select first added hdu as selected input
+                setSelectedInputImageHDU(libraryHdu);
             }
         }
-
-        // Add FitsImageHDU into model:
-        final boolean added = addToImageLibrary(hdu, filename);
-
-        return added;
+        // notify model change (to display model):
+        IRModelManager.getInstance().fireIRModelChanged(this, null);
     }
 
     /**
@@ -558,26 +559,32 @@ public class IRModel {
     }
 
     /** add a HDU to the library.
+     * the hdu is not added if there is already an checksum-equivalent one in the library.
      * @param hdu hdu to add to imageLibrary. its HDU_NAME can be modified.
      * @param altName alternative name to be used if HDU_NAME of the hdu is empty. (optional)
-     * @return true if added. false otherwise.
+     * @return the equivalent hdu in the library.
+     * if the hdu had no equivalent, return the hdu.
+     * if there was en equivalent hdu in imageLibrary, return this equivalent hdu.
+     * if there was a problem, return null.
      */
-    private boolean addToImageLibrary(final FitsImageHDU hdu, final String altName) {
+    private FitsImageHDU addToImageLibrary(final FitsImageHDU hdu, final String altName) {
 
         if (hdu == null || hdu == NULL_IMAGE_HDU) {
             logger.info("HDU not added to image library because it is null.");
-            return false;
+            return null;
 
         } else if (!hdu.hasImages()) {
             logger.info("HDU {} not added because it has no images.", hdu.getHduName());
-            return false;
-        }
-        if (existInImageLibrary(hdu)) {
-            logger.info("HDU {} no added to image library because an equivalent HDU is already in the library.", hdu.getHduName());
-            return false;
+            return null;
         }
 
-        // if checks passed, renaming and adding to imageLibrary
+        // return an equivalent if there exists one
+        final FitsImageHDU equivalentHDU = findInImageLibrary(hdu);
+        if (equivalentHDU != null) {
+            logger.info("HDU {} no added to image library because the equivalent HDU {} is already in the library.",
+                    hdu.getHduName(), equivalentHDU.getHduName());
+            return equivalentHDU;
+        }
 
         // Ensure that HDU_NAME is unique among imageLibrary
 
@@ -603,7 +610,7 @@ public class IRModel {
                     // TODO check if this branch can be reached
                     MessagePane.showErrorMessage("HDU already loaded with hduname='" + newName + "', skipping");
                     // TODO propose here to replace the previous loaded HDU
-                    return false;
+                    return null;
                 } else {
                     logger.info("HDU_NAME '{}' is already used in imageLibrary, so it has been renamed to '{}'.",
                             hdu.getHduName(), newName);
@@ -618,11 +625,11 @@ public class IRModel {
 
         if (added) {
             logger.info("Added HDU \"{}\" to imageLibrary.", hdu.getHduName());
+            return hdu;
         } else {
             logger.info("Could not add HDU \"{}\" to imageLibrary for a unknown reason.", hdu.getHduName());
+            return null;
         }
-
-        return added;
     }
 
     public List<ServiceResult> getResultSets() {
@@ -637,7 +644,9 @@ public class IRModel {
     public void addFitsImageFile(FitsImageFile fitsImageFile) {
         final List<FitsImageHDU> hdus = fitsImageFile.getFitsImageHDUs();
         if (!hdus.isEmpty()) {
-            addFitsImageHDUs(hdus, fitsImageFile.getFileName(), null, true);
+	    // disabled early skipping so null roles
+            // enabled modifying input file
+            addFitsImageHDUs(hdus, fitsImageFile.getFileName(), null, false, true);
         } else {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
@@ -761,8 +770,10 @@ public class IRModel {
             serviceResult.setIndex(resultCounter.incrementAndGet());
             postProcessOIFitsFile(serviceResult);
 
+	    // enabled early skipping so roles computed
+            // enabled modifying input file
             addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName(),
-                    getInputHdus(serviceResult.getOifitsFile()), true);
+                    getHdusRoles(serviceResult.getOifitsFile()), true, true);
 
             // this needs to be done after the call addFitsImageHDUs()
             // so it uses the (possible) new name
