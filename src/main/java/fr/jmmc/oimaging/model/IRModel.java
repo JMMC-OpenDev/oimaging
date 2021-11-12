@@ -337,15 +337,14 @@ public class IRModel {
      * @return true if added successfully. false otherwise.
      */
     private boolean addFitsImageHDU(final FitsImageHDU hdu, final String filename, final boolean checkSelectedImageHDUs) {
-        if (!hdu.hasImages()) {
-            logger.info("HDU {} not added because it has no images.", hdu.getHduName());
-            return false;
-        }
+
+        // prepare images (negative values, padding, orientation):
         try {
-            // prepare images (negative values, padding, orientation):
             FitsImageUtils.prepareImages(hdu);
         } catch (IllegalArgumentException iae) {
-            MessagePane.showErrorMessage("Unable to prepare image from file '{}'", filename, iae);
+            MessagePane.showErrorMessage("Unable to prepare images from HDU \"{}\", error: {}", hdu.getHduName(), iae);
+            logger.info("HDU \"{}\" not added to image library because unable to prepare images, error: {}",
+                    hdu.getHduName(), iae.getMessage());
             return false;
         }
 
@@ -362,7 +361,7 @@ public class IRModel {
         }
 
         // Add FitsImageHDU into model:
-        final boolean added = addToImageLibrary(hdu, filename, true);
+        final boolean added = addToImageLibrary(hdu, filename);
 
         return added;
     }
@@ -541,74 +540,69 @@ public class IRModel {
     /** add a HDU to the library.
      * @param hdu hdu to add to imageLibrary. its HDU_NAME can be modified.
      * @param altName alternative name to be used if HDU_NAME of the hdu is empty. (optional)
-     * @param checkHdu enable checking of the hdu.
-     * if enabled, and hdu is null or already in image library, hdu is not added.
      * @return true if added. false otherwise.
      */
-    private boolean addToImageLibrary(final FitsImageHDU hdu, final String altName, final boolean checkHdu) {
-        boolean hduOK = true;
+    private boolean addToImageLibrary(final FitsImageHDU hdu, final String altName) {
 
-        if (checkHdu) {
-            if (hdu == null || hdu == NULL_IMAGE_HDU) {
-                hduOK = false;
-                logger.info("HDU not added to image library because it is null.");
+        if (hdu == null || hdu == NULL_IMAGE_HDU) {
+            logger.info("HDU not added to image library because it is null.");
+            return false;
 
-            } else if (existInImageLibrary(hdu)) {
-                hduOK = false;
-                logger.info("HDU {} no added to image library because an equivalent HDU is already in the library.", hdu.getHduName());
-
-            }
-        }
-
-        if (hduOK) {
-
-            // Ensure that HDU_NAME is unique among imageLibrary
-
-            String tryHduName = (!StringUtils.isEmpty(hdu.getHduName())) ? hdu.getHduName()
-                    : (altName != null) ? altName.substring(0, Math.min(50, altName.length())) : null;
-
-            if (StringUtils.isEmpty(tryHduName)) {
-                tryHduName = "UNDEFINED_" + hdu.getChecksum();
-                logger.warn("Hdu has no hduName {}, using '{}'", hdu, tryHduName);
-            }
-            // hdu name is always set:
-
-            hdu.setHduName(tryHduName);
-
-            // Fix duplicated hduName in the image library:
-            final String now = DateUtils.now().substring(0, 19);
-
-            for (FitsImageHDU libraryHDU : imageLibrary) {
-                if (libraryHDU.getHduName().equals(tryHduName)) {
-                    final String newName = tryHduName + "-" + now;
-
-                    if (hdu.getHduName().equals(newName)) {
-                        // TODO check if this branch can be reached
-                        MessagePane.showErrorMessage("HDU already loaded with hduname='" + newName + "', skipping");
-                        // TODO propose here to replace the previous loaded HDU
-                        return false;
-                    } else {
-                        logger.info("HDU_NAME '{}' is already used in imageLibrary, so it has been renamed to '{}'.",
-                                hdu.getHduName(), newName);
-                        hdu.setHduName(newName);
-                    }
-                    break;
-                }
-            }
-
-            // finally, add the hdu to the library
-            final boolean added = this.imageLibrary.add(hdu);
-            if (added) {
-                logger.info("Added HDU \"{}\" to imageLibrary.", hdu.getHduName());
-            } else {
-                logger.info("Could not add HDU \"{}\" to imageLibrary for a unknown reason.", hdu.getHduName());
-            }
-            return added;
-
-        } else {
-            // checks failed, so we don't add the hdu
+        } else if (!hdu.hasImages()) {
+            logger.info("HDU {} not added because it has no images.", hdu.getHduName());
             return false;
         }
+        if (existInImageLibrary(hdu)) {
+            logger.info("HDU {} no added to image library because an equivalent HDU is already in the library.", hdu.getHduName());
+            return false;
+        }
+
+        // if checks passed, renaming and adding to imageLibrary
+
+        // Ensure that HDU_NAME is unique among imageLibrary
+
+        String tryHduName = (!StringUtils.isEmpty(hdu.getHduName())) ? hdu.getHduName()
+                : (altName != null) ? altName.substring(0, Math.min(50, altName.length())) : null;
+
+        if (StringUtils.isEmpty(tryHduName)) {
+            tryHduName = "UNDEFINED_" + hdu.getChecksum();
+            logger.warn("Hdu has no hduName {}, using '{}'", hdu, tryHduName);
+        }
+        // hdu name is always set:
+
+        hdu.setHduName(tryHduName);
+
+        // Fix duplicated hduName in the image library:
+        final String now = DateUtils.now().substring(0, 19);
+
+        for (FitsImageHDU libraryHDU : imageLibrary) {
+            if (libraryHDU.getHduName().equals(tryHduName)) {
+                final String newName = tryHduName + "-" + now;
+
+                if (hdu.getHduName().equals(newName)) {
+                    // TODO check if this branch can be reached
+                    MessagePane.showErrorMessage("HDU already loaded with hduname='" + newName + "', skipping");
+                    // TODO propose here to replace the previous loaded HDU
+                    return false;
+                } else {
+                    logger.info("HDU_NAME '{}' is already used in imageLibrary, so it has been renamed to '{}'.",
+                            hdu.getHduName(), newName);
+                    hdu.setHduName(newName);
+                }
+                break;
+            }
+        }
+
+        // finally, add the hdu to the library
+        final boolean added = this.imageLibrary.add(hdu);
+
+        if (added) {
+            logger.info("Added HDU \"{}\" to imageLibrary.", hdu.getHduName());
+        } else {
+            logger.info("Could not add HDU \"{}\" to imageLibrary for a unknown reason.", hdu.getHduName());
+        }
+
+        return added;
     }
 
     public List<ServiceResult> getResultSets() {
