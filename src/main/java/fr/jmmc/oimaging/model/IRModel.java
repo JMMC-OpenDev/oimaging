@@ -167,17 +167,43 @@ public class IRModel {
         inputParam.useVis2(oifitsFile.hasOiVis2());
         inputParam.useT3(oifitsFile.hasOiT3());
 
-        // load fits Image HDU data if any present
-        // Select first image as selected one if not yet initialized
-	// disabled early skipping so no null roles
-        // disabled modifying of input file to avoid conflicts
-        if (!oifitsFile.getFitsImageHDUs().isEmpty()) {
-            addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName(),
-                    null, false, false);
-        }
+
+        List<Role> hdusRoles = getHdusRoles(oifitsFile);
+
+        // load fits Image HDU data 
+        // disabled early skipping
+        List<FitsImageHDU> libraryHdus = addFitsImageHDUs(oifitsFile.getFitsImageHDUs(), oifitsFile.getFileName(),
+                null, false);
+
         // this needs to be done after the call addFitsImageHDUs()
         // so it uses the (possible) new name
+        // it also needs to be called before selecting HDUs
         updateImageIdentifiers(oifitsFile);
+
+        // selecting equivalents for INIT_IMG and RGL_PRIO
+        for (int i = 0; i < libraryHdus.size(); i++) {
+            final Role role = hdusRoles.get(i);
+
+            if (role == Role.INIT) {
+                final FitsImageHDU initHduEquiv = libraryHdus.get(i);
+                if (initHduEquiv == null) {
+                    logger.debug("Did not select init image equiv hdu from oifitsfile, because it was null.");
+                } else {
+                    setSelectedInputImageHDU(initHduEquiv);
+                    logger.debug("Selected init image equiv hdu from oifitsfile.");
+                }
+            } else if (role == Role.RGL) {
+                final FitsImageHDU rglHduEquiv = libraryHdus.get(i);
+                if (rglHduEquiv == null) {
+                    logger.debug("Did not select rgl image equiv hdu from oifitsfile, because it was null.");
+                } else {
+                    setSelectedRglPrioImageHdu(rglHduEquiv);
+                    logger.debug("Selected rgl image equiv hdu from oifitsfile.");
+                }
+            }
+        }
+
+
 
         // try to guess and set service
         Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
@@ -197,10 +223,6 @@ public class IRModel {
                 initSpecificParams(false);
             }
         }
-
-        // TODO: should restore INIT_IMG & RGL_PRIOR ?
-        this.selectedInputImageHDU = null;
-        this.selectedRglPrioImageHdu = null;
     }
 
     /** Role of a HDU */
@@ -294,16 +316,14 @@ public class IRModel {
     }
 
     /**
-     * Add many HDUs to present ones and select the first new one as input image.
+     * Add many HDUs to present ones
      * @param hdus new hdus
      * @param filename filename of given hdu
      * @param roles the role of each HDU (used if earlySkipInitRgl is enabled)
      * @param earlySkipInitRgl enable early skip for INIT and RGL hdus
-     * @param modifyInputFile enable modifying input file (disabled when loading oifitsfile to avoid conflicts)
      */
-    public void addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
-            final List<Role> roles,
-            final boolean earlySkipInitRgl, final boolean modifyInputFile) {
+    public List<FitsImageHDU> addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
+            final List<Role> roles, final boolean earlySkipInitRgl) {
 
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", hdus.size(), filename);
 
@@ -340,18 +360,7 @@ public class IRModel {
             libraryHdus.add(addToImageLibrary(hdu, filename));
         }
 
-        // avoid modifying input file while loading OIFits (reentrance)
-        if (modifyInputFile) {
-            final FitsImageHDU selectedInitImage;
-            if (libraryHdus.get(0) != null) {
-                // select first added hdu as selected input
-                selectedInitImage = libraryHdus.get(0);
-            } else {
-                // restore selected image (even null) to fix current OifitsFile:
-                selectedInitImage = selectedInputImageHDU;
-            }
-            setSelectedInputImageHDU(selectedInitImage);
-        }
+        return libraryHdus;
     }
 
     /** 
@@ -644,16 +653,27 @@ public class IRModel {
     public void addFitsImageFile(FitsImageFile fitsImageFile) {
         final List<FitsImageHDU> hdus = fitsImageFile.getFitsImageHDUs();
         if (!hdus.isEmpty()) {
-	    // disabled early skipping so null roles
-            // enabled modifying input file
-            addFitsImageHDUs(hdus, fitsImageFile.getFileName(), null, false, true);
+            // disabled early skipping
+            List<FitsImageHDU> libraryHdus = addFitsImageHDUs(hdus, fitsImageFile.getFileName(), null, false);
+
+	    // this needs to be done after the call addFitsImageHDUs()
+            // so it uses the (possible) new name
+            // it also needs to be called before selecting HDUs
+	    updateImageIdentifiers(fitsImageFile);
+
+            // select the equivalent of the first image
+            final FitsImageHDU firstImageEquiv = libraryHdus.get(0);
+            if (firstImageEquiv == null) {
+                logger.debug("Could not select first image equivalent hdu as initial image, because it was null.");
+            } else {
+                setSelectedInputImageHDU(firstImageEquiv);
+                logger.debug("Select first image equivalent hdu as initial image.");
+            }
+
         } else {
             logger.debug("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath());
             MessagePane.showErrorMessage("no ImageHDUs found in " + fitsImageFile.getAbsoluteFilePath(), "Image loading");
         }
-        // this needs to be done after the call addFitsImageHDUs()
-        // so it uses the (possible) new name
-        updateImageIdentifiers(fitsImageFile);
     }
 
     /**
@@ -770,14 +790,41 @@ public class IRModel {
             serviceResult.setIndex(resultCounter.incrementAndGet());
             postProcessOIFitsFile(serviceResult);
 
-	    // enabled early skipping so roles computed
-            // enabled modifying input file
-            addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(), serviceResult.getInputFile().getName(),
-                    getHdusRoles(serviceResult.getOifitsFile()), true, true);
+
+            List<Role> hdusRoles = getHdusRoles(serviceResult.getOifitsFile());
+
+            // enabled early skipping
+            List<FitsImageHDU> libraryHdus = addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(),
+                    serviceResult.getInputFile().getName(), hdusRoles, true);
 
             // this needs to be done after the call addFitsImageHDUs()
             // so it uses the (possible) new name
+            // it also needs to be called before selecting HDUs
             updateImageIdentifiers(serviceResult);
+
+            for (int i = 0; i < libraryHdus.size(); i++) {
+                final Role role = hdusRoles.get(i);
+
+                if (role == Role.RESULT) {
+                    // select RESULT as initial image
+                    final FitsImageHDU resultHduEquiv = libraryHdus.get(i);
+                    if (resultHduEquiv == null) {
+                        logger.debug("Did not select result image equivalent hdu from result, as initial image, because it was null.");
+                    } else {
+                        setSelectedInputImageHDU(resultHduEquiv);
+                        logger.debug("Selected result image equivalent hdu from result, as initial image.");
+                    }
+                } else if (role == Role.RGL) {
+                    // select the same rgl image
+                    final FitsImageHDU rglHduEquiv = libraryHdus.get(i);
+                    if (rglHduEquiv == null) {
+                        logger.debug("Did not select rgl image equivalent hdu from result, as rgl image, because it was null.");
+                    } else {
+                        setSelectedRglPrioImageHdu(rglHduEquiv);
+                        logger.debug("Selected rgl image equivalent hdu from result, as rgl image.");
+                    }
+                }
+            }
         }
 
         // notify model update
