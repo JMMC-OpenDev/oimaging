@@ -645,7 +645,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 jComboBoxImage.addItem(NULL_IMAGE_HDU);
             }
 
-            irModel.getFitsImageHDUs().forEach(jComboBoxImage::addItem);
+            irModel.getImageLibrary().forEach(jComboBoxImage::addItem);
 
             final FitsImageHDU initImage = irModel.getSelectedInputImageHDU();
 
@@ -678,7 +678,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                     jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
                 }
 
-                irModel.getFitsImageHDUs().forEach(jComboBoxRglPrio::addItem);
+                irModel.getImageLibrary().forEach(jComboBoxRglPrio::addItem);
 
                 FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
 
@@ -821,7 +821,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 && (comboBoxInitImage == null || comboBoxInitImage == NULL_IMAGE_HDU)) {
             logger.error("INIT_IMG should not be null because keyword is mandatory.");
         } else {
-            if (irModel.getSelectedInputImageHDU() != comboBoxInitImage) {
+            if (differentHdus(irModel.getSelectedInputImageHDU(), comboBoxInitImage)) {
                 irModel.setSelectedInputImageHDU(comboBoxInitImage);
                 irModel.setInputImageView(KEYWORD_INIT_IMG);
                 changed = true;
@@ -836,7 +836,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                     && (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU)) {
                 logger.error("RGL PRIO should not be null because keyword is mandatory.");
             } else {
-                if (irModel.getSelectedRglPrioImageHdu() != comboBoxRglPrioImage) {
+                if (differentHdus(irModel.getSelectedRglPrioImageHdu(), comboBoxRglPrioImage)) {
                     irModel.setSelectedRglPrioImageHdu(comboBoxRglPrioImage);
                     irModel.setInputImageView(KEYWORD_RGL_PRIO);
                     changed = true;
@@ -921,6 +921,24 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         }
 
         return changed;
+    }
+    
+    /** Tell if two FitsImageHDUs are different.
+     *    Consider that null == NULL_IMAGE_HDU
+     * @param first FitsImageHDU to compare to second
+     * @param second FitsImageHDU to compare to first
+     * @return true if they are different. false if they are the same 
+     *         (remember that null == NULL_IMAGE_HDU)
+     */
+    private static boolean differentHdus (final FitsImageHDU first, final FitsImageHDU second) {
+        if ((first == second) 
+                || (first == null && second == NULL_IMAGE_HDU) 
+                || (first == NULL_IMAGE_HDU && second == null)) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     private void updateJComboBoxRglName(final ImageOiInputParam inputParam, final Service service) {

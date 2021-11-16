@@ -7,6 +7,8 @@ import fr.jmmc.oitools.image.FitsUnit;
 import java.util.List;
 
 import fr.jmmc.oitools.image.ImageOiConstants;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_FLUXERR;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_WGT;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
@@ -113,17 +115,27 @@ public class MiraInputParam extends SoftwareInputParam {
         // default values:
         if (applyDefaults) {
             // specific default values for MiRA:
-            params.setFluxErr(0);
+            params.setFluxErr(0.0);
             params.setRglWgt(1E6); // -mu=1E6
         }
+
+        // change table default:
+        if (params.getFluxErr() == 0.01) {
+            params.setFluxErr(0.0);
+        }
+        if (params.getRglWgt() == 0.0) {
+            params.setRglWgt(1E6);
+        }
+
         params.setKeywordDefaultDouble(KEYWORD_SMEAR_FC, 1.0);
         params.setKeywordDefault(KEYWORD_SMEAR_FN, KEYWORD_SMEAR_FN_LIST[0]); // none
     }
 
     @Override
     public void validate(final ImageOiInputParam params, final List<String> failures) {
+        super.validate(params, failures);
+
         // custom validation rules:
-        // TODO
     }
 
     public String getDefaultCliOptions() {

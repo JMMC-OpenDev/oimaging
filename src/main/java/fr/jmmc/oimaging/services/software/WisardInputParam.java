@@ -4,12 +4,13 @@
 package fr.jmmc.oimaging.services.software;
 
 import fr.jmmc.oitools.image.ImageOiConstants;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_WGT;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
-import fr.jmmc.oitools.meta.Units;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,23 +18,26 @@ import java.util.Set;
  */
 public final class WisardInputParam extends SoftwareInputParam {
 
-    public static final Set<String> SUPPORTED_STD_KEYWORDS = new HashSet<String>(Arrays.asList(new String[]{
-        ImageOiConstants.KEYWORD_MAXITER,
-        ImageOiConstants.KEYWORD_RGL_NAME
-    }));
+    public static final Set<String> SUPPORTED_STD_KEYWORDS = new HashSet<String>(Arrays.asList(
+            ImageOiConstants.KEYWORD_MAXITER,
+            ImageOiConstants.KEYWORD_RGL_NAME,
+            ImageOiConstants.KEYWORD_RGL_WGT,
+            ImageOiConstants.KEYWORD_FLUX,
+            ImageOiConstants.KEYWORD_FLUXERR,
+            ImageOiConstants.KEYWORD_RGL_PRIO
+    ));
 
-    public static final String KEYWORD_FOV = "FOV";
-    public static final String KEYWORD_NP_MIN = "NP_MIN";
+    /** Parameters that can be missing. */
+    public static final Set<String> SUPPORTED_MISSING_KEYWORDS = new HashSet<>(Arrays.asList(
+            ImageOiConstants.KEYWORD_INIT_IMG,
+            ImageOiConstants.KEYWORD_RGL_PRIO
+    ));
+
     // optional
     public static final String KEYWORD_SCALE = "SCALE";
     public static final String KEYWORD_DELTA = "DELTA";
 
     // Wisard specific
-    private static final KeywordMeta FOV = new KeywordMeta(KEYWORD_FOV,
-            "Field of view (mas)", Types.TYPE_DBL, Units.UNIT_MILLI_ARCSEC);
-    private static final KeywordMeta NP_MIN = new KeywordMeta(KEYWORD_NP_MIN,
-            "MINimum width (Number of Points) of the reconstructed image", Types.TYPE_INT);
-
     // optional
     private static final KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE,
             "Scalar factor for L1-L2 regularization", Types.TYPE_DBL);
@@ -58,14 +62,6 @@ public final class WisardInputParam extends SoftwareInputParam {
     public void update(final ImageOiInputParam params, final boolean applyDefaults) {
         super.update(params, applyDefaults);
 
-        // define keywords:
-        params.addKeyword(FOV);
-        params.addKeyword(NP_MIN);
-
-        // default values:
-        params.setKeywordDefaultDouble(KEYWORD_FOV, 20.0);
-        params.setKeywordDefaultInt(KEYWORD_NP_MIN, 32);
-
         // for our first implementation, just add to params if not TOTVAR
         if (params.getRglName().startsWith(PREFIX_RGL_NAME_WISARD_L1)) {
             params.addKeyword(SCALE);
@@ -74,6 +70,24 @@ public final class WisardInputParam extends SoftwareInputParam {
             params.setKeywordDefaultDouble(KEYWORD_SCALE, 0.0001);
             params.setKeywordDefaultDouble(KEYWORD_DELTA, 1);
         }
+
+        // default values:
+        if (applyDefaults) {
+            // specific default values for WISARD:
+            params.setRglWgt(1E-4);
+        }
+        
+        // change table default:
+        if (params.getRglWgt() == 0.0) {
+            params.setRglWgt(1E-4);
+        }
+    }
+
+    @Override
+    public void validate(final ImageOiInputParam params, final List<String> failures) {
+        super.validate(params, failures);
+
+        // custom validation rules:
     }
 
     @Override
@@ -88,10 +102,7 @@ public final class WisardInputParam extends SoftwareInputParam {
 
     @Override
     public boolean supportsMissingKeyword(final String keywordName) {
-        if (ImageOiConstants.KEYWORD_INIT_IMG.equals(keywordName)) {
-            return true;
-        }
-        return false;
+        return SUPPORTED_MISSING_KEYWORDS.contains(keywordName);
     }
 
 }

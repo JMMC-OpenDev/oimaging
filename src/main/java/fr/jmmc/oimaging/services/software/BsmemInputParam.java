@@ -71,14 +71,9 @@ public final class BsmemInputParam extends SoftwareInputParam {
 
     @Override
     public void validate(final ImageOiInputParam params, final List<String> failures) {
-        // custom validation rules:
-        final double fluxerr = params.getKeywordDouble(ImageOiConstants.KEYWORD_FLUXERR);
+        super.validate(params, failures);
 
-        if (fluxerr < 1e-5) {
-            failures.add("FluxErr must be greater than 1e-5");
-        } else if (fluxerr > 1.0) {
-            failures.add("FluxErr must be smaller than 1.0");
-        }
+        // custom validation rules:
     }
 
     @Override
