@@ -202,6 +202,10 @@ public class IRModel {
                 }
             }
         }
+        // Clean the oifitsfile from any hdus that is not selected in the form.
+        // This function is called in setSelectedInputImageHDU and setSelectedRglPrioImageHdu
+        // but in case no HDU has been selected, we need still need to clear unused hdus.
+        updateOifitsFileHDUs();
 
         // try to guess and set service
         final Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
@@ -508,7 +512,7 @@ public class IRModel {
         oifitsFileHDUs.clear();
 
         // init image
-        if (selectedInputImageHDU != null && selectedRglPrioImageHdu != NULL_IMAGE_HDU) {
+        if (selectedInputImageHDU != null && selectedInputImageHDU != NULL_IMAGE_HDU) {
             oifitsFileHDUs.add(selectedInputImageHDU);
         }
 
