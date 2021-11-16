@@ -62,13 +62,13 @@ public class RunAction extends RegisteredAction {
                 // change model state to lock it and extract its snapshot
                 setRunningState(irModel, true);
                 new RunFitActionWorker(irModel.getCliOptions(), irModel.prepareTempFile(), irModel, this).executeTask();
-            } catch (FitsException ex) {
+            } catch (FitsException fe) {
                 setRunningState(irModel, false);
-                logger.error("Can't prepare temporary file before running process", ex);
-                StatusBar.show("Can't spawn new process : " + ex.getMessage());
-            } catch (IOException ex) {
-                logger.error("Can't prepare temporary file before running process", ex);
-                StatusBar.show("Can't spawn new process : " + ex.getMessage());
+                logger.error("Can't prepare temporary file before running process", fe);
+                StatusBar.show("Can't spawn new process: " + fe.getMessage());
+            } catch (IOException ioe) {
+                logger.error("Can't prepare temporary file before running process", ioe);
+                StatusBar.show("Can't spawn new process: " + ioe.getMessage());
                 setRunningState(irModel, false);
             }
         }

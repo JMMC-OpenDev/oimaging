@@ -177,6 +177,8 @@ public final class SparcoInputParam extends MiraInputParam {
 
     @Override
     public void validate(final ImageOiInputParam params, final List<String> failures) {
+        super.validate(params, failures);
+
         // custom validation rules:
         final int nmods = params.getKeywordInt(KEYWORD_SNMODS);
 
