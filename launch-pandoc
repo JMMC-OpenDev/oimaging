@@ -1,0 +1,12 @@
+if type -p pandoc
+then
+	cd doc
+	ls -1 *.md | while read mdfile; 
+		do 
+			name=$(basename "$mdfile" .md) ;
+			pandoc "$mdfile" --standalone --metadata pagetitle="${name}" --output="$name".html ; 
+		done
+	cd ..
+else
+	echo "pandoc command was not found. Did not parse any markdown documentation file."
+fi

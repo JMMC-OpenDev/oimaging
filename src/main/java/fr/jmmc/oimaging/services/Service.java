@@ -3,6 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.services;
 
+import fr.jmmc.jmcs.util.ResourceUtils;
 import fr.jmmc.oimaging.services.software.SoftwareInputParam;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import java.util.List;
@@ -24,16 +25,15 @@ public final class Service {
     private final String name;
     private final String program;
     private final OImagingExecutionMode execMode;
-    private final String description;
+    private String documentation;
     private final String contact;
     private final SoftwareInputParam softwareInputParam;
 
-    public Service(final String name, final String program, final OImagingExecutionMode execMode, final String description, final String contact,
-                   final SoftwareInputParam softwareInputParam) {
+    public Service(final String name, final String program, final OImagingExecutionMode execMode, final String contact, final SoftwareInputParam softwareInputParam) {
         this.name = name;
         this.program = program;
         this.execMode = execMode;
-        this.description = description;
+        this.documentation = null;
         this.contact = contact;
         this.softwareInputParam = softwareInputParam;
     }
@@ -54,8 +54,19 @@ public final class Service {
         return execMode;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDocumentation() {
+        if (this.documentation == null) {
+
+            final String documentationPath = "fr/jmmc/oimaging/resource/doc/" + getProgram() + ".html";
+
+            try {
+                this.documentation = ResourceUtils.readResource(documentationPath);
+            } catch (IllegalStateException e) {
+                this.documentation = "No documentation has been written yet.";
+            }
+        }
+
+        return this.documentation;
     }
 
     public String getContact() {
