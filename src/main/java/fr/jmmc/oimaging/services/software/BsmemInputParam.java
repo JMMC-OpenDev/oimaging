@@ -5,8 +5,6 @@ package fr.jmmc.oimaging.services.software;
 
 import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
-import fr.jmmc.oitools.meta.KeywordMeta;
-import fr.jmmc.oitools.meta.Types;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -32,15 +30,6 @@ public final class BsmemInputParam extends SoftwareInputParam {
             ImageOiConstants.KEYWORD_RGL_PRIO
     ));
 
-    public final static String KEYWORD_RGL_ALPH = "RGL_ALPH";
-    public final static String KEYWORD_RGL_BETA = "RGL_BETA";
-
-    // Bsmem specific
-    private final static KeywordMeta RGL_ALPH = new KeywordMeta(KEYWORD_RGL_ALPH,
-            "Parameter alpha of the regularization", Types.TYPE_DBL);
-    private final static KeywordMeta RGL_BETA = new KeywordMeta(KEYWORD_RGL_BETA,
-            "Parameter beta of the regularization", Types.TYPE_DBL); // like wisard
-
     public static final String[] RGL_NAME_BSMEM = new String[]{"mem_prior"};
 
     BsmemInputParam() {
@@ -55,18 +44,12 @@ public final class BsmemInputParam extends SoftwareInputParam {
             params.removeKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
         }
 
-        // define keywords:
-        params.addKeyword(RGL_ALPH);
-        params.addKeyword(RGL_BETA);
-
         // default values:
         if (applyDefaults) {
             // specific default values for BSMEM:
             params.setAutoWgt(true);
             params.setRglWgt(0.0);
         }
-        params.setKeywordDefaultDouble(KEYWORD_RGL_ALPH, 1.0);
-        params.setKeywordDefaultDouble(KEYWORD_RGL_BETA, 0.01); // 1% error on VIS2
     }
 
     @Override
