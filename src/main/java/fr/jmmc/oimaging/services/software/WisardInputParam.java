@@ -78,7 +78,7 @@ public final class WisardInputParam extends SoftwareInputParam {
         }
         
         // change table default:
-        if (params.getRglWgt() == 0.0) {
+        if (params.getRglWgt() == ImageOiInputParam.DEF_KEYWORD_RGL_WGT) {
             params.setRglWgt(1E-4);
         }
     }
