@@ -143,6 +143,8 @@
             <menu/> <!-- menu separator -->
             <menu label="Modify image" classpath="fr.jmmc.oimaging.gui.action.ModifyImageAction" action="modify"
                   description="Modify the current image (change fov and resample according to the pixel increments)"/>
+            <menu label="Create image" classpath="fr.jmmc.oimaging.gui.action.CreateImageAction" action="createImage"
+                  description="Create a gaussian image"/>
         </menu>
 
         <menu label="Interop">

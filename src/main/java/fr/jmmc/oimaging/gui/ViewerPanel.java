@@ -40,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.Action;
@@ -536,6 +537,22 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
         } else {
             displaySelection(fitsImageHDU);
+        }
+    }
+
+    public void createImage() {
+        final IRModel irModel = IRModelManager.getInstance().getIRModel();
+        
+        final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
+
+        if (newHDU != null) {
+            // add the FitsImageHDU to the imageLibrary
+            final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)", null);
+
+            // selecting first library HDU as inputImageHDU
+            if (libraryHDUs.get(0) != null) {
+                irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+            }
         }
     }
 

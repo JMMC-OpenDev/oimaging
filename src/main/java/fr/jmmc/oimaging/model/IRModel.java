@@ -302,8 +302,8 @@ public final class IRModel {
      * @param roles optional list of FitsImageHDU roles to early skip INIT or RGL images
      * @return list of FitsImageHDU present in the image library or NULL
      */
-    protected List<FitsImageHDU> addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
-                                                  final List<Role> roles) {
+    public List<FitsImageHDU> addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
+            final List<Role> roles) {
 
         final int nHdus = hdus.size();
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);

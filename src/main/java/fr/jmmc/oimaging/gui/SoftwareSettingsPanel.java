@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
+import fr.jmmc.oimaging.gui.action.CreateImageAction;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.model.IRModel;
 import static fr.jmmc.oimaging.model.IRModel.NULL_IMAGE_HDU;
@@ -86,6 +87,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Map actions to widgets
         jButtonLoadFitsImage.setAction(ActionRegistrar.getInstance().get(LoadFitsImageAction.className, LoadFitsImageAction.actionName));
         jButtonLoadFitsImage.setHideActionText(true);
+        jButtonCreateImage.setAction(
+                ActionRegistrar.getInstance().get(CreateImageAction.CLASS_NAME, CreateImageAction.ACTION_NAME));
     }
 
     /**
@@ -124,6 +127,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jLabelView = new javax.swing.JLabel();
         jRadioButtonViewInitImg = new javax.swing.JRadioButton();
         jRadioButtonViewRglPrio = new javax.swing.JRadioButton();
+        jButtonCreateImage = new javax.swing.JButton();
         jTableKeywordsEditor = new fr.jmmc.oimaging.gui.TableKeywordsEditor();
         jPanelOptions = new javax.swing.JPanel();
         jTextAreaOptions = new javax.swing.JTextArea();
@@ -144,7 +148,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxSoftware, gridBagConstraints);
@@ -169,7 +173,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -195,7 +199,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jSpinnerMaxIter, gridBagConstraints);
@@ -221,7 +225,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxRglName, gridBagConstraints);
@@ -262,7 +266,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -295,7 +299,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jFormattedTextFieldFlux, gridBagConstraints);
@@ -327,7 +331,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jFormattedTextFieldFluxErr, gridBagConstraints);
@@ -353,7 +357,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxRglPrio, gridBagConstraints);
@@ -389,7 +393,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jCheckBoxAutoWgt, gridBagConstraints);
@@ -448,9 +452,17 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 11;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jPanelForm.add(jPanelView, gridBagConstraints);
+
+        jButtonCreateImage.setText("Create image");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelForm.add(jButtonCreateImage, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -559,6 +571,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonsView;
+    private javax.swing.JButton jButtonCreateImage;
     private javax.swing.JButton jButtonLoadFitsImage;
     private javax.swing.JButton jButtonRemoveFitsImage;
     private javax.swing.JCheckBox jCheckBoxAutoWgt;
