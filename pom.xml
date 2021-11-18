@@ -51,7 +51,8 @@
                                 </goals>
                                 <configuration>
                                     <executable>/bin/bash</executable>
-                                    <commandlineArgs>launch-pandoc</commandlineArgs>
+                                    <workingDirectory>doc</workingDirectory>
+                                    <commandlineArgs>gen_html.sh</commandlineArgs>
                                     <timeout>1000</timeout>
                                 </configuration>
                             </execution>
