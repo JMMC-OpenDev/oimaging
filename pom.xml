@@ -45,7 +45,7 @@
                         <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <phase>compile</phase>
+                                <phase>generate-resources</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
@@ -78,7 +78,7 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <phase>compile</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
