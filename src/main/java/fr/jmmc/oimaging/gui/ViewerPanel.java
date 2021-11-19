@@ -540,8 +540,12 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
+    /** Call the dialog for creating an image.
+     * Also add the image to the image library, and select it as initial image.
+     */
     public void createImage() {
-        final IRModel irModel = IRModelManager.getInstance().getIRModel();
+        final IRModelManager irModelManager = IRModelManager.getInstance();
+        final IRModel irModel = irModelManager.getIRModel();
         
         final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
 
@@ -550,9 +554,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)", null);
 
             // selecting first library HDU as inputImageHDU
-            if (libraryHDUs.get(0) != null) {
-                irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
-            }
+            irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+
+            // notify model update
+            irModelManager.fireIRModelUpdated(this, null);
         }
     }
 
