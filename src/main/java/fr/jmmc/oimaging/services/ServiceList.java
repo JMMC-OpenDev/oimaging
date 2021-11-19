@@ -49,19 +49,19 @@ public final class ServiceList {
         final SoftwareInputParam swParamSparco = SoftwareInputParam.newInstance(SERVICE_SPARCO);
         final SoftwareInputParam swParamWisard = SoftwareInputParam.newInstance(SERVICE_WISARD);
 
-        availableServices.add(new Service(SERVICE_BSMEM, CMD_BSMEM, remoteExecutionMode, "", "", swParamBsmem));
-        availableServices.add(new Service(SERVICE_MIRA, CMD_MIRA, remoteExecutionMode, "", "", swParamMira));
-        availableServices.add(new Service(SERVICE_SPARCO, CMD_SPARCO, remoteExecutionMode, "", "", swParamSparco));
+        availableServices.add(new Service(SERVICE_BSMEM, CMD_BSMEM, remoteExecutionMode, "", swParamBsmem));
+        availableServices.add(new Service(SERVICE_MIRA, CMD_MIRA, remoteExecutionMode, "", swParamMira));
+        availableServices.add(new Service(SERVICE_SPARCO, CMD_SPARCO, remoteExecutionMode, "", swParamSparco));
         // TODO define prefered service in a preference:
-        preferedService = new Service(SERVICE_WISARD, CMD_WISARD, remoteExecutionMode, "", "", swParamWisard);
+        preferedService = new Service(SERVICE_WISARD, CMD_WISARD, remoteExecutionMode, "", swParamWisard);
         availableServices.add(preferedService);
 
         if (ENABLE_LOCAL_MODE) {
             final OImagingExecutionMode localExecutionMode = LocalExecutionMode.INSTANCE;
-            availableServices.add(new Service(SERVICE_BSMEM + " (local)", CMD_BSMEM, localExecutionMode, "", "", swParamBsmem));
-            availableServices.add(new Service(SERVICE_MIRA + " (local)", CMD_MIRA, localExecutionMode, "", "", swParamMira));
-            availableServices.add(new Service(SERVICE_SPARCO + " (local)", CMD_SPARCO, localExecutionMode, "", "", swParamSparco));
-            availableServices.add(new Service(SERVICE_WISARD + " (local)", CMD_WISARD, localExecutionMode, "", "", swParamWisard));
+            availableServices.add(new Service(SERVICE_BSMEM + " (local)", CMD_BSMEM, localExecutionMode, "", swParamBsmem));
+            availableServices.add(new Service(SERVICE_MIRA + " (local)", CMD_MIRA, localExecutionMode, "", swParamMira));
+            availableServices.add(new Service(SERVICE_SPARCO + " (local)", CMD_SPARCO, localExecutionMode, "", swParamSparco));
+            availableServices.add(new Service(SERVICE_WISARD + " (local)", CMD_WISARD, localExecutionMode, "", swParamWisard));
         }
     }
 

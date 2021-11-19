@@ -1,11 +1,18 @@
 #!/bin/bash
 
-for f in *.md; do 
-        
-    echo '######################'
-    echo "Processing file : $f "
+if type -p pandoc
+then
+   for f in *.md; do 
+       NAME=`basename $f .md`
 
-    NAME=`basename $f .md`
-    pandoc --standalone --metadata pagetitle="${NAME}" ${NAME}.md > ${NAME}.html
-done
+       if [ "${NAME}.md" -nt "${NAME}.html" ]; then
+           echo '######################'
+           echo "Processing file : $f "
+
+           pandoc --standalone --metadata pagetitle="${NAME}" ${NAME}.md > ${NAME}.html
+       fi
+   done
+else
+    echo "pandoc command was not found. Did not parse any markdown documentation file."
+fi
 

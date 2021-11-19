@@ -30,7 +30,7 @@ public class TestDoc {
     public void testDocMira() throws Exception {
         System.out.println("testDocMira");
 
-        final String doc = "mira.html";
+        final String doc = "mira-ci.html";
         final String html = FileUtils.readFile(new File(TEST_FOLDER, doc));
 
         ResizableTextViewFactory.createHtmlWindow(html, doc, true);
