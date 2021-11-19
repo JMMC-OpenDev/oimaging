@@ -527,12 +527,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         displaySelection(copyFitsImageHDU);
 
         if (operation.action(fitsImagePanel)) {
-            try {
-                // update checksum:
-                copyFitsImageHDU.updateChecksum();
-            } catch (FitsException fe) {
-                logger.info("unable to update checksum on {}", copyFitsImageHDU, fe);
-            }
+            // update checksum:
+            copyFitsImageHDU.updateChecksum();
+
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
         } else {
@@ -550,6 +547,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
 
         if (newHDU != null) {
+            // update checksum:
+            newHDU.updateChecksum();
+
             // add the FitsImageHDU to the imageLibrary
             final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)", null);
 
