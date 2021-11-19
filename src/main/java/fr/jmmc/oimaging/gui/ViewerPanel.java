@@ -40,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.Action;
@@ -526,16 +527,37 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         displaySelection(copyFitsImageHDU);
 
         if (operation.action(fitsImagePanel)) {
-            try {
-                // update checksum:
-                copyFitsImageHDU.updateChecksum();
-            } catch (FitsException fe) {
-                logger.info("unable to update checksum on {}", copyFitsImageHDU, fe);
-            }
+            // update checksum:
+            copyFitsImageHDU.updateChecksum();
+
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
         } else {
             displaySelection(fitsImageHDU);
+        }
+    }
+
+    /** Call the dialog for creating an image.
+     * Also add the image to the image library, and select it as initial image.
+     */
+    public void createImage() {
+        final IRModelManager irModelManager = IRModelManager.getInstance();
+        final IRModel irModel = irModelManager.getIRModel();
+        
+        final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
+
+        if (newHDU != null) {
+            // update checksum:
+            newHDU.updateChecksum();
+
+            // add the FitsImageHDU to the imageLibrary
+            final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)", null);
+
+            // selecting first library HDU as inputImageHDU
+            irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+
+            // notify model update
+            irModelManager.fireIRModelUpdated(this, null);
         }
     }
 

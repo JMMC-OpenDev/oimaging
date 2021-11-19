@@ -24,6 +24,7 @@ import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oimaging.gui.MainPanel;
 import fr.jmmc.oimaging.gui.PreferencePanel;
+import fr.jmmc.oimaging.gui.action.CreateImageAction;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
@@ -326,6 +327,7 @@ public final class OImaging extends App {
         // Processing menu :
         new RunAction();
         new ModifyImageAction();
+        new CreateImageAction();
 
         // Interop menu :
         // Send OIFits (SAMP) :
