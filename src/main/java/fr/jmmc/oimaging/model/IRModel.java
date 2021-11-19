@@ -389,10 +389,10 @@ public final class IRModel {
         if (removed) {
             // cleanup references:
             if (selectedInputImageHDU == hdu) {
-                selectedInputImageHDU = null;
+                setSelectedInputImageHDU(null);
             }
             if (selectedRglPrioImageHdu == hdu) {
-                selectedRglPrioImageHdu = null;
+                setSelectedRglPrioImageHdu(null);
             }
             // notify model change (to display model):
             IRModelManager.getInstance().fireIRModelUpdated(this, null);
