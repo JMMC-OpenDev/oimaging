@@ -4,7 +4,6 @@
 package fr.jmmc.oimaging.services.software;
 
 import fr.jmmc.oitools.image.ImageOiConstants;
-import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_WGT;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
@@ -35,24 +34,26 @@ public final class WisardInputParam extends SoftwareInputParam {
 
     // optional
     public static final String KEYWORD_SCALE = "SCALE";
-    public static final String KEYWORD_DELTA = "DELTA";
 
     // Wisard specific
     // optional
     private static final KeywordMeta SCALE = new KeywordMeta(KEYWORD_SCALE,
             "Scalar factor for L1-L2 regularization", Types.TYPE_DBL);
-    private static final KeywordMeta DELTA = new KeywordMeta(KEYWORD_DELTA,
-            "Scalar factor for L1-L2 regularization, used to set the threshold between quadratic (l2) and linear (L1) regularizations", Types.TYPE_DBL);
 
     // TODO:
-    // - L1L2WHITE/PSD: add MEAN_OBJECT KW: An image, rescaled NP_MINxNP_MIN as INIT_IMG. (NULL)
-    // - PSD: add PSD KW: An image, rescaled NP_MINxNP_MIN as INIT_IMG. (NULL)
+    // - L1L2WHITE: add MEAN_OBJECT KW: An image, rescaled NP_MINxNP_MIN as INIT_IMG. (NULL)
     // - SOFT_SUPPORT: add MU_SUPPORT (0.5)
     // either:
     //     - MEAN_OBJECT : An image, rescaled NP_MINxNP_MIN as INIT_IMG. (NULL)
     //     - FWHM : Full Width Half maximum of a lorentzian used as prior, in pixels (3.) (less prefered as costly)
-    public static final String[] RGL_NAME_WISARD = new String[]{"L1L2", "L1L2WHITE", "PSD", "SOFT_SUPPORT", "TOTVAR"};
-    private static final String PREFIX_RGL_NAME_WISARD_L1 = "L1";
+
+    /** parameter value "L1L2WHITE" for RGL_NAME for WISARD */
+    private static final String RLG_NAME_WISARD_L1L2WHITE = "L1L2WHITE";
+    /** parameter value "SOFT_SUPPORT" for RGL_NAME for WISARD */
+    private static final String RLG_NAME_WISARD_SOFT_SUPPORT = "SOFT_SUPPORT";
+
+    public static final String[] RGL_NAME_WISARD = new String[]{
+        RLG_NAME_WISARD_L1L2WHITE, RLG_NAME_WISARD_SOFT_SUPPORT};
 
     WisardInputParam() {
         super();
@@ -62,13 +63,10 @@ public final class WisardInputParam extends SoftwareInputParam {
     public void update(final ImageOiInputParam params, final boolean applyDefaults) {
         super.update(params, applyDefaults);
 
-        // for our first implementation, just add to params if not TOTVAR
-        if (params.getRglName().startsWith(PREFIX_RGL_NAME_WISARD_L1)) {
+        if (params.getRglName().equals(RLG_NAME_WISARD_L1L2WHITE)) {
             params.addKeyword(SCALE);
-            params.addKeyword(DELTA);
 
             params.setKeywordDefaultDouble(KEYWORD_SCALE, 0.0001);
-            params.setKeywordDefaultDouble(KEYWORD_DELTA, 1);
         }
 
         // default values:
