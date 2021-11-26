@@ -553,6 +553,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // add the FitsImageHDU to the imageLibrary
             final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)", null);
 
+            irModel.updateImageIdentifiers(newHDU);
+
             // selecting first library HDU as inputImageHDU
             irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
 
