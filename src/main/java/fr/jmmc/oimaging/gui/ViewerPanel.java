@@ -35,7 +35,6 @@ import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -131,6 +130,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage.setRenderer(new OiCellRenderer());
 
         jLabelImageDebug.setVisible(SHOW_DEBUG_INFO);
+
+        // hiding buttons replaced by ModifyImage button
+        jButtonResample.setVisible(false);
+        jButtonRescale.setVisible(false);
+        jButtonViewport.setVisible(false);
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
@@ -639,6 +643,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jPanelImageSelector, gridBagConstraints);
 
         jButtonViewport.setText("Viewport");
+        jButtonViewport.setEnabled(false);
         jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonViewportActionPerformed(evt);
@@ -651,6 +656,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
 
         jButtonResample.setText("Resample");
+        jButtonResample.setEnabled(false);
         jButtonResample.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonResampleActionPerformed(evt);
@@ -675,6 +681,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
 
         jButtonRescale.setText("Rescale");
+        jButtonRescale.setEnabled(false);
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRescaleActionPerformed(evt);
