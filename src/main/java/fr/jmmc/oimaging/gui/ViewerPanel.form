@@ -104,6 +104,7 @@
             <Component class="javax.swing.JButton" name="jButtonViewport">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Viewport"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonViewportActionPerformed"/>
@@ -117,6 +118,7 @@
             <Component class="javax.swing.JButton" name="jButtonResample">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Resample"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonResampleActionPerformed"/>
@@ -143,6 +145,7 @@
             <Component class="javax.swing.JButton" name="jButtonRescale">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Rescale"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRescaleActionPerformed"/>

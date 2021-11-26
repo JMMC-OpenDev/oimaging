@@ -35,7 +35,6 @@ import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -131,6 +130,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage.setRenderer(new OiCellRenderer());
 
         jLabelImageDebug.setVisible(SHOW_DEBUG_INFO);
+
+        // hiding buttons replaced by ModifyImage button
+        jButtonResample.setVisible(false);
+        jButtonRescale.setVisible(false);
+        jButtonViewport.setVisible(false);
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
@@ -547,14 +551,24 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
 
         if (newHDU != null) {
+
             // update checksum:
             newHDU.updateChecksum();
 
             // add the FitsImageHDU to the imageLibrary
             final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)", null);
 
+            irModel.updateImageIdentifiers(newHDU);
+
             // selecting first library HDU as inputImageHDU
-            irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+            final String selection = irModel.getInputImageView();
+            if (selection == KEYWORD_INIT_IMG || selection == null) {
+                irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+            } else if (selection == KEYWORD_RGL_PRIO) {
+                irModel.setSelectedRglPrioImageHdu(libraryHDUs.get(0));
+            }
+
+            displayModel(irModel);
 
             // notify model update
             irModelManager.fireIRModelUpdated(this, null);
@@ -637,6 +651,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jPanelImageSelector, gridBagConstraints);
 
         jButtonViewport.setText("Viewport");
+        jButtonViewport.setEnabled(false);
         jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonViewportActionPerformed(evt);
@@ -649,6 +664,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
 
         jButtonResample.setText("Resample");
+        jButtonResample.setEnabled(false);
         jButtonResample.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonResampleActionPerformed(evt);
@@ -673,6 +689,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
 
         jButtonRescale.setText("Rescale");
+        jButtonRescale.setEnabled(false);
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRescaleActionPerformed(evt);

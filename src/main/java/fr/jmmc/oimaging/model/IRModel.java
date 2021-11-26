@@ -830,7 +830,7 @@ public final class IRModel {
         updateImageIdentifiers(fitsImageFile.getFitsImageHDUs(), fitsImageFile.getFileName());
     }
 
-    private void updateImageIdentifiers(FitsImageHDU fitsImageHDU) {
+    public void updateImageIdentifiers(FitsImageHDU fitsImageHDU) {
         updateImageIdentifiers(fitsImageHDU, "(mem)", 0);
     }
 
