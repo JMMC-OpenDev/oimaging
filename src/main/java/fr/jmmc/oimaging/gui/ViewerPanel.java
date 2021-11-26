@@ -551,6 +551,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
 
         if (newHDU != null) {
+
             // update checksum:
             newHDU.updateChecksum();
 
@@ -560,7 +561,14 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             irModel.updateImageIdentifiers(newHDU);
 
             // selecting first library HDU as inputImageHDU
-            irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+            final String selection = irModel.getInputImageView();
+            if (selection == KEYWORD_INIT_IMG || selection == null) {
+                irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+            } else if (selection == KEYWORD_RGL_PRIO) {
+                irModel.setSelectedRglPrioImageHdu(libraryHDUs.get(0));
+            }
+
+            displayModel(irModel);
 
             // notify model update
             irModelManager.fireIRModelUpdated(this, null);
