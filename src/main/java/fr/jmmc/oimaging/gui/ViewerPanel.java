@@ -25,12 +25,15 @@ import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
+import fr.jmmc.oitools.image.FitsImageLoader;
 import fr.jmmc.oitools.image.FitsImageWriter;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_PRIO;
 import fr.jmmc.oitools.image.ImageOiData;
+import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.nom.tam.fits.BasicHDU;
 import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -529,6 +532,14 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         if (operation.action(fitsImagePanel)) {
             // update checksum:
             copyFitsImageHDU.updateChecksum();
+
+            // update keywords
+            try {
+                final BasicHDU basicHdu = FitsImageWriter.createHDUnit(copyFitsImageHDU);
+                FitsImageLoader.processKeywords(new OIFitsChecker(), basicHdu.getHeader(), copyFitsImageHDU);
+            } catch (FitsException e) {
+                logger.info(e.getMessage());
+            }
 
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
