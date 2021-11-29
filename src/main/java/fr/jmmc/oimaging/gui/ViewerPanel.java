@@ -536,6 +536,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // update keywords
             try {
                 final BasicHDU basicHdu = FitsImageWriter.createHDUnit(copyFitsImageHDU);
+                // clear the header cards, because basicHdu already have all of them updated
+                // not clearing them would make processKeywords() to output duplicates header cards.
+                copyFitsImageHDU.getHeaderCards().clear();
                 FitsImageLoader.processKeywords(new OIFitsChecker(), basicHdu.getHeader(), copyFitsImageHDU);
             } catch (FitsException e) {
                 logger.info(e.getMessage());
