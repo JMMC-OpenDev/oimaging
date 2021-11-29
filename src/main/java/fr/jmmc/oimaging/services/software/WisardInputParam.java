@@ -55,6 +55,8 @@ public final class WisardInputParam extends SoftwareInputParam {
     public static final String[] RGL_NAME_WISARD = new String[]{
         RLG_NAME_WISARD_L1L2WHITE, RLG_NAME_WISARD_SOFT_SUPPORT};
 
+    private boolean rglPrioNeeded = true;
+
     WisardInputParam() {
         super();
     }
@@ -67,6 +69,12 @@ public final class WisardInputParam extends SoftwareInputParam {
             params.addKeyword(SCALE);
 
             params.setKeywordDefaultDouble(KEYWORD_SCALE, 0.0001);
+
+            // we don't need rgl prio when rgl name is L1L2WHITE
+            rglPrioNeeded = false;
+        } else {
+            // rgl prio is needed whenever rgl name is not L1L2WHITE
+            rglPrioNeeded = true;
         }
 
         // default values:
@@ -84,7 +92,6 @@ public final class WisardInputParam extends SoftwareInputParam {
     @Override
     public void validate(final ImageOiInputParam params, final List<String> failures) {
         super.validate(params, failures);
-
         // custom validation rules:
     }
 
@@ -95,7 +102,12 @@ public final class WisardInputParam extends SoftwareInputParam {
 
     @Override
     public boolean supportsStandardKeyword(final String keywordName) {
-        return SUPPORTED_STD_KEYWORDS.contains(keywordName);
+        if (ImageOiConstants.KEYWORD_RGL_PRIO.equals(keywordName)) {
+            // RGL PRIO is supported but disabled when RGL_NAME is L1L2WHITE
+            return rglPrioNeeded;
+        } else {
+            return SUPPORTED_STD_KEYWORDS.contains(keywordName);
+        }
     }
 
     @Override
