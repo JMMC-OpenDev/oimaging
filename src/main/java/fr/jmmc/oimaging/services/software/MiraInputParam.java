@@ -7,8 +7,6 @@ import fr.jmmc.oitools.image.FitsUnit;
 import java.util.List;
 
 import fr.jmmc.oitools.image.ImageOiConstants;
-import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_FLUXERR;
-import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_WGT;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.Types;
@@ -90,6 +88,8 @@ public class MiraInputParam extends SoftwareInputParam {
 
     public static final String[] RGL_NAME_MIRA = new String[]{"compactness", "hyperbolic"};
 
+    private static final double DEF_KEYWORD_RGL_WGT_MIRA = 1.0;
+
     MiraInputParam() {
         super();
     }
@@ -106,7 +106,7 @@ public class MiraInputParam extends SoftwareInputParam {
                     FitsUnit.ANGLE_MILLI_ARCSEC.convert(20.0, FitsUnit.ANGLE_DEG)); // 20 mas
         } else if (params.getRglName().startsWith("hyperbolic")) {
             params.addKeyword(RGL_TAU);
-            params.setKeywordDefaultDouble(KEYWORD_RGL_TAU, 1E-2);
+            params.setKeywordDefaultDouble(KEYWORD_RGL_TAU, 1E-4);
         }
 
         params.addKeyword(SMEAR_FN);
@@ -116,7 +116,7 @@ public class MiraInputParam extends SoftwareInputParam {
         if (applyDefaults) {
             // specific default values for MiRA:
             params.setFluxErr(0.0);
-            params.setRglWgt(1E6); // -mu=1E6
+            params.setRglWgt(DEF_KEYWORD_RGL_WGT_MIRA); // -mu=1E6
         }
 
         // change table default:
@@ -124,7 +124,7 @@ public class MiraInputParam extends SoftwareInputParam {
             params.setFluxErr(0.0);
         }
         if (params.getRglWgt() == ImageOiInputParam.DEF_KEYWORD_RGL_WGT) {
-            params.setRglWgt(1E6);
+            params.setRglWgt(DEF_KEYWORD_RGL_WGT_MIRA);
         }
 
         params.setKeywordDefaultDouble(KEYWORD_SMEAR_FC, 1.0);
