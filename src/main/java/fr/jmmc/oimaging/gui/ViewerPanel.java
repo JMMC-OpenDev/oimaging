@@ -30,7 +30,6 @@ import fr.jmmc.oitools.image.FitsImageWriter;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_PRIO;
 import fr.jmmc.oitools.image.ImageOiData;
-import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.BasicHDU;
@@ -539,7 +538,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 // clear the header cards, because basicHdu already have all of them updated
                 // not clearing them would make processKeywords() to output duplicates header cards.
                 copyFitsImageHDU.getHeaderCards().clear();
-                FitsImageLoader.processKeywords(new OIFitsChecker(), basicHdu.getHeader(), copyFitsImageHDU);
+                FitsImageLoader.processKeywords(null, basicHdu.getHeader(), copyFitsImageHDU);
             } catch (FitsException e) {
                 logger.info(e.getMessage());
             }
