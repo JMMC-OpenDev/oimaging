@@ -571,7 +571,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             displayModel(irModel);
 
             // notify model update
-            irModelManager.fireIRModelUpdated(this, null);
+            irModelManager.fireIRModelChanged(this, null);
         }
     }
 
