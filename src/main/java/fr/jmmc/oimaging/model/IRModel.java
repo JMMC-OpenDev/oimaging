@@ -395,7 +395,7 @@ public final class IRModel {
                 setSelectedRglPrioImageHdu(null);
             }
             // notify model change (to display model):
-            IRModelManager.getInstance().fireIRModelUpdated(this, null);
+            IRModelManager.getInstance().fireIRModelChanged(this, null);
         }
         return removed;
     }

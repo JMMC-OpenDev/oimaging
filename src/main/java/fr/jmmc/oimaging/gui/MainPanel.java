@@ -802,7 +802,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             final ServiceResult lastResult = currentModel.getLastResultSet();
 
             // resultSet Table
-            jTablePanel.setResults(modelResults);
+            if (event.getType() == IRModelEventType.IRMODEL_UPDATED) {
+                jTablePanel.setResults(modelResults);
+            }
 
             // set the slider results boundaries
             if (modelResults.size() > 1) {

@@ -233,7 +233,7 @@ public final class IRModelManager {
     public boolean loadOIFitsFile(final OIFitsFile oiFitsFile) {
         if (oiFitsFile != null) {
             irModel.loadOifitsFile(oiFitsFile);
-            fireIRModelUpdated(this, null);
+            fireIRModelChanged(this, null);
             return true;
 
         }
