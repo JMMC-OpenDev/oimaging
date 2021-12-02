@@ -855,6 +855,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             if (event.getType() == IRModelEventType.IRMODEL_CHANGED || modelResults.isEmpty()) {
                 // to ensure jsplit pane will be given 90% once it becomes visible:
                 showTablePanel(!modelResults.isEmpty());
+                jTablePanel.getSelectionModel().clearSelection();
                 viewerPanel.displayModel(currentModel);
             } else {
                 showTablePanel(true);
