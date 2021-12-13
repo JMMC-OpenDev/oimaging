@@ -651,7 +651,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             case IRMODEL_CHANGED:
                 syncUI(event);
                 break;
-            case IRMODEL_UPDATED:
+            case IRMODEL_RESULT_LIST_CHANGED:
                 syncUI(event);
                 break;
             default:
@@ -802,7 +802,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             final ServiceResult lastResult = currentModel.getLastResultSet();
 
             // resultSet Table
-            if (event.getType() == IRModelEventType.IRMODEL_UPDATED) {
+            if (event.getType() == IRModelEventType.IRMODEL_RESULT_LIST_CHANGED) {
                 jTablePanel.setResults(modelResults);
             }
 

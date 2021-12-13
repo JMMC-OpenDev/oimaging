@@ -432,18 +432,18 @@ public final class IRModelManager {
     }
 
     /**
-     * This fires an IRMODEL_UPDATED event to given registered listener ASYNCHRONOUSLY !
-     *     *
+     * This fires an IRMODEL_RESULT_LIST_CHANGED event to given registered listener ASYNCHRONOUSLY !
+     *
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireIRModelUpdated(final Object source, final IRModelEventListener destination) {
+    public void fireIRModelResultListChanged(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
-                logger.debug("fireIRModelUpdated TO {}", (destination != null) ? destination : "ALL");
+                logger.debug("fireIRModelResultListChanged TO {}", (destination != null) ? destination : "ALL");
             }
             getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.IRMODEL_UPDATED, null, getIRModel()), destination);
+                    new IRModelEvent(IRModelEventType.IRMODEL_RESULT_LIST_CHANGED, null, getIRModel()), destination);
         }
     }
 
