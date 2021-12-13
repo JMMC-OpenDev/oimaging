@@ -67,6 +67,8 @@ public final class WisardInputParam extends SoftwareInputParam {
             rglPrioNeeded = true;
         }
 
+        params.setFluxErr(1E-6);
+
         // default values:
         if (applyDefaults) {
             // specific default values for WISARD:
