@@ -395,7 +395,7 @@ public final class IRModel {
                 setSelectedRglPrioImageHdu(null);
             }
             // notify model change (to display model):
-            IRModelManager.getInstance().fireIRModelUpdated(this, null);
+            IRModelManager.getInstance().fireIRModelChanged(this, null);
         }
         return removed;
     }
@@ -771,7 +771,7 @@ public final class IRModel {
             setSelectedRglPrioImageHdu(rglHduEquiv);
         }
         // notify model update
-        IRModelManager.getInstance().fireIRModelUpdated(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
     }
 
     /** 
@@ -808,13 +808,13 @@ public final class IRModel {
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
         getResultSets().remove(serviceResultToDelete);
         // notify model update
-        IRModelManager.getInstance().fireIRModelUpdated(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
     }
 
     public void removeServiceResults(List<ServiceResult> selectedServicesList) {
         getResultSets().removeAll(selectedServicesList);
         // notify model update
-        IRModelManager.getInstance().fireIRModelUpdated(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
     }
 
     private void loadLog(final ServiceResult serviceResult) {

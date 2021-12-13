@@ -651,7 +651,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             case IRMODEL_CHANGED:
                 syncUI(event);
                 break;
-            case IRMODEL_UPDATED:
+            case IRMODEL_RESULT_LIST_CHANGED:
                 syncUI(event);
                 break;
             default:
@@ -802,7 +802,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             final ServiceResult lastResult = currentModel.getLastResultSet();
 
             // resultSet Table
-            jTablePanel.setResults(modelResults);
+            if (event.getType() == IRModelEventType.IRMODEL_RESULT_LIST_CHANGED) {
+                jTablePanel.setResults(modelResults);
+            }
 
             // set the slider results boundaries
             if (modelResults.size() > 1) {
@@ -853,6 +855,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             if (event.getType() == IRModelEventType.IRMODEL_CHANGED || modelResults.isEmpty()) {
                 // to ensure jsplit pane will be given 90% once it becomes visible:
                 showTablePanel(!modelResults.isEmpty());
+                jTablePanel.getSelectionModel().clearSelection();
                 viewerPanel.displayModel(currentModel);
             } else {
                 showTablePanel(true);
