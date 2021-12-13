@@ -215,7 +215,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
-    private void setTabMode(SHOW_MODE mode) {
+    public void setTabMode(SHOW_MODE mode) {
         syncingUI = true;
         try {
             // change border title
@@ -389,6 +389,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
             setTabMode(SHOW_MODE.GRID);
         }
+    }
+
+    /** display an empty result */
+    public void displayEmptyResult() {
+        displayImage(null, null);
+        displayOiFitsAndParams(null, null);
+        jPanelImage.repaint();
     }
 
     // TODO move out of this class

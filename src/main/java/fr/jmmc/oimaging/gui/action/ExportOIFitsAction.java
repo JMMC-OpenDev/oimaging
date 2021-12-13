@@ -43,7 +43,7 @@ public final class ExportOIFitsAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanel();
+        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
         if (viewerPanel.getShowMode() == ViewerPanel.SHOW_MODE.GRID) {
             MessagePane.showErrorMessage("Cannot export while in GRID mode. Please select one single result.");
         } else {

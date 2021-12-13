@@ -37,7 +37,7 @@ public final class ModifyImageAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        OImaging.getInstance().getMainPanel().getViewerPanel().modifyFitsImage();
+        OImaging.getInstance().getMainPanel().getViewerPanelActive().modifyFitsImage();
     }
 
 }

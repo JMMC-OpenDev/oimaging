@@ -769,6 +769,8 @@ public final class IRModel {
             // Always update selected images:
             setSelectedInputImageHDU(initHduEquiv);
             setSelectedRglPrioImageHdu(rglHduEquiv);
+
+            setInputImageView(KEYWORD_INIT_IMG);
         }
         // notify model update
         IRModelManager.getInstance().fireIRModelResultListChanged(this, null);

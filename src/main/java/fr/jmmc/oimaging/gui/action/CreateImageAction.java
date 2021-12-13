@@ -36,6 +36,6 @@ public class CreateImageAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        OImaging.getInstance().getMainPanel().getViewerPanel().createImage();
+        OImaging.getInstance().getMainPanel().getViewerPanelInput().createImage();
     }
 }

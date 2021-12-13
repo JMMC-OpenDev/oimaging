@@ -60,7 +60,7 @@ public final class SendOIFitsAction extends SampCapabilityAction {
     public Map<?, ?> composeMessage() throws IllegalStateException {
         logger.debug("composeMessage");
 
-        final File file = OImaging.getInstance().getMainPanel().getViewerPanel().exportOIFits(false);
+        final File file = OImaging.getInstance().getMainPanel().getViewerPanelActive().exportOIFits(false);
 
         if (file != null) {
             // Store parameters into SAMP message:
