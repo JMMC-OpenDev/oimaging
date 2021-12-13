@@ -34,6 +34,7 @@ import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridLayout;
 
 import java.awt.event.MouseAdapter;
@@ -131,6 +132,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jComboBoxImage.setRenderer(new OiCellRenderer());
 
         jLabelImageDebug.setVisible(SHOW_DEBUG_INFO);
+        
+        jEditorPaneExecutionLog.setFont(new Font("Monospaced", Font.PLAIN, SwingUtils.adjustUISize(10)));
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
