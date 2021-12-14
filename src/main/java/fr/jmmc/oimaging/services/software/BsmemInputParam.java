@@ -44,6 +44,8 @@ public final class BsmemInputParam extends SoftwareInputParam {
             params.removeKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
         }
 
+        params.setFluxErr(1E-1);
+
         // default values:
         if (applyDefaults) {
             // specific default values for BSMEM:

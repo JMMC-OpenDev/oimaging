@@ -4,7 +4,6 @@
 package fr.jmmc.oimaging.services.software;
 
 import fr.jmmc.oimaging.services.ServiceList;
-import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import java.util.List;
 
@@ -50,10 +49,6 @@ public class SoftwareInputParam {
         if (rglName == null || !isSupported(getSupported_RGL_NAME(), rglName)) {
             // use first as default one if null or not included in the supported values
             params.setRglName(getSupported_RGL_NAME()[0]);
-        }
-
-        if (applyDefaults) {
-            params.setFluxErr(0.01);
         }
     }
 
