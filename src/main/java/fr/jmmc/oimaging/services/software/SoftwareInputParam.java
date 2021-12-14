@@ -4,7 +4,6 @@
 package fr.jmmc.oimaging.services.software;
 
 import fr.jmmc.oimaging.services.ServiceList;
-import fr.jmmc.oitools.image.ImageOiConstants;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import java.util.List;
 

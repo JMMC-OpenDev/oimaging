@@ -398,9 +398,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImage.repaint();
     }
 
+    public OIFitsFile getCurrentOIFitsFile() {
+        return oifitsViewPanel.getOIFitsData();
+    }
+
     // TODO move out of this class
     public File exportOIFits(final boolean useFileChooser) {
-        final OIFitsFile oifitsFile = oifitsViewPanel.getOIFitsData();
+        final OIFitsFile oifitsFile = getCurrentOIFitsFile();
         // store original filename
         final String originalAbsoluteFilePath = oifitsFile.getAbsoluteFilePath();
         String name = oifitsFile.getFileName();
@@ -871,7 +875,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     private void enableActions() {
-        final OIFitsFile oiFitsFile = oifitsViewPanel.getOIFitsData();
+        final OIFitsFile oiFitsFile = getCurrentOIFitsFile();
         final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
         exportOiFitsAction.setEnabled(enableExportOiFits);
         sendOiFitsAction.setEnabled(enableExportOiFits);

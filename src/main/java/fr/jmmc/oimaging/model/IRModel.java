@@ -303,7 +303,7 @@ public final class IRModel {
      * @return list of FitsImageHDU present in the image library or NULL
      */
     public List<FitsImageHDU> addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
-            final List<Role> roles) {
+                                               final List<Role> roles) {
 
         final int nHdus = hdus.size();
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);

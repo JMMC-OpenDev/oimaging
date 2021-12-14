@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.5.4 beta 9"/>
-    <compilation date="24/11/2021" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.5.4 beta 10"/>
+    <compilation date="14/12/2021" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -135,7 +135,8 @@
 
         <menu label="Edit">
             <menu label="Delete" classpath="fr.jmmc.oimaging.gui.action.DeleteSelectionAction" action="deleteSelection" accelerator="DELETE"/>
-            <!-- TODO  find common icon icon="fr/jmmc/o/gui/icons/button_fewer.png"/-->
+            <menu/> <!-- menu separator -->
+            <menu label="OIFits Browser" classpath="fr.jmmc.oimaging.gui.action.OIFitsBrowserAction" action="browseOIFits" accelerator="B" description="Open FITS table browser on the current oifits file"/>
         </menu>
 
         <menu label="Processing">
@@ -157,7 +158,10 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Wed, 24 Nov 2021 20:00:00 GMT</pubDate>
+            <pubDate>Tue, 14 Dec 2021 10:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 10">
+                <change type="FEATURE">Added the 'OIFits Browser' action in the 'Edit' menu to navigate among all FITS HDUs (images and tables)</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 9">
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/15">Added the 'Create Image' action to generate a centered-gaussian normalized image (FWHM, FOV)</change>
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/11">Added small documentation about algorithms (HTML / markdown page)</change>
