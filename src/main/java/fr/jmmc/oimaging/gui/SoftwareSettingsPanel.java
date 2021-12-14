@@ -976,7 +976,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
         return changed;
     }
-    
+
     /** Tell if two FitsImageHDUs are different.
      *    Consider that null == NULL_IMAGE_HDU
      * @param first FitsImageHDU to compare to second
@@ -984,13 +984,12 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
      * @return true if they are different. false if they are the same 
      *         (remember that null == NULL_IMAGE_HDU)
      */
-    private static boolean differentHdus (final FitsImageHDU first, final FitsImageHDU second) {
-        if ((first == second) 
-                || (first == null && second == NULL_IMAGE_HDU) 
+    private static boolean differentHdus(final FitsImageHDU first, final FitsImageHDU second) {
+        if ((first == second)
+                || (first == null && second == NULL_IMAGE_HDU)
                 || (first == NULL_IMAGE_HDU && second == null)) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
