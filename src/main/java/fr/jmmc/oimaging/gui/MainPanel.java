@@ -198,7 +198,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         });
 
         viewerPanelInput.setTabMode(ViewerPanel.SHOW_MODE.MODEL);
+        viewerPanelInput.setShowMode(ViewerPanel.SHOW_MODE.MODEL);
         viewerPanelResults.setTabMode(ViewerPanel.SHOW_MODE.RESULT);
+        viewerPanelResults.setShowMode(ViewerPanel.SHOW_MODE.RESULT);
     }
 
     /**

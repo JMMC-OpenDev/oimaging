@@ -251,7 +251,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void displayModel(IRModel irModel) {
-        showMode = SHOW_MODE.MODEL;
+        setShowMode(SHOW_MODE.MODEL);
         if (irModel != null) {
             String inputImageView = irModel.getInputImageView();
             displayOiFitsAndParams(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
@@ -268,7 +268,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void displayResult(ServiceResult result) {
-        showMode = SHOW_MODE.RESULT;
+        setShowMode(SHOW_MODE.RESULT);
 
         // Remove the grid view if any
         jPanelImage.removeAll();
@@ -313,7 +313,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void displayGrid(List<ServiceResult> results) {
-        showMode = SHOW_MODE.GRID;
+        setShowMode(SHOW_MODE.GRID);
 
         if (!results.isEmpty()) {
             final int gridSize = calculateGridSize(results.size());
@@ -915,5 +915,12 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
      */
     public SHOW_MODE getShowMode() {
         return showMode;
+    }
+
+    /**
+     * @param showMode the showMode to set
+     */
+    public void setShowMode(SHOW_MODE showMode) {
+        this.showMode = showMode;
     }
 }
