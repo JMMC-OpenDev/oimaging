@@ -187,6 +187,7 @@ public final class SparcoInputParam extends MiraInputParam {
         }
     }
 
+    @Override
     public String getDefaultCliOptions() {
         return DEFAULT_CLI_OPTIONS;
     }
