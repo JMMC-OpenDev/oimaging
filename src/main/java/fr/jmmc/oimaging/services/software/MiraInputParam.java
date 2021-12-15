@@ -137,6 +137,7 @@ public class MiraInputParam extends SoftwareInputParam {
         // custom validation rules:
     }
 
+    @Override
     public String getDefaultCliOptions() {
         return DEFAULT_CLI_OPTIONS;
     }

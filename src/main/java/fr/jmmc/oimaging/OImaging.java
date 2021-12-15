@@ -32,6 +32,7 @@ import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.NewAction;
 import fr.jmmc.oimaging.gui.action.ModifyImageAction;
+import fr.jmmc.oimaging.gui.action.OIFitsBrowserAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
@@ -323,6 +324,7 @@ public final class OImaging extends App {
 
         // Edit menu :
         new DeleteSelectionAction();
+        new OIFitsBrowserAction();
 
         // Processing menu :
         new RunAction();

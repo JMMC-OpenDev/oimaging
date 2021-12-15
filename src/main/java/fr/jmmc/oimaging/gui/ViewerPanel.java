@@ -37,6 +37,7 @@ import fr.nom.tam.fits.BasicHDU;
 import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -140,6 +141,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             jButtonRescale.setVisible(false);
             jButtonViewport.setVisible(false);
         }
+
+        jEditorPaneExecutionLog.setFont(new Font("Monospaced", Font.PLAIN, SwingUtils.adjustUISize(10)));
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
@@ -391,9 +394,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
     }
 
+    public OIFitsFile getCurrentOIFitsFile() {
+        return oifitsViewPanel.getOIFitsData();
+    }
+
     // TODO move out of this class
     public File exportOIFits(final boolean useFileChooser) {
-        final OIFitsFile oifitsFile = oifitsViewPanel.getOIFitsData();
+        final OIFitsFile oifitsFile = getCurrentOIFitsFile();
         // store original filename
         final String originalAbsoluteFilePath = oifitsFile.getAbsoluteFilePath();
         String name = oifitsFile.getFileName();
@@ -568,11 +575,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     public void createImage() {
         final IRModelManager irModelManager = IRModelManager.getInstance();
         final IRModel irModel = irModelManager.getIRModel();
-        
+
         final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
 
         if (newHDU != null) {
-
             // update checksum:
             newHDU.updateChecksum();
 
@@ -867,7 +873,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     private void enableActions() {
-        final OIFitsFile oiFitsFile = oifitsViewPanel.getOIFitsData();
+        final OIFitsFile oiFitsFile = getCurrentOIFitsFile();
         final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
         exportOiFitsAction.setEnabled(enableExportOiFits);
         sendOiFitsAction.setEnabled(enableExportOiFits);
