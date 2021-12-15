@@ -21,7 +21,7 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(LocalExecutionMode.class.getName());
     /** application identifier for LocalExecutionMode */
-    public final static String APP_NAME = "OImaging";
+    public final static String APP_NAME = "OImaging-gui";
     /** user for LocalExecutionMode */
     public final static String USER_NAME = "JMMC";
     /** task identifier for LocalExecutionMode */
@@ -41,7 +41,6 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
      * @param cliOptions software options on command line or null
      * @param inputFilename input filename
      * @param result the service result pointing result file to write data into.
-     * @return the job context identifier
      * @throws IllegalStateException if the job can not be submitted to the job queue
      */
     public static void exec(final String software, final String cliOptions, final String inputFilename, final ServiceResult result) throws IllegalStateException {

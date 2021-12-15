@@ -31,24 +31,52 @@ import org.slf4j.LoggerFactory;
 public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     // Use -DRemoteExecutionMode.local=true (dev) to use local uws server (docker)
-    private static final boolean USE_LOCAL = Boolean.getBoolean("RemoteExecutionMode.local");
+    private static boolean USE_LOCAL = Boolean.getBoolean("RemoteExecutionMode.local");
 
     // Use -DRemoteExecution.beta=true (dev) to use remote beta uws server (docker)
-    private static final boolean USE_BETA = Boolean.getBoolean("RemoteExecution.beta") || ApplicationDescription.isBetaVersion();
+    private static boolean USE_BETA = Boolean.getBoolean("RemoteExecution.beta")
+            || ApplicationDescription.isBetaVersion();
 
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
 
     public static final String SERVICE_PATH = "oimaging/oimaging";
 
-    public static final String[] SERVER_URLS = ((USE_LOCAL) ? new String[]{"http://127.0.0.1:8080/OImaging-uws/"}
-            : ((USE_BETA) ? (new String[]{"http://oimaging-beta.jmmc.fr/OImaging-uws/"})
-                    : (new String[]{"http://oimaging.jmmc.fr/OImaging-uws/"})));
-
     private static final ClientFactory FACTORY = new ClientFactory();
 
     /** singleton */
     public static final RemoteExecutionMode INSTANCE = new RemoteExecutionMode();
+
+    @SuppressWarnings("StaticNonFinalUsedInInitialization")
+    private static String SERVER_URL = getServerUrl(USE_LOCAL, USE_BETA);
+
+    private static String getServerUrl(final boolean local, final boolean beta) {
+        return ((local) ? "http://127.0.0.1:8080/OImaging-uws/"
+                : ((beta) ? "http://oimaging-beta.jmmc.fr/OImaging-uws/"
+                        : "http://oimaging.jmmc.fr/OImaging-uws/"));
+    }
+
+    public static void resolveRemoteServer() {
+        SERVER_URL = getServerUrl(USE_LOCAL, USE_BETA);
+        // reset to be sure:
+        FACTORY.reset();
+    }
+
+    public static boolean isUSE_LOCAL() {
+        return USE_LOCAL;
+    }
+
+    public static void setUSE_LOCAL(final boolean local) {
+        RemoteExecutionMode.USE_LOCAL = local;
+    }
+
+    public static boolean isUSE_BETA() {
+        return USE_BETA;
+    }
+
+    public static void setUSE_BETA(final boolean beta) {
+        RemoteExecutionMode.USE_BETA = beta;
+    }
 
     private final static class ClientFactory {
 
@@ -59,33 +87,32 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         }
 
         /**
-         * try to connect to the first server of the hardcoded list.
-         * // TODO move this method in a factory
+         * try to connect to the OImaging server
+         * @return client
+         * @throws fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWSException
          */
         public ClientUWS getClient() throws ClientUWSException {
             if (uwsClient == null) {
                 ClientUWSException cue = null;
                 // Move it in a property file (or constant at least)
-                for (String url : SERVER_URLS) {
-                    try {
-                        final ClientUWS c = new ClientUWS(url, SERVICE_PATH);
+                final String url = SERVER_URL;
+                try {
+                    final ClientUWS c = new ClientUWS(url, SERVICE_PATH);
 
-                        // Get home page as an isAlive request:
-                        if (c.getHomePage() != null) {
-                            uwsClient = c;
-                            _logger.info("UWS service endpoint : '{}'", url);
-                            break;
-                        }
-                    } catch (ClientUWSException ce) {
-                        _logger.info("UWS service endpoint unreachable: '{}'", url);
-                        if (cue == null) {
-                            cue = ce;
-                        }
-                    } catch (Exception e) {
-                        // we should avoid to catch Exception, please catch e just before
-                        _logger.info("UWS service endpoint unreachable: '{}'", url);
-                        throw new IllegalStateException("UWS service endpoint unreachable: '" + url + "'", e);
+                    // Get home page as an isAlive request:
+                    if (c.getHomePage() != null) {
+                        uwsClient = c;
+                        _logger.info("UWS service endpoint : '{}'", url);
                     }
+                } catch (ClientUWSException ce) {
+                    _logger.info("UWS service endpoint unreachable: '{}'", url);
+                    if (cue == null) {
+                        cue = ce;
+                    }
+                } catch (Exception e) {
+                    // we should avoid to catch Exception, please catch e just before
+                    _logger.info("UWS service endpoint unreachable: '{}'", url);
+                    throw new IllegalStateException("UWS service endpoint unreachable: '" + url + "'", e);
                 }
                 if (uwsClient == null) {
                     if (cue != null) {
@@ -114,8 +141,14 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
      * @param inputFilename input filename
      * @param result the service result pointing result file to write data into.
      * @throws IllegalStateException if the job can not be submitted to the job queue
+     * @throws fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWSException
+     * @throws java.net.URISyntaxException
+     * @throws java.io.IOException
      */
-    public void callUwsOimagingService(final String software, final String cliOptions, final String inputFilename, ServiceResult result) throws IllegalStateException, ClientUWSException, URISyntaxException, IOException {
+    @SuppressWarnings("SleepWhileInLoop")
+    public void callUwsOimagingService(final String software, final String cliOptions,
+                                       final String inputFilename, ServiceResult result)
+            throws IllegalStateException, ClientUWSException, URISyntaxException, IOException {
 
         if (StringUtils.isEmpty(software)) {
             throw new IllegalArgumentException("empty application name !");
@@ -130,7 +163,8 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             throw new IllegalArgumentException("empty log filename !");
         }
 
-        _logger.info("callUwsOimagingService: software={} cliOptions={} inputFilenane={}", software, cliOptions, inputFilename);
+        _logger.info("callUwsOimagingService: software={} cliOptions={} inputFilenane={}",
+                software, cliOptions, inputFilename);
 
         // prepare input of next uws call
         final FormDataSet formDataSet = new FormDataSet();
@@ -235,7 +269,9 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         }
     }
 
-    private static void prepareResult(final ClientUWS client, String jobId, ServiceResult result) throws ClientUWSException, URISyntaxException, IOException {
+    private static void prepareResult(final ClientUWS client, String jobId, ServiceResult result)
+            throws ClientUWSException, URISyntaxException, IOException {
+
         final Results results = client.getJobResults(jobId);
 
         for (ResultReference resultRef : results.getResult()) {
