@@ -14,6 +14,7 @@ import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
 import fr.jmmc.oiexplorer.core.gui.SliderPanel;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
+import fr.jmmc.oimaging.OImaging;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
@@ -134,12 +135,14 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jLabelImageDebug.setVisible(SHOW_DEBUG_INFO);
 
-        jEditorPaneExecutionLog.setFont(new Font("Monospaced", Font.PLAIN, SwingUtils.adjustUISize(10)));
+        if (!OImaging.DEV_MODE) {
+            // hiding buttons replaced by ModifyImage button
+            jButtonResample.setVisible(false);
+            jButtonRescale.setVisible(false);
+            jButtonViewport.setVisible(false);
+        }
 
-        // hiding buttons replaced by ModifyImage button
-        jButtonResample.setVisible(false);
-        jButtonRescale.setVisible(false);
-        jButtonViewport.setVisible(false);
+        jEditorPaneExecutionLog.setFont(new Font("Monospaced", Font.PLAIN, SwingUtils.adjustUISize(10)));
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
@@ -539,6 +542,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         // switch image to copied HDU in the fitsImagePanel to be modified in-place:
         displaySelection(copyFitsImageHDU);
 
+        // show dialog and waits for user action (async changes may happen):
         if (operation.action(fitsImagePanel)) {
             // update checksum:
             copyFitsImageHDU.updateChecksum();
@@ -557,7 +561,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
         } else {
-            displaySelection(fitsImageHDU);
+            if ((fitsImagePanel.getFitsImage() != null) 
+                    && (copyFitsImageHDU == fitsImagePanel.getFitsImage().getFitsImageHDU())) {
+                // restore initial image if displayed:
+                displaySelection(fitsImageHDU);
+            }
         }
     }
 
@@ -627,7 +635,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jScrollPaneTableInput = new javax.swing.JScrollPane();
         jTableInputParamKeywords = new javax.swing.JTable();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation")); // NOI18N
         setLayout(new java.awt.GridBagLayout());
 
         jTabbedPaneVizualizations.setName("jTabbedPaneVizualizations"); // NOI18N
@@ -670,7 +678,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jPanelImageSelector, gridBagConstraints);
 
         jButtonViewport.setText("Viewport");
-        jButtonViewport.setEnabled(false);
         jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonViewportActionPerformed(evt);
@@ -683,7 +690,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
 
         jButtonResample.setText("Resample");
-        jButtonResample.setEnabled(false);
         jButtonResample.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonResampleActionPerformed(evt);
@@ -708,7 +714,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
 
         jButtonRescale.setText("Rescale");
-        jButtonRescale.setEnabled(false);
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRescaleActionPerformed(evt);
@@ -731,7 +736,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;

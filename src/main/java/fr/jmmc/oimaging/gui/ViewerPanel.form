@@ -104,7 +104,6 @@
             <Component class="javax.swing.JButton" name="jButtonViewport">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Viewport"/>
-                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonViewportActionPerformed"/>
@@ -118,7 +117,6 @@
             <Component class="javax.swing.JButton" name="jButtonResample">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Resample"/>
-                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonResampleActionPerformed"/>
@@ -145,7 +143,6 @@
             <Component class="javax.swing.JButton" name="jButtonRescale">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Rescale"/>
-                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRescaleActionPerformed"/>
@@ -172,7 +169,7 @@
             <Container class="javax.swing.JPanel" name="jPanelImage">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-                  <GridBagConstraints gridX="0" gridY="1" gridWidth="4" gridHeight="1" fill="1" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="10" weightX="1.0" weightY="1.0"/>
+                  <GridBagConstraints gridX="0" gridY="1" gridWidth="6" gridHeight="1" fill="1" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="10" weightX="1.0" weightY="1.0"/>
                 </Constraint>
               </Constraints>
 

@@ -45,6 +45,9 @@ public final class BsmemInputParam extends SoftwareInputParam {
         }
 
         // default values:
+        // set FLUX_ERR for BSMEM (non editable):
+        params.setFluxErr(0.01); // 1% error on VIS2
+
         if (applyDefaults) {
             // specific default values for BSMEM:
             params.setAutoWgt(true);
