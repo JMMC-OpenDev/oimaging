@@ -50,10 +50,6 @@ public class SoftwareInputParam {
             // use first as default one if null or not included in the supported values
             params.setRglName(getSupported_RGL_NAME()[0]);
         }
-
-        if (applyDefaults) {
-            params.setFluxErr(0.01);
-        }
     }
 
     public void validate(final ImageOiInputParam params, final List<String> failures) {

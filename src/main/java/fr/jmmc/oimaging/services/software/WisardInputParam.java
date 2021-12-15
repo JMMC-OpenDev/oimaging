@@ -68,6 +68,9 @@ public final class WisardInputParam extends SoftwareInputParam {
         }
 
         // default values:
+        // set FLUX_ERR for WISARD (non editable):
+        params.setFluxErr(1E-6);
+
         if (applyDefaults) {
             // specific default values for WISARD:
             params.setRglWgt(1E-4);

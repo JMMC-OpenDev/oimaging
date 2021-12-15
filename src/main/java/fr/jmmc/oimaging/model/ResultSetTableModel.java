@@ -124,6 +124,25 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         final FitsTable inputParam, outputParam;
 
         switch (columnDesc.getSource()) {
+            case OUTPUT_PARAM:
+                if (result.getOifitsFile() != null) {
+                    outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
+                    Object value = getKeywordValue(outputParam, columnDesc.getName());
+                    if (value != null) {
+                        return value;
+                    }
+                }
+                // no break: if nothing has been found in OUTPUT we fallback to INPUT
+                logger.debug("No value found in Output params. fallback to input params.");
+            case INPUT_PARAM:
+                if (result.getOifitsFile() != null) {
+                    inputParam = result.getOifitsFile().getImageOiData().getInputParam();
+                    Object value = getKeywordValue(inputParam, columnDesc.getName());
+                    if (value != null) {
+                        return value;
+                    }
+                }
+                break;
             case HARD_CODED:
                 switch (HardCodedColumn.valueOf(columnDesc.getName())) {
                     case FILE:
@@ -134,18 +153,6 @@ public class ResultSetTableModel extends ColumnDescTableModel {
                         return result.getJobDuration();
                     case SUCCESS:
                         return result.isValid();
-                }
-                break;
-            case INPUT_PARAM:
-                if (result.getOifitsFile() != null) {
-                    inputParam = result.getOifitsFile().getImageOiData().getInputParam();
-                    return getKeywordValue(inputParam, columnDesc.getName());
-                }
-                break;
-            case OUTPUT_PARAM:
-                if (result.getOifitsFile() != null) {
-                    outputParam = result.getOifitsFile().getImageOiData().getOutputParam();
-                    return getKeywordValue(outputParam, columnDesc.getName());
                 }
                 break;
             default:
