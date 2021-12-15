@@ -112,9 +112,10 @@ public class MiraInputParam extends SoftwareInputParam {
         params.addKeyword(SMEAR_FN);
         params.addKeyword(SMEAR_FC);
 
+        // default values:
+        // set FLUX_ERR for MIRA/SPARCO (non editable):
         params.setFluxErr(0.0);
 
-        // default values:
         if (applyDefaults) {
             // specific default values for MiRA:
             params.setRglWgt(DEF_KEYWORD_RGL_WGT_MIRA); // -mu=1E6
