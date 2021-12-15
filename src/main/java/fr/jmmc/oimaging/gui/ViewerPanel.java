@@ -483,27 +483,27 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         return file;
     }
 
-    public void changeViewportFitsImage() {
-        processFitsImage(ProcessOperations.changeViewport);
+    private void changeViewportFitsImage() {
+        processFitsImage(ProcessImageOperation.changeViewport);
     }
 
-    public void resampleFitsImage() {
-        processFitsImage(ProcessOperations.resample);
+    private void resampleFitsImage() {
+        processFitsImage(ProcessImageOperation.resample);
     }
 
-    public void rescaleFitsImage() {
-        processFitsImage(ProcessOperations.rescale);
+    private void rescaleFitsImage() {
+        processFitsImage(ProcessImageOperation.rescale);
     }
 
-    public void modifyFitsImage() {
-        processFitsImage(ProcessOperations.modifyFitsImage);
+    private void modifyFitsImage() {
+        processFitsImage(ProcessImageOperation.modifyImage);
     }
 
-    private enum ProcessOperations {
+    public enum ProcessImageOperation {
         changeViewport,
         resample,
         rescale,
-        modifyFitsImage;
+        modifyImage;
 
         public boolean action(final FitsImagePanel fitsImagePanel) {
             switch (this) {
@@ -513,15 +513,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                     return fitsImagePanel.resampleFitsImage();
                 case rescale:
                     return fitsImagePanel.rescaleFitsImage();
-                case modifyFitsImage:
-                    return fitsImagePanel.dialogModifyImage();
+                case modifyImage:
+                    return fitsImagePanel.modifyFitsImage();
                 default:
             }
             return false;
         }
     }
 
-    private void processFitsImage(final ProcessOperations operation) {
+    public void processFitsImage(final ProcessImageOperation operation) {
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();
 
         if ((fitsImage == null) || (fitsImage.getFitsImageHDU() == null)) {
@@ -561,7 +561,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
         } else {
-            if ((fitsImagePanel.getFitsImage() != null) 
+            if ((fitsImagePanel.getFitsImage() != null)
                     && (copyFitsImageHDU == fitsImagePanel.getFitsImage().getFitsImageHDU())) {
                 // restore initial image if displayed:
                 displaySelection(fitsImageHDU);
@@ -572,11 +572,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     /** Call the dialog for creating an image.
      * Also add the image to the image library, and select it as initial image.
      */
-    public void createImage() {
+    public void createFitsImage() {
         final IRModelManager irModelManager = IRModelManager.getInstance();
         final IRModel irModel = irModelManager.getIRModel();
 
-        final FitsImageHDU newHDU = fitsImagePanel.dialogCreateImage();
+        final FitsImageHDU newHDU = fitsImagePanel.createFitsImage();
 
         if (newHDU != null) {
             // update checksum:

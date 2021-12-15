@@ -135,17 +135,27 @@
 
         <menu label="Edit">
             <menu label="Delete" classpath="fr.jmmc.oimaging.gui.action.DeleteSelectionAction" action="deleteSelection" accelerator="DELETE"/>
-            <menu/> <!-- menu separator -->
-            <menu label="OIFits Browser" classpath="fr.jmmc.oimaging.gui.action.OIFitsBrowserAction" action="browseOIFits" accelerator="B" description="Open FITS table browser on the current oifits file"/>
         </menu>
 
         <menu label="Processing">
             <menu label="Run" classpath="fr.jmmc.oimaging.gui.action.RunAction" action="run" description="Run the image reconstruction using the current input OIFITS file"/>
             <menu/> <!-- menu separator -->
-            <menu label="Create Image" classpath="fr.jmmc.oimaging.gui.action.CreateImageAction" action="createImage"
+            <menu label="Create image" classpath="fr.jmmc.oimaging.gui.action.CreateImageAction" action="createImage"
                   description="Create a centered-gaussian image"/>
-            <menu label="Modify Image" classpath="fr.jmmc.oimaging.gui.action.ModifyImageAction" action="modify"
+            <menu label="Modify image" classpath="fr.jmmc.oimaging.gui.action.ProcessImageAction" action="modifyImage"
                   description="Modify the current image (change fov and resample according to the pixel increments)"/>
+            <menu/> <!-- menu separator -->
+            <menu label="OIFits Browser" classpath="fr.jmmc.oimaging.gui.action.OIFitsBrowserAction" action="browseOIFits" accelerator="B"
+                  description="Open FITS table browser on the current oifits file"/>
+            <menu label="Misc. tools">
+                <menu/> <!-- menu separator -->
+                <menu label="Change viewport" classpath="fr.jmmc.oimaging.gui.action.ProcessImageAction" action="changeViewport"
+                      description="TODO"/>
+                <menu label="Resample image" classpath="fr.jmmc.oimaging.gui.action.ProcessImageAction" action="resample"
+                      description="TODO"/>
+                <menu label="Rescale image" classpath="fr.jmmc.oimaging.gui.action.ProcessImageAction" action="rescale"
+                      description="TODO"/>
+            </menu>
         </menu>
 
         <menu label="Interop">
