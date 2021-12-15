@@ -93,6 +93,8 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jLabelInterpolation = new javax.swing.JLabel();
         jComboBoxInterpolation = new javax.swing.JComboBox();
         jPanelCommonPreferencesView = new fr.jmmc.jmcs.gui.component.CommonPreferencesView();
+        jPanelResultsTablePreferences = new javax.swing.JPanel();
+        jButtonResetColumns = new javax.swing.JButton();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -167,6 +169,15 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jPanelLayout.add(jPanelModelImage);
         jPanelLayout.add(jPanelCommonPreferencesView);
 
+        jPanelResultsTablePreferences.setBorder(javax.swing.BorderFactory.createTitledBorder("Results Table"));
+        jPanelResultsTablePreferences.setLayout(new java.awt.GridBagLayout());
+
+        jButtonResetColumns.setText("Reset Columns to default");
+        jPanelResultsTablePreferences.add(jButtonResetColumns, new java.awt.GridBagConstraints());
+
+        jPanelLayout.add(jPanelResultsTablePreferences);
+        jPanelResultsTablePreferences.getAccessibleContext().setAccessibleName("Results Table");
+
         jScrollPane.setViewportView(jPanelLayout);
 
         add(jScrollPane);
@@ -200,6 +211,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
     }//GEN-LAST:event_jComboBoxInterpolationActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonResetColumns;
     private javax.swing.JComboBox jComboBoxColorScale;
     private javax.swing.JComboBox jComboBoxInterpolation;
     private javax.swing.JComboBox jComboBoxLUT;
@@ -209,6 +221,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
     private fr.jmmc.jmcs.gui.component.CommonPreferencesView jPanelCommonPreferencesView;
     private javax.swing.JPanel jPanelLayout;
     private javax.swing.JPanel jPanelModelImage;
+    private javax.swing.JPanel jPanelResultsTablePreferences;
     private javax.swing.JScrollPane jScrollPane;
     // End of variables declaration//GEN-END:variables
 

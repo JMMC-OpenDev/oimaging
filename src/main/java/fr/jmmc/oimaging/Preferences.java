@@ -7,6 +7,7 @@ import fr.jmmc.jmal.image.ColorModels;
 import fr.jmmc.jmal.image.ColorScale;
 import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     /** prefix for visible results columns */
     public static final String RESULTS_COLUMNS_VISIBLE = "results.columns.visible";
     /** Default results columns order list, as of default */
-    private static final String COLUMNS_DEFAULT = ""; // TODO: define interesting sets of columns
+    public static final List<String> COLUMNS_DEFAULT = Arrays.asList("INDEX", "TARGET");
 
     /**
      * Private constructor that must be empty.
@@ -108,5 +109,10 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     public void setResultsVisibleColumns(final List<String> visibleColumns) {
         logger.debug("setResultsVisibleColumns: [{}]", visibleColumns);
         setPreferenceAndSaveToFile(RESULTS_COLUMNS_VISIBLE, visibleColumns);
+    }
+
+    public void resetColumnsToDefault() {
+        resetToDefaultOnePreference(RESULTS_COLUMNS_ALL);
+        resetToDefaultOnePreference(RESULTS_COLUMNS_VISIBLE);
     }
 }
