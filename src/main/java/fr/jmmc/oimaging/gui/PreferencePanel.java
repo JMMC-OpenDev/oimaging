@@ -173,10 +173,14 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jPanelResultsTablePreferences.setLayout(new java.awt.GridBagLayout());
 
         jButtonResetColumns.setText("Reset Columns to default");
+        jButtonResetColumns.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResetColumnsActionPerformed(evt);
+            }
+        });
         jPanelResultsTablePreferences.add(jButtonResetColumns, new java.awt.GridBagConstraints());
 
         jPanelLayout.add(jPanelResultsTablePreferences);
-        jPanelResultsTablePreferences.getAccessibleContext().setAccessibleName("Results Table");
 
         jScrollPane.setViewportView(jPanelLayout);
 
@@ -209,6 +213,14 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
             logger.error("property failure : ", pe);
         }
     }//GEN-LAST:event_jComboBoxInterpolationActionPerformed
+
+    private void jButtonResetColumnsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetColumnsActionPerformed
+        try {
+            this.myPreferences.resetColumnsToDefault();
+        } catch (PreferencesException pe) {
+            logger.error("property failure: ", pe);
+        }
+    }//GEN-LAST:event_jButtonResetColumnsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonResetColumns;
