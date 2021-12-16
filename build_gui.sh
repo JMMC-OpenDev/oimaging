@@ -30,8 +30,9 @@ echo "Build Dependencies: done."
 
 # 2. build module:
 cd $DIR
-mvn process-resources
-mvn $MVN_OPTS clean install
+# note: use insecure https as restlet https certificates are out-dated!
+mvn -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true process-resources
+mvn -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true $MVN_OPTS clean install
 
 echo "Build: done."
 
