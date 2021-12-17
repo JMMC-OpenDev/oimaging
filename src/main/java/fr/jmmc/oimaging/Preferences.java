@@ -110,9 +110,4 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         logger.debug("setResultsVisibleColumns: [{}]", visibleColumns);
         setPreferenceAndSaveToFile(RESULTS_COLUMNS_VISIBLE, visibleColumns);
     }
-
-    public void resetColumnsToDefault() throws PreferencesException {
-        resetToDefaultOnePreference(RESULTS_COLUMNS_ALL);
-        resetToDefaultOnePreference(RESULTS_COLUMNS_VISIBLE);
-    }
 }

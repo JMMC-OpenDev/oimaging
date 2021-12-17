@@ -172,20 +172,35 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
      * Display the table keywords editor and set the new headers
      */
     private void jButtonShowTableEditorActionPerformed(java.awt.event.ActionEvent evt) {
+        final List<String> prevAllColumns = getTableModel().getColumnNames();
         final List<String> prevVisibleColumns = resultSetTableSorter.getVisibleColumnNames();
 
+        final List<String> newAllColumns = new ArrayList<>();
+        final List<String> newVisibleColumns = new ArrayList<>();
+        
         // show the table editor dialog to select visible columns:
-        final List<String> newVisibleColumns = TableEditorPanel.showEditor(
-                getTableModel().getColumnNames(),
+        TableEditorPanel.showEditor(
+                prevAllColumns,
                 prevVisibleColumns,
+                Preferences.COLUMNS_DEFAULT,
+                newAllColumns,
+                newVisibleColumns,
                 TABLE_EDITOR_DIMENSION_KEY
         );
 
-        if (newVisibleColumns != null) {
+        // we set visibleColumns before allColumns,
+        // in case some columns have been removed (from both),
+        // to ensure the invariant that visibleColumns is a subset of allColumns
+        if (!newVisibleColumns.equals(prevVisibleColumns)) {
             // Update visible columns if needed:
             if (!prevVisibleColumns.equals(newVisibleColumns)) {
                 setVisibleColumnNames(newVisibleColumns);
             }
+        }
+        if (!newAllColumns.equals(prevAllColumns)) {
+            List<String> updatedNewAllColumns = getTableModel().updateAllColumnsNames(newAllColumns);
+            // updateAllColumnsNames may have added more columns to newAllColumns
+            updateAllColumnsPreferences(updatedNewAllColumns);
         }
     }
 
@@ -212,7 +227,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
 
         AutofitTableColumns.autoResizeTable(jResultSetTable, true, true); // include header width
     }
-
+    
     public void setResults(List<ServiceResult> results) {
         final List<String> prevAllColumns = myPreferences.getResultsAllColumns();
         getTableModel().setResults(results, prevAllColumns);

@@ -106,6 +106,20 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         fireTableStructureChanged();
         fireTableDataChanged();
     }
+    
+    /** update allColumns, keep the same results.
+     * This function is used to purge the columns that are not used anywhere,
+     * not in the results, not hardcoded.
+     * @param allColumnsNames the new columns to use.
+     * @return setResults will add the columns from the results, and some hardcoded columns,
+     * so we return the new complete list of columns.
+     */
+    public List<String> updateAllColumnsNames (List<String> allColumnsNames) {
+        final List<ServiceResult> resultsCopy = new ArrayList<>(this.results.size());
+        resultsCopy.addAll(this.results);
+        setResults(resultsCopy, allColumnsNames);
+        return getColumnNames();
+    }
 
     public ServiceResult getServiceResult(final int rowIndex) {
         return this.results.get(rowIndex);
