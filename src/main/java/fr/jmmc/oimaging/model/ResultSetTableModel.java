@@ -37,6 +37,11 @@ public class ResultSetTableModel extends ColumnDescTableModel {
     public static final int HARD_CODED = 0;
     public static final int OUTPUT_PARAM = 1;
     public static final int INPUT_PARAM = 2;
+    /** source for columns that are not part of the results or hardcoded.
+     *  they come from the "all known" column list.
+     *  It also means they have no data in the current result table.
+     */
+    public static final int ALL_KNOWN = 3; 
 
     /* members */
     /** results (another list copy) */
@@ -87,7 +92,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         // 5. we add missing columns (from all known columns) to the set
         for (String columnName : allColumnNames) {
             if (!columnDescMap.containsKey(columnName)) {
-                columnDescMap.put(columnName, new ColumnDesc(columnName, Object.class));
+                columnDescMap.put(columnName, new ColumnDesc(columnName, Object.class, ALL_KNOWN));
             }
         }
 

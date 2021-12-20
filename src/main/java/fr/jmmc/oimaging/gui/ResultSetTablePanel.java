@@ -175,6 +175,36 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
         final List<String> prevAllColumns = getTableModel().getColumnNames();
         final List<String> prevVisibleColumns = resultSetTableSorter.getVisibleColumnNames();
 
+        // defaultAllColumns is the same list as prevAllColumns, 
+        // but all columns with ALL_KNOWN source are removed,
+        // these are the columns with no data in results list.
+        // defaultVisibleColumns is the same list as prevVisibleColumns, 
+        // but all columns with ALL_KNOWN source are removed,
+        // and all columns from Preferences.COLUMNS_DEFAULT are added (without duplicate).
+        
+        final List<String> defaultAllColumns = new ArrayList<>(prevAllColumns.size());
+        defaultAllColumns.addAll(prevAllColumns);
+        
+        final List<String> defaultVisibleColumns = new ArrayList<>(prevVisibleColumns.size());
+        defaultVisibleColumns.addAll(prevVisibleColumns);
+        
+        // removing ALL_KNOWN columns that are not part of COLUMNS_DEFAULT
+        resultSetTableModel.getColumnDescList().forEach(columnDesc -> { 
+            final String colName = columnDesc.getName();
+            if ((columnDesc.getSource() == ResultSetTableModel.ALL_KNOWN)
+              && (!Preferences.COLUMNS_DEFAULT.contains(colName))) {
+                defaultAllColumns.remove(colName);
+                defaultVisibleColumns.remove(colName);
+            }
+        });
+        
+        // adding missing COLUMNS_DEFAULT columns
+        Preferences.COLUMNS_DEFAULT.forEach(colName -> {
+            if ((!defaultVisibleColumns.contains(colName)) && (!defaultAllColumns.contains(colName))) {
+                defaultVisibleColumns.add(colName);
+            }
+        });
+        
         final List<String> newAllColumns = new ArrayList<>();
         final List<String> newVisibleColumns = new ArrayList<>();
         
@@ -182,7 +212,8 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
         TableEditorPanel.showEditor(
                 prevAllColumns,
                 prevVisibleColumns,
-                Preferences.COLUMNS_DEFAULT,
+                defaultAllColumns,
+                defaultVisibleColumns,
                 newAllColumns,
                 newVisibleColumns,
                 TABLE_EDITOR_DIMENSION_KEY
