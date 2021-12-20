@@ -27,7 +27,10 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     /** prefix for visible results columns */
     public static final String RESULTS_COLUMNS_VISIBLE = "results.columns.visible";
     /** Default results columns order list, as of default */
-    public static final List<String> COLUMNS_DEFAULT = Arrays.asList("INDEX", "TARGET");
+    public static final List<String> COLUMNS_DEFAULT = 
+            Arrays.asList(
+                    "INDEX", "TARGET", "SOFTWARE", "INIT_IMG", "RGL_NAME", "RGL_WGT",
+                    "NITER", "CHIQ", "SUCCESS", "RATING", "USERNOTE", "FOV", "FILE");
 
     /**
      * Private constructor that must be empty.
