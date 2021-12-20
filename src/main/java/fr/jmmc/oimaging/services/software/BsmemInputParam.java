@@ -30,6 +30,10 @@ public final class BsmemInputParam extends SoftwareInputParam {
             ImageOiConstants.KEYWORD_RGL_PRIO
     ));
 
+    // deprecated keywords:
+    private final static String KEYWORD_RGL_ALPH = "RGL_ALPH";
+    private final static String KEYWORD_RGL_BETA = "RGL_BETA";
+
     public static final String[] RGL_NAME_BSMEM = new String[]{"mem_prior"};
 
     BsmemInputParam() {
@@ -58,6 +62,10 @@ public final class BsmemInputParam extends SoftwareInputParam {
     @Override
     public void validate(final ImageOiInputParam params, final List<String> failures) {
         super.validate(params, failures);
+
+        // remove deprecated keywords (2021.11):
+        params.removeFirstHeaderCard(KEYWORD_RGL_ALPH);
+        params.removeFirstHeaderCard(KEYWORD_RGL_BETA);
 
         // custom validation rules:
     }

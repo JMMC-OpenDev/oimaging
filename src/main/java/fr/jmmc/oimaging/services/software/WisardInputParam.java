@@ -32,6 +32,12 @@ public final class WisardInputParam extends SoftwareInputParam {
             ImageOiConstants.KEYWORD_RGL_PRIO
     ));
 
+    // deprecated keywords:
+    private static final String KEYWORD_FOV = "FOV";
+    private static final String KEYWORD_NP_MIN = "NP_MIN";
+    private static final String KEYWORD_THRESHOLD = "THRESHOL";
+    private static final String KEYWORD_SCALE = "SCALE";    
+    
     // optional
     public static final String KEYWORD_DELTA = "DELTA";
 
@@ -58,7 +64,7 @@ public final class WisardInputParam extends SoftwareInputParam {
 
         if (params.getRglName().equals(RLG_NAME_WISARD_L1L2WHITE)) {
             params.addKeyword(DELTA);
-            params.setKeywordDefaultDouble(KEYWORD_DELTA, 1);
+            params.setKeywordDefaultDouble(KEYWORD_DELTA, 1.0);
 
             // we don't need rgl prio when rgl name is L1L2WHITE
             rglPrioNeeded = false;
@@ -85,6 +91,13 @@ public final class WisardInputParam extends SoftwareInputParam {
     @Override
     public void validate(final ImageOiInputParam params, final List<String> failures) {
         super.validate(params, failures);
+
+        // remove deprecated keywords (2021.11):
+        params.removeFirstHeaderCard(KEYWORD_FOV);
+        params.removeFirstHeaderCard(KEYWORD_NP_MIN);
+        params.removeFirstHeaderCard(KEYWORD_THRESHOLD);
+        params.removeFirstHeaderCard(KEYWORD_SCALE);
+        
         // custom validation rules:
     }
 
