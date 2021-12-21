@@ -37,16 +37,12 @@ public class ResultSetTableModel extends ColumnDescTableModel {
     public static final int HARD_CODED = 0;
     public static final int OUTPUT_PARAM = 1;
     public static final int INPUT_PARAM = 2;
-    /** source for columns that are not part of the results or hardcoded.
-     *  they come from the "all known" column list.
-     *  It also means they have no data in the current result table.
-     */
-    public static final int ALL_KNOWN = 3; 
 
     /* members */
     /** results (another list copy) */
     private final List<ServiceResult> results;
 
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public ResultSetTableModel() {
         super();
         results = new ArrayList<>();
@@ -92,7 +88,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         // 5. we add missing columns (from all known columns) to the set
         for (String columnName : allColumnNames) {
             if (!columnDescMap.containsKey(columnName)) {
-                columnDescMap.put(columnName, new ColumnDesc(columnName, Object.class, ALL_KNOWN));
+                columnDescMap.put(columnName, new ColumnDesc(columnName, Object.class));
             }
         }
 
@@ -111,19 +107,27 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         fireTableStructureChanged();
         fireTableDataChanged();
     }
-    
-    /** update allColumns, keep the same results.
+
+    /** 
+     * Update allColumns, keep the same results.
      * This function is used to purge the columns that are not used anywhere,
      * not in the results, not hardcoded.
      * @param allColumnsNames the new columns to use.
      * @return setResults will add the columns from the results, and some hardcoded columns,
      * so we return the new complete list of columns.
      */
-    public List<String> updateAllColumnsNames (List<String> allColumnsNames) {
+    public List<String> updateAllColumnsNames(List<String> allColumnsNames) {
+        setResults(getServiceResults(), allColumnsNames);
+        return getColumnNames();
+    }
+
+    /**
+     * @return copy of the result list to allow reentrance in setResults()
+     */
+    public List<ServiceResult> getServiceResults() {
         final List<ServiceResult> resultsCopy = new ArrayList<>(this.results.size());
         resultsCopy.addAll(this.results);
-        setResults(resultsCopy, allColumnsNames);
-        return getColumnNames();
+        return resultsCopy;
     }
 
     public ServiceResult getServiceResult(final int rowIndex) {
@@ -136,6 +140,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
     }
 
     @Override
+    @SuppressWarnings("fallthrough")
     public Object getValueAt(int rowIndex, int columnIndex) {
         final ServiceResult result = getServiceResult(rowIndex);
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
@@ -297,19 +302,26 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         return null;
     }
 
+    // hard-coded column names:
+    public final static String COLUMN_FILE = "FILE";
+    public final static String COLUMN_INDEX = "INDEX";
+    public final static String COLUMN_JOB_DURATION = "JOB_DURATION";
+    public final static String COLUMN_SUCCESS = "SUCCESS";
+
     /**
      * Enum for HardCoded Columns wrapping ColumnDesc
      */
+    @SuppressWarnings("PublicInnerClass")
     public enum HardCodedColumn {
-        FILE(String.class, "File"),
-        INDEX(Integer.class, "Index"),
-        JOB_DURATION(Double.class, "Job duration"),
-        SUCCESS(Boolean.class, "Success");
+        FILE(COLUMN_FILE, String.class, "File"),
+        INDEX(COLUMN_INDEX, Integer.class, "Index"),
+        JOB_DURATION(COLUMN_JOB_DURATION, Double.class, "Job duration"),
+        SUCCESS(COLUMN_SUCCESS, Boolean.class, "Success");
 
         private final ColumnDesc columnDesc;
 
-        private HardCodedColumn(Class<?> dataClass, String label) {
-            this.columnDesc = new ColumnDesc(name(), dataClass, HARD_CODED, label);
+        private HardCodedColumn(final String name, final Class<?> dataClass, final String label) {
+            this.columnDesc = new ColumnDesc(name, dataClass, HARD_CODED, label);
         }
 
         public ColumnDesc getColumnDesc() {

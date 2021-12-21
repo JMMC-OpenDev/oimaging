@@ -7,6 +7,7 @@ import fr.jmmc.jmal.image.ColorModels;
 import fr.jmmc.jmal.image.ColorScale;
 import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
@@ -26,11 +27,15 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     public static final String RESULTS_COLUMNS_ALL = "results.columns.all";
     /** prefix for visible results columns */
     public static final String RESULTS_COLUMNS_VISIBLE = "results.columns.visible";
-    /** Default results columns order list, as of default */
-    public static final List<String> COLUMNS_DEFAULT = 
-            Arrays.asList(
-                    "INDEX", "TARGET", "SOFTWARE", "INIT_IMG", "RGL_NAME", "RGL_WGT",
-                    "NITER", "CHIQ", "SUCCESS", "RATING", "USERNOTE", "FOV", "FILE");
+
+    /* following names are raw string values, not constants (may be deprecated or unknown values) */
+    public static final List<String> COLUMNS_DEFAULT_ALL = generateAllColumns();
+
+    /** Visible results columns order list, as of default */
+    public static final List<String> COLUMNS_DEFAULT_VISIBLE = Arrays.asList(
+            "INDEX", "TARGET", "SOFTWARE", "INIT_IMG", "RGL_NAME", "RGL_WGT",
+            "NITER", "CHIQ", "SUCCESS", "RATING", "USERNOTE", "FOV", "FILE"
+    );
 
     /**
      * Private constructor that must be empty.
@@ -82,8 +87,8 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         // Disable interpolation:
         setDefaultPreference(MODEL_IMAGE_INTERPOLATION, ImageInterpolation.None.toString());
 
-        setDefaultPreference(RESULTS_COLUMNS_ALL, COLUMNS_DEFAULT);
-        setDefaultPreference(RESULTS_COLUMNS_VISIBLE, COLUMNS_DEFAULT);
+        setDefaultPreference(RESULTS_COLUMNS_ALL, COLUMNS_DEFAULT_ALL);
+        setDefaultPreference(RESULTS_COLUMNS_VISIBLE, COLUMNS_DEFAULT_VISIBLE);
     }
 
     @Override
@@ -112,5 +117,35 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     public void setResultsVisibleColumns(final List<String> visibleColumns) {
         logger.debug("setResultsVisibleColumns: [{}]", visibleColumns);
         setPreferenceAndSaveToFile(RESULTS_COLUMNS_VISIBLE, visibleColumns);
+    }
+
+    private static List<String> generateAllColumns() {
+        // All results columns order list, as of default (collected by FEST OImagingDocJUnitTest @ 2021.12.21)
+        final List<String> COLUMNS_ALL = Arrays.asList(
+                "FILE", "INDEX", "JOB_DURATION", "SUCCESS", "CHISQ", "DELTA",
+                "FLUX", "FLUXERR", "FOV", "JOBEND", "JOBSTART", "LAST_IMG",
+                "MAXITER", "NITER", "NP_MIN", "RATING", "RGL_NAME", "RGL_WGT",
+                "SOFTWARE", "TARGET", "USERNOTE", "VERSION", "WAVE_MAX", "WAVE_MIN",
+                "AUTO_WGT", "INIT_IMG", "RGL_ALPH", "RGL_BETA", "RGL_PRIO", "SCALE",
+                "THRESHOL", "USE_T3", "USE_VIS", "USE_VIS2", "ENTROPY", "FPRIOR",
+                "INITFLUX", "NDATA", "NEVAL", "PLUGIN", "PXL_MIN", "RECENTER", "REPEAT", "RGL_GAMM", "RGL_TAU",
+                "SMEAR_FC", "SMEAR_FN", "T3AMPA",
+                "T3AMPB", "T3PHIA", "T3PHIB", "UV_MAX", "V2A", "V2B", "XFORM"
+        );
+
+        /* sparco specific (dynamic keywords) */
+        final List<String> COLUMNS_SPARCO = Arrays.asList(
+                "SDEX", "SDEY", "SFLU", "SIDX", "SMOD", "SPEC", "SWAVE"
+        );
+
+        final List<String> allColumns = new ArrayList<>(COLUMNS_ALL);
+
+        for (int i = 0; i <= 5; i++) {
+            for (String prefix : COLUMNS_SPARCO) {
+                allColumns.add(prefix + i);
+            }
+        }
+        logger.debug("generateAllColumns: {}", allColumns);
+        return allColumns;
     }
 }
