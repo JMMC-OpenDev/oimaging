@@ -874,4 +874,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private static String getTooltip(final String name) {
         return ImageOiInputParam.getDescription(name);
     }
+
+    /**
+     * @return the jTablePanel
+     */
+    public ResultSetTablePanel getResultSetTablePanel() {
+        return jTablePanel;
+    }
 }

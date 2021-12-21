@@ -21,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -41,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author martin
  */
-public final class ResultSetTablePanel extends javax.swing.JPanel implements BasicTableColumnMovedListener, ListSelectionListener {
+public final class ResultSetTablePanel extends javax.swing.JPanel implements Observer, BasicTableColumnMovedListener, ListSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -65,6 +67,8 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
     private final Preferences myPreferences = Preferences.getInstance();
     /** previous selected result */
     private ServiceResult prevSelectedResult = null;
+    /** flag to enable / disable the automatic preference listener to avoid reentrance */
+    private boolean doListenPrefs = true;
 
     /**
      * Creates new form TablePanel
@@ -111,8 +115,11 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
         jResultSetTable.setDefaultRenderer(Double.class, customCellRenderer);
         jResultSetTable.setDefaultRenderer(Date.class, customCellRenderer);
 
-        // load user preference for columns:
+        // set user preference for columns:
         resultSetTableSorter.setVisibleColumnNames(myPreferences.getResultsVisibleColumns());
+
+        // register this instance as a Preference Observer :
+        this.myPreferences.addObserver(this);
 
         // Decorate scrollpane corner:
         final JButton cornerButton = new JButton();
@@ -125,6 +132,24 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
         jScrollPaneTable.setCorner(JScrollPane.LOWER_RIGHT_CORNER, cornerButton);
 
         jResultSetTable.getSelectionModel().addListSelectionListener(this);
+    }
+
+    /**
+     * Listen to preferences changes
+     * @param o Preferences
+     * @param arg unused
+     */
+    @Override
+    public void update(final Observable o, final Object arg) {
+        if (this.doListenPrefs) {
+            logger.warn("Preferences updated:");
+            // set user preference for columns:
+            resultSetTableSorter.setVisibleColumnNames(myPreferences.getResultsVisibleColumns());
+
+            setResults(getTableModel().getServiceResults());
+        } else {
+            logger.warn("Preferences update ignored.");
+        }
     }
 
     /**
@@ -172,20 +197,41 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
      * Display the table keywords editor and set the new headers
      */
     private void jButtonShowTableEditorActionPerformed(java.awt.event.ActionEvent evt) {
+        final List<String> prevAllColumns = getTableModel().getColumnNames();
         final List<String> prevVisibleColumns = resultSetTableSorter.getVisibleColumnNames();
 
+        final List<String> newAllColumns = new ArrayList<>();
+        final List<String> newVisibleColumns = new ArrayList<>();
+
         // show the table editor dialog to select visible columns:
-        final List<String> newVisibleColumns = TableEditorPanel.showEditor(
-                getTableModel().getColumnNames(),
+        TableEditorPanel.showEditor(
+                prevAllColumns,
                 prevVisibleColumns,
+                Preferences.COLUMNS_DEFAULT_ALL,
+                Preferences.COLUMNS_DEFAULT_VISIBLE,
+                newAllColumns,
+                newVisibleColumns,
                 TABLE_EDITOR_DIMENSION_KEY
         );
 
-        if (newVisibleColumns != null) {
-            // Update visible columns if needed:
-            if (!prevVisibleColumns.equals(newVisibleColumns)) {
+        // disable the preference listener:
+        this.doListenPrefs = false;
+        try {
+            // we set visibleColumns before allColumns,
+            // in case some columns have been removed (from both),
+            // to ensure the invariant that visibleColumns is a subset of allColumns
+            if (!newVisibleColumns.equals(prevVisibleColumns)) {
+                // Update visible columns if needed:
                 setVisibleColumnNames(newVisibleColumns);
             }
+            if (!newAllColumns.equals(prevAllColumns)) {
+                final List<String> updatedNewAllColumns = getTableModel().updateAllColumnsNames(newAllColumns);
+                // updateAllColumnsNames may have added more columns to newAllColumns
+                updateAllColumnsPreferences(updatedNewAllColumns);
+            }
+        } finally {
+            // restore the preference listener:
+            this.doListenPrefs = true;
         }
     }
 
@@ -219,23 +265,38 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Bas
 
         // Update all columns if needed:
         final List<String> newAllColumns = getTableModel().getColumnNames();
-        if (!prevAllColumns.equals(newAllColumns)) {
-            updateAllColumnsPreferences(newAllColumns);
-            // show new columns:
-            prevAllColumns.forEach(newAllColumns::remove);
-            logger.debug("setResults: new columns : {}", newAllColumns);
 
-            // make list copy (can be unmodifiable)
-            final List<String> newVisibleColumns = new ArrayList<String>(resultSetTableSorter.getVisibleColumnNames());
-            newAllColumns.forEach(newVisibleColumns::add);
-            setVisibleColumnNames(newVisibleColumns);
+        if (!prevAllColumns.equals(newAllColumns)) {
+            // disable the preference listener:
+            this.doListenPrefs = false;
+            try {
+                updateAllColumnsPreferences(newAllColumns);
+                // show new columns:
+                prevAllColumns.forEach(newAllColumns::remove);
+                logger.debug("setResults: new columns : {}", newAllColumns);
+
+                // make list copy (can be unmodifiable)
+                final List<String> newVisibleColumns = new ArrayList<String>(resultSetTableSorter.getVisibleColumnNames());
+                newAllColumns.forEach(newVisibleColumns::add);
+                setVisibleColumnNames(newVisibleColumns);
+            } finally {
+                // restore the preference listener:
+                this.doListenPrefs = true;
+            }
         }
     }
 
     @Override
     public void tableColumnMoved(BasicTableSorter source) {
-        // save preference after resultSetTableSorter updated:
-        updateVisibleColumnsPreferences();
+        // disable the preference listener:
+        this.doListenPrefs = false;
+        try {
+            // save preference after resultSetTableSorter updated:
+            updateVisibleColumnsPreferences();
+        } finally {
+            // restore the preference listener:
+            this.doListenPrefs = true;
+        }
     }
 
     /**

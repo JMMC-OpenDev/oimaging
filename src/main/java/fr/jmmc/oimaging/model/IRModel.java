@@ -170,7 +170,7 @@ public final class IRModel {
      *
      * @param oifitsFile oifits file to load
      */
-    protected void loadOifitsFile(final OIFitsFile oifitsFile) {
+    void loadOifitsFile(final OIFitsFile oifitsFile) {
         logger.info("loadOifitsFile: oifitsFile: {}", oifitsFile);
 
         // reset oidata and put some user data into the new containers
@@ -274,7 +274,7 @@ public final class IRModel {
      * Each added HDU get HDUNAME set with original fits filename with suffixe # and extension index.
      * @param fitsImageFile fitsImageFile to load for fitsImageHDU discover
      */
-    protected void addFitsImageFile(final FitsImageFile fitsImageFile) {
+    void addFitsImageFile(final FitsImageFile fitsImageFile) {
         final List<FitsImageHDU> hdus = fitsImageFile.getFitsImageHDUs();
         if (!hdus.isEmpty()) {
             // load all FitsImageHDUs:

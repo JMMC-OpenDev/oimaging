@@ -42,6 +42,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
     /** results (another list copy) */
     private final List<ServiceResult> results;
 
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public ResultSetTableModel() {
         super();
         results = new ArrayList<>();
@@ -107,6 +108,28 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         fireTableDataChanged();
     }
 
+    /** 
+     * Update allColumns, keep the same results.
+     * This function is used to purge the columns that are not used anywhere,
+     * not in the results, not hardcoded.
+     * @param allColumnsNames the new columns to use.
+     * @return setResults will add the columns from the results, and some hardcoded columns,
+     * so we return the new complete list of columns.
+     */
+    public List<String> updateAllColumnsNames(List<String> allColumnsNames) {
+        setResults(getServiceResults(), allColumnsNames);
+        return getColumnNames();
+    }
+
+    /**
+     * @return copy of the result list to allow reentrance in setResults()
+     */
+    public List<ServiceResult> getServiceResults() {
+        final List<ServiceResult> resultsCopy = new ArrayList<>(this.results.size());
+        resultsCopy.addAll(this.results);
+        return resultsCopy;
+    }
+
     public ServiceResult getServiceResult(final int rowIndex) {
         return this.results.get(rowIndex);
     }
@@ -117,6 +140,7 @@ public class ResultSetTableModel extends ColumnDescTableModel {
     }
 
     @Override
+    @SuppressWarnings("fallthrough")
     public Object getValueAt(int rowIndex, int columnIndex) {
         final ServiceResult result = getServiceResult(rowIndex);
         final ColumnDesc columnDesc = getColumnDesc(columnIndex);
@@ -278,19 +302,26 @@ public class ResultSetTableModel extends ColumnDescTableModel {
         return null;
     }
 
+    // hard-coded column names:
+    public final static String COLUMN_FILE = "FILE";
+    public final static String COLUMN_INDEX = "INDEX";
+    public final static String COLUMN_JOB_DURATION = "JOB_DURATION";
+    public final static String COLUMN_SUCCESS = "SUCCESS";
+
     /**
      * Enum for HardCoded Columns wrapping ColumnDesc
      */
+    @SuppressWarnings("PublicInnerClass")
     public enum HardCodedColumn {
-        FILE(String.class, "File"),
-        INDEX(Integer.class, "Index"),
-        JOB_DURATION(Double.class, "Job duration"),
-        SUCCESS(Boolean.class, "Success");
+        FILE(COLUMN_FILE, String.class, "File"),
+        INDEX(COLUMN_INDEX, Integer.class, "Index"),
+        JOB_DURATION(COLUMN_JOB_DURATION, Double.class, "Job duration"),
+        SUCCESS(COLUMN_SUCCESS, Boolean.class, "Success");
 
         private final ColumnDesc columnDesc;
 
-        private HardCodedColumn(Class<?> dataClass, String label) {
-            this.columnDesc = new ColumnDesc(name(), dataClass, HARD_CODED, label);
+        private HardCodedColumn(final String name, final Class<?> dataClass, final String label) {
+            this.columnDesc = new ColumnDesc(name, dataClass, HARD_CODED, label);
         }
 
         public ColumnDesc getColumnDesc() {
