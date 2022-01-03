@@ -3,7 +3,6 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.gui.action;
 
-import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.oimaging.OImaging;
 import java.awt.event.ActionEvent;
@@ -31,10 +30,6 @@ public final class TableEditorAction extends RegisteredAction {
      * Class logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(CLASS_NAME);
-    /**
-     * OIFits MimeType
-     */
-    private final static MimeType MIME_TYPE = MimeType.OIFITS;
 
     /**
      * Public constructor that automatically register the action in RegisteredAction.

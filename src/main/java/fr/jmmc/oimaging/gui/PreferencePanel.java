@@ -95,7 +95,8 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jLabelInterpolation = new javax.swing.JLabel();
         jComboBoxInterpolation = new javax.swing.JComboBox();
         jPanelTableOfResults = new javax.swing.JPanel();
-        jButtonTableEditor = new javax.swing.JButton();
+        jLabelResultsTableEditor = new javax.swing.JLabel();
+        jButtonResultsTableEditor = new javax.swing.JButton();
         jPanelCommonPreferencesView = new fr.jmmc.jmcs.gui.component.CommonPreferencesView();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
@@ -170,12 +171,24 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
 
         jPanelLayout.add(jPanelModelImage);
 
-        jPanelTableOfResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Table of Results"));
+        jPanelTableOfResults.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
         jPanelTableOfResults.setLayout(new java.awt.GridBagLayout());
 
-        jButtonTableEditor.setAction(ActionRegistrar.getInstance().get(TableEditorAction.CLASS_NAME, TableEditorAction.ACTION_NAME));
-        jButtonTableEditor.setText("Table Editor");
-        jPanelTableOfResults.add(jButtonTableEditor, new java.awt.GridBagConstraints());
+        jLabelResultsTableEditor.setText("Results table:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        jPanelTableOfResults.add(jLabelResultsTableEditor, gridBagConstraints);
+
+        jButtonResultsTableEditor.setAction(ActionRegistrar.getInstance().get(TableEditorAction.CLASS_NAME, TableEditorAction.ACTION_NAME));
+        jButtonResultsTableEditor.setText("Table editor");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.5;
+        jPanelTableOfResults.add(jButtonResultsTableEditor, gridBagConstraints);
 
         jPanelLayout.add(jPanelTableOfResults);
         jPanelLayout.add(jPanelCommonPreferencesView);
@@ -213,13 +226,14 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
     }//GEN-LAST:event_jComboBoxInterpolationActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonTableEditor;
+    private javax.swing.JButton jButtonResultsTableEditor;
     private javax.swing.JComboBox jComboBoxColorScale;
     private javax.swing.JComboBox jComboBoxInterpolation;
     private javax.swing.JComboBox jComboBoxLUT;
     private javax.swing.JLabel jLabelColorScale;
     private javax.swing.JLabel jLabelInterpolation;
     private javax.swing.JLabel jLabelLutTable;
+    private javax.swing.JLabel jLabelResultsTableEditor;
     private fr.jmmc.jmcs.gui.component.CommonPreferencesView jPanelCommonPreferencesView;
     private javax.swing.JPanel jPanelLayout;
     private javax.swing.JPanel jPanelModelImage;
