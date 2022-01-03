@@ -7,8 +7,10 @@ import fr.jmmc.jmal.image.ColorModels;
 import fr.jmmc.jmal.image.ColorScale;
 import fr.jmmc.jmal.image.ImageUtils.ImageInterpolation;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.oiexplorer.core.gui.IconComboBoxRenderer;
 import fr.jmmc.oimaging.Preferences;
+import fr.jmmc.oimaging.gui.action.TableEditorAction;
 import java.awt.Image;
 import java.util.Observable;
 import java.util.Observer;
@@ -92,6 +94,8 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jComboBoxColorScale = new javax.swing.JComboBox();
         jLabelInterpolation = new javax.swing.JLabel();
         jComboBoxInterpolation = new javax.swing.JComboBox();
+        jPanelTableOfResults = new javax.swing.JPanel();
+        jButtonTableEditor = new javax.swing.JButton();
         jPanelCommonPreferencesView = new fr.jmmc.jmcs.gui.component.CommonPreferencesView();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
@@ -165,6 +169,15 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jPanelModelImage.add(jComboBoxInterpolation, gridBagConstraints);
 
         jPanelLayout.add(jPanelModelImage);
+
+        jPanelTableOfResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Table of Results"));
+        jPanelTableOfResults.setLayout(new java.awt.GridBagLayout());
+
+        jButtonTableEditor.setAction(ActionRegistrar.getInstance().get(TableEditorAction.CLASS_NAME, TableEditorAction.ACTION_NAME));
+        jButtonTableEditor.setText("Table Editor");
+        jPanelTableOfResults.add(jButtonTableEditor, new java.awt.GridBagConstraints());
+
+        jPanelLayout.add(jPanelTableOfResults);
         jPanelLayout.add(jPanelCommonPreferencesView);
 
         jScrollPane.setViewportView(jPanelLayout);
@@ -200,6 +213,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
     }//GEN-LAST:event_jComboBoxInterpolationActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonTableEditor;
     private javax.swing.JComboBox jComboBoxColorScale;
     private javax.swing.JComboBox jComboBoxInterpolation;
     private javax.swing.JComboBox jComboBoxLUT;
@@ -209,6 +223,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
     private fr.jmmc.jmcs.gui.component.CommonPreferencesView jPanelCommonPreferencesView;
     private javax.swing.JPanel jPanelLayout;
     private javax.swing.JPanel jPanelModelImage;
+    private javax.swing.JPanel jPanelTableOfResults;
     private javax.swing.JScrollPane jScrollPane;
     // End of variables declaration//GEN-END:variables
 
