@@ -185,6 +185,9 @@ public final class IRModel {
         // change current model immediately:
         this.oifitsFile = oifitsFile;
 
+        // cleaning all output params as they are meaningless in the input form
+        this.oifitsFile.getImageOiData().getOutputParam().resetFitsHDU();
+
         // load targets
         this.targetListModel.clear();
 
