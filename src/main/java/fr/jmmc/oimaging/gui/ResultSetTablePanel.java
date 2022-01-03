@@ -3,6 +3,7 @@
  ***************************************************************************** */
 package fr.jmmc.oimaging.gui;
 
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.BasicTableColumnMovedListener;
 import fr.jmmc.jmcs.gui.component.BasicTableSorter;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
@@ -10,12 +11,11 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.model.TableEditorPanel;
 import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.oimaging.Preferences;
+import fr.jmmc.oimaging.gui.action.TableEditorAction;
 import static fr.jmmc.oimaging.model.IRModel.KEYWORD_RATING;
 import fr.jmmc.oimaging.model.ResultSetTableModel;
 import fr.jmmc.oimaging.model.RatingCell;
 import fr.jmmc.oimaging.services.ServiceResult;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -123,12 +123,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Obs
 
         // Decorate scrollpane corner:
         final JButton cornerButton = new JButton();
-        cornerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jButtonShowTableEditorActionPerformed(e);
-            }
-        });
+        cornerButton.setAction(ActionRegistrar.getInstance().get(TableEditorAction.CLASS_NAME, TableEditorAction.ACTION_NAME));
         jScrollPaneTable.setCorner(JScrollPane.LOWER_RIGHT_CORNER, cornerButton);
 
         jResultSetTable.getSelectionModel().addListSelectionListener(this);
@@ -180,12 +175,8 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Obs
 
         jPanelTableOptions.setLayout(new javax.swing.BoxLayout(jPanelTableOptions, javax.swing.BoxLayout.PAGE_AXIS));
 
+        jButtonShowTableEditor.setAction(ActionRegistrar.getInstance().get(TableEditorAction.CLASS_NAME, TableEditorAction.ACTION_NAME));
         jButtonShowTableEditor.setText("Table editor");
-        jButtonShowTableEditor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonShowTableEditorActionPerformed(evt);
-            }
-        });
         jPanelTableOptions.add(jButtonShowTableEditor);
 
         jSplitPane1.setLeftComponent(jPanelTableOptions);
@@ -196,7 +187,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Obs
     /**
      * Display the table keywords editor and set the new headers
      */
-    private void jButtonShowTableEditorActionPerformed(java.awt.event.ActionEvent evt) {
+    public void showTableEditor() {
         final List<String> prevAllColumns = getTableModel().getColumnNames();
         final List<String> prevVisibleColumns = resultSetTableSorter.getVisibleColumnNames();
 
