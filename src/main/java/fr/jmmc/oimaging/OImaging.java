@@ -35,6 +35,7 @@ import fr.jmmc.oimaging.gui.action.NewAction;
 import fr.jmmc.oimaging.gui.action.ProcessImageAction;
 import fr.jmmc.oimaging.gui.action.OIFitsBrowserAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.gui.action.TableEditorAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModelManager;
@@ -340,6 +341,9 @@ public final class OImaging extends App {
         new SendOIFitsAction();
         // Send Fits (SAMP) :
         new SendFitsAction();
+
+        // accessible indirectly from the menu by Preferences Panel:
+        new TableEditorAction();
     }
 
     /**

@@ -309,7 +309,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jFormattedTextFieldFluxErr.setColumns(6);
         jFormattedTextFieldFluxErr.setFormatterFactory(getDecimalFormatterFactory());
         jFormattedTextFieldFluxErr.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUXERR));
-        jFormattedTextFieldFluxErr.setEnabled(false);
         jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldFluxErrActionPerformed(evt);
@@ -805,8 +804,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             // flux Err:
             jFormattedTextFieldFluxErr.setValue(inputParam.getFluxErr());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_FLUXERR);
-            jLabelFluxErr.setVisible(false && show); // purposely hidden
-            jFormattedTextFieldFluxErr.setVisible(false && show); // purposely hidden
+            jLabelFluxErr.setVisible(show);
+            jFormattedTextFieldFluxErr.setVisible(show);
 
             // validate
             service.validate(inputParam, failures);
