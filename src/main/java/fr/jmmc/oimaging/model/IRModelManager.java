@@ -321,6 +321,14 @@ public final class IRModelManager {
     }
 
     /**
+     * load the selected result in the input form
+     */
+    public void continueCurrentResult () {
+        irModel.continueCurrentResult();
+        fireIRModelChanged();
+    }
+    
+    /**
      * Return the current model file
      * @return the current model file or null if undefined
      */

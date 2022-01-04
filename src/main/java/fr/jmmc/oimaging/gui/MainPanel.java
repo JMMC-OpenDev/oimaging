@@ -253,7 +253,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jButtonExportOIFits = new javax.swing.JButton();
         jScrollPaneEditor = new javax.swing.JScrollPane();
         jEditorPane = new javax.swing.JEditorPane();
+        jSplitPane1 = new javax.swing.JSplitPane();
         viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
+        toolBarPanel = new fr.jmmc.oimaging.gui.ToolBarPanel();
         jTablePanel = new fr.jmmc.oimaging.gui.ResultSetTablePanel();
 
         jButtonCompare.setText("Compare");
@@ -273,7 +275,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jSplitPane.setMinimumSize(new java.awt.Dimension(900, 600));
 
         jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane.setViewportView(jPanelLeft);
 
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
@@ -512,7 +513,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jScrollPane.setViewportView(jPanelLeft);
 
         jSplitPane.setLeftComponent(jScrollPane);
-        jSplitPane.setRightComponent(viewerPanel);
+
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setRightComponent(viewerPanel);
+        jSplitPane1.setLeftComponent(toolBarPanel);
+
+        jSplitPane.setRightComponent(jSplitPane1);
 
         jSplitPaneGlobal.setTopComponent(jSplitPane);
 
@@ -633,9 +639,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
     private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPaneGlobal;
     private fr.jmmc.oimaging.gui.ResultSetTablePanel jTablePanel;
     private fr.jmmc.oimaging.gui.SoftwareSettingsPanel softwareSettingsPanel;
+    private fr.jmmc.oimaging.gui.ToolBarPanel toolBarPanel;
     private fr.jmmc.oimaging.gui.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
 

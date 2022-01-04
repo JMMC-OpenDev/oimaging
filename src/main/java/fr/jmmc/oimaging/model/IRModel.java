@@ -9,6 +9,7 @@ import fr.jmmc.jmcs.util.DateUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
+import fr.jmmc.oimaging.OImaging;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -22,9 +23,11 @@ import fr.jmmc.oitools.image.ImageOiOutputParam;
 import fr.jmmc.oitools.meta.KeywordMeta;
 import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.meta.Types;
+import fr.jmmc.oitools.model.OIData;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.jmmc.oitools.model.OITable;
 import fr.jmmc.oitools.model.range.Range;
 import fr.nom.tam.fits.FitsDate;
 import fr.nom.tam.fits.FitsException;
@@ -825,6 +828,84 @@ public final class IRModel {
         }
     }
 
+    /**
+     * load the selected result in the input form
+     */
+    public void continueCurrentResult () {
+        
+        ImageOiInputParam inputParams = this.oifitsFile.getImageOiData().getInputParam();
+               
+        ServiceResult serviceResult = OImaging.getInstance().getMainPanel().getResultSetTablePanel().getSelectedRow();
+        OIFitsFile resultOIFitsfile = serviceResult.getOifitsFile();
+        
+        // update targets
+        this.targetListModel.clear();
+        if (resultOIFitsfile.hasOiTarget()) {
+            for (String target : resultOIFitsfile.getOiTarget().getTarget()) {
+                this.targetListModel.add(target);
+                logger.debug("continueCurrentResult: added target {}", target);
+            }
+        }
+        if (this.targetListModel.isEmpty()) {
+            inputParams.setTarget("");
+        }
+        else {
+            inputParams.setTarget(this.targetListModel.get(0));
+        }
+        
+        // update OITables
+        for (OITable oITable : this.oifitsFile.getOiTables()) {
+            if (oITable instanceof OIData) {
+                this.oifitsFile.removeOiTable((OIData) oITable);
+            }
+            else {
+                this.oifitsFile.unregisterOiTable(oITable);
+            }
+        }
+        for (OITable oITable : resultOIFitsfile.getOiTables()) {
+            this.oifitsFile.addOiTable(oITable);
+        }
+        
+        // updating images (init and rgl prior)
+        
+        // getting the library equivalents of images in currentOIFitsfile
+        // every image in a result should already be in the library so we don't check for null values
+        final List<FitsImageHDU> libraryHDUs = new ArrayList<>(resultOIFitsfile.getFitsImageHDUs());
+        libraryHDUs.replaceAll(this::findInImageLibrary);
+        
+        FitsImageHDU initHduEquiv = null;
+        FitsImageHDU rglHduEquiv = null;
+
+        final List<Role> roles = getHdusRoles(resultOIFitsfile);
+        
+        // add only the RESULT and RGL images. Set the input params accordingly.
+        for (int i = 0, end = roles.size(); i < end; i++) {
+            switch (roles.get(i)) {
+                case RESULT:
+                    if (initHduEquiv == null) {
+                        initHduEquiv = libraryHDUs.get(i);
+                    }
+                    break;
+                case RGL:
+                    if (rglHduEquiv == null) {
+                        rglHduEquiv = libraryHDUs.get(i);
+                    }
+                    break;
+                default:
+            }
+        }
+        
+        setSelectedInputImageHDU(initHduEquiv);
+        setSelectedRglPrioImageHdu(rglHduEquiv);
+        
+        // update software
+        setSelectedService(serviceResult.getService());
+        
+        // update parameters
+        // TODO: how to empty the current input or output params ?
+        
+    }
+    
     // --- updateImageIdentifiers ---
     private void updateImageIdentifiers(FitsImageFile fitsImageFile) {
         updateImageIdentifiers(fitsImageFile.getFitsImageHDUs(), fitsImageFile.getFileName());

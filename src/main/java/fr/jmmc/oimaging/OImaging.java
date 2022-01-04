@@ -25,6 +25,7 @@ import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oimaging.gui.MainPanel;
 import fr.jmmc.oimaging.gui.PreferencePanel;
 import fr.jmmc.oimaging.gui.ViewerPanel.ProcessImageOperation;
+import fr.jmmc.oimaging.gui.action.ContinueAction;
 import fr.jmmc.oimaging.gui.action.CreateImageAction;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
@@ -344,6 +345,8 @@ public final class OImaging extends App {
 
         // accessible indirectly from the menu by Preferences Panel:
         new TableEditorAction();
+
+        new ContinueAction();
     }
 
     /**
