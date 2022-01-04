@@ -109,27 +109,30 @@ public final class ServiceList {
      */
     private static String getServiceNameFromOiFitsFile(final OIFitsFile oiFitsFile) {
         if (oiFitsFile != null) {
-            final FitsTable outputFitsTable = oiFitsFile.getImageOiData().getOutputParam();
+            final FitsTable outputFitsTable = oiFitsFile.getImageOiData().getExistingOutputParam();
 
-            // Attempt 1: looking for a SOFTWARE output param
-            // TODO: there will be a ResultSetTableModel.getKeywordValue method in a future merge, maybe use it here
-            if (outputFitsTable.hasKeywordMeta(IRModel.KEYWORD_SOFTWARE.getName())) {
-                Object algoValue = outputFitsTable.getKeywordValue(IRModel.KEYWORD_SOFTWARE.getName());
-                if (algoValue instanceof String) {
-                    return (String) algoValue;
+            if (outputFitsTable != null) {
+                
+                // Attempt 1: looking for a SOFTWARE output param
+                // TODO: there will be a ResultSetTableModel.getKeywordValue method in a future merge, maybe use it here
+                if (outputFitsTable.hasKeywordMeta(IRModel.KEYWORD_SOFTWARE.getName())) {
+                    Object algoValue = outputFitsTable.getKeywordValue(IRModel.KEYWORD_SOFTWARE.getName());
+                    if (algoValue instanceof String) {
+                        return (String) algoValue;
+                    }
                 }
-            }
 
-            // Attempt 2: looking for known specific keywords
-            // guessing WISARD program from SOFTWARE=WISARD output header card
-            if (outputFitsTable.hasHeaderCards()) {
-                FitsHeaderCard card = outputFitsTable.findFirstHeaderCard("SOFTWARE");
-                if (card != null) {
-                    Object softwareValue = card.parseValue();
-                    if (softwareValue instanceof String) {
-                        String softwareStr = (String) softwareValue;
-                        if (softwareStr.equals(SERVICE_WISARD)) {
-                            return SERVICE_WISARD;
+                // Attempt 2: looking for known specific keywords
+                // guessing WISARD program from SOFTWARE=WISARD output header card
+                if (outputFitsTable.hasHeaderCards()) {
+                    FitsHeaderCard card = outputFitsTable.findFirstHeaderCard("SOFTWARE");
+                    if (card != null) {
+                        Object softwareValue = card.parseValue();
+                        if (softwareValue instanceof String) {
+                            String softwareStr = (String) softwareValue;
+                            if (softwareStr.equals(SERVICE_WISARD)) {
+                                return SERVICE_WISARD;
+                            }
                         }
                     }
                 }

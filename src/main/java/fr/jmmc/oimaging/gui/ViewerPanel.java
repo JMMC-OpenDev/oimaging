@@ -204,7 +204,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             jPanelOIFits.add(oifitsViewPanel);
             final ImageOiData imageOiData = oifitsFile.getImageOiData();
             // init Param Tables
-            ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getOutputParam());
+            ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getExistingOutputParam());
             ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(imageOiData.getInputParam());
 
             AutofitTableColumns.autoResizeTable(jTableOutputParamKeywords, true, true); // include header width
