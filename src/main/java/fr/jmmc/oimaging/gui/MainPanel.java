@@ -889,7 +889,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 case IRMODEL_RESULT_LIST_CHANGED:
                     if (modelResults.isEmpty()) {
                         showTablePanel(false);
-                        viewerPanelResults.displayEmptyResult();
+                        viewerPanelResults.displayResult(null);
                     } else {
                         showTablePanel(true);
                         if (lastResult != null) {

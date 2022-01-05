@@ -277,7 +277,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelImage.removeAll();
         jPanelImage.setLayout(new BorderLayout());
 
-        if (result != null) {
+        if (result == null) {
+            jEditorPaneExecutionLog.setText("");
+            displaySelection(null);
+            displayImage(null, null);
+            displayOiFitsAndParams(null, null);
+        }
+        else {
             // execution log
             jEditorPaneExecutionLog.setText(result.getExecutionLog());
 
@@ -392,13 +398,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
             setTabMode(SHOW_MODE.GRID);
         }
-    }
-
-    /** display an empty result */
-    public void displayEmptyResult() {
-        displayImage(null, null);
-        displayOiFitsAndParams(null, null);
-        jPanelImage.repaint();
     }
 
     public OIFitsFile getCurrentOIFitsFile() {
