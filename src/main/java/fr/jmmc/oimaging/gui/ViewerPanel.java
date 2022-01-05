@@ -72,7 +72,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(ViewerPanel.class);
     /** fits extension including '.' (dot) character ie '.fits' */
     public final static String FITS_EXTENSION = "." + MimeType.OIFITS.getExtension();
-
+    
+    /** reference to parent MainPanel */
+    private MainPanel mainPanel;
+    
     /** Fits image panel */
     private final FitsImagePanel fitsImagePanel;
 
@@ -82,10 +85,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     /** Slider panel */
     private final SliderPanel sliderPanel;
 
-    private final Action exportOiFitsAction;
-    private final Action sendOiFitsAction;
-    private final Action exportFitsImageAction;
-    private final Action sendFitsAction;
     private Component lastModelPanel;
     private Component lastResultPanel;
     private Component lastGridPanel;
@@ -125,11 +124,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.weighty = 1.0;
         jPanelOIFitsViewer.add(oifitsViewPanel, gridBagConstraints);
-
-        exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
-        sendOiFitsAction = ActionRegistrar.getInstance().get(SendOIFitsAction.className, SendOIFitsAction.actionName);
-        exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
-        sendFitsAction = ActionRegistrar.getInstance().get(SendFitsAction.className, SendFitsAction.actionName);
 
         jComboBoxImage.setRenderer(new OiCellRenderer());
 
@@ -211,6 +205,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             AutofitTableColumns.autoResizeTable(jTableInputParamKeywords, true, true); // include header width
 
         } else {
+            // call to plot with null so it forgets the oifitsfile 
+            oifitsViewPanel.plot(null, null);
+            
             jPanelOIFits.remove(oifitsViewPanel);
             // reset Param Tables
             ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(null);
@@ -879,14 +876,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     private void enableActions() {
-        final OIFitsFile oiFitsFile = getCurrentOIFitsFile();
-        final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
-        exportOiFitsAction.setEnabled(enableExportOiFits);
-        sendOiFitsAction.setEnabled(enableExportOiFits);
-
-        final boolean enableExportImage = (fitsImagePanel.getFitsImage() != null);
-        exportFitsImageAction.setEnabled(enableExportImage);
-        sendFitsAction.setEnabled(enableExportImage);
+        // small check to prevent calls too early in the application start
+        // mainPanel is given at the end of MainPanel.initComponents()
+        if (mainPanel != null) {
+            
+            // mainPanel has knowledge of both viewerPanels and will take decision of which actions to enable
+            mainPanel.updateEnabledActions();
+        }
     }
 
     private void storeLastPanel() {
@@ -930,5 +926,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
      */
     public void setShowMode(SHOW_MODE showMode) {
         this.showMode = showMode;
+    }
+    
+    /**
+     * @return true if no image in fitsImagePanel
+     */
+    public boolean isFitsImageNull () {
+        return this.fitsImagePanel.getFitsImage() == null;
+    }
+    
+    /**
+     * @param mainPanel reference to parent MainPanel.
+     */
+    public void setMainPanel (MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
     }
 }

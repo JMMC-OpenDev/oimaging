@@ -6,15 +6,19 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.App;
+import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
+import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.interop.SendFitsAction;
+import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
@@ -78,6 +82,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private DeleteSelectionAction deleteSelectionAction;
     private RunAction runAction;
     private Action exportOiFitsAction;
+    private Action sendOiFitsAction;
+    private Action exportFitsImageAction;
+    private Action sendFitsAction;
 
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
@@ -197,6 +204,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
 
+        viewerPanelInput.setMainPanel(this);
+        viewerPanelResults.setMainPanel(this);
+        
         viewerPanelInput.setTabMode(ViewerPanel.SHOW_MODE.MODEL);
         viewerPanelInput.setShowMode(ViewerPanel.SHOW_MODE.MODEL);
         viewerPanelResults.setTabMode(ViewerPanel.SHOW_MODE.RESULT);
@@ -218,6 +228,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
         jButtonExportOIFits.setAction(exportOiFitsAction);
+        
+        sendOiFitsAction = ActionRegistrar.getInstance().get(SendOIFitsAction.className, SendOIFitsAction.actionName);
+        exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
+        sendFitsAction = ActionRegistrar.getInstance().get(SendFitsAction.className, SendFitsAction.actionName);
     }
 
     @Override
@@ -280,6 +294,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         });
 
         setLayout(new java.awt.BorderLayout());
+
+        jTabbedPaneTwoTabsDisplay.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPaneTwoTabsDisplayStateChanged(evt);
+            }
+        });
 
         jPanelTabInput.setLayout(new java.awt.BorderLayout());
 
@@ -598,6 +618,18 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
     }//GEN-LAST:event_jButtonCompareActionPerformed
 
+    private void jTabbedPaneTwoTabsDisplayStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPaneTwoTabsDisplayStateChanged
+        // we need this precaution, unless updateEnabledActions() is called too soon in the 
+        // application start, and it provokes a bug.
+        if (Bootstrapper.getState().after(App.ApplicationState.GUI_SETUP)) {
+            
+            // when the tab is changed, another viewerPanel is displayed,
+            // so we have to (en/dis)able actions. i.e, if the new viewerPanel has no images,
+            // the action exportFitsImage must be disabled.
+            updateEnabledActions();
+        }
+    }//GEN-LAST:event_jTabbedPaneTwoTabsDisplayStateChanged
+
     public void deleteSelectedRows() {
         final int nSelected = jTablePanel.getSelectedRowsCount();
         if (nSelected != 0) {
@@ -632,6 +664,26 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
     }
 
+    /**
+     * Decides if each action should be enabled or not.
+     * is called when the selection in the list of results changes,
+     * or when the tab (input/results) selection changes,
+     * or when the function setTabMode in ViewerPanel is called (which more or less means when
+     * the ViewerPanel data has been updated).
+     */
+    public void updateEnabledActions() {
+        ViewerPanel activeViewerPanel = this.getViewerPanelActive();
+                        
+        final OIFitsFile oiFitsFile = activeViewerPanel.getCurrentOIFitsFile();
+        final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
+        exportOiFitsAction.setEnabled(enableExportOiFits);
+        sendOiFitsAction.setEnabled(enableExportOiFits);
+
+        final boolean enableExportImage = (!activeViewerPanel.isFitsImageNull());
+        exportFitsImageAction.setEnabled(enableExportImage);
+        sendFitsAction.setEnabled(enableExportImage);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCompare;
     private javax.swing.JButton jButtonExportOIFits;
