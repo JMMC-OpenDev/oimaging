@@ -904,6 +904,11 @@ public final class IRModel {
         // update parameters
         // TODO: how to empty the current input or output params ?
         
+        
+        // update other fields
+        this.oifitsFile.setMd5sum(null);
+        this.oifitsFile.setSourceURI(null);
+        this.oifitsFile.setChanged();
     }
     
     // --- updateImageIdentifiers ---
