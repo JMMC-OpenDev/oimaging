@@ -35,6 +35,7 @@ import fr.jmmc.oimaging.gui.action.NewAction;
 import fr.jmmc.oimaging.gui.action.ProcessImageAction;
 import fr.jmmc.oimaging.gui.action.OIFitsBrowserAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.gui.action.SwitchTabAction;
 import fr.jmmc.oimaging.gui.action.TableEditorAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
 import fr.jmmc.oimaging.interop.SendOIFitsAction;
@@ -323,6 +324,8 @@ public final class OImaging extends App {
 
         new ExportOIFitsAction();
         new ExportFitsImageAction();
+
+        new SwitchTabAction();
 
         // Edit menu :
         new DeleteSelectionAction();

@@ -988,4 +988,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     public ResultSetTablePanel getResultSetTablePanel() {
         return jTablePanel;
     }
+
+    /** Switch tab. */
+    public void switchTab () {
+        // only works when there is only two tabs
+        this.jTabbedPaneTwoTabsDisplay.setSelectedIndex(1 - this.jTabbedPaneTwoTabsDisplay.getSelectedIndex());
+    }
 }
