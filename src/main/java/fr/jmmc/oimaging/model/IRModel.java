@@ -855,12 +855,7 @@ public final class IRModel {
         
         // update OITables
         for (OITable oITable : this.oifitsFile.getOiTables()) {
-            if (oITable instanceof OIData) {
-                this.oifitsFile.removeOiTable((OIData) oITable);
-            }
-            else {
-                this.oifitsFile.unregisterOiTable(oITable);
-            }
+            this.oifitsFile.removeOiTable(oITable);
         }
         for (OITable oITable : resultOIFitsfile.getOiTables()) {
             this.oifitsFile.addOiTable(oITable);
