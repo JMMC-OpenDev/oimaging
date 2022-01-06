@@ -131,6 +131,8 @@
             <menu/> <!-- menu separator -->
             <menu label="Save OIFits file" classpath="fr.jmmc.oimaging.gui.action.ExportOIFitsAction" action="exportOIFits" description="Export selected OIFits to a local file"/>
             <menu label="Save Fits Image file" classpath="fr.jmmc.oimaging.gui.action.ExportFitsImageAction" action="exportFitsImage" description="Export selected Fits image to a local file"/>
+            <menu />
+            <menu label="Switch Tab" accelerator="T" classpath="fr.jmmc.oimaging.gui.action.SwitchTabAction" action="switchTab" description="Switch tab" />
         </menu>
 
         <menu label="Edit">
@@ -140,7 +142,7 @@
         <menu label="Processing">
             <menu label="Run" classpath="fr.jmmc.oimaging.gui.action.RunAction" action="run" description="Run the image reconstruction using the current input OIFITS file"/>
             <menu/> <!-- menu separator -->
-            <menu label="Create image" classpath="fr.jmmc.oimaging.gui.action.CreateImageAction" action="createImage"
+            <menu label="Create image" classpath="fr.jmmc.oimaging.gui.action.CreateImageAction" action="createImage" 
                   description="Create a centered-gaussian image"/>
             <menu label="Modify image" classpath="fr.jmmc.oimaging.gui.action.ProcessImageAction" action="modifyImage"
                   description="Modify the current image (change fov and resample according to the pixel increments)"/>
