@@ -204,6 +204,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
 
+        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.INPUT.ordinal(), jLabelTabInput);
+        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.RESULTS.ordinal(), jLabelTabResults);
+
         viewerPanelInput.setMainPanel(this);
         viewerPanelResults.setMainPanel(this);
         
@@ -253,6 +256,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         java.awt.GridBagConstraints gridBagConstraints;
 
         jButtonCompare = new javax.swing.JButton();
+        jLabelTabInput = new javax.swing.JLabel();
+        jLabelTabResults = new javax.swing.JLabel();
         jTabbedPaneTwoTabsDisplay = new javax.swing.JTabbedPane();
         jPanelTabInput = new javax.swing.JPanel();
         jSplitPaneInput = new javax.swing.JSplitPane();
@@ -292,6 +297,14 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 jButtonCompareActionPerformed(evt);
             }
         });
+
+        jLabelTabInput.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelTabInput.setText("Input");
+        jLabelTabInput.setPreferredSize(new java.awt.Dimension(200, 40));
+
+        jLabelTabResults.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelTabResults.setText("Results");
+        jLabelTabResults.setPreferredSize(new java.awt.Dimension(200, 40));
 
         setLayout(new java.awt.BorderLayout());
 
@@ -697,6 +710,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMax;
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMin;
     private javax.swing.JLabel jLabelOifitsFile;
+    private javax.swing.JLabel jLabelTabInput;
+    private javax.swing.JLabel jLabelTabResults;
     private javax.swing.JLabel jLabelTarget;
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
