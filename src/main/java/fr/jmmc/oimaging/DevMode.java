@@ -133,12 +133,16 @@ public class DevMode {
         // that function will update keywords used here
         OIFitsFile oiFitsFile = serviceResult.getOifitsFile();
         if (oiFitsFile != null) {
-            ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getOutputParam();
+            ImageOiOutputParam outputParams = oiFitsFile.getImageOiData().getExistingOutputParam();
 
-            final String strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
+            String strStartDate = null, strEndDate = null;
+            
+            if (outputParams != null) {
+                strStartDate = outputParams.getKeyword(IRModel.KEYWORD_START_DATE.getName());
+                strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
+            }
+            
             serviceResult.setStartTime(parseKeywordDate(strStartDate));
-
-            final String strEndDate = outputParams.getKeyword(IRModel.KEYWORD_END_DATE.getName());
             serviceResult.setEndTime(parseKeywordDate(strEndDate));
         }
 

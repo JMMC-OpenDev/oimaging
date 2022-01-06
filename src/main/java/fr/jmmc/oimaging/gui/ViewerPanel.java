@@ -198,12 +198,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             jPanelOIFits.add(oifitsViewPanel);
             final ImageOiData imageOiData = oifitsFile.getImageOiData();
             // init Param Tables
-            ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getOutputParam());
+            ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getExistingOutputParam());
             ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(imageOiData.getInputParam());
 
             AutofitTableColumns.autoResizeTable(jTableOutputParamKeywords, true, true); // include header width
             AutofitTableColumns.autoResizeTable(jTableInputParamKeywords, true, true); // include header width
-
         } else {
             // call to plot with null so it forgets the oifitsfile 
             oifitsViewPanel.plot(null, null);
@@ -213,6 +212,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(null);
             ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(null);
         }
+        // hide output params table if empty:
+        final boolean showOutput = ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).getRowCount() != 0;
+        jLabelOutput.setVisible(showOutput);
+        jScrollPaneTableOutput.setVisible(showOutput);
     }
 
     public void setTabMode(SHOW_MODE mode) {

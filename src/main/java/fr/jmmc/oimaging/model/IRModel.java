@@ -267,6 +267,12 @@ public final class IRModel {
                 initSpecificParams(false);
             }
         }
+        
+        // cleaning all output params as they are meaningless in the input form
+        // it must be done AFTER role computation (it uses output params)
+        // it must be done AFTER guessing the service (it uses output params)
+        // it should be best to keep this call at the end
+        this.oifitsFile.getImageOiData().removeOutputParam();
     }
 
     /**
@@ -415,12 +421,12 @@ public final class IRModel {
         }
 
         final ImageOiInputParam inputParam = oifitsFile.getImageOiData().getInputParam();
-        final ImageOiOutputParam outputParam = oifitsFile.getImageOiData().getOutputParam();
+        final ImageOiOutputParam outputParam = oifitsFile.getImageOiData().getExistingOutputParam();
 
         // result image
         // the output param LAST_IMG contains the HDU_NAME.
         // the result image is always in the first HDU.
-        final String lastImgParam = outputParam.getLastImg();
+        final String lastImgParam = (outputParam == null) ? null : outputParam.getLastImg();
 
         if (lastImgParam != null && !lastImgParam.isEmpty()) {
             // if the first HDU_NAME is equal to LAST_IMG
