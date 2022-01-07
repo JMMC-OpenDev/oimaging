@@ -282,13 +282,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         softwareSettingsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
-        jButtonExportOIFits = new javax.swing.JButton();
         jScrollPaneEditor = new javax.swing.JScrollPane();
         jEditorPane = new javax.swing.JEditorPane();
         viewerPanelInput = new fr.jmmc.oimaging.gui.ViewerPanel();
         jPanelTabResults = new javax.swing.JPanel();
         jSplitPaneResults = new javax.swing.JSplitPane();
+        jPanelViewerAndActions = new javax.swing.JPanel();
         viewerPanelResults = new fr.jmmc.oimaging.gui.ViewerPanel();
+        jPanelResultsActions = new javax.swing.JPanel();
+        jButtonExportOIFits = new javax.swing.JButton();
         jTablePanel = new fr.jmmc.oimaging.gui.ResultSetTablePanel();
 
         jButtonCompare.setText("Compare");
@@ -521,18 +523,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
-
-        jButtonExportOIFits.setText("[Save]");
-        jButtonExportOIFits.setName("jButtonExportOIFits"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
+        jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
 
         jScrollPaneEditor.setMinimumSize(new java.awt.Dimension(100, 100));
         jScrollPaneEditor.setPreferredSize(new java.awt.Dimension(100, 100));
@@ -567,8 +560,30 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelTabResults.setLayout(new java.awt.BorderLayout());
 
         jSplitPaneResults.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jSplitPaneResults.setResizeWeight(0.9);
-        jSplitPaneResults.setLeftComponent(viewerPanelResults);
+        jSplitPaneResults.setResizeWeight(0.8);
+
+        jPanelViewerAndActions.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanelViewerAndActions.add(viewerPanelResults, gridBagConstraints);
+
+        jPanelResultsActions.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
+
+        jButtonExportOIFits.setText("[Save]");
+        jButtonExportOIFits.setName("jButtonExportOIFits"); // NOI18N
+        jPanelResultsActions.add(jButtonExportOIFits);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        jPanelViewerAndActions.add(jPanelResultsActions, gridBagConstraints);
+
+        jSplitPaneResults.setTopComponent(jPanelViewerAndActions);
 
         jTablePanel.setPreferredSize(new java.awt.Dimension(900, 100));
         jSplitPaneResults.setBottomComponent(jTablePanel);
@@ -718,9 +733,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
     private javax.swing.JPanel jPanelInputForm;
+    private javax.swing.JPanel jPanelResultsActions;
     private javax.swing.JPanel jPanelTabInput;
     private javax.swing.JPanel jPanelTabResults;
     private javax.swing.JPanel jPanelTarget;
+    private javax.swing.JPanel jPanelViewerAndActions;
     private javax.swing.JPanel jPanelWL;
     private javax.swing.JScrollPane jScrollPaneEditor;
     private javax.swing.JScrollPane jScrollPaneInputForm;
