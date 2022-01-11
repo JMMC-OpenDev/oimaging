@@ -6,7 +6,6 @@ package fr.jmmc.oimaging.gui.action;
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.oimaging.OImaging;
-import fr.jmmc.oimaging.gui.ViewerPanel;
 import java.awt.event.ActionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +41,7 @@ public final class ExportFitsImageAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
-        if (viewerPanel != null) {
-            viewerPanel.exportFitsImage(true);
-        }
+        OImaging.getInstance().getMainPanel().getViewerPanelActive().exportFitsImage(true);
     }
 
 }
