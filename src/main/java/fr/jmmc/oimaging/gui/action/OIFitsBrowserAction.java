@@ -43,14 +43,16 @@ public final class OIFitsBrowserAction extends RegisteredAction {
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
         final ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
-        if (viewerPanel.getShowMode() == ViewerPanel.SHOW_MODE.GRID) {
-            MessagePane.showErrorMessage("Cannot open OIFits browser while in GRID mode. Please select one single result.");
-        } else {
-            final OIFitsFile oiFitsFile = viewerPanel.getCurrentOIFitsFile();
+        if (viewerPanel != null) {
+            if (viewerPanel.getShowMode() == ViewerPanel.SHOW_MODE.GRID) {
+                MessagePane.showErrorMessage("Cannot open OIFits browser while in GRID mode. Please select one single result.");
+            } else {
+                final OIFitsFile oiFitsFile = viewerPanel.getCurrentOIFitsFile();
 
-            if ((oiFitsFile != null)
-                    && ((oiFitsFile.getImageHDUCount() != 0) || (oiFitsFile.getNbOiTables() != 0))) {
-                OIFitsTableBrowser.showFitsBrowser(oiFitsFile);
+                if ((oiFitsFile != null)
+                        && ((oiFitsFile.getImageHDUCount() != 0) || (oiFitsFile.getNbOiTables() != 0))) {
+                    OIFitsTableBrowser.showFitsBrowser(oiFitsFile);
+                }
             }
         }
     }

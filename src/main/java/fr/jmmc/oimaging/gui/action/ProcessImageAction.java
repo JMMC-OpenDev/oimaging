@@ -5,6 +5,7 @@ package fr.jmmc.oimaging.gui.action;
 
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.oimaging.OImaging;
+import fr.jmmc.oimaging.gui.ViewerPanel;
 import fr.jmmc.oimaging.gui.ViewerPanel.ProcessImageOperation;
 import java.awt.event.ActionEvent;
 import org.slf4j.Logger;
@@ -42,7 +43,10 @@ public final class ProcessImageAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        OImaging.getInstance().getMainPanel().getViewerPanelActive().processFitsImage(op);
+        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
+        if (viewerPanel != null) {
+            viewerPanel.processFitsImage(op);
+        }
     }
 
 }

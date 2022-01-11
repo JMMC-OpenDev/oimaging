@@ -70,12 +70,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     /** default mouse cursor refresh period = 100 ms */
     private static final int REFRESH_PERIOD = 100;
 
-    /** Enum used for indexes of tabs.
-     * Caution: Must be in sync with the order in which the tabs are added in jTabbedPaneTwoTabsDisplay.
+    /**
+     * constants used for indexes of tabs.     * Caution: Must be in sync with the order in which the tabs are added in jTabbedPaneTwoTabsDisplay.
      */
-    private static enum TABS {
-        INPUT, RESULTS
-    };
+    public final static int TAB_INPUT = 0;
+    public final static int TAB_RESULTS = 1;
 
     /* members */
  /* actions */
@@ -204,8 +203,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
 
-        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.INPUT.ordinal(), jLabelTabInput);
-        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.RESULTS.ordinal(), jLabelTabResults);
+        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TAB_INPUT, jLabelTabInput);
+        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TAB_RESULTS, jLabelTabResults);
 
         viewerPanelInput.setMainPanel(this);
         viewerPanelResults.setMainPanel(this);
@@ -655,6 +654,27 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             // so we have to (en/dis)able actions. i.e, if the new viewerPanel has no images,
             // the action exportFitsImage must be disabled.
             updateEnabledActions();
+
+            // update viewerPanel display
+            switch (jTabbedPaneTwoTabsDisplay.getSelectedIndex()) {
+                case TAB_INPUT:
+                    viewerPanelInput.displayModel(currentModel);
+                    break;
+                case TAB_RESULTS:
+                    switch (viewerPanelResults.getShowMode()) {
+                        case RESULT:
+                            viewerPanelResults.displayResult(jTablePanel.getSelectedRow());
+                            break;
+                        case GRID:
+                            viewerPanelResults.displayGrid(jTablePanel.getSelectedRows());
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }//GEN-LAST:event_jTabbedPaneTwoTabsDisplayStateChanged
 
@@ -701,13 +721,22 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
      */
     public void updateEnabledActions() {
         ViewerPanel activeViewerPanel = this.getViewerPanelActive();
-                        
-        final OIFitsFile oiFitsFile = activeViewerPanel.getCurrentOIFitsFile();
-        final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
+
+        boolean enableExportOiFits, enableExportImage;
+
+        if (activeViewerPanel == null) {
+            enableExportOiFits = false;
+            enableExportImage = false;
+        }
+        else {
+            final OIFitsFile oiFitsFile = activeViewerPanel.getCurrentOIFitsFile();
+            enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
+            enableExportImage = (!activeViewerPanel.isFitsImageNull());
+        }
+
         exportOiFitsAction.setEnabled(enableExportOiFits);
         sendOiFitsAction.setEnabled(enableExportOiFits);
 
-        final boolean enableExportImage = (!activeViewerPanel.isFitsImageNull());
         exportFitsImageAction.setEnabled(enableExportImage);
         sendFitsAction.setEnabled(enableExportImage);
     }
@@ -967,23 +996,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
             switch (event.getType()) {
                 case IRMODEL_CHANGED:
+                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TAB_INPUT);
                     viewerPanelInput.displayModel(currentModel);
-                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.INPUT.ordinal());
                     break;
                 case IRMODEL_RESULT_LIST_CHANGED:
-                    if (modelResults.isEmpty()) {
-                        showTablePanel(false);
-                        viewerPanelResults.displayResult(null);
-                    } else {
-                        showTablePanel(true);
-                        if (lastResult != null) {
-                            jTablePanel.setSelectedRow(lastResult);
-
-                            // we also update input display because a new run will change init image
-                            viewerPanelInput.displayModel(currentModel);
-                        }
-                    }
-                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.RESULTS.ordinal());
+                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TAB_RESULTS);
+                    showTablePanel(!modelResults.isEmpty());
+                    jTablePanel.setSelectedRow(lastResult);
                     break;
                 default:
                     break;
@@ -1001,13 +1020,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
      * @return viewerPanelInput, or viewerPanelResults, or null when no tabs selected (it should never happen).
      */
     public ViewerPanel getViewerPanelActive() {
-        switch (TABS.values()[jTabbedPaneTwoTabsDisplay.getSelectedIndex()]) {
-            case INPUT:
+        switch (jTabbedPaneTwoTabsDisplay.getSelectedIndex()) {
+            case TAB_INPUT:
                 return viewerPanelInput;
-            case RESULTS:
+            case TAB_RESULTS:
                 return viewerPanelResults;
+            default:
+                break;
         }
-        return null;
+        return null; // TODO: check call points for null pointer exception
     }
 
     private static String getTooltip(final String name) {

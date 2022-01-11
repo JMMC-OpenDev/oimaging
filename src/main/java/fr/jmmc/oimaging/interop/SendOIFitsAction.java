@@ -6,6 +6,7 @@ package fr.jmmc.oimaging.interop;
 import fr.jmmc.jmcs.network.interop.SampCapability;
 import fr.jmmc.jmcs.network.interop.SampCapabilityAction;
 import fr.jmmc.oimaging.OImaging;
+import fr.jmmc.oimaging.gui.ViewerPanel;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.HashMap;
@@ -60,13 +61,18 @@ public final class SendOIFitsAction extends SampCapabilityAction {
     public Map<?, ?> composeMessage() throws IllegalStateException {
         logger.debug("composeMessage");
 
-        final File file = OImaging.getInstance().getMainPanel().getViewerPanelActive().exportOIFits(false);
+        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
 
-        if (file != null) {
-            // Store parameters into SAMP message:
-            final Map<String, String> parameters = new HashMap<String, String>(4);
-            addUrlParameter(parameters, file);
-            return parameters;
+        if (viewerPanel != null) {
+
+            final File file = viewerPanel.exportOIFits(false);
+
+            if (file != null) {
+                // Store parameters into SAMP message:
+                final Map<String, String> parameters = new HashMap<String, String>(4);
+                addUrlParameter(parameters, file);
+                return parameters;
+            }
         }
         return null;
     }
