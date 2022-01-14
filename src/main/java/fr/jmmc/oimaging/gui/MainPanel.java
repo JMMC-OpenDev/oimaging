@@ -12,6 +12,10 @@ import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
 import fr.jmmc.jmcs.util.ObjectUtils;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
+import fr.jmmc.oiexplorer.core.model.oi.Plot;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
@@ -76,6 +80,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private static enum TABS {
         INPUT, RESULTS
     };
+
+    /**
+     * OIFitsCollectionManager singleton
+     */
+    private static final OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
     /* members */
  /* actions */
@@ -209,6 +218,53 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         viewerPanelInput.setMainPanel(this);
         viewerPanelResults.setMainPanel(this);
+
+        // create two plot def, two subset def, and two views for the two ViewerPanel
+
+        SubsetDefinition subDefInput = new SubsetDefinition();
+        subDefInput.setId("SUBSET_INPUT");
+        subDefInput.setName("Subset Definition Input");
+        subDefInput.setDescription("Subset Definition for input ViewerPanel");
+        OCM.addSubsetDefinition(subDefInput);
+
+        SubsetDefinition subDefResults = new SubsetDefinition();
+        subDefResults.setId("SUBSET_RESULTS");
+        subDefResults.setName("Subset Definition Results");
+        subDefResults.setDescription("Subset Definition for results ViewerPanel");
+        OCM.addSubsetDefinition(subDefResults);
+
+        PlotDefinition plotDefInput = new PlotDefinition();
+        plotDefInput.setId("PLOT_DEF_INPUT");
+        plotDefInput.setName("Plot Definition Input");
+        plotDefInput.setDescription("Plot Definition for input ViewerPanel");
+        plotDefInput.copyValues(OCM.getCurrentPlotDefinitionRef());
+        OCM.addPlotDefinition(plotDefInput);
+
+        PlotDefinition plotDefResults = new PlotDefinition();
+        plotDefResults.setId("PLOT_DEF_RESULTS");
+        plotDefResults.setName("Plot Definition Results");
+        plotDefResults.setDescription("Plot Definition for results ViewerPanel");
+        plotDefResults.copyValues(OCM.getCurrentPlotDefinitionRef());
+        OCM.addPlotDefinition(plotDefResults);
+
+        Plot plotInput = new Plot();
+        plotInput.setId("VIEW_INPUT");
+        plotInput.setName("View Input");
+        plotInput.setDescription("View for input ViewerPanel");
+        plotInput.setPlotDefinition(plotDefInput);
+        plotInput.setSubsetDefinition(subDefInput);
+        OCM.addPlot(plotInput);
+
+        Plot plotResults = new Plot();
+        plotResults.setId("VIEW_RESULTS");
+        plotResults.setName("View Results");
+        plotResults.setDescription("View for results ViewerPanel");
+        plotResults.setPlotDefinition(plotDefResults);
+        plotResults.setSubsetDefinition(subDefResults);
+        OCM.addPlot(plotResults);
+
+        viewerPanelInput.setOCMViewId(plotInput.getId());
+        viewerPanelResults.setOCMViewId(plotResults.getId());
         
         viewerPanelInput.setTabMode(ViewerPanel.SHOW_MODE.MODEL);
         viewerPanelInput.setShowMode(ViewerPanel.SHOW_MODE.MODEL);

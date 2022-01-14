@@ -10,7 +10,9 @@ import fr.jmmc.oiexplorer.core.gui.PlotChartPanel;
 import fr.jmmc.oiexplorer.core.gui.PlotView;
 import fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
+import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.oi.TableUID;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.BorderLayout;
 import org.jfree.chart.ChartColor;
@@ -28,6 +30,11 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     private static final long serialVersionUID = 1;
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OIFitsViewPanel.class.getName());
+
+    /**
+     * OIFitsCollectionManager singleton
+     */
+    private static final OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
     /* members */
     /** OIFitsCollectionManager singleton */
@@ -143,9 +150,19 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
         this.jLabelMessage.setForeground(ChartColor.DARK_RED);
 
-        // define which plot to use:
-        final String plotId = OIFitsCollectionManager.CURRENT_VIEW;
+        // init with default plotId
+        updatePlotId(OCM.getCurrentPlot().getId());
+    }
 
+    /**
+     * change the plot associated to this Panel.
+     * @param plotId the id of the new plot (for example VIEW_0)
+     */
+    public void updatePlotId (String plotId) {
+        if (this.plotView != null) {
+            remove(this.plotView);
+            this.plotView.dispose();
+        }
         this.plotView = new PlotView(plotId);
         this.plotChartPanel = this.plotView.getPlotPanel();
 
@@ -171,15 +188,13 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     /**
      * Plot OIFits data using embedded OIFitsExplorer Plot panel
      * This code must be executed by the Swing Event Dispatcher thread (EDT)
-     * @param oiFitsData OIFits data
+     * @param oiFitsFileParam OIFits data
+     * @param targetName the target to display in the data
      */
-    public void plot(OIFitsFile oiFitsFile, String targetName) {
-        logger.debug("plot : {} for target {}", oiFitsFile, targetName);
+    public void plot(OIFitsFile oiFitsFileParam, String targetName) {
+        logger.debug("plot : {} for target {}", oiFitsFileParam, targetName);
 
-        // memorize chart data (used by export PDF):
-        setOIFitsData(oiFitsFile);
-
-        if (oiFitsFile == null || !oiFitsFile.hasOiData() || targetName == null || oiFitsFile.getAbsoluteFilePath() == null) {
+        if (oiFitsFileParam == null || !oiFitsFileParam.hasOiData() || targetName == null || oiFitsFileParam.getAbsoluteFilePath() == null) {
             if (targetName == null) {
                 this.jLabelMessage.setText("Missing target name in response.");
                 // We could implement some fall back looking at OI_TARGET, using selected input one...
@@ -190,29 +205,38 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
             display(false, true);
 
-            // reset:
-            ocm.reset();
-
+            ocm.removeOIFitsFile(this.oiFitsFile);
+            this.oiFitsFile = null;
+            
         } else {
             display(true, false);
-            /*
-            // Fix file paths ie generate file names ?
-            for (OIFitsFile oiFitsFile : oiFitsList) {
-                oiFitsFile.setAbsoluteFilePath(ExportOIFitsAction.getDefaultFileName(oiFitsFile));
-            }
-             */
-            // remove all oifits files:
-            ocm.removeAllOIFitsFiles();
 
-            // Add the given OIFits file:
-            ocm.addOIFitsFile(oiFitsFile);
+            ocm.removeOIFitsFile(this.oiFitsFile);
+            this.oiFitsFile = oiFitsFileParam;
+
+            // fix the situation where both input and result viewerPanel point to the same filepath.
+            // filepaths must be unique among the ocm's collection so we suffix it with "_bits".
+            // Without this fix, the call ocm.addOIFitsFile() replaces the old oifitsFile with the same filepath,
+            // so it corrupts the data of the other Viewer.
+            // see OIFitsCollection.addOIFitsFile, `removeOIFitsFile(previous);`
+            while (ocm.getOIFitsCollection().getOIFitsFile(this.oiFitsFile.getAbsoluteFilePath()) != null) {
+                this.oiFitsFile.setAbsoluteFilePath(this.oiFitsFile.getAbsoluteFilePath() + "_bis");
+            }
+            // Note: two distinct filepath can have the same filename.
+            // OIFitsCollectionManager already manages this case by using unique internal ids.
+            // see OIFitsCollectionManager.addOIFitsFile, `id += "_bis";`
+
+            ocm.addOIFitsFile(this.oiFitsFile);
 
             // get current subset definition (copy):
-            final SubsetDefinition subsetCopy = ocm.getCurrentSubsetDefinition();
+            final String subdefid = ocm.getPlot(this.plotView.getPlotId()).getSubsetDefinition().getId();
+            final SubsetDefinition subsetCopy = ocm.getSubsetDefinition(subdefid);
+            
+            OIDataFile fileInCollection = ocm.getOIDataFile(this.oiFitsFile);
 
-            subsetCopy.getFilter().setTargetUID(targetName);
-            // use all data files (default):
-            // subset.getTables().clear();
+            // a filter that targets all tables from fileInCollection
+            subsetCopy.getFilter().getTables().clear();
+            subsetCopy.getFilter().getTables().add(new TableUID(fileInCollection));
 
             // fire subset changed event (generates OIFitsSubset and then plot asynchronously):
             ocm.updateSubsetDefinition(this, subsetCopy);

@@ -5,7 +5,6 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.FeedbackReport;
-import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
@@ -16,10 +15,6 @@ import fr.jmmc.oiexplorer.core.gui.SliderPanel;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
 import fr.jmmc.oimaging.OImaging;
 import fr.jmmc.oimaging.Preferences;
-import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
-import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
-import fr.jmmc.oimaging.interop.SendFitsAction;
-import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -46,7 +41,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.Action;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
@@ -137,6 +131,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
 
         jEditorPaneExecutionLog.setFont(new Font("Monospaced", Font.PLAIN, SwingUtils.adjustUISize(10)));
+    }
+
+    /**
+     * set the view associated to this panel.
+     *
+     * @param ocmViewId the id of the view (example "VIEW_0")
+     */
+    public void setOCMViewId(String ocmViewId) {
+        this.oifitsViewPanel.updatePlotId(ocmViewId);
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
