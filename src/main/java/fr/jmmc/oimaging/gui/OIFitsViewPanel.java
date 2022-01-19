@@ -215,12 +215,28 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
             this.oiFitsFile = oiFitsFileParam;
 
             // fix the situation where both input and result viewerPanel point to the same filepath.
-            // filepaths must be unique among the ocm's collection so we suffix it with "_bits".
+            // filepaths must be unique among the ocm's collection so we suffix it with "_bitsN".
             // Without this fix, the call ocm.addOIFitsFile() replaces the old oifitsFile with the same filepath,
             // so it corrupts the data of the other Viewer.
             // see OIFitsCollection.addOIFitsFile, `removeOIFitsFile(previous);`
-            while (ocm.getOIFitsCollection().getOIFitsFile(this.oiFitsFile.getAbsoluteFilePath()) != null) {
-                this.oiFitsFile.setAbsoluteFilePath(this.oiFitsFile.getAbsoluteFilePath() + "_bis");
+            String path = this.oiFitsFile.getAbsoluteFilePath();
+            while (ocm.getOIFitsCollection().getOIFitsFile(path) != null) {
+
+                int index = path.lastIndexOf("_bis");
+                if (index == -1) {
+                    path += "_bis1";
+                } else {
+                    String strNumber = path.substring(index + 4);
+                    try {
+                        int number = Integer.decode(strNumber);
+                        number++;
+                        path = path.substring(0, index);
+                        path += "_bis" + number;
+                    } catch (NumberFormatException e) {
+                        path += "_bis1";
+                    }
+                }
+                this.oiFitsFile.setAbsoluteFilePath(path);
             }
             // Note: two distinct filepath can have the same filename.
             // OIFitsCollectionManager already manages this case by using unique internal ids.
