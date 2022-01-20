@@ -6,7 +6,6 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.App;
-import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
@@ -216,11 +215,21 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.INPUT.ordinal(), jLabelTabInput);
         jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.RESULTS.ordinal(), jLabelTabResults);
 
+        // Add listener after tabs added:
+        jTabbedPaneTwoTabsDisplay.addChangeListener(new javax.swing.event.ChangeListener() {
+            @Override
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                // when the tab is changed, another viewerPanel is displayed,
+                // so we have to (en/dis)able actions. i.e, if the new viewerPanel has no images,
+                // the action exportFitsImage must be disabled.
+                updateEnabledActions();
+            }
+        });
+
         viewerPanelInput.setMainPanel(this);
         viewerPanelResults.setMainPanel(this);
 
         // create two plot def, two subset def, and two views for the two ViewerPanel
-
         SubsetDefinition subDefInput = new SubsetDefinition();
         subDefInput.setId("SUBSET_INPUT");
         subDefInput.setName("Subset Definition Input");
@@ -263,9 +272,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         plotResults.setSubsetDefinition(subDefResults);
         OCM.addPlot(plotResults);
 
-        viewerPanelInput.setOCMViewId(plotInput.getId());
-        viewerPanelResults.setOCMViewId(plotResults.getId());
-        
+        viewerPanelInput.setOIFitsViewPlotId(plotInput.getId());
+        viewerPanelResults.setOIFitsViewPlotId(plotResults.getId());
+
         viewerPanelInput.setTabMode(ViewerPanel.SHOW_MODE.MODEL);
         viewerPanelInput.setShowMode(ViewerPanel.SHOW_MODE.MODEL);
         viewerPanelResults.setTabMode(ViewerPanel.SHOW_MODE.RESULT);
@@ -287,7 +296,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
         jButtonExportOIFits.setAction(exportOiFitsAction);
-        
+
         sendOiFitsAction = ActionRegistrar.getInstance().get(SendOIFitsAction.className, SendOIFitsAction.actionName);
         exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
         sendFitsAction = ActionRegistrar.getInstance().get(SendFitsAction.className, SendFitsAction.actionName);
@@ -365,12 +374,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jLabelTabResults.setPreferredSize(new java.awt.Dimension(200, 40));
 
         setLayout(new java.awt.BorderLayout());
-
-        jTabbedPaneTwoTabsDisplay.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jTabbedPaneTwoTabsDisplayStateChanged(evt);
-            }
-        });
 
         jPanelTabInput.setLayout(new java.awt.BorderLayout());
 
@@ -702,18 +705,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
     }//GEN-LAST:event_jButtonCompareActionPerformed
 
-    private void jTabbedPaneTwoTabsDisplayStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPaneTwoTabsDisplayStateChanged
-        // we need this precaution, unless updateEnabledActions() is called too soon in the 
-        // application start, and it provokes a bug.
-        if (Bootstrapper.getState().after(App.ApplicationState.GUI_SETUP)) {
-            
-            // when the tab is changed, another viewerPanel is displayed,
-            // so we have to (en/dis)able actions. i.e, if the new viewerPanel has no images,
-            // the action exportFitsImage must be disabled.
-            updateEnabledActions();
-        }
-    }//GEN-LAST:event_jTabbedPaneTwoTabsDisplayStateChanged
-
     public void deleteSelectedRows() {
         final int nSelected = jTablePanel.getSelectedRowsCount();
         if (nSelected != 0) {
@@ -757,7 +748,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
      */
     public void updateEnabledActions() {
         ViewerPanel activeViewerPanel = this.getViewerPanelActive();
-                        
+
         final OIFitsFile oiFitsFile = activeViewerPanel.getCurrentOIFitsFile();
         final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
         exportOiFitsAction.setEnabled(enableExportOiFits);
@@ -767,7 +758,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         exportFitsImageAction.setEnabled(enableExportImage);
         sendFitsAction.setEnabled(enableExportImage);
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCompare;
     private javax.swing.JButton jButtonExportOIFits;
@@ -1078,7 +1069,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }
 
     /** Switch tab. */
-    public void switchTab () {
+    public void switchTab() {
         // only works when there is only two tabs
         this.jTabbedPaneTwoTabsDisplay.setSelectedIndex(1 - this.jTabbedPaneTwoTabsDisplay.getSelectedIndex());
     }

@@ -158,7 +158,7 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
      * change the plot associated to this Panel.
      * @param plotId the id of the new plot (for example VIEW_0)
      */
-    public void updatePlotId (String plotId) {
+    public void updatePlotId(String plotId) {
         if (this.plotView != null) {
             remove(this.plotView);
             this.plotView.dispose();
@@ -207,7 +207,7 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
             ocm.removeOIFitsFile(this.oiFitsFile);
             this.oiFitsFile = null;
-            
+
         } else {
             display(true, false);
 
@@ -247,7 +247,7 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
             // get current subset definition (copy):
             final String subdefid = ocm.getPlot(this.plotView.getPlotId()).getSubsetDefinition().getId();
             final SubsetDefinition subsetCopy = ocm.getSubsetDefinition(subdefid);
-            
+
             OIDataFile fileInCollection = ocm.getOIDataFile(this.oiFitsFile);
 
             // a filter that targets all tables from fileInCollection

@@ -134,12 +134,12 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     /**
-     * set the view associated to this panel.
+     * set the plot id associated to the OIFitsViewPanel.
      *
-     * @param ocmViewId the id of the view (example "VIEW_0")
+     * @param plotId the id of the plot
      */
-    public void setOCMViewId(String ocmViewId) {
-        this.oifitsViewPanel.updatePlotId(ocmViewId);
+    public void setOIFitsViewPlotId(String plotId) {
+        this.oifitsViewPanel.updatePlotId(plotId);
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
