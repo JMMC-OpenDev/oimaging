@@ -189,6 +189,10 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     public void plot(OIFitsFile oiFitsFileParam, String targetName) {
         logger.debug("plot : {} for target {}", oiFitsFileParam, targetName);
 
+        // Remove previous OIFits in collection:
+        ocm.removeOIFitsFile(this.oiFitsFile);
+        this.oiFitsFile = null;
+
         if (oiFitsFileParam == null || !oiFitsFileParam.hasOiData() || targetName == null || oiFitsFileParam.getAbsoluteFilePath() == null) {
             if (targetName == null) {
                 this.jLabelMessage.setText("Missing target name in response.");
@@ -197,16 +201,10 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
                 this.jLabelMessage.setText("No OIFits data available.");
 
             }
-
             display(false, true);
-
-            ocm.removeOIFitsFile(this.oiFitsFile);
-            this.oiFitsFile = null;
-
         } else {
             display(true, false);
 
-            ocm.removeOIFitsFile(this.oiFitsFile);
             this.oiFitsFile = oiFitsFileParam;
 
             // fix the situation where both input and result viewerPanel point to the same filepath.
@@ -245,7 +243,7 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
             OIDataFile fileInCollection = ocm.getOIDataFile(this.oiFitsFile);
 
-            // a filter that targets all tables from fileInCollection
+            // a filter that matches all tables of the given oifitsFile:
             subsetCopy.getFilter().getTables().clear();
             subsetCopy.getFilter().getTables().add(new TableUID(fileInCollection));
 
