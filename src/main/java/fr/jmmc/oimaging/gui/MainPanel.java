@@ -1012,21 +1012,25 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
+            // Ensure to reset results anyway:
+            if (modelResults.isEmpty()) {
+                showTablePanel(false);
+                viewerPanelResults.displayResult(null);
+            }
+
             switch (event.getType()) {
                 case IRMODEL_CHANGED:
                     viewerPanelInput.displayModel(currentModel);
                     jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.INPUT.ordinal());
                     break;
                 case IRMODEL_RESULT_LIST_CHANGED:
-                    if (modelResults.isEmpty()) {
-                        showTablePanel(false);
-                        viewerPanelResults.displayResult(null);
-                    } else {
+                    if (!modelResults.isEmpty()) {
                         showTablePanel(true);
+
                         if (lastResult != null) {
                             jTablePanel.setSelectedRow(lastResult);
 
-                            // we also update input display because a new run will change init image
+                            // update input display because init image changed:
                             viewerPanelInput.displayModel(currentModel);
                         }
                     }
