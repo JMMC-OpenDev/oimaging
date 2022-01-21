@@ -31,11 +31,6 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OIFitsViewPanel.class.getName());
 
-    /**
-     * OIFitsCollectionManager singleton
-     */
-    private static final OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
-
     /* members */
     /** OIFitsCollectionManager singleton */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
@@ -151,7 +146,7 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
         this.jLabelMessage.setForeground(ChartColor.DARK_RED);
 
         // init with default plotId
-        updatePlotId(OCM.getCurrentPlot().getId());
+        updatePlotId(ocm.getCurrentPlot().getId());
     }
 
     /**

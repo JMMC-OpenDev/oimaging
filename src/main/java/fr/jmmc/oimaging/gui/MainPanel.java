@@ -80,11 +80,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         INPUT, RESULTS
     };
 
-    /**
-     * OIFitsCollectionManager singleton
-     */
-    private static final OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
-
     /* members */
  /* actions */
     private DeleteSelectionAction deleteSelectionAction;
@@ -229,32 +224,34 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         viewerPanelInput.setMainPanel(this);
         viewerPanelResults.setMainPanel(this);
 
+        final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+
         // create two plot def, two subset def, and two views for the two ViewerPanel
         SubsetDefinition subDefInput = new SubsetDefinition();
         subDefInput.setId("SUBSET_INPUT");
         subDefInput.setName("Subset Definition Input");
         subDefInput.setDescription("Subset Definition for input ViewerPanel");
-        OCM.addSubsetDefinition(subDefInput);
+        ocm.addSubsetDefinition(subDefInput);
 
         SubsetDefinition subDefResults = new SubsetDefinition();
         subDefResults.setId("SUBSET_RESULTS");
         subDefResults.setName("Subset Definition Results");
         subDefResults.setDescription("Subset Definition for results ViewerPanel");
-        OCM.addSubsetDefinition(subDefResults);
+        ocm.addSubsetDefinition(subDefResults);
 
         PlotDefinition plotDefInput = new PlotDefinition();
         plotDefInput.setId("PLOT_DEF_INPUT");
         plotDefInput.setName("Plot Definition Input");
         plotDefInput.setDescription("Plot Definition for input ViewerPanel");
-        plotDefInput.copyValues(OCM.getCurrentPlotDefinitionRef());
-        OCM.addPlotDefinition(plotDefInput);
+        plotDefInput.copyValues(ocm.getCurrentPlotDefinitionRef());
+        ocm.addPlotDefinition(plotDefInput);
 
         PlotDefinition plotDefResults = new PlotDefinition();
         plotDefResults.setId("PLOT_DEF_RESULTS");
         plotDefResults.setName("Plot Definition Results");
         plotDefResults.setDescription("Plot Definition for results ViewerPanel");
-        plotDefResults.copyValues(OCM.getCurrentPlotDefinitionRef());
-        OCM.addPlotDefinition(plotDefResults);
+        plotDefResults.copyValues(ocm.getCurrentPlotDefinitionRef());
+        ocm.addPlotDefinition(plotDefResults);
 
         Plot plotInput = new Plot();
         plotInput.setId("VIEW_INPUT");
@@ -262,7 +259,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         plotInput.setDescription("View for input ViewerPanel");
         plotInput.setPlotDefinition(plotDefInput);
         plotInput.setSubsetDefinition(subDefInput);
-        OCM.addPlot(plotInput);
+        ocm.addPlot(plotInput);
 
         Plot plotResults = new Plot();
         plotResults.setId("VIEW_RESULTS");
@@ -270,7 +267,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         plotResults.setDescription("View for results ViewerPanel");
         plotResults.setPlotDefinition(plotDefResults);
         plotResults.setSubsetDefinition(subDefResults);
-        OCM.addPlot(plotResults);
+        ocm.addPlot(plotResults);
 
         viewerPanelInput.setOIFitsViewPlotId(plotInput.getId());
         viewerPanelResults.setOIFitsViewPlotId(plotResults.getId());
