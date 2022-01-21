@@ -10,6 +10,7 @@ import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
+import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
@@ -364,11 +365,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jLabelTabInput.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelTabInput.setText("Input");
-        jLabelTabInput.setPreferredSize(new java.awt.Dimension(200, 40));
+        jLabelTabInput.setPreferredSize(new java.awt.Dimension(SwingUtils.adjustUISize(200), SwingUtils.adjustUISize(40)));
 
         jLabelTabResults.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelTabResults.setText("Results");
-        jLabelTabResults.setPreferredSize(new java.awt.Dimension(200, 40));
+        jLabelTabResults.setPreferredSize(new java.awt.Dimension(SwingUtils.adjustUISize(200), SwingUtils.adjustUISize(40)));
 
         setLayout(new java.awt.BorderLayout());
 
