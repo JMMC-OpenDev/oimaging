@@ -66,10 +66,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(ViewerPanel.class);
     /** fits extension including '.' (dot) character ie '.fits' */
     public final static String FITS_EXTENSION = "." + MimeType.OIFITS.getExtension();
-    
+
+    /* members */
     /** reference to parent MainPanel */
     private MainPanel mainPanel;
-    
+
     /** Fits image panel */
     private final FitsImagePanel fitsImagePanel;
 
@@ -209,7 +210,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         } else {
             // call to plot with null so it forgets the oifitsfile 
             oifitsViewPanel.plot(null, null);
-            
+
             jPanelOIFits.remove(oifitsViewPanel);
             // reset Param Tables
             ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(null);
@@ -285,8 +286,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             displaySelection(null);
             displayImage(null, null);
             displayOiFitsAndParams(null, null);
-        }
-        else {
+        } else {
             // execution log
             jEditorPaneExecutionLog.setText(result.getExecutionLog());
 
@@ -871,6 +871,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JTable jTableOutputParamKeywords;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * ChangeListener implementation on jTabbedPaneVizualizations
+     * @param e unused
+     */
     @Override
     public void stateChanged(ChangeEvent e) {
         if (syncingUI) {
@@ -885,10 +889,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         // small check to prevent calls too early in the application start
         // mainPanel is given at the end of MainPanel.initComponents()
         if (mainPanel != null) {
-            
             // mainPanel has knowledge of both viewerPanels and will take decision of which actions to enable
             mainPanel.updateEnabledActions();
         }
+    }
+
+    void setMainPanel(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
     }
 
     private void storeLastPanel() {
@@ -933,18 +940,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     public void setShowMode(SHOW_MODE showMode) {
         this.showMode = showMode;
     }
-    
+
     /**
      * @return true if no image in fitsImagePanel
      */
-    public boolean isFitsImageNull () {
+    public boolean isFitsImageNull() {
         return this.fitsImagePanel.getFitsImage() == null;
-    }
-    
-    /**
-     * @param mainPanel reference to parent MainPanel.
-     */
-    public void setMainPanel (MainPanel mainPanel) {
-        this.mainPanel = mainPanel;
     }
 }
