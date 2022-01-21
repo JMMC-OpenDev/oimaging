@@ -741,12 +741,38 @@ public final class IRModel {
 
             postProcessOIFitsFile(serviceResult);
 
+            final List<FitsImageHDU> resultHdus = serviceResult.getOifitsFile().getFitsImageHDUs();
+
             // get roles in the given list order:
             final List<Role> hdusRoles = getHdusRoles(serviceResult.getOifitsFile());
 
             // import partially FitsImageHDUs:
-            final List<FitsImageHDU> libraryHdus = addFitsImageHDUs(serviceResult.getOifitsFile().getFitsImageHDUs(),
-                    serviceResult.getInputFile().getName(), hdusRoles);
+            final List<FitsImageHDU> libraryHdus = addFitsImageHDUs(
+                    resultHdus, serviceResult.getInputFile().getName(), hdusRoles);
+
+            // when added to library, some hdu can have their hduName changed.
+            // so we report the changes into the parameters of the hdu, to make it consistent.
+            ImageOiInputParam inputParams = serviceResult.getOifitsFile().getImageOiData().getInputParam();
+            ImageOiOutputParam outputParams = serviceResult.getOifitsFile().getImageOiData().getOutputParam();
+            for (int i = 0, s = resultHdus.size(); i < s; i++) {
+                switch (hdusRoles.get(i)) {
+                    case RESULT:
+                        // we use resultHdus and not libraryHdus
+                        // we don't want the hduName of equivalent hdus in library
+                        // our target is only the hdus of the result that have been added to library
+                        // and that had their names changed
+                        outputParams.setLastImg(resultHdus.get(i).getHduName());
+                        break;
+                    case INIT:
+                        inputParams.setInitImg(resultHdus.get(i).getHduName());
+                        break;
+                    case RGL:
+                        inputParams.setRglPrio(resultHdus.get(i).getHduName());
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             // this needs to be done after the call addFitsImageHDUs()
             // so it uses the (possible) new name
