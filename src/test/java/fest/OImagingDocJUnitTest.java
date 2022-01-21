@@ -12,6 +12,7 @@ import fr.jmmc.jmcs.data.preference.CommonPreferences;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
 import fr.jmmc.jmcs.data.preference.SessionSettingsPreferences;
 import fr.jmmc.oimaging.Preferences;
+import fr.jmmc.oimaging.gui.ViewerPanel;
 import fr.jmmc.oimaging.services.ServiceList;
 import java.awt.Dimension;
 import static java.awt.event.KeyEvent.*;
@@ -142,7 +143,7 @@ public final class OImagingDocJUnitTest extends JmcsFestSwingJUnitTestCase {
 
         pauseMedium();
 
-        window.tabbedPane("jTabbedPaneVizualizations").selectTab("Image");
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab(ViewerPanel.TAB_LABEL_IMAGES);
         saveScreenshot(window, "OImaging-output-" + algorithm + ".png");
 
         if (small) {
@@ -161,13 +162,13 @@ public final class OImagingDocJUnitTest extends JmcsFestSwingJUnitTestCase {
             saveImage(rescaledImage, "OImaging-output-" + algorithm + "-small.png");
         }
 
-        window.tabbedPane("jTabbedPaneVizualizations").selectTab("OIFits");
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab(ViewerPanel.TAB_LABEL_OIFITS);
         saveScreenshot(window, "OImaging-output-" + algorithm + "-oifits.png");
 
-        window.tabbedPane("jTabbedPaneVizualizations").selectTab("Parameters");
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab(ViewerPanel.TAB_LABEL_PARAMS);
         saveScreenshot(window, "OImaging-output-" + algorithm + "-parameters.png");
 
-        window.tabbedPane("jTabbedPaneVizualizations").selectTab("Execution log");
+        window.tabbedPane("jTabbedPaneVizualizations").selectTab(ViewerPanel.TAB_LABEL_EXECLOG);
         saveScreenshot(window, "OImaging-output-" + algorithm + "-log.png");
     }
 

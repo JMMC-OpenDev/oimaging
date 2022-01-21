@@ -67,6 +67,12 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     /** fits extension including '.' (dot) character ie '.fits' */
     public final static String FITS_EXTENSION = "." + MimeType.OIFITS.getExtension();
 
+    /* constants for the labels of the tab headers */
+    public static final String TAB_LABEL_IMAGES = "Images";
+    public static final String TAB_LABEL_OIFITS = "OIFits data";
+    public static final String TAB_LABEL_PARAMS = "Parameters";
+    public static final String TAB_LABEL_EXECLOG = "Execution log";
+
     /* members */
     /** reference to parent MainPanel */
     private MainPanel mainPanel;
@@ -242,11 +248,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             if ((mode.equals(SHOW_MODE.MODEL) && (jTabbedPaneVizualizations.getComponentCount() > 3))
                     || (mode.equals(SHOW_MODE.RESULT) && (jTabbedPaneVizualizations.getComponentCount() == 3))) {
                 jTabbedPaneVizualizations.removeAll();
-                jTabbedPaneVizualizations.add("Image", jPanelImageViewer);
-                jTabbedPaneVizualizations.add("OIFits", jPanelOIFitsViewer);
-                jTabbedPaneVizualizations.add("Parameters", jPanelOutputParamViewer);
+                jTabbedPaneVizualizations.add(TAB_LABEL_IMAGES, jPanelImageViewer);
+                jTabbedPaneVizualizations.add(TAB_LABEL_OIFITS, jPanelOIFitsViewer);
+                jTabbedPaneVizualizations.add(TAB_LABEL_PARAMS, jPanelOutputParamViewer);
                 if (mode.equals(SHOW_MODE.RESULT)) {
-                    jTabbedPaneVizualizations.add("Execution log", jPanelLogViewer);
+                    jTabbedPaneVizualizations.add(TAB_LABEL_EXECLOG, jPanelLogViewer);
                 }
             }
         } finally {
@@ -644,7 +650,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jScrollPaneTableInput = new javax.swing.JScrollPane();
         jTableInputParamKeywords = new javax.swing.JTable();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation")); // NOI18N
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
         setLayout(new java.awt.GridBagLayout());
 
         jTabbedPaneVizualizations.setName("jTabbedPaneVizualizations"); // NOI18N
@@ -660,7 +666,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 0.1;
         jPanelOIFitsViewer.add(jPanelOIFits, gridBagConstraints);
 
-        jTabbedPaneVizualizations.addTab("OIFits data", jPanelOIFitsViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_OIFITS, jPanelOIFitsViewer);
 
         jPanelImageViewer.setLayout(new java.awt.GridBagLayout());
 
@@ -751,7 +757,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 1.0;
         jPanelImageViewer.add(jPanelImage, gridBagConstraints);
 
-        jTabbedPaneVizualizations.addTab("Images", jPanelImageViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_IMAGES, jPanelImageViewer);
 
         jPanelLogViewer.setLayout(new java.awt.BorderLayout());
 
@@ -760,7 +766,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelLogViewer.add(jScrollPaneLog, java.awt.BorderLayout.CENTER);
 
-        jTabbedPaneVizualizations.addTab("Execution log", jPanelLogViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_EXECLOG, jPanelLogViewer);
 
         jPanelOutputParamViewer.setLayout(new java.awt.GridBagLayout());
 
@@ -810,7 +816,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 0.8;
         jPanelOutputParamViewer.add(jScrollPaneTableInput, gridBagConstraints);
 
-        jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_PARAMS, jPanelOutputParamViewer);
 
         jTabbedPaneVizualizations.setSelectedIndex(1);
 
