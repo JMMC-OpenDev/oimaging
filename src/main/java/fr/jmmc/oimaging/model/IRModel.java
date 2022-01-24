@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -621,30 +623,41 @@ public final class IRModel {
 
         // Fix duplicated hduName in the image library:
         if (existHduNameInImageLibrary(tryHduName)) {
-            // TODO: parse tryHduName to remove date suffix
 
-            // duplicated HDU name found:
-            String newName = tryHduName + "-" + DateUtils.now().substring(0, 19);
-
-            // Always ensure name fits in header card:
-            if (newName.length() > 68) {
-                newName = newName.substring(0, 68);
+            // remove suffix
+            Matcher dateMatcher = Pattern.compile("-\\d{4}-[01]\\d-[0123]\\d").matcher(tryHduName);
+            int dateStart = -1;
+            while (dateMatcher.find()) {
+                dateStart = dateMatcher.start();
+            }
+            if (dateStart != -1) {
+                tryHduName = tryHduName.substring(0, dateStart);
             }
 
-            if (existHduNameInImageLibrary(newName)) {
+            // duplicated HDU name found:
+            // adding a date suffix
+            String suffix = "-" + DateUtils.now().substring(0, 19);
+            if (existHduNameInImageLibrary(tryHduName + suffix)) {
+                // adding a _N suffix to the date suffix
                 int idx = 1;
-                String newNameAlt = newName + "_" + idx;
-
+                String suffixAlt = suffix + "_" + idx;
                 for (;;) {
-                    if (!existHduNameInImageLibrary(newNameAlt)) {
+                    if (!existHduNameInImageLibrary(tryHduName + suffixAlt)) {
                         break;
                     }
                     // use another suffix (_nn):
                     idx++;
-                    newNameAlt = newName + "_" + idx;
+                    suffixAlt = suffix + "_" + idx;
                 }
-                newName = newNameAlt;
+                suffix = suffixAlt;
             }
+
+            // Always ensure name fits in header card (we truncate tryHduName, not suffix)
+            final int nameMaxLength = 68; // 70 minus the two surrounding quotes "myName"
+            String newName
+                    = tryHduName.substring(0, Math.min(tryHduName.length(), nameMaxLength - suffix.length()))
+                    + suffix;
+
             // name is available:
             logger.info("HDU_NAME '{}' is already used in imageLibrary, renamed to '{}'.", hdu.getHduName(), newName);
             hdu.setHduName(newName);
