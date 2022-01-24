@@ -231,9 +231,6 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
                 }
                 this.oiFitsFile.setAbsoluteFilePath(path);
             }
-            // Note: two distinct filepath can have the same filename.
-            // OIFitsCollectionManager already manages this case by using unique internal ids.
-            // see OIFitsCollectionManager.addOIFitsFile, `id += "_bis";`
 
             ocm.addOIFitsFile(this.oiFitsFile);
 
