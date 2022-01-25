@@ -70,6 +70,9 @@ public final class IRModel {
         RESULT, INIT, RGL, NO_ROLE
     };
 
+    /** RegExp expression to match date (yyyy-MM-dd'T'HH:mm:ss) */
+    private final static Pattern PATTERN_DATE = Pattern.compile("-\\d{4}-[01]\\d-[0123]\\dT\\d{2}:\\d{2}:\\d{2}");
+
     /* Members */
     /** Selected algorithm */
     private Service selectedService;
@@ -269,7 +272,7 @@ public final class IRModel {
                 initSpecificParams(false);
             }
         }
-        
+
         // cleaning all output params as they are meaningless in the input form
         // it must be done AFTER role computation (it uses output params)
         // it must be done AFTER guessing the service (it uses output params)
@@ -307,11 +310,21 @@ public final class IRModel {
      * Add FitsImageHDUs to the image library
      * @param hdus new hdus from files (not in the image library)
      * @param filename filename of given hdu
+     * @return list of FitsImageHDU present in the image library or NULL
+     */
+    public List<FitsImageHDU> addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename) {
+        return addFitsImageHDUs(hdus, filename, null);
+    }
+
+    /**
+     * Add FitsImageHDUs to the image library
+     * @param hdus new hdus from files (not in the image library)
+     * @param filename filename of given hdu
      * @param roles optional list of FitsImageHDU roles to early skip INIT or RGL images
      * @return list of FitsImageHDU present in the image library or NULL
      */
-    public List<FitsImageHDU> addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
-                                               final List<Role> roles) {
+    private List<FitsImageHDU> addFitsImageHDUs(final List<FitsImageHDU> hdus, final String filename,
+                                                final List<Role> roles) {
 
         final int nHdus = hdus.size();
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);
@@ -622,20 +635,18 @@ public final class IRModel {
         hdu.setHduName(tryHduName);
 
         // Fix duplicated hduName in the image library:
-        if (existHduNameInImageLibrary(tryHduName)) {
+        if ((tryHduName != null) && existHduNameInImageLibrary(tryHduName)) {
+            // remove date suffix
+            final Matcher dateMatcher = PATTERN_DATE.matcher(tryHduName);
 
-            // remove suffix
-            Matcher dateMatcher = Pattern.compile("-\\d{4}-[01]\\d-[0123]\\d").matcher(tryHduName);
-            int dateStart = -1;
-            while (dateMatcher.find()) {
-                dateStart = dateMatcher.start();
-            }
-            if (dateStart != -1) {
+            // match first occurence:
+            int dateStart = (dateMatcher.find()) ? dateMatcher.start() : -1;
+            if (dateStart > 0) {
                 tryHduName = tryHduName.substring(0, dateStart);
             }
 
             // duplicated HDU name found:
-            // adding a date suffix
+            // adding a date suffix (yyyy-MM-dd'T'HH:mm:ss)
             String suffix = "-" + DateUtils.now().substring(0, 19);
             if (existHduNameInImageLibrary(tryHduName + suffix)) {
                 // adding a _N suffix to the date suffix
@@ -655,7 +666,7 @@ public final class IRModel {
             // Always ensure name fits in header card (we truncate tryHduName, not suffix)
             final int nameMaxLength = 68; // 70 minus the two surrounding quotes "myName"
             String newName
-                    = tryHduName.substring(0, Math.min(tryHduName.length(), nameMaxLength - suffix.length()))
+                   = tryHduName.substring(0, Math.min(tryHduName.length(), nameMaxLength - suffix.length()))
                     + suffix;
 
             // name is available:
@@ -968,6 +979,7 @@ public final class IRModel {
         this.running = running;
     }
 
+    @Override
     public String toString() {
         return "IRModel [" + oifitsFile + ", " + imageLibrary + ", " + selectedService + "]";
     }
