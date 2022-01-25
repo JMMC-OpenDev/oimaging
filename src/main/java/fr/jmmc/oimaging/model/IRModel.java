@@ -778,7 +778,8 @@ public final class IRModel {
             // so we report the changes into the parameters of the hdu, to make it consistent.
             ImageOiInputParam inputParams = serviceResult.getOifitsFile().getImageOiData().getInputParam();
             ImageOiOutputParam outputParams = serviceResult.getOifitsFile().getImageOiData().getOutputParam();
-            for (int i = 0, s = resultHdus.size(); i < s; i++) {
+
+            for (int i = 0, len = resultHdus.size(); i < len; i++) {
                 switch (hdusRoles.get(i)) {
                     case RESULT:
                         // we use resultHdus and not libraryHdus

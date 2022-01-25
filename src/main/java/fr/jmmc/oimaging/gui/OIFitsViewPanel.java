@@ -208,29 +208,31 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
             this.oiFitsFile = oiFitsFileParam;
 
             // fix the situation where both input and result viewerPanel point to the same filepath.
-            // filepaths must be unique among the ocm's collection so we suffix it with "_bitsN".
+            // filepaths must be unique among the ocm's collection so we suffix it with "_bisN".
             // Without this fix, the call ocm.addOIFitsFile() replaces the old oifitsFile with the same filepath,
             // so it corrupts the data of the other Viewer.
             // see OIFitsCollection.addOIFitsFile, `removeOIFitsFile(previous);`
             String path = this.oiFitsFile.getAbsoluteFilePath();
-            while (ocm.getOIFitsCollection().getOIFitsFile(path) != null) {
 
-                int index = path.lastIndexOf("_bis");
-                if (index == -1) {
-                    path += "_bis1";
-                } else {
-                    String strNumber = path.substring(index + 4);
+            // make the id unique with a _bisN suffix
+            final String pathSuffix = "_bis";
+
+            while (ocm.getOIFitsCollection().getOIFitsFile(path) != null) {
+                int index = path.lastIndexOf(pathSuffix);
+                int number = 1;
+                if (index != -1) {
+                    String strNumber = path.substring(index + pathSuffix.length());
+                    path = path.substring(0, index);
                     try {
-                        int number = Integer.decode(strNumber);
+                        number = Integer.parseInt(strNumber);
                         number++;
-                        path = path.substring(0, index);
-                        path += "_bis" + number;
-                    } catch (NumberFormatException e) {
-                        path += "_bis1";
+                    } catch (NumberFormatException nfe) {
+                        logger.debug("Unable to parse '{}'", strNumber);
                     }
                 }
-                this.oiFitsFile.setAbsoluteFilePath(path);
+                path += pathSuffix + number;
             }
+            this.oiFitsFile.setAbsoluteFilePath(path);
 
             ocm.addOIFitsFile(this.oiFitsFile);
 
