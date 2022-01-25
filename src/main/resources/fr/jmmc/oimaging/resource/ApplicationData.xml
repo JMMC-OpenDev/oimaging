@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.6.0 beta 10"/>
-    <compilation date="16/12/2021" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.6.0 beta 11"/>
+    <compilation date="25/01/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -142,7 +142,7 @@
         <menu label="Processing">
             <menu label="Run" classpath="fr.jmmc.oimaging.gui.action.RunAction" action="run" description="Run the image reconstruction using the current input OIFITS file"/>
             <menu/> <!-- menu separator -->
-            <menu label="Create image" classpath="fr.jmmc.oimaging.gui.action.CreateImageAction" action="createImage" 
+            <menu label="Create image" classpath="fr.jmmc.oimaging.gui.action.CreateImageAction" action="createImage"
                   description="Create a centered-gaussian image"/>
             <menu label="Modify image" classpath="fr.jmmc.oimaging.gui.action.ProcessImageAction" action="modifyImage"
                   description="Modify the current image (change fov and resample according to the pixel increments)"/>
@@ -170,7 +170,10 @@
 
     <releasenotes>
         <release version="0.6.0">
-            <pubDate>Thu, 16 Dec 2021 16:00:00 GMT</pubDate>
+            <pubDate>Tue, 25 Jan 2022 16:00:00 GMT</pubDate>
+            <prerelease version="0.6.0 beta 11">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/21">Improved GUI to adopt two views Input &amp; Results</change>
+            </prerelease>
             <prerelease version="0.6.0 beta 10">
                 <change type="FEATURE">Updated MIRA release that fills INPUT / OUTPUT parameters (chi2); SPARCO updated to latest release on kluskaj</change>
                 <change type="BUGFIX">Improvements to focus handling, image renaming and race conditions</change>
