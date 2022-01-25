@@ -5,7 +5,6 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.FeedbackReport;
-import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
@@ -16,10 +15,6 @@ import fr.jmmc.oiexplorer.core.gui.SliderPanel;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
 import fr.jmmc.oimaging.OImaging;
 import fr.jmmc.oimaging.Preferences;
-import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
-import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
-import fr.jmmc.oimaging.interop.SendFitsAction;
-import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -46,7 +41,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.Action;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
@@ -73,6 +67,16 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     /** fits extension including '.' (dot) character ie '.fits' */
     public final static String FITS_EXTENSION = "." + MimeType.OIFITS.getExtension();
 
+    /* constants for the labels of the tab headers */
+    public static final String TAB_LABEL_IMAGES = "Images";
+    public static final String TAB_LABEL_OIFITS = "OIFits data";
+    public static final String TAB_LABEL_PARAMS = "Parameters";
+    public static final String TAB_LABEL_EXECLOG = "Execution log";
+
+    /* members */
+    /** reference to parent MainPanel */
+    private MainPanel mainPanel;
+
     /** Fits image panel */
     private final FitsImagePanel fitsImagePanel;
 
@@ -82,10 +86,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     /** Slider panel */
     private final SliderPanel sliderPanel;
 
-    private final Action exportOiFitsAction;
-    private final Action sendOiFitsAction;
-    private final Action exportFitsImageAction;
-    private final Action sendFitsAction;
     private Component lastModelPanel;
     private Component lastResultPanel;
     private Component lastGridPanel;
@@ -126,11 +126,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 1.0;
         jPanelOIFitsViewer.add(oifitsViewPanel, gridBagConstraints);
 
-        exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
-        sendOiFitsAction = ActionRegistrar.getInstance().get(SendOIFitsAction.className, SendOIFitsAction.actionName);
-        exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
-        sendFitsAction = ActionRegistrar.getInstance().get(SendFitsAction.className, SendFitsAction.actionName);
-
         jComboBoxImage.setRenderer(new OiCellRenderer());
 
         jLabelImageDebug.setVisible(SHOW_DEBUG_INFO);
@@ -143,6 +138,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
 
         jEditorPaneExecutionLog.setFont(new Font("Monospaced", Font.PLAIN, SwingUtils.adjustUISize(10)));
+    }
+
+    /**
+     * set the plot id associated to the OIFitsViewPanel.
+     *
+     * @param plotId the id of the plot
+     */
+    public void setOIFitsViewPlotId(String plotId) {
+        this.oifitsViewPanel.updatePlotId(plotId);
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
@@ -210,6 +214,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             AutofitTableColumns.autoResizeTable(jTableOutputParamKeywords, true, true); // include header width
             AutofitTableColumns.autoResizeTable(jTableInputParamKeywords, true, true); // include header width
         } else {
+            // call to plot with null so it forgets the oifitsfile 
+            oifitsViewPanel.plot(null, null);
+
             jPanelOIFits.remove(oifitsViewPanel);
             // reset Param Tables
             ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(null);
@@ -221,7 +228,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jScrollPaneTableOutput.setVisible(showOutput);
     }
 
-    private void setTabMode(SHOW_MODE mode) {
+    public void setTabMode(SHOW_MODE mode) {
         syncingUI = true;
         try {
             // change border title
@@ -241,11 +248,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             if ((mode.equals(SHOW_MODE.MODEL) && (jTabbedPaneVizualizations.getComponentCount() > 3))
                     || (mode.equals(SHOW_MODE.RESULT) && (jTabbedPaneVizualizations.getComponentCount() == 3))) {
                 jTabbedPaneVizualizations.removeAll();
-                jTabbedPaneVizualizations.add("Image", jPanelImageViewer);
-                jTabbedPaneVizualizations.add("OIFits", jPanelOIFitsViewer);
-                jTabbedPaneVizualizations.add("Parameters", jPanelOutputParamViewer);
+                jTabbedPaneVizualizations.add(TAB_LABEL_IMAGES, jPanelImageViewer);
+                jTabbedPaneVizualizations.add(TAB_LABEL_OIFITS, jPanelOIFitsViewer);
+                jTabbedPaneVizualizations.add(TAB_LABEL_PARAMS, jPanelOutputParamViewer);
                 if (mode.equals(SHOW_MODE.RESULT)) {
-                    jTabbedPaneVizualizations.add("Execution log", jPanelLogViewer);
+                    jTabbedPaneVizualizations.add(TAB_LABEL_EXECLOG, jPanelLogViewer);
                 }
             }
         } finally {
@@ -257,7 +264,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void displayModel(IRModel irModel) {
-        showMode = SHOW_MODE.MODEL;
+        setShowMode(SHOW_MODE.MODEL);
         if (irModel != null) {
             String inputImageView = irModel.getInputImageView();
             displayOiFitsAndParams(irModel.getOifitsFile(), irModel.getImageOiData().getInputParam().getTarget());
@@ -274,13 +281,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void displayResult(ServiceResult result) {
-        showMode = SHOW_MODE.RESULT;
+        setShowMode(SHOW_MODE.RESULT);
 
         // Remove the grid view if any
         jPanelImage.removeAll();
         jPanelImage.setLayout(new BorderLayout());
 
-        if (result != null) {
+        if (result == null) {
+            jEditorPaneExecutionLog.setText("");
+            displaySelection(null);
+            displayImage(null, null);
+            displayOiFitsAndParams(null, null);
+        } else {
             // execution log
             jEditorPaneExecutionLog.setText(result.getExecutionLog());
 
@@ -319,7 +331,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     public void displayGrid(List<ServiceResult> results) {
-        showMode = SHOW_MODE.GRID;
+        setShowMode(SHOW_MODE.GRID);
 
         if (!results.isEmpty()) {
             final int gridSize = calculateGridSize(results.size());
@@ -586,7 +598,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             newHDU.updateChecksum();
 
             // add the FitsImageHDU to the imageLibrary
-            final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)", null);
+            final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)");
 
             irModel.updateImageIdentifiers(newHDU);
 
@@ -638,7 +650,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jScrollPaneTableInput = new javax.swing.JScrollPane();
         jTableInputParamKeywords = new javax.swing.JTable();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation")); // NOI18N
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
         setLayout(new java.awt.GridBagLayout());
 
         jTabbedPaneVizualizations.setName("jTabbedPaneVizualizations"); // NOI18N
@@ -654,7 +666,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 0.1;
         jPanelOIFitsViewer.add(jPanelOIFits, gridBagConstraints);
 
-        jTabbedPaneVizualizations.addTab("OIFits data", jPanelOIFitsViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_OIFITS, jPanelOIFitsViewer);
 
         jPanelImageViewer.setLayout(new java.awt.GridBagLayout());
 
@@ -745,7 +757,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 1.0;
         jPanelImageViewer.add(jPanelImage, gridBagConstraints);
 
-        jTabbedPaneVizualizations.addTab("Images", jPanelImageViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_IMAGES, jPanelImageViewer);
 
         jPanelLogViewer.setLayout(new java.awt.BorderLayout());
 
@@ -754,7 +766,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelLogViewer.add(jScrollPaneLog, java.awt.BorderLayout.CENTER);
 
-        jTabbedPaneVizualizations.addTab("Execution log", jPanelLogViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_EXECLOG, jPanelLogViewer);
 
         jPanelOutputParamViewer.setLayout(new java.awt.GridBagLayout());
 
@@ -804,7 +816,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints.weighty = 0.8;
         jPanelOutputParamViewer.add(jScrollPaneTableInput, gridBagConstraints);
 
-        jTabbedPaneVizualizations.addTab("Parameters", jPanelOutputParamViewer);
+        jTabbedPaneVizualizations.addTab(TAB_LABEL_PARAMS, jPanelOutputParamViewer);
 
         jTabbedPaneVizualizations.setSelectedIndex(1);
 
@@ -865,6 +877,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JTable jTableOutputParamKeywords;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * ChangeListener implementation on jTabbedPaneVizualizations
+     * @param e unused
+     */
     @Override
     public void stateChanged(ChangeEvent e) {
         if (syncingUI) {
@@ -876,14 +892,16 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     private void enableActions() {
-        final OIFitsFile oiFitsFile = getCurrentOIFitsFile();
-        final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
-        exportOiFitsAction.setEnabled(enableExportOiFits);
-        sendOiFitsAction.setEnabled(enableExportOiFits);
+        // small check to prevent calls too early in the application start
+        // mainPanel is given at the end of MainPanel.initComponents()
+        if (mainPanel != null) {
+            // mainPanel has knowledge of both viewerPanels and will take decision of which actions to enable
+            mainPanel.updateEnabledActions();
+        }
+    }
 
-        final boolean enableExportImage = (fitsImagePanel.getFitsImage() != null);
-        exportFitsImageAction.setEnabled(enableExportImage);
-        sendFitsAction.setEnabled(enableExportImage);
+    void setMainPanel(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
     }
 
     private void storeLastPanel() {
@@ -920,5 +938,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
      */
     public SHOW_MODE getShowMode() {
         return showMode;
+    }
+
+    /**
+     * @param showMode the showMode to set
+     */
+    public void setShowMode(SHOW_MODE showMode) {
+        this.showMode = showMode;
+    }
+
+    /**
+     * @return true if no image in fitsImagePanel
+     */
+    public boolean isFitsImageNull() {
+        return this.fitsImagePanel.getFitsImage() == null;
     }
 }

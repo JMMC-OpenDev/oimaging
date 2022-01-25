@@ -10,7 +10,9 @@ import fr.jmmc.oiexplorer.core.gui.PlotChartPanel;
 import fr.jmmc.oiexplorer.core.gui.PlotView;
 import fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
+import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.oi.TableUID;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.BorderLayout;
 import org.jfree.chart.ChartColor;
@@ -143,9 +145,19 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
         this.jLabelMessage.setForeground(ChartColor.DARK_RED);
 
-        // define which plot to use:
-        final String plotId = OIFitsCollectionManager.CURRENT_VIEW;
+        // init with default plotId
+        updatePlotId(ocm.getCurrentPlot().getId());
+    }
 
+    /**
+     * change the plot associated to this Panel.
+     * @param plotId the id of the new plot (for example VIEW_0)
+     */
+    public void updatePlotId(String plotId) {
+        if (this.plotView != null) {
+            remove(this.plotView);
+            this.plotView.dispose();
+        }
         this.plotView = new PlotView(plotId);
         this.plotChartPanel = this.plotView.getPlotPanel();
 
@@ -171,15 +183,17 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     /**
      * Plot OIFits data using embedded OIFitsExplorer Plot panel
      * This code must be executed by the Swing Event Dispatcher thread (EDT)
-     * @param oiFitsData OIFits data
+     * @param oiFitsFileParam OIFits data
+     * @param targetName the target to display in the data
      */
-    public void plot(OIFitsFile oiFitsFile, String targetName) {
-        logger.debug("plot : {} for target {}", oiFitsFile, targetName);
+    public void plot(OIFitsFile oiFitsFileParam, String targetName) {
+        logger.debug("plot : {} for target {}", oiFitsFileParam, targetName);
 
-        // memorize chart data (used by export PDF):
-        setOIFitsData(oiFitsFile);
+        // Remove previous OIFits in collection:
+        ocm.removeOIFitsFile(this.oiFitsFile);
+        this.oiFitsFile = null;
 
-        if (oiFitsFile == null || !oiFitsFile.hasOiData() || targetName == null || oiFitsFile.getAbsoluteFilePath() == null) {
+        if (oiFitsFileParam == null || !oiFitsFileParam.hasOiData() || targetName == null || oiFitsFileParam.getAbsoluteFilePath() == null) {
             if (targetName == null) {
                 this.jLabelMessage.setText("Missing target name in response.");
                 // We could implement some fall back looking at OI_TARGET, using selected input one...
@@ -187,32 +201,50 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
                 this.jLabelMessage.setText("No OIFits data available.");
 
             }
-
             display(false, true);
-
-            // reset:
-            ocm.reset();
-
         } else {
             display(true, false);
-            /*
-            // Fix file paths ie generate file names ?
-            for (OIFitsFile oiFitsFile : oiFitsList) {
-                oiFitsFile.setAbsoluteFilePath(ExportOIFitsAction.getDefaultFileName(oiFitsFile));
-            }
-             */
-            // remove all oifits files:
-            ocm.removeAllOIFitsFiles();
 
-            // Add the given OIFits file:
-            ocm.addOIFitsFile(oiFitsFile);
+            this.oiFitsFile = oiFitsFileParam;
+
+            // fix the situation where both input and result viewerPanel point to the same filepath.
+            // filepaths must be unique among the ocm's collection so we suffix it with "_bisN".
+            // Without this fix, the call ocm.addOIFitsFile() replaces the old oifitsFile with the same filepath,
+            // so it corrupts the data of the other Viewer.
+            // see OIFitsCollection.addOIFitsFile, `removeOIFitsFile(previous);`
+            String path = this.oiFitsFile.getAbsoluteFilePath();
+
+            // make the id unique with a _bisN suffix
+            final String pathSuffix = "_bis";
+
+            while (ocm.getOIFitsCollection().getOIFitsFile(path) != null) {
+                int index = path.lastIndexOf(pathSuffix);
+                int number = 1;
+                if (index != -1) {
+                    String strNumber = path.substring(index + pathSuffix.length());
+                    path = path.substring(0, index);
+                    try {
+                        number = Integer.parseInt(strNumber);
+                        number++;
+                    } catch (NumberFormatException nfe) {
+                        logger.debug("Unable to parse '{}'", strNumber);
+                    }
+                }
+                path += pathSuffix + number;
+            }
+            this.oiFitsFile.setAbsoluteFilePath(path);
+
+            ocm.addOIFitsFile(this.oiFitsFile);
 
             // get current subset definition (copy):
-            final SubsetDefinition subsetCopy = ocm.getCurrentSubsetDefinition();
+            final String subdefid = ocm.getPlot(this.plotView.getPlotId()).getSubsetDefinition().getId();
+            final SubsetDefinition subsetCopy = ocm.getSubsetDefinition(subdefid);
 
-            subsetCopy.getFilter().setTargetUID(targetName);
-            // use all data files (default):
-            // subset.getTables().clear();
+            OIDataFile fileInCollection = ocm.getOIDataFile(this.oiFitsFile);
+
+            // a filter that matches all tables of the given oifitsFile:
+            subsetCopy.getFilter().getTables().clear();
+            subsetCopy.getFilter().getTables().add(new TableUID(fileInCollection));
 
             // fire subset changed event (generates OIFitsSubset and then plot asynchronously):
             ocm.updateSubsetDefinition(this, subsetCopy);

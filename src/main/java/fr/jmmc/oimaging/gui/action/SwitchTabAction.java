@@ -3,7 +3,6 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui.action;
 
-import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.oimaging.OImaging;
 import java.awt.event.ActionEvent;
@@ -11,27 +10,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Export one (and only one) file.
- * @author mella
+ * Switch tab.
  */
-public final class ExportFitsImageAction extends RegisteredAction {
+public class SwitchTabAction extends RegisteredAction {
 
-    /** default serial UID for Serializable interface */
-    private static final long serialVersionUID = 1;
-    /** Class name. This name is used to register to the ActionRegistrar */
-    public final static String className = ExportFitsImageAction.class.getName();
-    /** Action name. This name is used to register to the ActionRegistrar */
-    public final static String actionName = "exportFitsImage";
     /** Class logger */
-    private static final Logger logger = LoggerFactory.getLogger(className);
-    /** OIFits MimeType */
-    private final static MimeType mimeType = MimeType.OIFITS;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SwitchTabAction.class);
+
+    /** Class name. This name is used to register to the ActionRegistrar */
+    public final static String CLASS_NAME = SwitchTabAction.class.getName();
+    /** Action name. This name is used to register to the ActionRegistrar */
+    public final static String ACTION_NAME = "switchTab";
 
     /**
      * Public constructor that automatically register the action in RegisteredAction.
      */
-    public ExportFitsImageAction() {
-        super(className, actionName);
+    public SwitchTabAction() {
+        super(CLASS_NAME, ACTION_NAME);
     }
 
     /**
@@ -40,8 +35,7 @@ public final class ExportFitsImageAction extends RegisteredAction {
      */
     @Override
     public void actionPerformed(final ActionEvent evt) {
-        logger.debug("actionPerformed");
-        OImaging.getInstance().getMainPanel().getViewerPanelActive().exportFitsImage(true);
+        LOGGER.debug("actionPerformed");
+        OImaging.getInstance().getMainPanel().switchTab();
     }
-
 }

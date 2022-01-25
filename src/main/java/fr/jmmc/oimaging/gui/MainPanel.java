@@ -10,11 +10,19 @@ import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.FieldSliderAdapter;
+import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
+import fr.jmmc.oiexplorer.core.model.oi.Plot;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
+import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.interop.SendFitsAction;
+import fr.jmmc.oimaging.interop.SendOIFitsAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
@@ -66,11 +74,21 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     /** default mouse cursor refresh period = 100 ms */
     private static final int REFRESH_PERIOD = 100;
 
+    /** Enum used for indexes of tabs.
+     * Caution: Must be in sync with the order in which the tabs are added in jTabbedPaneTwoTabsDisplay.
+     */
+    private static enum TABS {
+        INPUT, RESULTS
+    };
+
     /* members */
  /* actions */
     private DeleteSelectionAction deleteSelectionAction;
     private RunAction runAction;
     private Action exportOiFitsAction;
+    private Action sendOiFitsAction;
+    private Action exportFitsImageAction;
+    private Action sendFitsAction;
 
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
@@ -154,7 +172,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jTablePanel.getSelectionModel().addListSelectionListener(this);
 
         // init viewer Panel
-        viewerPanel.displayModel(null);
+        viewerPanelInput.displayModel(null);
 
         // create image slider:
         jSliderResults = new JSlider();
@@ -175,7 +193,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // to ensure jsplit pane will be given 90% once it becomes visible:
         showTablePanel(false);
 
-        jSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+        jSplitPaneInput.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 
             @Override
             public void propertyChange(final PropertyChangeEvent changeEvent) {
@@ -184,11 +202,81 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
                 if (last < priorLast) {
                     // restore free space ie avoid having the left panel too large:
-                    jScrollPane.revalidate();
-                    jScrollPane.repaint();
+                    jScrollPaneInputForm.revalidate();
+                    jScrollPaneInputForm.repaint();
                 }
             }
         });
+
+        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.INPUT.ordinal(), jLabelTabInput);
+        jTabbedPaneTwoTabsDisplay.setTabComponentAt(TABS.RESULTS.ordinal(), jLabelTabResults);
+
+        // Add listener after tabs added:
+        jTabbedPaneTwoTabsDisplay.addChangeListener(new javax.swing.event.ChangeListener() {
+            @Override
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                // when the tab is changed, another viewerPanel is displayed,
+                // so we have to (en/dis)able actions. i.e, if the new viewerPanel has no images,
+                // the action exportFitsImage must be disabled.
+                updateEnabledActions();
+            }
+        });
+
+        viewerPanelInput.setMainPanel(this);
+        viewerPanelResults.setMainPanel(this);
+
+        final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+
+        // create two plot def, two subset def, and two views for the two ViewerPanel
+        SubsetDefinition subDefInput = new SubsetDefinition();
+        subDefInput.setId("SUBSET_INPUT");
+        subDefInput.setName("Subset Definition Input");
+        subDefInput.setDescription("Subset Definition for input ViewerPanel");
+        ocm.addSubsetDefinition(subDefInput);
+
+        SubsetDefinition subDefResults = new SubsetDefinition();
+        subDefResults.setId("SUBSET_RESULTS");
+        subDefResults.setName("Subset Definition Results");
+        subDefResults.setDescription("Subset Definition for results ViewerPanel");
+        ocm.addSubsetDefinition(subDefResults);
+
+        PlotDefinition plotDefInput = new PlotDefinition();
+        plotDefInput.setId("PLOT_DEF_INPUT");
+        plotDefInput.setName("Plot Definition Input");
+        plotDefInput.setDescription("Plot Definition for input ViewerPanel");
+        plotDefInput.copyValues(ocm.getCurrentPlotDefinitionRef());
+        ocm.addPlotDefinition(plotDefInput);
+
+        PlotDefinition plotDefResults = new PlotDefinition();
+        plotDefResults.setId("PLOT_DEF_RESULTS");
+        plotDefResults.setName("Plot Definition Results");
+        plotDefResults.setDescription("Plot Definition for results ViewerPanel");
+        plotDefResults.copyValues(ocm.getCurrentPlotDefinitionRef());
+        ocm.addPlotDefinition(plotDefResults);
+
+        Plot plotInput = new Plot();
+        plotInput.setId("VIEW_INPUT");
+        plotInput.setName("View Input");
+        plotInput.setDescription("View for input ViewerPanel");
+        plotInput.setPlotDefinition(plotDefInput);
+        plotInput.setSubsetDefinition(subDefInput);
+        ocm.addPlot(plotInput);
+
+        Plot plotResults = new Plot();
+        plotResults.setId("VIEW_RESULTS");
+        plotResults.setName("View Results");
+        plotResults.setDescription("View for results ViewerPanel");
+        plotResults.setPlotDefinition(plotDefResults);
+        plotResults.setSubsetDefinition(subDefResults);
+        ocm.addPlot(plotResults);
+
+        viewerPanelInput.setOIFitsViewPlotId(plotInput.getId());
+        viewerPanelResults.setOIFitsViewPlotId(plotResults.getId());
+
+        viewerPanelInput.setTabMode(ViewerPanel.SHOW_MODE.MODEL);
+        viewerPanelInput.setShowMode(ViewerPanel.SHOW_MODE.MODEL);
+        viewerPanelResults.setTabMode(ViewerPanel.SHOW_MODE.RESULT);
+        viewerPanelResults.setShowMode(ViewerPanel.SHOW_MODE.RESULT);
     }
 
     /**
@@ -206,6 +294,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         exportOiFitsAction = ActionRegistrar.getInstance().get(ExportOIFitsAction.className, ExportOIFitsAction.actionName);
         jButtonExportOIFits.setAction(exportOiFitsAction);
+
+        sendOiFitsAction = ActionRegistrar.getInstance().get(SendOIFitsAction.className, SendOIFitsAction.actionName);
+        exportFitsImageAction = ActionRegistrar.getInstance().get(ExportFitsImageAction.className, ExportFitsImageAction.actionName);
+        sendFitsAction = ActionRegistrar.getInstance().get(SendFitsAction.className, SendFitsAction.actionName);
     }
 
     @Override
@@ -227,10 +319,13 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         java.awt.GridBagConstraints gridBagConstraints;
 
         jButtonCompare = new javax.swing.JButton();
-        jSplitPaneGlobal = new javax.swing.JSplitPane();
-        jSplitPane = new javax.swing.JSplitPane();
-        jScrollPane = new javax.swing.JScrollPane();
-        jPanelLeft = new javax.swing.JPanel();
+        jLabelTabInput = new javax.swing.JLabel();
+        jLabelTabResults = new javax.swing.JLabel();
+        jTabbedPaneTwoTabsDisplay = new javax.swing.JTabbedPane();
+        jPanelTabInput = new javax.swing.JPanel();
+        jSplitPaneInput = new javax.swing.JSplitPane();
+        jScrollPaneInputForm = new javax.swing.JScrollPane();
+        jPanelInputForm = new javax.swing.JPanel();
         jPanelDataSelection = new javax.swing.JPanel();
         jCheckBoxUseVis = new javax.swing.JCheckBox();
         jCheckBoxUseVis2 = new javax.swing.JCheckBox();
@@ -250,10 +345,15 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         softwareSettingsPanel = new fr.jmmc.oimaging.gui.SoftwareSettingsPanel();
         jPanelExecutionLog = new javax.swing.JPanel();
         jButtonRun = new javax.swing.JButton();
-        jButtonExportOIFits = new javax.swing.JButton();
         jScrollPaneEditor = new javax.swing.JScrollPane();
         jEditorPane = new javax.swing.JEditorPane();
-        viewerPanel = new fr.jmmc.oimaging.gui.ViewerPanel();
+        viewerPanelInput = new fr.jmmc.oimaging.gui.ViewerPanel();
+        jPanelTabResults = new javax.swing.JPanel();
+        jSplitPaneResults = new javax.swing.JSplitPane();
+        jPanelViewerAndActions = new javax.swing.JPanel();
+        viewerPanelResults = new fr.jmmc.oimaging.gui.ViewerPanel();
+        jPanelResultsActions = new javax.swing.JPanel();
+        jButtonExportOIFits = new javax.swing.JButton();
         jTablePanel = new fr.jmmc.oimaging.gui.ResultSetTablePanel();
 
         jButtonCompare.setText("Compare");
@@ -263,19 +363,24 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
         });
 
+        jLabelTabInput.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelTabInput.setText("Input");
+        jLabelTabInput.setPreferredSize(new java.awt.Dimension(SwingUtils.adjustUISize(200), SwingUtils.adjustUISize(40)));
+
+        jLabelTabResults.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelTabResults.setText("Results");
+        jLabelTabResults.setPreferredSize(new java.awt.Dimension(SwingUtils.adjustUISize(200), SwingUtils.adjustUISize(40)));
+
         setLayout(new java.awt.BorderLayout());
 
-        jSplitPaneGlobal.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jSplitPaneGlobal.setMinimumSize(new java.awt.Dimension(900, 30));
+        jPanelTabInput.setLayout(new java.awt.BorderLayout());
 
-        jSplitPane.setResizeWeight(0.3);
-        jSplitPane.setContinuousLayout(true);
-        jSplitPane.setMinimumSize(new java.awt.Dimension(900, 600));
+        jSplitPaneInput.setResizeWeight(0.3);
+        jSplitPaneInput.setMinimumSize(new java.awt.Dimension(900, 600));
 
-        jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane.setViewportView(jPanelLeft);
+        jScrollPaneInputForm.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-        jPanelLeft.setLayout(new java.awt.GridBagLayout());
+        jPanelInputForm.setLayout(new java.awt.GridBagLayout());
 
         jPanelDataSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Data selection"));
         jPanelDataSelection.setLayout(new java.awt.GridBagLayout());
@@ -459,12 +564,12 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        jPanelLeft.add(jPanelDataSelection, gridBagConstraints);
+        jPanelInputForm.add(jPanelDataSelection, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        jPanelLeft.add(softwareSettingsPanel, gridBagConstraints);
+        jPanelInputForm.add(softwareSettingsPanel, gridBagConstraints);
 
         jPanelExecutionLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
         jPanelExecutionLog.setLayout(new java.awt.GridBagLayout());
@@ -475,18 +580,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
-
-        jButtonExportOIFits.setText("[Save]");
-        jButtonExportOIFits.setName("jButtonExportOIFits"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelExecutionLog.add(jButtonExportOIFits, gridBagConstraints);
+        jPanelExecutionLog.add(jButtonRun, gridBagConstraints);
 
         jScrollPaneEditor.setMinimumSize(new java.awt.Dimension(100, 100));
         jScrollPaneEditor.setPreferredSize(new java.awt.Dimension(100, 100));
@@ -507,19 +603,53 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 0.2;
-        jPanelLeft.add(jPanelExecutionLog, gridBagConstraints);
+        jPanelInputForm.add(jPanelExecutionLog, gridBagConstraints);
 
-        jScrollPane.setViewportView(jPanelLeft);
+        jScrollPaneInputForm.setViewportView(jPanelInputForm);
 
-        jSplitPane.setLeftComponent(jScrollPane);
-        jSplitPane.setRightComponent(viewerPanel);
+        jSplitPaneInput.setLeftComponent(jScrollPaneInputForm);
+        jSplitPaneInput.setRightComponent(viewerPanelInput);
 
-        jSplitPaneGlobal.setTopComponent(jSplitPane);
+        jPanelTabInput.add(jSplitPaneInput, java.awt.BorderLayout.CENTER);
+
+        jTabbedPaneTwoTabsDisplay.addTab("Input", jPanelTabInput);
+
+        jPanelTabResults.setLayout(new java.awt.BorderLayout());
+
+        jSplitPaneResults.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPaneResults.setResizeWeight(0.8);
+
+        jPanelViewerAndActions.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanelViewerAndActions.add(viewerPanelResults, gridBagConstraints);
+
+        jPanelResultsActions.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
+
+        jButtonExportOIFits.setText("[Save]");
+        jButtonExportOIFits.setName("jButtonExportOIFits"); // NOI18N
+        jPanelResultsActions.add(jButtonExportOIFits);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        jPanelViewerAndActions.add(jPanelResultsActions, gridBagConstraints);
+
+        jSplitPaneResults.setTopComponent(jPanelViewerAndActions);
 
         jTablePanel.setPreferredSize(new java.awt.Dimension(900, 100));
-        jSplitPaneGlobal.setBottomComponent(jTablePanel);
+        jSplitPaneResults.setBottomComponent(jTablePanel);
 
-        add(jSplitPaneGlobal, java.awt.BorderLayout.CENTER);
+        jPanelTabResults.add(jSplitPaneResults, java.awt.BorderLayout.CENTER);
+
+        jTabbedPaneTwoTabsDisplay.addTab("Results", jPanelTabResults);
+
+        add(jTabbedPaneTwoTabsDisplay, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSliderResultsStateChanged(ChangeEvent evt) {
@@ -552,7 +682,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (this.jTablePanel.isVisible() != visible) {
             if (visible) {
                 // ensure 10% for table (not too large):
-                this.jSplitPaneGlobal.setDividerLocation(0.9);
+                this.jSplitPaneResults.setDividerLocation(0.9);
             }
             this.jTablePanel.setVisible(visible);
         }
@@ -565,11 +695,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             // select all results in table:
             jTablePanel.setSelectedViewAll();
             // note: use table order:
-            viewerPanel.displayGrid(jTablePanel.getSelectedRows());
+            viewerPanelResults.displayGrid(jTablePanel.getSelectedRows());
         } else if (selected == 1) {
-            viewerPanel.displayResult(jTablePanel.getSelectedRow());
+            viewerPanelResults.displayResult(jTablePanel.getSelectedRow());
         } else {
-            viewerPanel.displayGrid(jTablePanel.getSelectedRows());
+            viewerPanelResults.displayGrid(jTablePanel.getSelectedRows());
         }
     }//GEN-LAST:event_jButtonCompareActionPerformed
 
@@ -601,10 +731,30 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         deleteSelectionAction.setEnabled(jTablePanel.getSelectedRowsCount() != 0);
 
         if (e.getSource() == jTablePanel.getSelectionModel()) {
-            viewerPanel.displayResult(jTablePanel.getSelectedRow());
+            viewerPanelResults.displayResult(jTablePanel.getSelectedRow());
         } else {
             logger.warn("valueChanged: Unsupported component : {}", e.getSource());
         }
+    }
+
+    /**
+     * Decides if each action should be enabled or not.
+     * is called when the selection in the list of results changes,
+     * or when the tab (input/results) selection changes,
+     * or when the function setTabMode in ViewerPanel is called (which more or less means when
+     * the ViewerPanel data has been updated).
+     */
+    public void updateEnabledActions() {
+        ViewerPanel activeViewerPanel = this.getViewerPanelActive();
+
+        final OIFitsFile oiFitsFile = activeViewerPanel.getCurrentOIFitsFile();
+        final boolean enableExportOiFits = (oiFitsFile != null) && (oiFitsFile.getNbOiTables() > 0);
+        exportOiFitsAction.setEnabled(enableExportOiFits);
+        sendOiFitsAction.setEnabled(enableExportOiFits);
+
+        final boolean enableExportImage = (!activeViewerPanel.isFitsImageNull());
+        exportFitsImageAction.setEnabled(enableExportImage);
+        sendFitsAction.setEnabled(enableExportImage);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -620,23 +770,31 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMax;
     private javax.swing.JFormattedTextField jFormattedTextFieldWaveMin;
     private javax.swing.JLabel jLabelOifitsFile;
+    private javax.swing.JLabel jLabelTabInput;
+    private javax.swing.JLabel jLabelTabResults;
     private javax.swing.JLabel jLabelTarget;
     private javax.swing.JLabel jLabelWaveMax;
     private javax.swing.JLabel jLabelWaveMin;
     private javax.swing.JPanel jPanelDataSelection;
     private javax.swing.JPanel jPanelExecutionLog;
-    private javax.swing.JPanel jPanelLeft;
+    private javax.swing.JPanel jPanelInputForm;
+    private javax.swing.JPanel jPanelResultsActions;
+    private javax.swing.JPanel jPanelTabInput;
+    private javax.swing.JPanel jPanelTabResults;
     private javax.swing.JPanel jPanelTarget;
+    private javax.swing.JPanel jPanelViewerAndActions;
     private javax.swing.JPanel jPanelWL;
-    private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPaneEditor;
+    private javax.swing.JScrollPane jScrollPaneInputForm;
     private javax.swing.JSlider jSliderWaveMax;
     private javax.swing.JSlider jSliderWaveMin;
-    private javax.swing.JSplitPane jSplitPane;
-    private javax.swing.JSplitPane jSplitPaneGlobal;
+    private javax.swing.JSplitPane jSplitPaneInput;
+    private javax.swing.JSplitPane jSplitPaneResults;
+    private javax.swing.JTabbedPane jTabbedPaneTwoTabsDisplay;
     private fr.jmmc.oimaging.gui.ResultSetTablePanel jTablePanel;
     private fr.jmmc.oimaging.gui.SoftwareSettingsPanel softwareSettingsPanel;
-    private fr.jmmc.oimaging.gui.ViewerPanel viewerPanel;
+    private fr.jmmc.oimaging.gui.ViewerPanel viewerPanelInput;
+    private fr.jmmc.oimaging.gui.ViewerPanel viewerPanelResults;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -852,23 +1010,53 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
-            if (event.getType() == IRModelEventType.IRMODEL_CHANGED || modelResults.isEmpty()) {
-                // to ensure jsplit pane will be given 90% once it becomes visible:
-                showTablePanel(!modelResults.isEmpty());
-                jTablePanel.getSelectionModel().clearSelection();
-                viewerPanel.displayModel(currentModel);
-            } else {
-                showTablePanel(true);
-                jTablePanel.setSelectedRow(lastResult);
+            // Ensure to reset results anyway:
+            if (modelResults.isEmpty()) {
+                showTablePanel(false);
+                viewerPanelResults.displayResult(null);
+            }
+
+            switch (event.getType()) {
+                case IRMODEL_CHANGED:
+                    viewerPanelInput.displayModel(currentModel);
+                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.INPUT.ordinal());
+                    break;
+                case IRMODEL_RESULT_LIST_CHANGED:
+                    if (!modelResults.isEmpty()) {
+                        showTablePanel(true);
+
+                        if (lastResult != null) {
+                            jTablePanel.setSelectedRow(lastResult);
+
+                            // update input display because init image changed:
+                            viewerPanelInput.displayModel(currentModel);
+                        }
+                    }
+                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.RESULTS.ordinal());
+                    break;
+                default:
+                    break;
             }
         } finally {
             syncingUI = false;
         }
     }
 
-    public ViewerPanel getViewerPanel() {
-        return viewerPanel;
+    public ViewerPanel getViewerPanelInput() {
+        return viewerPanelInput;
+    }
 
+    /** return the active viewer panel. based on active tab.
+     * @return viewerPanelInput, or viewerPanelResults, or null when no tabs selected (it should never happen).
+     */
+    public ViewerPanel getViewerPanelActive() {
+        switch (TABS.values()[jTabbedPaneTwoTabsDisplay.getSelectedIndex()]) {
+            case INPUT:
+                return viewerPanelInput;
+            case RESULTS:
+                return viewerPanelResults;
+        }
+        return null;
     }
 
     private static String getTooltip(final String name) {
@@ -880,5 +1068,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
      */
     public ResultSetTablePanel getResultSetTablePanel() {
         return jTablePanel;
+    }
+
+    /** Switch tab. */
+    public void switchTab() {
+        // only works when there is only two tabs
+        this.jTabbedPaneTwoTabsDisplay.setSelectedIndex(1 - this.jTabbedPaneTwoTabsDisplay.getSelectedIndex());
     }
 }

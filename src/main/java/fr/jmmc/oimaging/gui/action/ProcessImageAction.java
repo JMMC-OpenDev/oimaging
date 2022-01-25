@@ -42,7 +42,7 @@ public final class ProcessImageAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
-        OImaging.getInstance().getMainPanel().getViewerPanel().processFitsImage(op);
+        OImaging.getInstance().getMainPanel().getViewerPanelActive().processFitsImage(op);
     }
 
 }
