@@ -34,7 +34,7 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     /** Visible results columns order list, as of default */
     public static final List<String> COLUMNS_DEFAULT_VISIBLE = Arrays.asList(
             "INDEX", "TARGET", "SOFTWARE", "INIT_IMG", "RGL_NAME", "RGL_WGT",
-            "NITER", "CHIQ", "SUCCESS", "RATING", "USERNOTE", "FOV", "FILE"
+            "NITER", "CHISQ", "SUCCESS", "RATING", "USERNOTE", "FOV", "FILE"
     );
 
     /**
