@@ -9,6 +9,9 @@ import fr.jmmc.jmcs.util.DateUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
+import fr.jmmc.oimaging.OImaging;
+import fr.jmmc.oimaging.gui.MainPanel;
+import fr.jmmc.oimaging.gui.ViewerPanel;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -152,7 +155,12 @@ public final class IRModel {
         // store original filename
         final String originalAbsoluteFilePath = oiFitsFile.getAbsoluteFilePath();
 
-        final File tmpFile = FileUtils.getTempFile(oiFitsFile.getFileName(), ".export-" + exportCount + ".fits");
+        // truncate file name to fix filepath too long crash
+        // TODO: do this more cleanly by parsing suffixes and removing them
+        final String trunkedFileName
+                = oiFitsFile.getFileName().substring(0, Math.min(oifitsFile.getFileName().length(), 80));
+
+        final File tmpFile = FileUtils.getTempFile(trunkedFileName, ".export-" + exportCount + ".fits");
 
         // Pre-processing:
         // Ensure OIFITS File is correct.
@@ -184,7 +192,7 @@ public final class IRModel {
 
     /**
      * Load the OiData tables of the model (oifits file, targets).
-     * @param oifitsFile OIFitsFile to use
+     * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
      */
     private void loadOIFits(final OIFitsFile oifitsFile) {
         // change current model immediately:
@@ -421,6 +429,76 @@ public final class IRModel {
         return removed;
     }
 
+    /**
+     * Load the selected result as input.
+     *
+     * @param useLastImgAsInit when true, the LAST_IMG of the result will be used for the INIT_IMG of the input.
+     * when false, the INIT_IMG of the result will be used for the INIT_IMG of the input.
+     * @return true if exactly one result was selected, false otherwise.
+     */
+    public boolean loadResultAsInput(boolean useLastImgAsInit) {
+        boolean success = true;
+        MainPanel mainPanel = OImaging.getInstance().getMainPanel();
+        List<ServiceResult> selectedResultList = mainPanel.getResultSetTablePanel().getSelectedRows();
+
+        if (selectedResultList.size() == 1) {
+            ServiceResult selectedResult = selectedResultList.get(0);
+            // copy of the file. because the input form will modify the oifitsfile.
+            OIFitsFile oifitsfile = new OIFitsFile(selectedResult.getOifitsFile());
+
+            // find last img HDU if needed, and if it exists in the oifitsfile
+            FitsImageHDU lastImgHdu = null;
+            if (useLastImgAsInit) {
+                List<Role> roles = getHdusRoles(oifitsfile);
+                for (int i = 0, s = roles.size(); i < s; i++) {
+                    switch (roles.get(i)) {
+                        case RESULT:
+                            lastImgHdu = oifitsfile.getFitsImageHDUs().get(i);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            this.loadOIFits(oifitsfile);
+
+            // if last img must becomes init image, set the equivalent of last img in library as init image.
+            // if lastImgHdu == null, it will correctly set init img to null.
+            if (useLastImgAsInit) {
+                setSelectedInputImageHDU(findInImageLibrary(lastImgHdu));
+            }
+        } else {
+            success = false;
+        }
+
+        return success;
+    }
+
+    public boolean setAsInitImg() {
+        boolean success = false;
+        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
+        if (viewerPanel != null) {
+            FitsImageHDU fihdu = viewerPanel.getDisplayedFitsImageHDU();
+            if (fihdu != null) {
+                FitsImageHDU libraryHDU = findInImageLibrary(fihdu);
+                if (libraryHDU != null) {
+                    setSelectedInputImageHDU(libraryHDU);
+                    success = true;
+                } else {
+                    // the image is not necessarily in the library.
+                    // the user could have manually removed it.
+                    // it can have been refused after the run's result (see the strategies to refuse duplicate hdus)
+                    // anyway we must add it to the library, to be able to select it as init img.
+                    FitsImageHDU newLibraryHDU = addToImageLibrary(fihdu, null);
+                    setSelectedInputImageHDU(newLibraryHDU);
+                    success = true;
+                }
+            }
+        }
+        return success;
+    }
+
     /** 
      * Return the roles associated to each hdu in the oifitsfile (in the same order)
      * @param oifitsFile the oifitsfile where we take the list of hdus
@@ -616,6 +694,7 @@ public final class IRModel {
         }
 
         // return an equivalent if there exists one
+        hdu.updateChecksum(); // first update the checksum to be able to checksum-compare
         final FitsImageHDU equivalentHDU = findInImageLibrary(hdu);
         if (equivalentHDU != null) {
             logger.info("HDU {} no added to image library because the equivalent HDU {} is already in the library.",
@@ -672,6 +751,7 @@ public final class IRModel {
             // name is available:
             logger.info("HDU_NAME '{}' is already used in imageLibrary, renamed to '{}'.", hdu.getHduName(), newName);
             hdu.setHduName(newName);
+            hdu.updateChecksum(); // update checksum after hduName update
         }
 
         // finally, add the hdu to the library
@@ -726,6 +806,7 @@ public final class IRModel {
      * @param second HDU to compare to first. (optional)
      * @return true if both contains same reference,
      * or if both are null, or if both have same checksum. false otherwise.
+     * return false if one of them has checksum = 0. The decision to compute expensively the checksum is on the caller.
      */
     private static boolean hduEquals(final FitsImageHDU first, final FitsImageHDU second) {
         if (first == second) {
@@ -733,7 +814,8 @@ public final class IRModel {
         } else if (first == null || second == null) {
             return false; // when only one of them is null
         } else {
-            return first.getChecksum() == second.getChecksum(); // compare the checksums
+            return ((first.getChecksum() != 0) // only accepts computed checksums
+                    && (first.getChecksum() == second.getChecksum())); // compare the checksums
         }
     }
 

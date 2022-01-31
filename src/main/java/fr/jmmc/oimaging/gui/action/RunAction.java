@@ -3,6 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui.action;
 
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
@@ -22,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,10 @@ public class RunAction extends RegisteredAction {
     public static final String actionName = "run";
     /** Task Run IR */
     public static final Task TASK_RUN_IR = new Task("RUN_IR");
+    /**
+     * Spinner icon gif to decorate "cancel" label.
+     */
+    private static final ImageIcon spinnerIcon = ImageUtils.loadResourceIcon("fr/jmmc/jmcs/resource/image/spinner.gif");
 
     public RunAction() {
         super(className, actionName);
@@ -45,7 +51,16 @@ public class RunAction extends RegisteredAction {
     private void setRunningState(final IRModel irModel, boolean running) {
         irModel.setRunning(running);
         putValue(Action.NAME, (running) ? "Cancel" : "Run");
-        putValue(Action.LARGE_ICON_KEY, running ? ImageUtils.loadResourceIcon("fr/jmmc/jmcs/resource/image/spinner.gif") : null);
+        putValue(Action.LARGE_ICON_KEY, running ? spinnerIcon : null);
+
+        // update associated RunMoreIterationsAction label and icon
+        Action runMoreIterationsAction = ActionRegistrar.getInstance().get(
+                RunMoreIterationsAction.CLASS_NAME, RunMoreIterationsAction.ACTION_NAME);
+        if (runMoreIterationsAction != null) {
+            runMoreIterationsAction.putValue(RunMoreIterationsAction.NAME,
+                    running ? RunMoreIterationsAction.LABEL_CANCEL : RunMoreIterationsAction.LABEL_IDLE);
+            runMoreIterationsAction.putValue(Action.LARGE_ICON_KEY, running ? spinnerIcon : null);
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@ package fr.jmmc.oimaging.model;
 
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.data.preference.SessionSettingsPreferences;
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.service.RecentFilesManager;
 import fr.jmmc.jmcs.util.FileUtils;
@@ -12,6 +13,7 @@ import fr.jmmc.jmcs.util.jaxb.JAXBFactory;
 import fr.jmmc.jmcs.util.jaxb.JAXBUtils;
 import fr.jmmc.jmcs.util.jaxb.XmlBindException;
 import fr.jmmc.oiexplorer.core.model.event.EventNotifier;
+import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageLoader;
 import fr.jmmc.oitools.meta.OIFitsStandard;
@@ -19,11 +21,13 @@ import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.nom.tam.fits.FitsException;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.EnumMap;
+import javax.swing.AbstractAction;
 import org.apache.commons.httpclient.auth.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -318,6 +322,60 @@ public final class IRModelManager {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Load selected result as input.
+     * @param useLastImgAsInit when true, the LAST_IMG of the result will be used for the INIT_IMG of the input.
+     * when false, the INIT_IMG of the result will be used for the INIT_IMG of the input.
+     * @return boolean return of IRModel.loadResultAsInput() call
+     */
+    public boolean loadResultAsInput(boolean useLastImgAsInit) {
+        boolean success = irModel.loadResultAsInput(useLastImgAsInit);
+        if (success) {
+            fireIRModelChanged();
+        }
+        return success;
+    }
+
+    /**
+     * Load selected result as input, and trigger Run action.
+     * But if IRModel was already running, it does not load the result, and it triggers Run action,
+     * which will cancel the running.
+     *
+     * @return true, unless loadResultAsInput has been called and has returned false
+     */
+    public boolean runMoreIterations() {
+        boolean success = true;
+
+        // only load result if the Run action is NOT already running
+        if (!irModel.isRunning()) {
+            boolean useLastImgAsInit = true;
+            success &= irModel.loadResultAsInput(useLastImgAsInit);
+            if (success) {
+                // we fire both events to trigger displays in both tabs and keep on results tab.
+                // TODO: clean this when the display is better handled in syncUI
+                fireIRModelChanged();
+                fireIRModelResultListChanged(this, null);
+            }
+        }
+
+        // need to check success, in case loadResultAsInput failed
+        if (success) {
+            // call RunAction (it triggers the start of the run or the cancel)
+            AbstractAction runAction = ActionRegistrar.getInstance().get(RunAction.className, RunAction.actionName);
+            runAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+        }
+
+        return success;
+    }
+
+    public boolean setAsInitImg() {
+        boolean success = irModel.setAsInitImg();
+        if (success) {
+            fireIRModelChanged();
+        }
+        return success;
     }
 
     /**

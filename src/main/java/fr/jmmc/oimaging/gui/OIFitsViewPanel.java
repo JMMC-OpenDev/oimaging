@@ -173,14 +173,6 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
     }
 
     /**
-     * Define the OIFits data
-     * @param oiFitsFile OIFits data
-     */
-    private void setOIFitsData(final OIFitsFile oiFitsFile) {
-        this.oiFitsFile = oiFitsFile;
-    }
-
-    /**
      * Plot OIFits data using embedded OIFitsExplorer Plot panel
      * This code must be executed by the Swing Event Dispatcher thread (EDT)
      * @param oiFitsFileParam OIFits data
