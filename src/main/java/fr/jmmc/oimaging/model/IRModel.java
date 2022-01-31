@@ -489,6 +489,7 @@ public final class IRModel {
                 FitsImageHDU libraryHDU = addToImageLibrary(fihdu, null);
                 if (libraryHDU != null) {
                     setSelectedInputImageHDU(libraryHDU);
+                    setInputImageView(KEYWORD_INIT_IMG);
                     success = true;
                 }
             }
