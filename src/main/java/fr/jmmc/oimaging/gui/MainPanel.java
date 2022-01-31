@@ -811,9 +811,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         sendFitsAction.setEnabled(enableExportImage);
 
         final boolean exactlyOneResultSelected = (this.getResultSetTablePanel().getSelectedRows().size() == 1);
+        final boolean selectedIsSuccess
+                = exactlyOneResultSelected && this.getResultSetTablePanel().getSelectedRow().isValid();
 
-        loadResultAsInputAction.setEnabled(exactlyOneResultSelected);
-        runMoreIterationsAction.setEnabled(exactlyOneResultSelected);
+        loadResultAsInputAction.setEnabled(selectedIsSuccess);
+        runMoreIterationsAction.setEnabled(selectedIsSuccess);
 
         boolean someImageDisplayed = false;
         ViewerPanel viewerPanel = this.getViewerPanelActive();
@@ -823,7 +825,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 someImageDisplayed = true;
             }
         }
-        setAsInitImgAction.setEnabled(exactlyOneResultSelected && someImageDisplayed);
+        setAsInitImgAction.setEnabled(selectedIsSuccess && someImageDisplayed);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

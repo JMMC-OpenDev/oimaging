@@ -443,30 +443,35 @@ public final class IRModel {
 
         if (selectedResultList.size() == 1) {
             ServiceResult selectedResult = selectedResultList.get(0);
-            // copy of the file. because the input form will modify the oifitsfile.
-            OIFitsFile oifitsfile = new OIFitsFile(selectedResult.getOifitsFile());
 
-            // find last img HDU if needed, and if it exists in the oifitsfile
-            FitsImageHDU lastImgHdu = null;
-            if (useLastImgAsInit) {
-                List<Role> roles = getHdusRoles(oifitsfile);
-                for (int i = 0, s = roles.size(); i < s; i++) {
-                    switch (roles.get(i)) {
-                        case RESULT:
-                            lastImgHdu = oifitsfile.getFitsImageHDUs().get(i);
-                            break;
-                        default:
-                            break;
+            if (selectedResult.isValid()) {
+                // copy of the file. because the input form will modify the oifitsfile.
+                OIFitsFile oifitsfile = new OIFitsFile(selectedResult.getOifitsFile());
+
+                // find last img HDU if needed, and if it exists in the oifitsfile
+                FitsImageHDU lastImgHdu = null;
+                if (useLastImgAsInit) {
+                    List<Role> roles = getHdusRoles(oifitsfile);
+                    for (int i = 0, s = roles.size(); i < s; i++) {
+                        switch (roles.get(i)) {
+                            case RESULT:
+                                lastImgHdu = oifitsfile.getFitsImageHDUs().get(i);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
-            }
 
-            this.loadOIFits(oifitsfile);
+                this.loadOIFits(oifitsfile);
 
-            // if last img must becomes init image, set the equivalent of last img in library as init image.
-            // if lastImgHdu == null, it will correctly set init img to null.
-            if (useLastImgAsInit) {
-                setSelectedInputImageHDU(findInImageLibrary(lastImgHdu));
+                // if last img must becomes init image, set the equivalent of last img in library as init image.
+                // if lastImgHdu == null, it will correctly set init img to null.
+                if (useLastImgAsInit) {
+                    setSelectedInputImageHDU(findInImageLibrary(lastImgHdu));
+                }
+            } else {
+                success = false;
             }
         } else {
             success = false;
