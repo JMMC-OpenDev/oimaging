@@ -486,17 +486,9 @@ public final class IRModel {
         if (viewerPanel != null) {
             FitsImageHDU fihdu = viewerPanel.getDisplayedFitsImageHDU();
             if (fihdu != null) {
-                FitsImageHDU libraryHDU = findInImageLibrary(fihdu);
+                FitsImageHDU libraryHDU = addToImageLibrary(fihdu, null);
                 if (libraryHDU != null) {
                     setSelectedInputImageHDU(libraryHDU);
-                    success = true;
-                } else {
-                    // the image is not necessarily in the library.
-                    // the user could have manually removed it.
-                    // it can have been refused after the run's result (see the strategies to refuse duplicate hdus)
-                    // anyway we must add it to the library, to be able to select it as init img.
-                    FitsImageHDU newLibraryHDU = addToImageLibrary(fihdu, null);
-                    setSelectedInputImageHDU(newLibraryHDU);
                     success = true;
                 }
             }
