@@ -982,6 +982,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         return this.fitsImagePanel.getFitsImage() == null;
     }
 
+    /**
+     * return the FitsImageHDU parent to the FitsImage (potentially) displayed.
+     * @return the FitsImageHDU if a FitsImage is displayed, null otherwise.
+     */
     public FitsImageHDU getDisplayedFitsImageHDU() {
 
         final FitsImage fitsImage = fitsImagePanel.getFitsImage();

@@ -480,6 +480,11 @@ public final class IRModel {
         return success;
     }
 
+    /**
+     * Set the displayed image as initial image in the input form.
+     * Also place focus radio button on INIT_IMG.
+     * @return true when there was a displayed image, false otherwise.
+     */
     public boolean setAsInitImg() {
         boolean success = false;
         ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
