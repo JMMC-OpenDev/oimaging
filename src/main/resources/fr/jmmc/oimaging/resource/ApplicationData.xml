@@ -172,6 +172,7 @@
         <release version="0.6.0">
             <pubDate>Tue, 25 Jan 2022 16:00:00 GMT</pubDate>
             <prerelease version="0.6.0 beta 11">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/69" >Added buttons to fill the input form with a selected result</change>
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/21">Improved GUI to adopt two views Input &amp; Results</change>
             </prerelease>
             <prerelease version="0.6.0 beta 10">
