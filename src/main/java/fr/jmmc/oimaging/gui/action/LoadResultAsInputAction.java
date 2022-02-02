@@ -4,8 +4,12 @@
 package fr.jmmc.oimaging.gui.action;
 
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
+import fr.jmmc.oimaging.OImaging;
+import fr.jmmc.oimaging.gui.MainPanel;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oimaging.services.ServiceResult;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +70,15 @@ public class LoadResultAsInputAction extends RegisteredAction {
                 useLastImgAsInit = true;
                 break;
         }
+        MainPanel mainPanel = OImaging.getInstance().getMainPanel();
+        List<ServiceResult> selectedResultList = mainPanel.getResultSetTablePanel().getSelectedRows();
 
-        IRModelManager.getInstance().loadResultAsInput(useLastImgAsInit);
+        if (selectedResultList.size() == 1) {
+            ServiceResult selectedResult = selectedResultList.get(0);
+
+            IRModelManager.getInstance().loadResultAsInput(selectedResult, useLastImgAsInit);
+        } else {
+            LOGGER.error("Cannot procede LoadResultAsInputAction when the number of selected results != 1");
+        }
     }
 }

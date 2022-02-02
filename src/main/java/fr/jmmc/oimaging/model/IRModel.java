@@ -9,9 +9,6 @@ import fr.jmmc.jmcs.util.DateUtils;
 import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.util.FitsImageUtils;
-import fr.jmmc.oimaging.OImaging;
-import fr.jmmc.oimaging.gui.MainPanel;
-import fr.jmmc.oimaging.gui.ViewerPanel;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -430,48 +427,41 @@ public final class IRModel {
     }
 
     /**
-     * Load the selected result as input.
+     * Load the result as input.
      *
+     * @param serviceResult the result to use. must be valid. (required)
      * @param useLastImgAsInit when true, the LAST_IMG of the result will be used for the INIT_IMG of the input.
      * when false, the INIT_IMG of the result will be used for the INIT_IMG of the input.
      * @return true if exactly one result was selected, false otherwise.
      */
-    public boolean loadResultAsInput(boolean useLastImgAsInit) {
+    public boolean loadResultAsInput(ServiceResult serviceResult, boolean useLastImgAsInit) {
         boolean success = true;
-        MainPanel mainPanel = OImaging.getInstance().getMainPanel();
-        List<ServiceResult> selectedResultList = mainPanel.getResultSetTablePanel().getSelectedRows();
 
-        if (selectedResultList.size() == 1) {
-            ServiceResult selectedResult = selectedResultList.get(0);
+        if (serviceResult.isValid()) {
+            // copy of the file. because the input form will modify the oifitsfile.
+            OIFitsFile oifitsfile = new OIFitsFile(serviceResult.getOifitsFile());
 
-            if (selectedResult.isValid()) {
-                // copy of the file. because the input form will modify the oifitsfile.
-                OIFitsFile oifitsfile = new OIFitsFile(selectedResult.getOifitsFile());
-
-                // find last img HDU if needed, and if it exists in the oifitsfile
-                FitsImageHDU lastImgHdu = null;
-                if (useLastImgAsInit) {
-                    List<Role> roles = getHdusRoles(oifitsfile);
-                    for (int i = 0, s = roles.size(); i < s; i++) {
-                        switch (roles.get(i)) {
-                            case RESULT:
-                                lastImgHdu = oifitsfile.getFitsImageHDUs().get(i);
-                                break;
-                            default:
-                                break;
-                        }
+            // find last img HDU if needed, and if it exists in the oifitsfile
+            FitsImageHDU lastImgHdu = null;
+            if (useLastImgAsInit) {
+                List<Role> roles = getHdusRoles(oifitsfile);
+                for (int i = 0, s = roles.size(); i < s; i++) {
+                    switch (roles.get(i)) {
+                        case RESULT:
+                            lastImgHdu = oifitsfile.getFitsImageHDUs().get(i);
+                            break;
+                        default:
+                            break;
                     }
                 }
+            }
 
-                this.loadOIFits(oifitsfile);
+            this.loadOIFits(oifitsfile);
 
-                // if last img must becomes init image, set the equivalent of last img in library as init image.
-                // if lastImgHdu == null, it will correctly set init img to null.
-                if (useLastImgAsInit) {
-                    setSelectedInputImageHDU(findInImageLibrary(lastImgHdu));
-                }
-            } else {
-                success = false;
+            // if last img must becomes init image, set the equivalent of last img in library as init image.
+            // if lastImgHdu == null, it will correctly set init img to null.
+            if (useLastImgAsInit) {
+                setSelectedInputImageHDU(findInImageLibrary(lastImgHdu));
             }
         } else {
             success = false;
@@ -483,23 +473,12 @@ public final class IRModel {
     /**
      * Set the displayed image as initial image in the input form.
      * Also place focus radio button on INIT_IMG.
-     * @return true when there was a displayed image, false otherwise.
+     * @param fihdu the FitsImageHDU to use.
      */
-    public boolean setAsInitImg() {
-        boolean success = false;
-        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
-        if (viewerPanel != null) {
-            FitsImageHDU fihdu = viewerPanel.getDisplayedFitsImageHDU();
-            if (fihdu != null) {
-                FitsImageHDU libraryHDU = addToImageLibrary(fihdu, null);
-                if (libraryHDU != null) {
-                    setSelectedInputImageHDU(libraryHDU);
-                    setInputImageView(KEYWORD_INIT_IMG);
-                    success = true;
-                }
-            }
-        }
-        return success;
+    public void setAsInitImg(FitsImageHDU fihdu) {
+        FitsImageHDU libraryHDU = addToImageLibrary(fihdu, null);
+        setSelectedInputImageHDU(libraryHDU);
+        setInputImageView(KEYWORD_INIT_IMG);
     }
 
     /** 

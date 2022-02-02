@@ -4,7 +4,10 @@
 package fr.jmmc.oimaging.gui.action;
 
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
+import fr.jmmc.oimaging.OImaging;
+import fr.jmmc.oimaging.gui.ViewerPanel;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oitools.image.FitsImageHDU;
 import java.awt.event.ActionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,17 @@ public class SetAsInitImgAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         LOGGER.debug("actionPerformed");
-        IRModelManager.getInstance().setAsInitImg();
+
+        ViewerPanel viewerPanel = OImaging.getInstance().getMainPanel().getViewerPanelActive();
+        if (viewerPanel != null) {
+            FitsImageHDU fihdu = viewerPanel.getDisplayedFitsImageHDU();
+            if (fihdu != null) {
+                IRModelManager.getInstance().setAsInitImg(fihdu);
+            } else {
+                LOGGER.error("Cannot procede SetAsInitImgAction because selected image is null");
+            }
+        } else {
+            LOGGER.error("Cannot procede SetAsInitImgAction because active viewer panel is null");
+        }
     }
 }

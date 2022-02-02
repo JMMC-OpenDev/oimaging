@@ -5,7 +5,6 @@ package fr.jmmc.oimaging.model;
 
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.data.preference.SessionSettingsPreferences;
-import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.service.RecentFilesManager;
 import fr.jmmc.jmcs.util.FileUtils;
@@ -13,21 +12,20 @@ import fr.jmmc.jmcs.util.jaxb.JAXBFactory;
 import fr.jmmc.jmcs.util.jaxb.JAXBUtils;
 import fr.jmmc.jmcs.util.jaxb.XmlBindException;
 import fr.jmmc.oiexplorer.core.model.event.EventNotifier;
-import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageFile;
+import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.FitsImageLoader;
 import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.nom.tam.fits.FitsException;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.EnumMap;
-import javax.swing.AbstractAction;
 import org.apache.commons.httpclient.auth.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -325,46 +323,22 @@ public final class IRModelManager {
     }
 
     /**
-     * Load selected result as input.
+     * Load result as input.
+     * @param serviceResult the result to use. must be valid. (required)
      * @param useLastImgAsInit when true, the LAST_IMG of the result will be used for the INIT_IMG of the input.
      * when false, the INIT_IMG of the result will be used for the INIT_IMG of the input.
      * @return boolean return of IRModel.loadResultAsInput() call
      */
-    public boolean loadResultAsInput(boolean useLastImgAsInit) {
-        boolean success = irModel.loadResultAsInput(useLastImgAsInit);
-        if (success) {
-            fireIRModelChanged();
-        }
-        return success;
-    }
-
-    /**
-     * Load selected result as input, and trigger Run action.
-     * But if IRModel was already running, it does not load the result, and it triggers Run action,
-     * which will cancel the running.
-     *
-     * @return true, unless loadResultAsInput has been called and has returned false
-     */
-    public boolean runMoreIterations() {
+    public boolean loadResultAsInput(ServiceResult serviceResult, boolean useLastImgAsInit) {
         boolean success = true;
 
-        // only load result if the Run action is NOT already running
-        if (!irModel.isRunning()) {
-            boolean useLastImgAsInit = true;
-            success &= irModel.loadResultAsInput(useLastImgAsInit);
+        if (serviceResult.isValid()) {
+            success &= irModel.loadResultAsInput(serviceResult, useLastImgAsInit);
             if (success) {
-                // we fire both events to trigger displays in both tabs and keep on results tab.
-                // TODO: clean this when the display is better handled in syncUI
                 fireIRModelChanged();
-                fireIRModelResultListChanged(this, null);
             }
-        }
-
-        // need to check success, in case loadResultAsInput failed
-        if (success) {
-            // call RunAction (it triggers the start of the run or the cancel)
-            AbstractAction runAction = ActionRegistrar.getInstance().get(RunAction.className, RunAction.actionName);
-            runAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+        } else {
+            success = false;
         }
 
         return success;
@@ -373,14 +347,11 @@ public final class IRModelManager {
     /**
      * Set the displayed image as initial image in the input form.
      * Also place focus radio button on INIT_IMG.
-     * @return true when there was a displayed image, false otherwise.
+     * @param fihdu the FitsImageHDU to use.
      */
-    public boolean setAsInitImg() {
-        boolean success = irModel.setAsInitImg();
-        if (success) {
-            fireIRModelChanged();
-        }
-        return success;
+    public void setAsInitImg(FitsImageHDU fihdu) {
+        irModel.setAsInitImg(fihdu);
+        fireIRModelChanged();
     }
 
     /**
@@ -469,11 +440,11 @@ public final class IRModelManager {
     }
 
     /**
-     * Return the READY event notifier
-     * @return READY event notifier
+     * Return the RUN event notifier
+     * @return RUN event notifier
      */
-    public EventNotifier<IRModelEvent, IRModelEventType, Object> getReadyEventNotifier() {
-        return this.irModelManagerEventNotifierMap.get(IRModelEventType.READY);
+    public EventNotifier<IRModelEvent, IRModelEventType, Object> getRunEventNotifier() {
+        return this.irModelManagerEventNotifierMap.get(IRModelEventType.RUN);
     }
 
     /**
@@ -518,17 +489,18 @@ public final class IRModelManager {
     }
 
     /**
-     * This fires a READY event to given registered listener ASYNCHRONOUSLY !
+     * This fires a RUN event to given registered listener ASYNCHRONOUSLY !
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireReady(final Object source, final IRModelEventListener destination) {
+    public void fireRun(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
+            logger.info(">>>FIRE RUN");
             if (logger.isDebugEnabled()) {
-                logger.debug("fireReady TO {}", (destination != null) ? destination : "ALL");
+                logger.debug("fireRun TO {}", (destination != null) ? destination : "ALL");
             }
-            getReadyEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.READY, null, getIRModel()), destination);
+            getRunEventNotifier().queueEvent((source != null) ? source : this,
+                    new IRModelEvent(IRModelEventType.RUN, null, getIRModel()), destination);
         }
     }
 }

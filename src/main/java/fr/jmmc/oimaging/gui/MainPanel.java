@@ -170,6 +170,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         registerActions();
 
         IRModelManager.getInstance().bindIRModelChangedEvent(this);
+        IRModelManager.getInstance().getRunEventNotifier().register(this);
 
         // associate sliders and fields
         fieldSliderAdapterWaveMin = new FieldSliderAdapter(jSliderWaveMin, jFormattedTextFieldWaveMin, 0, 1, 0);
@@ -886,6 +887,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             case IRMODEL_RESULT_LIST_CHANGED:
                 syncUI(event);
                 break;
+            case RUN:
+                jButtonRun.doClick();
+                jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.RESULTS.ordinal());
             default:
                 logger.info("event not handled : {}", event);
         }
