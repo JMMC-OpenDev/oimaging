@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
  */
 public class RunMoreIterationsAction extends RegisteredAction {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Class logger
      */
@@ -63,10 +65,11 @@ public class RunMoreIterationsAction extends RegisteredAction {
 
             // need to check success, in case loadResultAsInput failed
             if (success) {
-                // launch a Run
-                irModelManager.fireRun(this, null);
+                // disable allowChangeTwoTabs flag:
+                mainPanel.setAllowChangeTwoTabs(false);
+                // launch a Run (async) that will restore the allowChangeTwoTabs flag later:
+                irModelManager.fireRun(this);
             }
-
         } else {
             LOGGER.error("Cannot procede RunMoreIterationsAction when the number of selected results != 1");
         }
