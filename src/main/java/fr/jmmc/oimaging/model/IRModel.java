@@ -787,10 +787,13 @@ public final class IRModel {
      * return false if one of them has checksum = 0. The decision to compute expensively the checksum is on the caller.
      */
     private static boolean hduEquals(final FitsImageHDU first, final FitsImageHDU second) {
-        boolean equiv = FitsImageHDU.MATCHER.match(first, second);
-        logger.info("hdus {} and {} equiv: {}",
-                first == null ? "null" : first.getHduName(), second == null ? "null" : second.getHduName(), equiv);
-        return equiv;
+        boolean match = FitsImageHDU.MATCHER.match(first, second);
+        if (logger.isDebugEnabled()) {
+            logger.debug("hdus {} and {} match: {}",
+                    (first == null) ? "null" : first.getHduName(),
+                    (second == null) ? "null" : second.getHduName(), match);
+        }
+        return match;
     }
 
     // --- ServiceResult handling ---
