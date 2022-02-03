@@ -10,8 +10,8 @@ public enum IRModelEventType {
 
     /** IRModel changed */
     IRMODEL_CHANGED,
-    /** last event type = ready */
-    READY,
     /** IRModel get a new service result */
-    IRMODEL_RESULT_LIST_CHANGED
+    IRMODEL_RESULT_LIST_CHANGED,
+    /** Run action */
+    RUN
 }

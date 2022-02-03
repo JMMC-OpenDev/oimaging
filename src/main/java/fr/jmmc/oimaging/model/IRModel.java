@@ -152,7 +152,12 @@ public final class IRModel {
         // store original filename
         final String originalAbsoluteFilePath = oiFitsFile.getAbsoluteFilePath();
 
-        final File tmpFile = FileUtils.getTempFile(oiFitsFile.getFileName(), ".export-" + exportCount + ".fits");
+        // truncate file name to fix filepath too long crash
+        // TODO: do this more cleanly by parsing suffixes and removing them
+        final String trunkedFileName
+                     = oiFitsFile.getFileName().substring(0, Math.min(oifitsFile.getFileName().length(), 80));
+
+        final File tmpFile = FileUtils.getTempFile(trunkedFileName, ".export-" + exportCount + ".fits");
 
         // Pre-processing:
         // Ensure OIFITS File is correct.
@@ -184,7 +189,7 @@ public final class IRModel {
 
     /**
      * Load the OiData tables of the model (oifits file, targets).
-     * @param oifitsFile OIFitsFile to use
+     * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
      */
     private void loadOIFits(final OIFitsFile oifitsFile) {
         // change current model immediately:
@@ -395,7 +400,7 @@ public final class IRModel {
             }
         }
         // notify model change (to display model):
-        IRModelManager.getInstance().fireIRModelChanged(this, null);
+        IRModelManager.getInstance().fireIRModelChanged(this);
     }
 
     /**
@@ -416,9 +421,62 @@ public final class IRModel {
                 setSelectedRglPrioImageHdu(null);
             }
             // notify model change (to display model):
-            IRModelManager.getInstance().fireIRModelChanged(this, null);
+            IRModelManager.getInstance().fireIRModelChanged(this);
         }
         return removed;
+    }
+
+    /**
+     * Load the result as input.
+     *
+     * @param serviceResult the result to use. must be valid. (required)
+     * @param useLastImgAsInit when true, the LAST_IMG of the result will be used for the INIT_IMG of the input.
+     * when false, the INIT_IMG of the result will be used for the INIT_IMG of the input.
+     * @return true if exactly one result was selected, false otherwise.
+     */
+    public boolean loadResultAsInput(ServiceResult serviceResult, boolean useLastImgAsInit) {
+        boolean success = false;
+
+        if (serviceResult.isValid()) {
+            // copy of the file. because the input form will modify the oifitsfile.
+            OIFitsFile oifitsfile = new OIFitsFile(serviceResult.getOifitsFile());
+
+            // find last img HDU if needed, and if it exists in the oifitsfile
+            FitsImageHDU lastImgHdu = null;
+            if (useLastImgAsInit) {
+                List<Role> roles = getHdusRoles(oifitsfile);
+                for (int i = 0, s = roles.size(); i < s; i++) {
+                    switch (roles.get(i)) {
+                        case RESULT:
+                            lastImgHdu = oifitsfile.getFitsImageHDUs().get(i);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            this.loadOIFits(oifitsfile);
+
+            // if last img must becomes init image, set the equivalent of last img in library as init image.
+            // if lastImgHdu == null, it will correctly set init img to null.
+            if (useLastImgAsInit) {
+                setSelectedInputImageHDU(findInImageLibrary(lastImgHdu));
+            }
+            success = true;
+        }
+        return success;
+    }
+
+    /**
+     * Set the displayed image as initial image in the input form.
+     * Also place focus radio button on INIT_IMG.
+     * @param fihdu the FitsImageHDU to use.
+     */
+    public void setAsInitImg(FitsImageHDU fihdu) {
+        FitsImageHDU libraryHDU = addToImageLibrary(fihdu, null);
+        setSelectedInputImageHDU(libraryHDU);
+        setInputImageView(KEYWORD_INIT_IMG);
     }
 
     /** 
@@ -726,15 +784,16 @@ public final class IRModel {
      * @param second HDU to compare to first. (optional)
      * @return true if both contains same reference,
      * or if both are null, or if both have same checksum. false otherwise.
+     * return false if one of them has checksum = 0. The decision to compute expensively the checksum is on the caller.
      */
     private static boolean hduEquals(final FitsImageHDU first, final FitsImageHDU second) {
-        if (first == second) {
-            return true; // when they are the same reference or both null
-        } else if (first == null || second == null) {
-            return false; // when only one of them is null
-        } else {
-            return first.getChecksum() == second.getChecksum(); // compare the checksums
+        boolean match = FitsImageHDU.MATCHER.match(first, second);
+        if (logger.isDebugEnabled()) {
+            logger.debug("hdus {} and {} match: {}",
+                    (first == null) ? "null" : first.getHduName(),
+                    (second == null) ? "null" : second.getHduName(), match);
         }
+        return match;
     }
 
     // --- ServiceResult handling ---
@@ -830,7 +889,7 @@ public final class IRModel {
             setInputImageView(KEYWORD_INIT_IMG);
         }
         // notify model update
-        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this);
     }
 
     /** 
@@ -867,13 +926,13 @@ public final class IRModel {
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
         getResultSets().remove(serviceResultToDelete);
         // notify model update
-        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this);
     }
 
     public void removeServiceResults(List<ServiceResult> selectedServicesList) {
         getResultSets().removeAll(selectedServicesList);
         // notify model update
-        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this);
     }
 
     private void loadLog(final ServiceResult serviceResult) {

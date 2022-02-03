@@ -5,6 +5,7 @@ package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.FeedbackReport;
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
@@ -15,6 +16,7 @@ import fr.jmmc.oiexplorer.core.gui.SliderPanel;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
 import fr.jmmc.oimaging.OImaging;
 import fr.jmmc.oimaging.Preferences;
+import fr.jmmc.oimaging.gui.action.SetAsInitImgAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
@@ -170,6 +172,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 }
             } else {
                 logger.debug("Remove image panel");
+                // reset anyway
+                fitsImagePanel.setFitsImage(null);
                 jPanelImage.remove(fitsImagePanel);
             }
         } finally {
@@ -194,7 +198,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             FitsImage image = imageHDU.getFitsImages().get(0);
             fitsImagePanel.setFitsImage(image);
             jPanelImage.add(fitsImagePanel);
-            logger.debug("Display image HDU '{}'", imageHDU.getHduName());
+            logger.debug("Display image HDU {} '{}'", this.showMode, imageHDU.getHduName());
         } else {
             // reset anyway
             fitsImagePanel.setFitsImage(null);
@@ -234,12 +238,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // change border title
             switch (mode) {
                 case MODEL:
+                    this.jButtonSetAsInitImg.setVisible(false);
                     setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (INPUT)"));
                     break;
                 case RESULT:
+                    this.jButtonSetAsInitImg.setVisible(true);
                     setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (RESULT)"));
                     break;
                 case GRID:
+                    this.jButtonSetAsInitImg.setVisible(true);
                     setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation (GRID)"));
                     break;
             }
@@ -559,9 +566,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         // show dialog and waits for user action (async changes may happen):
         if (operation.action(fitsImagePanel)) {
-            // update checksum:
-            copyFitsImageHDU.updateChecksum();
-
             // update keywords
             try {
                 final BasicHDU basicHdu = FitsImageWriter.createHDUnit(copyFitsImageHDU);
@@ -575,12 +579,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
             // add modified image into image library and select it if appropriate:
             IRModelManager.getInstance().getIRModel().addFitsImageHDUAndSelect(fitsImageHDU, copyFitsImageHDU);
-        } else {
-            if ((fitsImagePanel.getFitsImage() != null)
-                    && (copyFitsImageHDU == fitsImagePanel.getFitsImage().getFitsImageHDU())) {
-                // restore initial image if displayed:
-                displaySelection(fitsImageHDU);
-            }
+        }
+
+        // restore initial image, but only if initial image have not changed:
+        // during the dialog, some async action (like run) could have changed it
+        if ((fitsImagePanel.getFitsImage() != null)
+                && (copyFitsImageHDU == fitsImagePanel.getFitsImage().getFitsImageHDU())) {
+            displaySelection(fitsImageHDU);
         }
     }
 
@@ -594,8 +599,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final FitsImageHDU newHDU = fitsImagePanel.createFitsImage();
 
         if (newHDU != null) {
-            // update checksum:
-            newHDU.updateChecksum();
+
+            // update keywords
+            try {
+                final BasicHDU basicHdu = FitsImageWriter.createHDUnit(newHDU);
+                // clear the header cards, because basicHdu already have all of them updated
+                // not clearing them would make processKeywords() to output duplicates header cards.
+                newHDU.getHeaderCards().clear();
+                FitsImageLoader.processKeywords(null, basicHdu.getHeader(), newHDU);
+            } catch (FitsException e) {
+                logger.info(e.getMessage());
+            }
 
             // add the FitsImageHDU to the imageLibrary
             final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)");
@@ -613,7 +627,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             displayModel(irModel);
 
             // notify model update
-            irModelManager.fireIRModelChanged(this, null);
+            irModelManager.fireIRModelChanged(this);
         }
     }
 
@@ -636,6 +650,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
         jButtonModifyImage = new javax.swing.JButton();
+        jButtonSetAsInitImg = new javax.swing.JButton();
         jButtonRescale = new javax.swing.JButton();
         jLabelImageDebug = new javax.swing.JLabel();
         jPanelImage = new javax.swing.JPanel();
@@ -723,10 +738,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
+
+        jButtonSetAsInitImg.setAction(ActionRegistrar.getInstance().get(SetAsInitImgAction.CLASS_NAME, SetAsInitImgAction.ACTION_NAME));
+        jButtonSetAsInitImg.setText("Set as Init Img");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelImageViewer.add(jButtonSetAsInitImg, gridBagConstraints);
 
         jButtonRescale.setText("Rescale");
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
@@ -743,7 +766,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jLabelImageDebug.setForeground(java.awt.Color.red);
         jLabelImageDebug.setText("Debug");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 0;
         jPanelImageViewer.add(jLabelImageDebug, gridBagConstraints);
 
@@ -856,6 +879,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JButton jButtonModifyImage;
     private javax.swing.JButton jButtonResample;
     private javax.swing.JButton jButtonRescale;
+    private javax.swing.JButton jButtonSetAsInitImg;
     private javax.swing.JButton jButtonViewport;
     private javax.swing.JComboBox jComboBoxImage;
     private javax.swing.JEditorPane jEditorPaneExecutionLog;
@@ -952,5 +976,20 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
      */
     public boolean isFitsImageNull() {
         return this.fitsImagePanel.getFitsImage() == null;
+    }
+
+    /**
+     * return the FitsImageHDU parent to the FitsImage (potentially) displayed.
+     * @return the FitsImageHDU if a FitsImage is displayed, null otherwise.
+     */
+    public FitsImageHDU getDisplayedFitsImageHDU() {
+
+        final FitsImage fitsImage = fitsImagePanel.getFitsImage();
+
+        if (fitsImage == null) {
+            return null;
+        } else {
+            return fitsImage.getFitsImageHDU();
+        }
     }
 }

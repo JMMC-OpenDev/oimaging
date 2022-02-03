@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 
 public class DeleteSelectionAction extends RegisteredAction {
 
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
+
     /** Class name. This name is used to register to the ActionRegistrar */
     public final static String className = DeleteSelectionAction.class.getName();
     /** Action name. This name is used to register to the ActionRegistrar */
@@ -18,7 +21,6 @@ public class DeleteSelectionAction extends RegisteredAction {
 
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(className);
-    private static final long serialVersionUID = 1L;
 
     public DeleteSelectionAction() {
         super(className, actionName);

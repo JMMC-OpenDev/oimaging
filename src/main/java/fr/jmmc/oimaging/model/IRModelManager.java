@@ -12,7 +12,9 @@ import fr.jmmc.jmcs.util.jaxb.JAXBFactory;
 import fr.jmmc.jmcs.util.jaxb.JAXBUtils;
 import fr.jmmc.jmcs.util.jaxb.XmlBindException;
 import fr.jmmc.oiexplorer.core.model.event.EventNotifier;
+import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageFile;
+import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.FitsImageLoader;
 import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.model.OIFitsChecker;
@@ -233,7 +235,7 @@ public final class IRModelManager {
     public boolean loadOIFitsFile(final OIFitsFile oiFitsFile) {
         if (oiFitsFile != null) {
             irModel.loadOifitsFile(oiFitsFile);
-            fireIRModelChanged(this, null);
+            fireIRModelChanged();
             return true;
 
         }
@@ -321,6 +323,35 @@ public final class IRModelManager {
     }
 
     /**
+     * Load result as input.
+     * @param serviceResult the result to use. must be valid. (required)
+     * @param useLastImgAsInit when true, the LAST_IMG of the result will be used for the INIT_IMG of the input.
+     * when false, the INIT_IMG of the result will be used for the INIT_IMG of the input.
+     * @return boolean return of IRModel.loadResultAsInput() call
+     */
+    public boolean loadResultAsInput(ServiceResult serviceResult, boolean useLastImgAsInit) {
+        boolean success = false;
+
+        if (serviceResult.isValid()) {
+            success = irModel.loadResultAsInput(serviceResult, useLastImgAsInit);
+            if (success) {
+                fireIRModelChanged();
+            }
+        }
+        return success;
+    }
+
+    /**
+     * Set the displayed image as initial image in the input form.
+     * Also place focus radio button on INIT_IMG.
+     * @param fihdu the FitsImageHDU to use.
+     */
+    public void setAsInitImg(FitsImageHDU fihdu) {
+        irModel.setAsInitImg(fihdu);
+        fireIRModelChanged();
+    }
+
+    /**
      * Return the current model file
      * @return the current model file or null if undefined
      */
@@ -398,6 +429,22 @@ public final class IRModelManager {
     }
 
     /**
+     * Bind the given listener to IRMODEL_RESULT_LIST_CHANGED event and fire such event to initialize the listener properly
+     * @param listener listener to bind
+     */
+    public void bindIRModelResultListChangedEvent(final IRModelEventListener listener) {
+        getIRModelResultListChangedEventNotifier().register(listener);
+    }
+
+    /**
+     * Bind the given listener to IRMODEL_CHANGED event and fire such event to initialize the listener properly
+     * @param listener listener to bind
+     */
+    public void bindRunEvent(final IRModelEventListener listener) {
+        getRunEventNotifier().register(listener);
+    }
+
+    /**
      * Return the IRMODEL_CHANGED event notifier
      * @return IRMODEL_CHANGED event notifier
      */
@@ -406,11 +453,34 @@ public final class IRModelManager {
     }
 
     /**
-     * Return the READY event notifier
-     * @return READY event notifier
+     * Return the IRMODEL_RESULT_LIST_CHANGED event notifier
+     * @return IRMODEL_RESULT_LIST_CHANGED event notifier
      */
-    public EventNotifier<IRModelEvent, IRModelEventType, Object> getReadyEventNotifier() {
-        return this.irModelManagerEventNotifierMap.get(IRModelEventType.READY);
+    private EventNotifier<IRModelEvent, IRModelEventType, Object> getIRModelResultListChangedEventNotifier() {
+        return this.irModelManagerEventNotifierMap.get(IRModelEventType.IRMODEL_RESULT_LIST_CHANGED);
+    }
+
+    /**
+     * Return the RUN event notifier
+     * @return RUN event notifier
+     */
+    private EventNotifier<IRModelEvent, IRModelEventType, Object> getRunEventNotifier() {
+        return this.irModelManagerEventNotifierMap.get(IRModelEventType.RUN);
+    }
+
+    /**
+     * This fires an IRMODEL_CHANGED event to given registered listeners ASYNCHRONOUSLY !
+     */
+    private void fireIRModelChanged() {
+        fireIRModelChanged(this);
+    }
+
+    /**
+     * This fires an IRMODEL_CHANGED event to given registered listener ASYNCHRONOUSLY !
+     * @param source event source
+     */
+    public void fireIRModelChanged(final Object source) {
+        fireIRModelChanged(source, null);
     }
 
     /**
@@ -421,14 +491,22 @@ public final class IRModelManager {
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireIRModelChanged(final Object source, final IRModelEventListener destination) {
+    private void fireIRModelChanged(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
                 logger.debug("fireIRModelChanged TO {}", (destination != null) ? destination : "ALL");
             }
             getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.IRMODEL_CHANGED, null, getIRModel()), destination);
+                    new IRModelEvent(IRModelEventType.IRMODEL_CHANGED), destination);
         }
+    }
+
+    /**
+     * This fires an IRMODEL_RESULT_LIST_CHANGED event to given registered listener ASYNCHRONOUSLY !
+     * @param source event source
+     */
+    public void fireIRModelResultListChanged(final Object source) {
+        fireIRModelResultListChanged(source, null);
     }
 
     /**
@@ -437,35 +515,36 @@ public final class IRModelManager {
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireIRModelResultListChanged(final Object source, final IRModelEventListener destination) {
+    private void fireIRModelResultListChanged(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
                 logger.debug("fireIRModelResultListChanged TO {}", (destination != null) ? destination : "ALL");
             }
-            getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.IRMODEL_RESULT_LIST_CHANGED, null, getIRModel()), destination);
+            getIRModelResultListChangedEventNotifier().queueEvent((source != null) ? source : this,
+                    new IRModelEvent(IRModelEventType.IRMODEL_RESULT_LIST_CHANGED), destination);
         }
     }
 
     /**
-     * This fires an IRMODEL_CHANGED event to given registered listeners ASYNCHRONOUSLY !
+     * This fires a RUN event to given registered listener ASYNCHRONOUSLY !
+     * @param source event source
      */
-    private void fireIRModelChanged() {
-        fireIRModelChanged(this, null);
+    public void fireRun(final Object source) {
+        fireRun(source, null);
     }
 
     /**
-     * This fires a READY event to given registered listener ASYNCHRONOUSLY !
+     * This fires a RUN event to given registered listener ASYNCHRONOUSLY !
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireReady(final Object source, final IRModelEventListener destination) {
+    private void fireRun(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
-                logger.debug("fireReady TO {}", (destination != null) ? destination : "ALL");
+                logger.debug("fireRun TO {}", (destination != null) ? destination : "ALL");
             }
-            getReadyEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.READY, null, getIRModel()), destination);
+            getRunEventNotifier().queueEvent((source != null) ? source : this,
+                    new IRModelEvent(IRModelEventType.RUN), destination);
         }
     }
 }

@@ -25,16 +25,19 @@ import fr.jmmc.oiexplorer.core.model.PlotDefinitionFactory;
 import fr.jmmc.oimaging.gui.MainPanel;
 import fr.jmmc.oimaging.gui.PreferencePanel;
 import fr.jmmc.oimaging.gui.ViewerPanel.ProcessImageOperation;
+import fr.jmmc.oimaging.gui.action.LoadResultAsInputAction;
 import fr.jmmc.oimaging.gui.action.CreateImageAction;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
+import fr.jmmc.oimaging.gui.action.RunMoreIterationsAction;
 import fr.jmmc.oimaging.gui.action.NewAction;
 import fr.jmmc.oimaging.gui.action.ProcessImageAction;
 import fr.jmmc.oimaging.gui.action.OIFitsBrowserAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
+import fr.jmmc.oimaging.gui.action.SetAsInitImgAction;
 import fr.jmmc.oimaging.gui.action.SwitchTabAction;
 import fr.jmmc.oimaging.gui.action.TableEditorAction;
 import fr.jmmc.oimaging.interop.SendFitsAction;
@@ -333,6 +336,9 @@ public final class OImaging extends App {
 
         // Processing menu :
         new RunAction();
+        new LoadResultAsInputAction();
+        new RunMoreIterationsAction();
+        new SetAsInitImgAction();
         new CreateImageAction();
         
         for (ProcessImageOperation op : ProcessImageOperation.values()) {

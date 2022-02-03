@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
  */
 public class CreateImageAction extends RegisteredAction {
 
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
+
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(CreateImageAction.class);
 

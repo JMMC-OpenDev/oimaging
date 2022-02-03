@@ -470,9 +470,39 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
                       <SubComponents>
+                        <Component class="javax.swing.JButton" name="jButtonRunMoreIterations">
+                          <Properties>
+                            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="ActionRegistrar.getInstance().get(fr.jmmc.oimaging.gui.action.RunMoreIterationsAction.CLASS_NAME, fr.jmmc.oimaging.gui.action.RunMoreIterationsAction.ACTION_NAME)" type="code"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="Run more iterations"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JButton" name="jButtonLoadAsInput">
+                          <Properties>
+                            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="ActionRegistrar.getInstance().get(fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.CLASS_NAME, fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.ACTION_NAME)" type="code"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="Load as input"/>
+                            <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="LoadResultAsInputAction.USE_INIT_IMG_AS_INIT" type="code"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JButton" name="jButtonLoadAsInputWithLastImg">
+                          <Properties>
+                            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="ActionRegistrar.getInstance().get(fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.CLASS_NAME, fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.ACTION_NAME)" type="code"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="Load as input with last img"/>
+                            <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="LoadResultAsInputAction.USE_LAST_IMG_AS_INIT" type="code"/>
+                            </Property>
+                          </Properties>
+                        </Component>
                         <Component class="javax.swing.JButton" name="jButtonExportOIFits">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="[Save]"/>
+                            <Property name="text" type="java.lang.String" value="Save OIFitsFile"/>
                             <Property name="name" type="java.lang.String" value="jButtonExportOIFits" noResource="true"/>
                           </Properties>
                         </Component>
