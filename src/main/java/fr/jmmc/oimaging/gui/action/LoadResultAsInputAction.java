@@ -18,6 +18,9 @@ import org.slf4j.LoggerFactory;
  */
 public class LoadResultAsInputAction extends RegisteredAction {
 
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
+
     /**
      * Class logger
      */

@@ -109,14 +109,12 @@ public class RunAction extends RegisteredAction {
             final Service service = irModel.getSelectedService();
             ServiceResult result = null;
             try {
-                boolean valid = false;
-
                 result = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
                 result.setService(service);
 
                 if (result.getErrorMessage() == null) {
                     // Result is valid only if the OIFITS file was downloaded successfully:
-                    valid = result.getOifitsResultFile().exists();
+                    boolean valid = result.getOifitsResultFile().exists();
                     result.setValid(valid);
 
                     if (!valid) {
