@@ -332,7 +332,7 @@ public final class IRModel {
                                                 final List<Role> roles) {
 
         final int nHdus = hdus.size();
-        logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);
+        logger.info("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);
 
         hdus.forEach(hdu -> {
             // prepare images (negative values, padding, orientation):
@@ -534,9 +534,7 @@ public final class IRModel {
                 roles.add(Role.NO_ROLE);
             }
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("getHdusRoles[{}] : {}", oifitsFile.getAbsoluteFilePath(), roles);
-        }
+        logger.info("getHdusRoles[{}] : {}", oifitsFile.getAbsoluteFilePath(), roles);
         return roles;
     }
 
@@ -676,7 +674,6 @@ public final class IRModel {
         }
 
         // return an equivalent if there exists one
-        hdu.updateChecksum(); // first update the checksum to be able to checksum-compare
         final FitsImageHDU equivalentHDU = findInImageLibrary(hdu);
         if (equivalentHDU != null) {
             logger.info("HDU {} no added to image library because the equivalent HDU {} is already in the library.",
@@ -733,7 +730,6 @@ public final class IRModel {
             // name is available:
             logger.info("HDU_NAME '{}' is already used in imageLibrary, renamed to '{}'.", hdu.getHduName(), newName);
             hdu.setHduName(newName);
-            hdu.updateChecksum(); // update checksum after hduName update
         }
 
         // finally, add the hdu to the library
@@ -791,14 +787,10 @@ public final class IRModel {
      * return false if one of them has checksum = 0. The decision to compute expensively the checksum is on the caller.
      */
     private static boolean hduEquals(final FitsImageHDU first, final FitsImageHDU second) {
-        if (first == second) {
-            return true; // when they are the same reference or both null
-        } else if (first == null || second == null) {
-            return false; // when only one of them is null
-        } else {
-            return ((first.getChecksum() != 0) // only accepts computed checksums
-                    && (first.getChecksum() == second.getChecksum())); // compare the checksums
-        }
+        boolean equiv = FitsImageHDU.MATCHER.match(first, second);
+        logger.info("hdus {} and {} equiv: {}",
+                first == null ? "null" : first.getHduName(), second == null ? "null" : second.getHduName(), equiv);
+        return equiv;
     }
 
     // --- ServiceResult handling ---
