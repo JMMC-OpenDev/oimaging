@@ -235,7 +235,7 @@ public final class IRModelManager {
     public boolean loadOIFitsFile(final OIFitsFile oiFitsFile) {
         if (oiFitsFile != null) {
             irModel.loadOifitsFile(oiFitsFile);
-            fireIRModelChanged(this, null);
+            fireIRModelChanged();
             return true;
 
         }
@@ -330,17 +330,14 @@ public final class IRModelManager {
      * @return boolean return of IRModel.loadResultAsInput() call
      */
     public boolean loadResultAsInput(ServiceResult serviceResult, boolean useLastImgAsInit) {
-        boolean success = true;
+        boolean success = false;
 
         if (serviceResult.isValid()) {
-            success &= irModel.loadResultAsInput(serviceResult, useLastImgAsInit);
+            success = irModel.loadResultAsInput(serviceResult, useLastImgAsInit);
             if (success) {
                 fireIRModelChanged();
             }
-        } else {
-            success = false;
         }
-
         return success;
     }
 
@@ -432,6 +429,22 @@ public final class IRModelManager {
     }
 
     /**
+     * Bind the given listener to IRMODEL_RESULT_LIST_CHANGED event and fire such event to initialize the listener properly
+     * @param listener listener to bind
+     */
+    public void bindIRModelResultListChangedEvent(final IRModelEventListener listener) {
+        getIRModelResultListChangedEventNotifier().register(listener);
+    }
+
+    /**
+     * Bind the given listener to IRMODEL_CHANGED event and fire such event to initialize the listener properly
+     * @param listener listener to bind
+     */
+    public void bindRunEvent(final IRModelEventListener listener) {
+        getRunEventNotifier().register(listener);
+    }
+
+    /**
      * Return the IRMODEL_CHANGED event notifier
      * @return IRMODEL_CHANGED event notifier
      */
@@ -440,11 +453,34 @@ public final class IRModelManager {
     }
 
     /**
+     * Return the IRMODEL_RESULT_LIST_CHANGED event notifier
+     * @return IRMODEL_RESULT_LIST_CHANGED event notifier
+     */
+    private EventNotifier<IRModelEvent, IRModelEventType, Object> getIRModelResultListChangedEventNotifier() {
+        return this.irModelManagerEventNotifierMap.get(IRModelEventType.IRMODEL_RESULT_LIST_CHANGED);
+    }
+
+    /**
      * Return the RUN event notifier
      * @return RUN event notifier
      */
-    public EventNotifier<IRModelEvent, IRModelEventType, Object> getRunEventNotifier() {
+    private EventNotifier<IRModelEvent, IRModelEventType, Object> getRunEventNotifier() {
         return this.irModelManagerEventNotifierMap.get(IRModelEventType.RUN);
+    }
+
+    /**
+     * This fires an IRMODEL_CHANGED event to given registered listeners ASYNCHRONOUSLY !
+     */
+    private void fireIRModelChanged() {
+        fireIRModelChanged(this);
+    }
+
+    /**
+     * This fires an IRMODEL_CHANGED event to given registered listener ASYNCHRONOUSLY !
+     * @param source event source
+     */
+    public void fireIRModelChanged(final Object source) {
+        fireIRModelChanged(source, null);
     }
 
     /**
@@ -455,14 +491,22 @@ public final class IRModelManager {
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireIRModelChanged(final Object source, final IRModelEventListener destination) {
+    private void fireIRModelChanged(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
                 logger.debug("fireIRModelChanged TO {}", (destination != null) ? destination : "ALL");
             }
             getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.IRMODEL_CHANGED, null, getIRModel()), destination);
+                    new IRModelEvent(IRModelEventType.IRMODEL_CHANGED), destination);
         }
+    }
+
+    /**
+     * This fires an IRMODEL_RESULT_LIST_CHANGED event to given registered listener ASYNCHRONOUSLY !
+     * @param source event source
+     */
+    public void fireIRModelResultListChanged(final Object source) {
+        fireIRModelResultListChanged(source, null);
     }
 
     /**
@@ -471,21 +515,22 @@ public final class IRModelManager {
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireIRModelResultListChanged(final Object source, final IRModelEventListener destination) {
+    private void fireIRModelResultListChanged(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
             if (logger.isDebugEnabled()) {
                 logger.debug("fireIRModelResultListChanged TO {}", (destination != null) ? destination : "ALL");
             }
-            getIRModelChangedEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.IRMODEL_RESULT_LIST_CHANGED, null, getIRModel()), destination);
+            getIRModelResultListChangedEventNotifier().queueEvent((source != null) ? source : this,
+                    new IRModelEvent(IRModelEventType.IRMODEL_RESULT_LIST_CHANGED), destination);
         }
     }
 
     /**
-     * This fires an IRMODEL_CHANGED event to given registered listeners ASYNCHRONOUSLY !
+     * This fires a RUN event to given registered listener ASYNCHRONOUSLY !
+     * @param source event source
      */
-    private void fireIRModelChanged() {
-        fireIRModelChanged(this, null);
+    public void fireRun(final Object source) {
+        fireRun(source, null);
     }
 
     /**
@@ -493,14 +538,13 @@ public final class IRModelManager {
      * @param source event source
      * @param destination destination listener (null means all)
      */
-    public void fireRun(final Object source, final IRModelEventListener destination) {
+    private void fireRun(final Object source, final IRModelEventListener destination) {
         if (enableEvents) {
-            logger.info(">>>FIRE RUN");
             if (logger.isDebugEnabled()) {
                 logger.debug("fireRun TO {}", (destination != null) ? destination : "ALL");
             }
             getRunEventNotifier().queueEvent((source != null) ? source : this,
-                    new IRModelEvent(IRModelEventType.RUN, null, getIRModel()), destination);
+                    new IRModelEvent(IRModelEventType.RUN), destination);
         }
     }
 }

@@ -14,20 +14,21 @@ import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
  */
 public final class IRModelEvent extends GenericEvent<IRModelEventType, Object> {
 
-    private final IRModel irModel;
-
     /**
      * Public constructor dealing with an IR Model 
      * @param type event type
-     * @param subjectId optional related object id
      */
-    public IRModelEvent(final IRModelEventType type, final String subjectId, IRModel irModel) {
-        super(type, subjectId);
-        this.irModel = irModel;
+    public IRModelEvent(final IRModelEventType type) {
+        this(type, null);
     }
 
-    public IRModel getIrModel() {
-        return irModel;
+    /**
+     * Private constructor dealing with an IR Model 
+     * @param type event type
+     * @param subjectId optional related object id
+     */
+    private IRModelEvent(final IRModelEventType type, final String subjectId) {
+        super(type, subjectId);
     }
 
     /**
@@ -38,6 +39,7 @@ public final class IRModelEvent extends GenericEvent<IRModelEventType, Object> {
         final Object value;
         switch (getType()) {
             case IRMODEL_CHANGED:
+            case IRMODEL_RESULT_LIST_CHANGED:
                 value = IRModelManager.getInstance().getIRModel();
                 break;
             default:
@@ -49,4 +51,7 @@ public final class IRModelEvent extends GenericEvent<IRModelEventType, Object> {
     /* 
      * helper methods to get correct type depending on the event type 
      */
+    public IRModel getIrModel() {
+        return (IRModel) getSubjectValue();
+    }
 }

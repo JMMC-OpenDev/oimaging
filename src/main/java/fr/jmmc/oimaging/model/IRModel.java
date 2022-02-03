@@ -155,7 +155,7 @@ public final class IRModel {
         // truncate file name to fix filepath too long crash
         // TODO: do this more cleanly by parsing suffixes and removing them
         final String trunkedFileName
-                = oiFitsFile.getFileName().substring(0, Math.min(oifitsFile.getFileName().length(), 80));
+                     = oiFitsFile.getFileName().substring(0, Math.min(oifitsFile.getFileName().length(), 80));
 
         final File tmpFile = FileUtils.getTempFile(trunkedFileName, ".export-" + exportCount + ".fits");
 
@@ -332,7 +332,7 @@ public final class IRModel {
                                                 final List<Role> roles) {
 
         final int nHdus = hdus.size();
-        logger.info("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);
+        logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);
 
         hdus.forEach(hdu -> {
             // prepare images (negative values, padding, orientation):
@@ -400,7 +400,7 @@ public final class IRModel {
             }
         }
         // notify model change (to display model):
-        IRModelManager.getInstance().fireIRModelChanged(this, null);
+        IRModelManager.getInstance().fireIRModelChanged(this);
     }
 
     /**
@@ -421,7 +421,7 @@ public final class IRModel {
                 setSelectedRglPrioImageHdu(null);
             }
             // notify model change (to display model):
-            IRModelManager.getInstance().fireIRModelChanged(this, null);
+            IRModelManager.getInstance().fireIRModelChanged(this);
         }
         return removed;
     }
@@ -435,7 +435,7 @@ public final class IRModel {
      * @return true if exactly one result was selected, false otherwise.
      */
     public boolean loadResultAsInput(ServiceResult serviceResult, boolean useLastImgAsInit) {
-        boolean success = true;
+        boolean success = false;
 
         if (serviceResult.isValid()) {
             // copy of the file. because the input form will modify the oifitsfile.
@@ -463,10 +463,8 @@ public final class IRModel {
             if (useLastImgAsInit) {
                 setSelectedInputImageHDU(findInImageLibrary(lastImgHdu));
             }
-        } else {
-            success = false;
+            success = true;
         }
-
         return success;
     }
 
@@ -534,7 +532,9 @@ public final class IRModel {
                 roles.add(Role.NO_ROLE);
             }
         }
-        logger.info("getHdusRoles[{}] : {}", oifitsFile.getAbsoluteFilePath(), roles);
+        if (logger.isDebugEnabled()) {
+            logger.debug("getHdusRoles[{}] : {}", oifitsFile.getAbsoluteFilePath(), roles);
+        }
         return roles;
     }
 
@@ -886,7 +886,7 @@ public final class IRModel {
             setInputImageView(KEYWORD_INIT_IMG);
         }
         // notify model update
-        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this);
     }
 
     /** 
@@ -923,13 +923,13 @@ public final class IRModel {
     public void removeServiceResult(ServiceResult serviceResultToDelete) {
         getResultSets().remove(serviceResultToDelete);
         // notify model update
-        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this);
     }
 
     public void removeServiceResults(List<ServiceResult> selectedServicesList) {
         getResultSets().removeAll(selectedServicesList);
         // notify model update
-        IRModelManager.getInstance().fireIRModelResultListChanged(this, null);
+        IRModelManager.getInstance().fireIRModelResultListChanged(this);
     }
 
     private void loadLog(final ServiceResult serviceResult) {
