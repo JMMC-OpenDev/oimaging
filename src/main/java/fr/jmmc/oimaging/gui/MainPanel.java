@@ -99,6 +99,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
     /** Flag set to true while the GUI is being updated by model else false. */
     private boolean syncingUI = false;
+    /** Flag to allow automatic change of the displayed tab (input / results) */
+    private boolean allowChangeTwoTabs = true;
 
     private FieldSliderAdapter fieldSliderAdapterWaveMin;
     private FieldSliderAdapter fieldSliderAdapterWaveMax;
@@ -170,7 +172,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         registerActions();
 
         IRModelManager.getInstance().bindIRModelChangedEvent(this);
-        IRModelManager.getInstance().getRunEventNotifier().register(this);
+        IRModelManager.getInstance().bindIRModelResultListChangedEvent(this);
+        IRModelManager.getInstance().bindRunEvent(this);
 
         // associate sliders and fields
         fieldSliderAdapterWaveMin = new FieldSliderAdapter(jSliderWaveMin, jFormattedTextFieldWaveMin, 0, 1, 0);
@@ -321,6 +324,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // TODO release child resource if any
+        IRModelManager.getInstance().unbind(this);
     }
 
     /**
@@ -813,7 +817,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         final boolean exactlyOneResultSelected = (this.getResultSetTablePanel().getSelectedRows().size() == 1);
         final boolean selectedIsSuccess
-                = exactlyOneResultSelected && this.getResultSetTablePanel().getSelectedRow().isValid();
+                      = exactlyOneResultSelected && this.getResultSetTablePanel().getSelectedRow().isValid();
 
         loadResultAsInputAction.setEnabled(selectedIsSuccess);
         runMoreIterationsAction.setEnabled(selectedIsSuccess);
@@ -877,6 +881,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         return null;
     }
 
+    @Override
     public void onProcess(final IRModelEvent event) {
         logger.debug("onProcess {}", event);
 
@@ -888,8 +893,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                 syncUI(event);
                 break;
             case RUN:
+                setAllowChangeTwoTabs(true);
                 jButtonRun.doClick();
-                jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.RESULTS.ordinal());
+                break;
             default:
                 logger.info("event not handled : {}", event);
         }
@@ -984,7 +990,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         if (changed) {
             // notify to other listener - if any in the future
             logger.debug("GUI updated");
-            IRModelManager.getInstance().fireIRModelChanged(this, null);
+            IRModelManager.getInstance().fireIRModelChanged(this);
         }
     }
 
@@ -1033,24 +1039,6 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jCheckBoxUseVis2.setSelected(hasOIData && inputParam.useVis2());
             jCheckBoxUseT3.setSelected(hasOIData && inputParam.useT3());
 
-            // model result list:
-            final List<ServiceResult> modelResults = currentModel.getResultSets();
-            final ServiceResult lastResult = currentModel.getLastResultSet();
-
-            // resultSet Table
-            if (event.getType() == IRModelEventType.IRMODEL_RESULT_LIST_CHANGED) {
-                jTablePanel.setResults(modelResults);
-            }
-
-            // set the slider results boundaries
-            if (modelResults.size() > 1) {
-                jSliderResults.setMinimum(1);
-                jSliderResults.setMaximum(modelResults.size());
-                jSliderResults.setVisible(true);
-            } else {
-                jSliderResults.setVisible(false);
-            }
-
             // perform analysis
             final List<String> failures = new LinkedList<String>();
 
@@ -1088,19 +1076,35 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             }
             jEditorPane.setText("<html><ul>" + sb.toString() + "</ul></html>");
 
+            // model result list:
+            final List<ServiceResult> modelResults = currentModel.getResultSets();
+            final ServiceResult lastResult = currentModel.getLastResultSet();
+
+            // set the slider results boundaries
+            if (modelResults.size() > 1) {
+                jSliderResults.setMinimum(1);
+                jSliderResults.setMaximum(modelResults.size());
+                jSliderResults.setVisible(true);
+            } else {
+                jSliderResults.setVisible(false);
+            }
+
             // Ensure to reset results anyway:
             if (modelResults.isEmpty()) {
                 showTablePanel(false);
+                jTablePanel.setResults(modelResults);
                 viewerPanelResults.displayResult(null);
             }
 
             switch (event.getType()) {
                 case IRMODEL_CHANGED:
                     viewerPanelInput.displayModel(currentModel);
-                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.INPUT.ordinal());
+                    selectTwoTabsDisplayed(TABS.INPUT.ordinal());
                     break;
                 case IRMODEL_RESULT_LIST_CHANGED:
                     if (!modelResults.isEmpty()) {
+                        // update result table:
+                        jTablePanel.setResults(modelResults);
                         showTablePanel(true);
 
                         if (lastResult != null) {
@@ -1110,7 +1114,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
                             viewerPanelInput.displayModel(currentModel);
                         }
                     }
-                    jTabbedPaneTwoTabsDisplay.setSelectedIndex(TABS.RESULTS.ordinal());
+                    selectTwoTabsDisplayed(TABS.RESULTS.ordinal());
                     break;
                 default:
                     break;
@@ -1151,6 +1155,16 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     /** Switch tab. */
     public void switchTab() {
         // only works when there is only two tabs
-        this.jTabbedPaneTwoTabsDisplay.setSelectedIndex(1 - this.jTabbedPaneTwoTabsDisplay.getSelectedIndex());
+        selectTwoTabsDisplayed(1 - this.jTabbedPaneTwoTabsDisplay.getSelectedIndex());
+    }
+
+    public void setAllowChangeTwoTabs(final boolean allow) {
+        allowChangeTwoTabs = allow;
+    }
+
+    private void selectTwoTabsDisplayed(final int index) {
+        if (allowChangeTwoTabs) {
+            this.jTabbedPaneTwoTabsDisplay.setSelectedIndex(index);
+        }
     }
 }

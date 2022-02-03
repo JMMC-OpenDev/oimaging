@@ -172,6 +172,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 }
             } else {
                 logger.debug("Remove image panel");
+                // reset anyway
+                fitsImagePanel.setFitsImage(null);
                 jPanelImage.remove(fitsImagePanel);
             }
         } finally {
@@ -564,9 +566,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         // show dialog and waits for user action (async changes may happen):
         if (operation.action(fitsImagePanel)) {
-            // update checksum:
-            copyFitsImageHDU.updateChecksum();
-
             // update keywords
             try {
                 final BasicHDU basicHdu = FitsImageWriter.createHDUnit(copyFitsImageHDU);
@@ -612,9 +611,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 logger.info(e.getMessage());
             }
 
-            // update checksum:
-            newHDU.updateChecksum();
-
             // add the FitsImageHDU to the imageLibrary
             final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)");
 
@@ -631,7 +627,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             displayModel(irModel);
 
             // notify model update
-            irModelManager.fireIRModelChanged(this, null);
+            irModelManager.fireIRModelChanged(this);
         }
     }
 
@@ -992,8 +988,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         if (fitsImage == null) {
             return null;
-        }
-        else {
+        } else {
             return fitsImage.getFitsImageHDU();
         }
     }
