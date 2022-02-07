@@ -731,7 +731,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
     }//GEN-LAST:event_jFormattedTextFieldActionPerformed
 
     private void jFormattedTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldPropertyChange
-        updateModel();
+        if ("value".equals(evt.getPropertyName())) {
+            updateModel();
+        }
     }//GEN-LAST:event_jFormattedTextFieldPropertyChange
 
     private void showTablePanel(final boolean visible) {
