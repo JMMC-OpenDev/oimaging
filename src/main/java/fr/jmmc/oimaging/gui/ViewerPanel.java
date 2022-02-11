@@ -314,9 +314,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
                 displayImage(imageHdus, imageHDU);
                 displayOiFitsAndParams(oifitsFile, target);
-            } else {
-                lastResultPanel = jPanelLogViewer;
             }
+            /*else {
+                lastResultPanel = jPanelLogViewer;
+            }*/
 
             setTabMode(SHOW_MODE.RESULT);
         }
