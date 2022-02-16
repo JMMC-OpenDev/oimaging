@@ -625,8 +625,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 irModel.setSelectedRglPrioImageHdu(libraryHDUs.get(0));
             }
 
-            displayModel(irModel);
-
             // notify model update
             irModelManager.fireIRModelChanged(this);
         }

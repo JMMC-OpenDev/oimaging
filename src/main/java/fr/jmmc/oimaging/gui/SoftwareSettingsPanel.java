@@ -552,7 +552,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jFormattedTextFieldRglWgtActionPerformed
 
     private void jFormattedTextFieldRglWgtPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldRglWgtPropertyChange
-        updateModel();
+        if ("value".equals(evt.getPropertyName())) {
+            updateModel();
+        }
     }//GEN-LAST:event_jFormattedTextFieldRglWgtPropertyChange
 
     private void jFormattedTextFieldFluxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxActionPerformed
@@ -560,7 +562,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jFormattedTextFieldFluxActionPerformed
 
     private void jFormattedTextFieldFluxPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxPropertyChange
-        updateModel();
+        if ("value".equals(evt.getPropertyName())) {
+            updateModel();
+        }
     }//GEN-LAST:event_jFormattedTextFieldFluxPropertyChange
 
     private void jFormattedTextFieldFluxErrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxErrActionPerformed
@@ -568,7 +572,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jFormattedTextFieldFluxErrActionPerformed
 
     private void jFormattedTextFieldFluxErrPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldFluxErrPropertyChange
-        updateModel();
+        if ("value".equals(evt.getPropertyName())) {
+            updateModel();
+        }
     }//GEN-LAST:event_jFormattedTextFieldFluxErrPropertyChange
 
     private void jButtonRemoveFitsImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveFitsImageActionPerformed
