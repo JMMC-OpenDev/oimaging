@@ -829,69 +829,28 @@ public final class IRModel {
 
             postProcessOIFitsFile(serviceResult);
 
-            final List<FitsImageHDU> resultHdus = serviceResult.getOifitsFile().getFitsImageHDUs();
-
-            // get roles in the given list order:
-            final List<Role> hdusRoles = getHdusRoles(serviceResult.getOifitsFile());
-
-            // import partially FitsImageHDUs:
-            final List<FitsImageHDU> libraryHdus = addFitsImageHDUs(
-                    resultHdus, serviceResult.getInputFile().getName(), hdusRoles);
-
-            // when added to library, some hdu can have their hduName changed.
-            // so we report the changes into the parameters of the hdu, to make it consistent.
-            ImageOiInputParam inputParams = serviceResult.getOifitsFile().getImageOiData().getInputParam();
-            ImageOiOutputParam outputParams = serviceResult.getOifitsFile().getImageOiData().getOutputParam();
-
-            for (int i = 0, len = resultHdus.size(); i < len; i++) {
-                switch (hdusRoles.get(i)) {
-                    case RESULT:
-                        // we use resultHdus and not libraryHdus
-                        // we don't want the hduName of equivalent hdus in library
-                        // our target is only the hdus of the result that have been added to library
-                        // and that had their names changed
-                        outputParams.setLastImg(resultHdus.get(i).getHduName());
-                        break;
-                    case INIT:
-                        inputParams.setInitImg(resultHdus.get(i).getHduName());
-                        break;
-                    case RGL:
-                        inputParams.setRglPrio(resultHdus.get(i).getHduName());
-                        break;
-                    default:
-                        break;
+            // prepare images in the result
+            for (FitsImageHDU fihdu : serviceResult.getOifitsFile().getFitsImageHDUs()) {
+                // set a hdu name if missing
+                if (fihdu.getHduName() == null || fihdu.getHduName().isEmpty()) {
+                    String filename = serviceResult.getOifitsFile().getFileName();
+                    if (filename == null || filename.isEmpty()) {
+                        fihdu.setHduName("untitled");
+                    }
+                    else { // use filename, maximum 50 characters
+                        fihdu.setHduName(filename.substring(0, Math.min(50, filename.length())));
+                    }
+                }
+                try {
+                    FitsImageUtils.prepareImages(fihdu);
+                } catch (IllegalArgumentException iae) {
+                    MessagePane.showErrorMessage(
+                            "Unable to prepare images from HDU \"{}\", error: {}", fihdu.getHduName(), iae);
                 }
             }
 
-            // this needs to be done after the call addFitsImageHDUs()
-            // so it uses the (possible) new name
-            // it also needs to be called before selecting HDUs
+            // better labels for images in the viewer panel
             updateImageIdentifiers(serviceResult);
-
-            // selecting equivalents for INIT_IMG and RGL_PRIO
-            FitsImageHDU initHduEquiv = null;
-            FitsImageHDU rglHduEquiv = null;
-
-            for (int i = 0, end = libraryHdus.size(); i < end; i++) {
-                final Role role = hdusRoles.get(i);
-
-                switch (role) {
-                    case RESULT:
-                        // select RESULT as initial image
-                        initHduEquiv = libraryHdus.get(i);
-                        break;
-                    case RGL:
-                        rglHduEquiv = libraryHdus.get(i);
-                        break;
-                    default:
-                }
-            }
-
-            // Always update selected images:
-            setSelectedInputImageHDU(initHduEquiv);
-            setSelectedRglPrioImageHdu(rglHduEquiv);
-
-            setInputImageView(KEYWORD_INIT_IMG);
         }
         // notify model update
         IRModelManager.getInstance().fireIRModelResultListChanged(this);
