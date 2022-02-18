@@ -77,7 +77,7 @@ public final class WisardInputParam extends SoftwareInputParam {
         if (applyDefaults) {
             // specific default values for WISARD:
             params.setRglWgt(1E-4);
-            params.setFluxErr(1E-6);
+            params.setFluxErr(1E-4);
         }
 
         // change table default:

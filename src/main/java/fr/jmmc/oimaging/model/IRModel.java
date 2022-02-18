@@ -171,7 +171,8 @@ public final class IRModel {
     }
 
     private void resetOIFits() {
-        loadOIFits(new OIFitsFile(OIFitsStandard.VERSION_1));
+        // we set default service parameters values
+        loadOIFits(new OIFitsFile(OIFitsStandard.VERSION_1), true);
     }
 
     /**
@@ -189,9 +190,19 @@ public final class IRModel {
 
     /**
      * Load the OiData tables of the model (oifits file, targets).
+     *
      * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
      */
     private void loadOIFits(final OIFitsFile oifitsFile) {
+        loadOIFits(oifitsFile, false);
+    }
+
+    /**
+     * Load the OiData tables of the model (oifits file, targets).
+     * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
+     * @param applyServiceDefaults boolean to set default service parameters values, or not
+     */
+    private void loadOIFits(final OIFitsFile oifitsFile, final boolean applyServiceDefaults) {
         // change current model immediately:
         this.oifitsFile = oifitsFile;
 
@@ -265,7 +276,7 @@ public final class IRModel {
             // avoid null service
             if (getSelectedService() == null) {
                 // Note: setSelectedService() calls initSpecificParams():
-                setSelectedService(ServiceList.getPreferedService());
+                setSelectedService(ServiceList.getPreferedService(), applyServiceDefaults);
             } else {
                 initSpecificParams(false);
             }
@@ -984,9 +995,24 @@ public final class IRModel {
         return selectedService;
     }
 
+    /**
+     * Set the service, and does not apply default parameters values.
+     *
+     * @param selectedService service to set
+     */
     public void setSelectedService(final Service selectedService) {
+        setSelectedService(selectedService, false);
+    }
+
+    /**
+     * Set the service, and apply default parameters values or not.
+     *
+     * @param selectedService service to set
+     * @param applyDefaults boolean saying if we apply default parameters values or not.
+     */
+    public void setSelectedService(final Service selectedService, final boolean applyDefaults) {
         this.selectedService = selectedService;
-        initSpecificParams(false);
+        initSpecificParams(applyDefaults);
     }
 
     public void initSpecificParams(final boolean applyDefaults) {
