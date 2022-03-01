@@ -222,9 +222,9 @@ public final class IRModel {
         inputParam.setWaveMax(effWaveRange.getMax());
 
         // Reset observable use according available tables
-        inputParam.useVis(oifitsFile.hasOiVis());
+        inputParam.useVis(oifitsFile.hasOiVis() ? ImageOiInputParam.VIS2_T3_ALL : ImageOiInputParam.VIS2_T3_NONE);
         inputParam.useVis2(oifitsFile.hasOiVis2());
-        inputParam.useT3(oifitsFile.hasOiT3());
+        inputParam.useT3(oifitsFile.hasOiT3() ? ImageOiInputParam.VIS2_T3_ALL : ImageOiInputParam.VIS2_T3_NONE);
 
         // get roles in the given list order:
         final List<Role> hdusRoles = getHdusRoles(oifitsFile);
