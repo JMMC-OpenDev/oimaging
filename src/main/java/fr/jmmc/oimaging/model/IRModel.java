@@ -24,6 +24,7 @@ import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
+import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.jmmc.oitools.model.range.Range;
 import fr.nom.tam.fits.FitsDate;
@@ -821,6 +822,9 @@ public final class IRModel {
 
         if (serviceResult.isValid()) {
             serviceResult.setIndex(resultCounter.incrementAndGet());
+
+            // fix OIFitsFile
+            OIFitsLoader.fixOIFitsFile(serviceResult.getOifitsFile());
 
             postProcessOIFitsFile(serviceResult);
 
