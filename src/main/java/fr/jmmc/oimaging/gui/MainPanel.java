@@ -997,7 +997,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // observables
         mString = params.useVis();
         wString = (String) jComboBoxUseVis.getSelectedItem();
-        if (mString != null && !mString.equals(wString)) {
+        if ((mString != null && !mString.equals(wString)) || (wString != null && !wString.equals(mString))) {
             params.useVis(wString);
             changed = true;
         }
@@ -1011,7 +1011,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         mString = params.useT3();
         wString = (String) jComboBoxUseT3.getSelectedItem();
-        if (mString != null && !mString.equals(wString)) {
+        if ((mString != null && !mString.equals(wString)) || (wString != null && !wString.equals(mString))) {
             params.useT3(wString);
             changed = true;
         }
