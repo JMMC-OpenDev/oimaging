@@ -298,7 +298,7 @@
                                 <Component class="javax.swing.JComboBox" name="jComboBoxUseVis">
                                   <Properties>
                                     <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                                      <Connection code="new DefaultComboBoxModel&lt;String&gt;(fr.jmmc.oitools.image.ImageOiInputParam.VIS2_T3_VALUES)" type="code"/>
+                                      <Connection code="new DefaultComboBoxModel&lt;String&gt;(ImageOiInputParam.USE_VALUES)" type="code"/>
                                     </Property>
                                   </Properties>
                                   <Events>
@@ -332,7 +332,7 @@
                                 <Component class="javax.swing.JComboBox" name="jComboBoxUseT3">
                                   <Properties>
                                     <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                                      <Connection code="new DefaultComboBoxModel&lt;String&gt;(fr.jmmc.oitools.image.ImageOiInputParam.VIS2_T3_VALUES)" type="code"/>
+                                      <Connection code="new DefaultComboBoxModel&lt;String&gt;(ImageOiInputParam.USE_VALUES)" type="code"/>
                                     </Property>
                                   </Properties>
                                   <Events>

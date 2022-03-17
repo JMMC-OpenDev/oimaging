@@ -200,9 +200,6 @@ public final class IRModelManager {
 
                     oifitsFile = OIFitsLoader.loadOIFits(OIFitsStandard.VERSION_1, checker, localCopy.getAbsolutePath());
                     oifitsFile.setSourceURI(new URI(fileLocation));
-
-                    // fix OIFitsFile
-                    OIFitsLoader.fixOIFitsFile(oifitsFile);
                 } else {
                     // download failed:
                     oifitsFile = null;

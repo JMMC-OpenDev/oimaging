@@ -24,7 +24,6 @@ import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.meta.Types;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
-import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.jmmc.oitools.model.range.Range;
 import fr.nom.tam.fits.FitsDate;
@@ -224,19 +223,19 @@ public final class IRModel {
 
         // Reset observable use according available tables
         if (oifitsFile.hasOiVis()) {
-            if (inputParam.useVis() == null) {
-                inputParam.useVis(ImageOiInputParam.VIS2_T3_ALL);
+            if (inputParam.getUseVis() == null) {
+                inputParam.setUseVis(ImageOiInputParam.USE_ALL);
             }
         } else {
-            inputParam.useVis(ImageOiInputParam.VIS2_T3_NONE);
+            inputParam.setUseVis(ImageOiInputParam.USE_NONE);
         }
-        inputParam.useVis2(oifitsFile.hasOiVis2());
+        inputParam.setUseVis2(oifitsFile.hasOiVis2());
         if (oifitsFile.hasOiT3()) {
-            if (inputParam.useT3() == null) {
-                inputParam.useT3(ImageOiInputParam.VIS2_T3_ALL);
+            if (inputParam.getUseT3() == null) {
+                inputParam.setUseT3(ImageOiInputParam.USE_ALL);
             }
         } else {
-            inputParam.useT3(ImageOiInputParam.VIS2_T3_NONE);
+            inputParam.setUseT3(ImageOiInputParam.USE_NONE);
         }
 
         // get roles in the given list order:
@@ -834,9 +833,6 @@ public final class IRModel {
 
         if (serviceResult.isValid()) {
             serviceResult.setIndex(resultCounter.incrementAndGet());
-
-            // fix OIFitsFile
-            OIFitsLoader.fixOIFitsFile(serviceResult.getOifitsFile());
 
             postProcessOIFitsFile(serviceResult);
 

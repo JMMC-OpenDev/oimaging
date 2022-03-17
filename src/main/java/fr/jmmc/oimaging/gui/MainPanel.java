@@ -547,7 +547,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jComboBoxUseVis.setModel(new DefaultComboBoxModel<String>(fr.jmmc.oitools.image.ImageOiInputParam.VIS2_T3_VALUES));
+        jComboBoxUseVis.setModel(new DefaultComboBoxModel<String>(ImageOiInputParam.USE_VALUES));
         jComboBoxUseVis.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxUseVisActionPerformed(evt);
@@ -575,7 +575,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel1.add(jCheckBoxUseVis2, gridBagConstraints);
 
-        jComboBoxUseT3.setModel(new DefaultComboBoxModel<String>(fr.jmmc.oitools.image.ImageOiInputParam.VIS2_T3_VALUES));
+        jComboBoxUseT3.setModel(new DefaultComboBoxModel<String>(ImageOiInputParam.USE_VALUES));
         jComboBoxUseT3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxUseT3ActionPerformed(evt);
@@ -970,7 +970,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         // Target
         mString = params.getTarget();
         wString = (String) jComboBoxTarget.getSelectedItem();
-        if ((mString != null && !mString.equals(wString)) || (wString != null && !wString.equals(mString))) {
+        if (!ObjectUtils.areEquals(mString, wString)) {
             params.setTarget(wString);
             changed = true;
         }
@@ -995,24 +995,24 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         }
 
         // observables
-        mString = params.useVis();
+        mString = params.getUseVis();
         wString = (String) jComboBoxUseVis.getSelectedItem();
-        if ((mString != null && !mString.equals(wString)) || (wString != null && !wString.equals(mString))) {
-            params.useVis(wString);
+        if (!ObjectUtils.areEquals(mString, wString)) {
+            params.setUseVis(wString);
             changed = true;
         }
 
-        mFlag = params.useVis2();
+        mFlag = params.isUseVis2();
         wFlag = jCheckBoxUseVis2.isSelected();
         if (mFlag != wFlag) {
-            params.useVis2(wFlag);
+            params.setUseVis2(wFlag);
             changed = true;
         }
 
-        mString = params.useT3();
+        mString = params.getUseT3();
         wString = (String) jComboBoxUseT3.getSelectedItem();
-        if ((mString != null && !mString.equals(wString)) || (wString != null && !wString.equals(mString))) {
-            params.useT3(wString);
+        if (!ObjectUtils.areEquals(mString, wString)) {
+            params.setUseT3(wString);
             changed = true;
         }
 
@@ -1072,9 +1072,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jComboBoxUseVis.setEnabled(hasOIData && oifitsFile.hasOiVis());
             jCheckBoxUseVis2.setEnabled(hasOIData && oifitsFile.hasOiVis2());
             jComboBoxUseT3.setEnabled(hasOIData && oifitsFile.hasOiT3());
-            jComboBoxUseVis.setSelectedItem(inputParam.useVis());
-            jCheckBoxUseVis2.setSelected(hasOIData && inputParam.useVis2());
-            jComboBoxUseT3.setSelectedItem(inputParam.useT3());
+            jComboBoxUseVis.setSelectedItem(inputParam.getUseVis());
+            jCheckBoxUseVis2.setSelected(hasOIData && inputParam.isUseVis2());
+            jComboBoxUseT3.setSelectedItem(inputParam.getUseT3());
 
             // perform analysis
             final List<String> failures = new LinkedList<String>();
