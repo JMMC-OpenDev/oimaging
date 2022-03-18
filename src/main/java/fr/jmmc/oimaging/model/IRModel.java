@@ -171,8 +171,8 @@ public final class IRModel {
     }
 
     private void resetOIFits() {
-        // we set default service parameters values
-        loadOIFits(new OIFitsFile(OIFitsStandard.VERSION_1), true);
+        loadOIFits(new OIFitsFile(OIFitsStandard.VERSION_1));
+        initSpecificParams(true); // force reset of specific parameters values
     }
 
     /**
@@ -190,19 +190,9 @@ public final class IRModel {
 
     /**
      * Load the OiData tables of the model (oifits file, targets).
-     *
      * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
      */
     private void loadOIFits(final OIFitsFile oifitsFile) {
-        loadOIFits(oifitsFile, false);
-    }
-
-    /**
-     * Load the OiData tables of the model (oifits file, targets).
-     * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
-     * @param applyServiceDefaults boolean to set default service parameters values, or not
-     */
-    private void loadOIFits(final OIFitsFile oifitsFile, final boolean applyServiceDefaults) {
         // change current model immediately:
         this.oifitsFile = oifitsFile;
 
@@ -271,23 +261,9 @@ public final class IRModel {
         setSelectedRglPrioImageHdu(rglHduEquiv);
 
         // try to guess and set service
-        final Service service = ServiceList.getServiceFromOIFitsFile(oifitsFile);
-        if (service == null) {
-            // avoid null service
-            if (getSelectedService() == null) {
-                // Note: setSelectedService() calls initSpecificParams():
-                setSelectedService(ServiceList.getPreferedService(), applyServiceDefaults);
-            } else {
-                initSpecificParams(false);
-            }
-        } else {
-            if ((getSelectedService() == null) || (!service.getProgram().equals(getSelectedService().getProgram()))) {
-                // Note: setSelectedService() calls initSpecificParams():
-                setSelectedService(service);
-            } else {
-                initSpecificParams(false);
-            }
-        }
+        final Service oifitsFileService = ServiceList.getServiceFromOIFitsFile(oifitsFile);
+        setSelectedService(oifitsFileService == null ? ServiceList.getPreferedService() : oifitsFileService);
+        initSpecificParams(false); // add keywords relating to the selected service
 
         // cleaning all output params as they are meaningless in the input form
         // it must be done AFTER role computation (it uses output params)
@@ -996,23 +972,12 @@ public final class IRModel {
     }
 
     /**
-     * Set the service, and does not apply default parameters values.
+     * Set the service
      *
      * @param selectedService service to set
      */
     public void setSelectedService(final Service selectedService) {
-        setSelectedService(selectedService, false);
-    }
-
-    /**
-     * Set the service, and apply default parameters values or not.
-     *
-     * @param selectedService service to set
-     * @param applyDefaults boolean saying if we apply default parameters values or not.
-     */
-    public void setSelectedService(final Service selectedService, final boolean applyDefaults) {
         this.selectedService = selectedService;
-        initSpecificParams(applyDefaults);
     }
 
     public void initSpecificParams(final boolean applyDefaults) {
