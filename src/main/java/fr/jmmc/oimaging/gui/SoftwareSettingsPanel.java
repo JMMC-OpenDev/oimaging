@@ -861,6 +861,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         if (guiService != null && !guiService.equals(modelSoftware)) {
             changedService = !modelSoftware.isCompatibleParams(guiService);
             irModel.setSelectedService(guiService);
+            irModel.initSpecificParams(false);
             changed = true;
         }
 
