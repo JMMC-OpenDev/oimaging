@@ -48,6 +48,9 @@ public final class BsmemInputParam extends SoftwareInputParam {
             params.removeKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
         }
 
+        // BSMEM never uses VIS:
+        params.setUseVis(ImageOiInputParam.USE_NONE);
+
         if (applyDefaults) {
             // specific default values for BSMEM:
             params.setAutoWgt(true);

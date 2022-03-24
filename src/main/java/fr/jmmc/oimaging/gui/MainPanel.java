@@ -31,6 +31,7 @@ import fr.jmmc.oimaging.model.IRModelEvent;
 import fr.jmmc.oimaging.model.IRModelEventListener;
 import fr.jmmc.oimaging.model.IRModelEventType;
 import fr.jmmc.oimaging.model.IRModelManager;
+import fr.jmmc.oimaging.services.ServiceList;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.FitsUnit;
@@ -1069,7 +1070,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jFormattedTextFieldWaveMax.setValue(inputParam.getWaveMax() / MICRO_METER);
 
             // arrange observable checkboxes
-            jComboBoxUseVis.setEnabled(hasOIData && oifitsFile.hasOiVis());
+            // BSMEM should always have USE_VIS disabled
+            final boolean isBSMEM = currentModel.getSelectedService().getProgram().equals(ServiceList.CMD_BSMEM);
+            jLabelUseVis.setEnabled(!isBSMEM);
+            jComboBoxUseVis.setEnabled(hasOIData && oifitsFile.hasOiVis() && !isBSMEM);
             jCheckBoxUseVis2.setEnabled(hasOIData && oifitsFile.hasOiVis2());
             jComboBoxUseT3.setEnabled(hasOIData && oifitsFile.hasOiT3());
             jComboBoxUseVis.setSelectedItem(inputParam.getUseVis());
