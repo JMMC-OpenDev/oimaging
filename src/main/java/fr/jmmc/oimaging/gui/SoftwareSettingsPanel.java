@@ -794,10 +794,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
             jFormattedTextFieldRglWgt.setValue(inputParam.getRglWgt());
             show = service.supportsStandardKeyword(ImageOiConstants.KEYWORD_RGL_WGT);
-            jLabelRglWgt.setVisible(show);
-            jFormattedTextFieldRglWgt.setVisible(show);
             // change visibility / enabled if RglWgt keyword exists (bsmem auto)
             final boolean enabled = inputParam.hasKeywordMeta(ImageOiConstants.KEYWORD_RGL_WGT);
+            jLabelRglWgt.setVisible(show && enabled);
+            jFormattedTextFieldRglWgt.setVisible(show && enabled);
             jLabelRglWgt.setEnabled(enabled);
             jFormattedTextFieldRglWgt.setEnabled(enabled);
 
