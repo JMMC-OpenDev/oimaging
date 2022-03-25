@@ -36,8 +36,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -397,20 +395,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                         final FitsImage image = imageHDU.getFitsImages().get(0);
                         panel.setFitsImage(image);
                     }
-
-                    // TODO FIX: not working !!
-                    // see JFreeChart listeners ?
-                    panel.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            if (e.getClickCount() == 2) {
-                                System.out.println("double clicked");
-                                jPanelImage.removeAll();
-                                displayResult(result);
-                            }
-                            System.out.println("not double clicked");
-                        }
-                    });
                 }
             }
             setTabMode(SHOW_MODE.GRID);
