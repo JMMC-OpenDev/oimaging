@@ -89,6 +89,7 @@ public final class OImagingDocJUnitTest extends JmcsFestSwingJUnitTestCase {
 
         // Set special system properties:
         System.setProperty("oimaging.devMode", "false");
+        System.setProperty("RemoteExecutionMode.local", "false"); // use local docker
 
         // Start application:
         JmcsFestSwingJUnitTestCase.startApplication(
