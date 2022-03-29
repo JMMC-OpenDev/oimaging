@@ -28,7 +28,6 @@ public final class WisardInputParam extends SoftwareInputParam {
 
     /** Parameters that can be missing. */
     public static final Set<String> SUPPORTED_MISSING_KEYWORDS = new HashSet<>(Arrays.asList(
-            ImageOiConstants.KEYWORD_INIT_IMG,
             ImageOiConstants.KEYWORD_RGL_PRIO
     ));
 
