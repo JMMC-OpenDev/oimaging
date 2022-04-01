@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.6.0"/>
-    <compilation date="04/02/2022" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.7.0 beta 1"/>
+    <compilation date="01/04/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -169,6 +169,15 @@
     </menubar>
 
     <releasenotes>
+        <release version="0.7.0">
+            <pubDate>Fri, 01 Apr 2022 14:00:00 GMT</pubDate>
+            <prerelease version="0.7.0 beta 1" >
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/18" >Updated BSMEM to v2.3.0 to handle standard values for USE_VIS and USE_T3 parameters: NONE, AMP, PHI, ALL</change>
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/26" >Fixed WISARD FLUXERR to 1E-4</change><!-- and apply defaults at reset -->
+                <!--<change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/80" >Execution log containing error message do not capture focus anymore</change>-->
+                <!--<change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/89" >Fix event over-listening on input formulary fields (MacOS)</change>-->
+            </prerelease>
+        </release>
         <release version="0.6.0">
             <pubDate>Fri, 04 Feb 2022 14:00:00 GMT</pubDate>
             <prerelease version="0.6.0 beta 11">
