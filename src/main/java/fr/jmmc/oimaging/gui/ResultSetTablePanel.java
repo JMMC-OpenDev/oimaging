@@ -137,13 +137,13 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Obs
     @Override
     public void update(final Observable o, final Object arg) {
         if (this.doListenPrefs) {
-            logger.warn("Preferences updated:");
+            logger.debug("Preferences updated.");
             // set user preference for columns:
             resultSetTableSorter.setVisibleColumnNames(myPreferences.getResultsVisibleColumns());
 
             setResults(getTableModel().getServiceResults());
         } else {
-            logger.warn("Preferences update ignored.");
+            logger.debug("Preferences update ignored.");
         }
     }
 
