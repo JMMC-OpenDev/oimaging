@@ -699,29 +699,21 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
             // INIT IMG
             jComboBoxImage.removeAllItems();
-
-            if (service.supportsMissingKeyword(KEYWORD_INIT_IMG)) {
-                jComboBoxImage.addItem(NULL_IMAGE_HDU);
-            }
-
+            jComboBoxImage.addItem(NULL_IMAGE_HDU);
             irModel.getImageLibrary().forEach(jComboBoxImage::addItem);
 
             final FitsImageHDU initImage = irModel.getSelectedInputImageHDU();
 
-            if (service.supportsMissingKeyword(KEYWORD_INIT_IMG)) {
-                if (initImage == null) {
-                    jComboBoxImage.getModel().setSelectedItem(NULL_IMAGE_HDU);
-                } else {
-                    jComboBoxImage.getModel().setSelectedItem(initImage);
+            if (initImage == null || initImage == NULL_IMAGE_HDU) {
+                jComboBoxImage.getModel().setSelectedItem(NULL_IMAGE_HDU);
+                if (!service.supportsMissingKeyword(KEYWORD_INIT_IMG)) {
+                    failures.add("INIT_IMG is mandatory");
+                    logger.error("Select null item but the keyword INIT_IMG is mandatory.");
                 }
             } else {
-                if (initImage == null || initImage == NULL_IMAGE_HDU) {
-                    failures.add(irModel.getSelectedInputFitsImageError());
-                    logger.error("Cannot select null item because the keyword INIT_IMG is mandatory.");
-                } else {
-                    jComboBoxImage.getModel().setSelectedItem(initImage);
-                }
+                jComboBoxImage.getModel().setSelectedItem(initImage);
             }
+
             jButtonRemoveFitsImage.setEnabled(jComboBoxImage.getModel().getSize() != 0);
 
             // RGL PRIO
@@ -732,28 +724,19 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
 
             if (show) {
                 jComboBoxRglPrio.removeAllItems();
-
-                if (service.supportsMissingKeyword(KEYWORD_RGL_PRIO)) {
-                    jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
-                }
-
+                jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
                 irModel.getImageLibrary().forEach(jComboBoxRglPrio::addItem);
 
                 FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
 
-                if (service.supportsMissingKeyword(KEYWORD_RGL_PRIO)) {
-                    if (rglPrioImage == null) {
-                        jComboBoxRglPrio.getModel().setSelectedItem(NULL_IMAGE_HDU);
-                    } else {
-                        jComboBoxRglPrio.getModel().setSelectedItem(rglPrioImage);
+                if (rglPrioImage == null || rglPrioImage == NULL_IMAGE_HDU) {
+                    jComboBoxRglPrio.getModel().setSelectedItem(NULL_IMAGE_HDU);
+                    if (!service.supportsMissingKeyword(KEYWORD_RGL_PRIO)) {
+                        failures.add("RGL_PRIO is mandatory");
+                        logger.error("Select null item but the keyword RGL_PRIO is mandatory.");
                     }
                 } else {
-                    if (rglPrioImage == null || rglPrioImage == NULL_IMAGE_HDU) {
-                        failures.add("No image for RGL_PRIO");
-                        logger.error("Cannot select null item because the keyword RGL_PRIO is mandatory.");
-                    } else {
-                        jComboBoxRglPrio.getModel().setSelectedItem(rglPrioImage);
-                    }
+                    jComboBoxRglPrio.getModel().setSelectedItem(rglPrioImage);
                 }
             }
 
@@ -880,12 +863,12 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         if (!modelSoftware.supportsMissingKeyword(KEYWORD_INIT_IMG)
                 && (comboBoxInitImage == null || comboBoxInitImage == NULL_IMAGE_HDU)) {
             logger.error("INIT_IMG should not be null because keyword is mandatory.");
-        } else {
-            if (differentHdus(irModel.getSelectedInputImageHDU(), comboBoxInitImage)) {
-                irModel.setSelectedInputImageHDU(comboBoxInitImage);
-                irModel.setInputImageView(KEYWORD_INIT_IMG);
-                changed = true;
-            }
+        }
+
+        if (differentHdus(irModel.getSelectedInputImageHDU(), comboBoxInitImage)) {
+            irModel.setSelectedInputImageHDU(comboBoxInitImage);
+            irModel.setInputImageView(KEYWORD_INIT_IMG);
+            changed = true;
         }
 
         // RGL PRIO Image Fits
@@ -895,12 +878,12 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             if (!modelSoftware.supportsMissingKeyword(KEYWORD_RGL_PRIO)
                     && (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU)) {
                 logger.error("RGL PRIO should not be null because keyword is mandatory.");
-            } else {
-                if (differentHdus(irModel.getSelectedRglPrioImageHdu(), comboBoxRglPrioImage)) {
-                    irModel.setSelectedRglPrioImageHdu(comboBoxRglPrioImage);
-                    irModel.setInputImageView(KEYWORD_RGL_PRIO);
-                    changed = true;
-                }
+            }
+
+            if (differentHdus(irModel.getSelectedRglPrioImageHdu(), comboBoxRglPrioImage)) {
+                irModel.setSelectedRglPrioImageHdu(comboBoxRglPrioImage);
+                irModel.setInputImageView(KEYWORD_RGL_PRIO);
+                changed = true;
             }
         }
 
