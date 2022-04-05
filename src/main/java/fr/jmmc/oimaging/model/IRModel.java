@@ -632,16 +632,6 @@ public final class IRModel {
         }
     }
 
-    // TODO KILL
-    public String getSelectedInputFitsImageError() {
-        if (getSelectedInputImageHDU() == null) {
-            return "No image data loaded";
-        }
-
-        // TODO implement more test in the future to verify HDU confirmity
-        return null;
-    }
-
     // --- Image Library handling --- 
     /** 
      * Get a read-only access to the image library.
