@@ -3,10 +3,9 @@
  ******************************************************************************/
 package fr.jmmc.oimaging.gui;
 
-import fr.jmmc.jmcs.util.ImageUtils;
+import fr.jmmc.jmcs.gui.util.ResourceImage;
 import java.awt.Component;
 import java.awt.Graphics;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -18,12 +17,6 @@ import javax.swing.table.TableCellRenderer;
 public class SuccessCell extends JPanel implements TableCellRenderer {
 
     private static final long serialVersionUID = 1L;
-
-    /** Common resource directory containing icon files */
-    private final static String IMAGE_RESOURCE_COMMON_PATH = "fr/jmmc/oimaging/resource/image/";
-
-    private final static ImageIcon IMG_OK = ImageUtils.loadResourceIcon(IMAGE_RESOURCE_COMMON_PATH + "ok-16.png");
-    private final static ImageIcon IMG_KO = ImageUtils.loadResourceIcon(IMAGE_RESOURCE_COMMON_PATH + "x-mark-3-16.png");
 
     /* member */
     private boolean success = false;
@@ -40,7 +33,7 @@ public class SuccessCell extends JPanel implements TableCellRenderer {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage((success) ? IMG_OK.getImage() : IMG_KO.getImage(), this.getWidth() / 2, 2, this);
+        g.drawImage((success) ? ResourceImage.OK_MARK.icon().getImage() : ResourceImage.KO_MARK.icon().getImage(), this.getWidth() / 2, 2, this);
     }
 
 }
