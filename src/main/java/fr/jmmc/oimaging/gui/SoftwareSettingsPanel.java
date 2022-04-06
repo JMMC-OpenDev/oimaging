@@ -697,14 +697,17 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 jTableKeywordsEditor.setVisible(true);
             }
 
+            boolean nullInitImg, nullRglPrio; // used for buttonsView
+
             // INIT IMG
             jComboBoxImage.removeAllItems();
             jComboBoxImage.addItem(NULL_IMAGE_HDU);
             irModel.getImageLibrary().forEach(jComboBoxImage::addItem);
 
             final FitsImageHDU initImage = irModel.getSelectedInputImageHDU();
+            nullInitImg = (initImage == null || initImage == NULL_IMAGE_HDU);
 
-            if (initImage == null || initImage == NULL_IMAGE_HDU) {
+            if (nullInitImg) {
                 jComboBoxImage.getModel().setSelectedItem(NULL_IMAGE_HDU);
                 if (!service.supportsMissingKeyword(KEYWORD_INIT_IMG)) {
                     failures.add("INIT_IMG is mandatory");
@@ -729,10 +732,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
             irModel.getImageLibrary().forEach(jComboBoxRglPrio::addItem);
 
-            if (show) {
-                FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
+            FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
+            nullRglPrio = (rglPrioImage == null || rglPrioImage == NULL_IMAGE_HDU);
 
-                if (rglPrioImage == null || rglPrioImage == NULL_IMAGE_HDU) {
+            if (show) {
+                if (nullRglPrio) {
                     jComboBoxRglPrio.getModel().setSelectedItem(NULL_IMAGE_HDU);
                     if (!service.supportsMissingKeyword(KEYWORD_RGL_PRIO)) {
                         failures.add("RGL_PRIO is mandatory");
@@ -757,6 +761,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                         break;
                 }
             }
+            // enable each radio buttons only if each image is not null
+            //jRadioButtonViewInitImg.setEnabled(!nullInitImg);
+            //jRadioButtonViewRglPrio.setEnabled(!nullRglPrio);
 
             boolean supportsRglPrio = service.supportsStandardKeyword(KEYWORD_RGL_PRIO);
             jRadioButtonViewRglPrio.setEnabled(supportsRglPrio);
@@ -855,16 +862,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Input Image View
         ButtonModel selectedButton = this.buttonsView.getSelection();
         String buttonAction = (selectedButton == null) ? null : selectedButton.getActionCommand();
-        if (!newService.supportsStandardKeyword(buttonAction)) {
-            buttonAction = KEYWORD_INIT_IMG;
-        }
         irModel.setInputImageView(buttonAction);
 
         // Init Image
         final FitsImageHDU comboBoxInitImage = (FitsImageHDU) jComboBoxImage.getSelectedItem();
 
-        if (!newService.supportsMissingKeyword(KEYWORD_INIT_IMG)
-                && (comboBoxInitImage == null || comboBoxInitImage == NULL_IMAGE_HDU)) {
+        final boolean nullInitImg = (comboBoxInitImage == null || comboBoxInitImage == NULL_IMAGE_HDU);
+
+        if (!newService.supportsMissingKeyword(KEYWORD_INIT_IMG) && nullInitImg) {
             logger.error("INIT_IMG should not be null because keyword is mandatory.");
         }
 
@@ -906,8 +911,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         if (newService.supportsStandardKeyword(KEYWORD_RGL_PRIO)) {
             final FitsImageHDU comboBoxRglPrioImage = (FitsImageHDU) jComboBoxRglPrio.getSelectedItem();
 
-            if (!newService.supportsMissingKeyword(KEYWORD_RGL_PRIO)
-                    && (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU)) {
+            final boolean nullRglPrio = (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU);
+
+            if (!newService.supportsMissingKeyword(KEYWORD_RGL_PRIO) && nullRglPrio) {
                 logger.error("RGL PRIO should not be null because keyword is mandatory.");
             }
 
@@ -921,6 +927,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         else {
             if (differentHdus(irModel.getSelectedRglPrioImageHdu(), null)) {
                 irModel.setSelectedRglPrioImageHdu(null);
+                irModel.setInputImageView(KEYWORD_RGL_PRIO);
                 changed = true;
             }
         }
