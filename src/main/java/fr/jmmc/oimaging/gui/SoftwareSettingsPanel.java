@@ -722,11 +722,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             jComboBoxRglPrio.setVisible(show);
             jComboBoxRglPrio.setEnabled(show);
 
-            if (show) {
-                jComboBoxRglPrio.removeAllItems();
-                jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
-                irModel.getImageLibrary().forEach(jComboBoxRglPrio::addItem);
+            // update the list items
+            // it must be done not matter if RGL_PRIO is supported or not,
+            // unless what it can keep zombie image items (images removed from library)
+            jComboBoxRglPrio.removeAllItems();
+            jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
+            irModel.getImageLibrary().forEach(jComboBoxRglPrio::addItem);
 
+            if (show) {
                 FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
 
                 if (rglPrioImage == null || rglPrioImage == NULL_IMAGE_HDU) {
@@ -847,11 +850,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             irModel.initSpecificParams(false);
             changed = true;
         }
+        final Service newService = (guiService == null) ? modelSoftware : guiService;
 
         // Input Image View
         ButtonModel selectedButton = this.buttonsView.getSelection();
         String buttonAction = (selectedButton == null) ? null : selectedButton.getActionCommand();
-        final Service newService = (guiService == null) ? modelSoftware : guiService;
         if (!newService.supportsStandardKeyword(buttonAction)) {
             buttonAction = KEYWORD_INIT_IMG;
         }
@@ -860,7 +863,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Init Image
         final FitsImageHDU comboBoxInitImage = (FitsImageHDU) jComboBoxImage.getSelectedItem();
 
-        if (!modelSoftware.supportsMissingKeyword(KEYWORD_INIT_IMG)
+        if (!newService.supportsMissingKeyword(KEYWORD_INIT_IMG)
                 && (comboBoxInitImage == null || comboBoxInitImage == NULL_IMAGE_HDU)) {
             logger.error("INIT_IMG should not be null because keyword is mandatory.");
         }
@@ -869,22 +872,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             irModel.setSelectedInputImageHDU(comboBoxInitImage);
             irModel.setInputImageView(KEYWORD_INIT_IMG);
             changed = true;
-        }
-
-        // RGL PRIO Image Fits
-        if (modelSoftware.supportsStandardKeyword(KEYWORD_RGL_PRIO)) {
-            final FitsImageHDU comboBoxRglPrioImage = (FitsImageHDU) jComboBoxRglPrio.getSelectedItem();
-
-            if (!modelSoftware.supportsMissingKeyword(KEYWORD_RGL_PRIO)
-                    && (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU)) {
-                logger.error("RGL PRIO should not be null because keyword is mandatory.");
-            }
-
-            if (differentHdus(irModel.getSelectedRglPrioImageHdu(), comboBoxRglPrioImage)) {
-                irModel.setSelectedRglPrioImageHdu(comboBoxRglPrioImage);
-                irModel.setInputImageView(KEYWORD_RGL_PRIO);
-                changed = true;
-            }
         }
 
         // max iter
@@ -908,6 +895,32 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             if (!wString.equals(mString)) {
                 inputParam.setRglName(wString);
                 irModel.initSpecificParams(false); // update call required to apply on fly specific param handling
+                changed = true;
+            }
+        }
+
+        // RGL PRIO Image Fits
+        // !!! purposely placed after regularization because the latter may call initSpecificParam
+        // !!! so it can change if RGL_PRIO is supported on WISARD
+        // !!! TODO: simplify all of this
+        if (newService.supportsStandardKeyword(KEYWORD_RGL_PRIO)) {
+            final FitsImageHDU comboBoxRglPrioImage = (FitsImageHDU) jComboBoxRglPrio.getSelectedItem();
+
+            if (!newService.supportsMissingKeyword(KEYWORD_RGL_PRIO)
+                    && (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU)) {
+                logger.error("RGL PRIO should not be null because keyword is mandatory.");
+            }
+
+            if (differentHdus(irModel.getSelectedRglPrioImageHdu(), comboBoxRglPrioImage)) {
+                irModel.setSelectedRglPrioImageHdu(comboBoxRglPrioImage);
+                irModel.setInputImageView(KEYWORD_RGL_PRIO);
+                changed = true;
+            }
+        }
+        // if RGL_PRIO is not supported, make sure we reset irModel.selectedRglPrioImageHDU and clean hdus
+        else {
+            if (differentHdus(irModel.getSelectedRglPrioImageHdu(), null)) {
+                irModel.setSelectedRglPrioImageHdu(null);
                 changed = true;
             }
         }
