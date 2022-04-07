@@ -66,6 +66,10 @@ public final class IRModel {
         NULL_IMAGE_HDU.setHduName("[No Image]");
     }
 
+    public static boolean isImageNull(final FitsImageHDU imageHdu) {
+        return (imageHdu == null || imageHdu == NULL_IMAGE_HDU);
+    }
+
     /** Role of a HDU */
     private enum Role {
         RESULT, INIT, RGL, NO_ROLE
@@ -556,7 +560,7 @@ public final class IRModel {
      */
     public void setSelectedInputImageHDU(final FitsImageHDU selectedInitImage) {
         final String hduName;
-        if (selectedInitImage == null || selectedInitImage == NULL_IMAGE_HDU) {
+        if (isImageNull(selectedInitImage)) {
             hduName = "";
         } else {
             hduName = selectedInitImage.getHduName();
@@ -595,7 +599,7 @@ public final class IRModel {
      */
     public void setSelectedRglPrioImageHdu(final FitsImageHDU selectedRglPrioImageHdu) {
         final String hduName;
-        if (selectedRglPrioImageHdu == null || selectedRglPrioImageHdu == NULL_IMAGE_HDU) {
+        if (isImageNull(selectedRglPrioImageHdu)) {
             hduName = "";
         } else {
             hduName = selectedRglPrioImageHdu.getHduName();
@@ -627,12 +631,12 @@ public final class IRModel {
         oifitsFileHDUs.clear();
 
         // init image
-        if ((selectedInputImageHDU != null) && (selectedInputImageHDU != NULL_IMAGE_HDU)) {
+        if (!isImageNull(selectedInputImageHDU)) {
             oifitsFileHDUs.add(selectedInputImageHDU);
         }
 
         // rgl image
-        if ((selectedRglPrioImageHdu != null) && (selectedRglPrioImageHdu != NULL_IMAGE_HDU)) {
+        if (!isImageNull(selectedRglPrioImageHdu)) {
             oifitsFileHDUs.add(selectedRglPrioImageHdu);
         }
     }
@@ -658,7 +662,7 @@ public final class IRModel {
      */
     private FitsImageHDU addToImageLibrary(final FitsImageHDU hdu, final String altName) {
 
-        if (hdu == null || hdu == NULL_IMAGE_HDU) {
+        if (isImageNull(hdu)) {
             logger.info("HDU not added to image library because it is null.");
             return null;
 
@@ -1032,10 +1036,8 @@ public final class IRModel {
 
     public void checkInputImageView() {
 
-        final boolean nullInitImg
-                = (getSelectedInputImageHDU() == null || getSelectedInputImageHDU() == NULL_IMAGE_HDU);
-        final boolean nullRglPrio
-                = (getSelectedRglPrioImageHdu() == null || getSelectedRglPrioImageHdu() == NULL_IMAGE_HDU);
+        final boolean nullInitImg = isImageNull(getSelectedInputImageHDU());
+        final boolean nullRglPrio = isImageNull(getSelectedRglPrioImageHdu());
 
         if (getInputImageView() == null) {
             if (!nullInitImg) {

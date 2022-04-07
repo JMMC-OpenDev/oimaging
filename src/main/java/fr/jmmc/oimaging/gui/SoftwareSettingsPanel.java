@@ -9,6 +9,7 @@ import fr.jmmc.jmcs.gui.component.ResizableTextViewFactory;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.model.IRModel;
 import static fr.jmmc.oimaging.model.IRModel.NULL_IMAGE_HDU;
+import static fr.jmmc.oimaging.model.IRModel.isImageNull;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
 import fr.jmmc.oimaging.services.ServiceList;
@@ -581,7 +582,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Init Image
         final FitsImageHDU comboBoxInitImage = (FitsImageHDU) jComboBoxImage.getSelectedItem();
 
-        if ((comboBoxInitImage != null) && (comboBoxInitImage != NULL_IMAGE_HDU)) {
+        if (!isImageNull(comboBoxInitImage)) {
             final IRModel irModel = IRModelManager.getInstance().getIRModel();
             irModel.removeFitsImageHDU(comboBoxInitImage);
         }
@@ -697,17 +698,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 jTableKeywordsEditor.setVisible(true);
             }
 
-            boolean nullInitImg, nullRglPrio; // used for buttonsView
-
             // INIT IMG
             jComboBoxImage.removeAllItems();
             jComboBoxImage.addItem(NULL_IMAGE_HDU);
             irModel.getImageLibrary().forEach(jComboBoxImage::addItem);
 
             final FitsImageHDU initImage = irModel.getSelectedInputImageHDU();
-            nullInitImg = (initImage == null || initImage == NULL_IMAGE_HDU);
 
-            if (nullInitImg) {
+            if (isImageNull(initImage)) {
                 jComboBoxImage.getModel().setSelectedItem(NULL_IMAGE_HDU);
                 if (!service.supportsMissingKeyword(KEYWORD_INIT_IMG)) {
                     failures.add("INIT_IMG is mandatory");
@@ -732,11 +730,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             jComboBoxRglPrio.addItem(NULL_IMAGE_HDU);
             irModel.getImageLibrary().forEach(jComboBoxRglPrio::addItem);
 
-            FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
-            nullRglPrio = (rglPrioImage == null || rglPrioImage == NULL_IMAGE_HDU);
+            final FitsImageHDU rglPrioImage = irModel.getSelectedRglPrioImageHdu();
 
             if (show) {
-                if (nullRglPrio) {
+                if (isImageNull(rglPrioImage)) {
                     jComboBoxRglPrio.getModel().setSelectedItem(NULL_IMAGE_HDU);
                     if (!service.supportsMissingKeyword(KEYWORD_RGL_PRIO)) {
                         failures.add("RGL_PRIO is mandatory");
@@ -867,9 +864,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Init Image
         final FitsImageHDU comboBoxInitImage = (FitsImageHDU) jComboBoxImage.getSelectedItem();
 
-        final boolean nullInitImg = (comboBoxInitImage == null || comboBoxInitImage == NULL_IMAGE_HDU);
-
-        if (!newService.supportsMissingKeyword(KEYWORD_INIT_IMG) && nullInitImg) {
+        if (!newService.supportsMissingKeyword(KEYWORD_INIT_IMG) && isImageNull(comboBoxInitImage)) {
             logger.error("INIT_IMG should not be null because keyword is mandatory.");
         }
 
@@ -911,9 +906,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         if (newService.supportsStandardKeyword(KEYWORD_RGL_PRIO)) {
             final FitsImageHDU comboBoxRglPrioImage = (FitsImageHDU) jComboBoxRglPrio.getSelectedItem();
 
-            final boolean nullRglPrio = (comboBoxRglPrioImage == null || comboBoxRglPrioImage == NULL_IMAGE_HDU);
-
-            if (!newService.supportsMissingKeyword(KEYWORD_RGL_PRIO) && nullRglPrio) {
+            if (!newService.supportsMissingKeyword(KEYWORD_RGL_PRIO) && isImageNull(comboBoxRglPrioImage)) {
                 logger.error("RGL PRIO should not be null because keyword is mandatory.");
             }
 
@@ -922,8 +915,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 irModel.setInputImageView(KEYWORD_RGL_PRIO);
                 changed = true;
             }
-        }
-        // if RGL_PRIO is not supported, make sure we reset irModel.selectedRglPrioImageHDU and clean hdus
+        } // if RGL_PRIO is not supported, make sure we reset irModel.selectedRglPrioImageHDU and clean hdus
         else {
             if (differentHdus(irModel.getSelectedRglPrioImageHdu(), null)) {
                 irModel.setSelectedRglPrioImageHdu(null);
@@ -994,9 +986,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
      *         (remember that null == NULL_IMAGE_HDU)
      */
     private static boolean differentHdus(final FitsImageHDU first, final FitsImageHDU second) {
-        if ((first == second)
-                || (first == null && second == NULL_IMAGE_HDU)
-                || (first == NULL_IMAGE_HDU && second == null)) {
+        if ((first == second) || (isImageNull(first) && isImageNull(second))) {
             return false;
         } else {
             return true;
