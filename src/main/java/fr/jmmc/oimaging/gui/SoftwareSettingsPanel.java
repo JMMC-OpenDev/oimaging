@@ -22,6 +22,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.ButtonModel;
 import javax.swing.JFormattedTextField;
 import javax.swing.event.DocumentEvent;
@@ -759,11 +760,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
                 }
             }
             // enable each radio buttons only if each image is not null
-            //jRadioButtonViewInitImg.setEnabled(!nullInitImg);
-            //jRadioButtonViewRglPrio.setEnabled(!nullRglPrio);
-
+            jRadioButtonViewInitImg.setEnabled(!isImageNull(initImage));
             boolean supportsRglPrio = service.supportsStandardKeyword(KEYWORD_RGL_PRIO);
-            jRadioButtonViewRglPrio.setEnabled(supportsRglPrio);
+            jRadioButtonViewRglPrio.setEnabled(!isImageNull(rglPrioImage) && supportsRglPrio);
             jRadioButtonViewRglPrio.setVisible(supportsRglPrio);
 
             // Max iter:
@@ -859,7 +858,14 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Input Image View
         ButtonModel selectedButton = this.buttonsView.getSelection();
         String buttonAction = (selectedButton == null) ? null : selectedButton.getActionCommand();
+<<<<<<< HEAD
         irModel.setInputImageView(buttonAction);
+=======
+        mString = irModel.getInputImageView(); // previous value
+        irModel.setInputImageView(buttonAction); // try setting the button value
+        wString = irModel.getInputImageView(); // new current value
+        changed |= Objects.equals(mString, wString);
+>>>>>>> 9955908d36ed2af3ff8cf01918e94e794ddb866b
 
         // Init Image
         final FitsImageHDU comboBoxInitImage = (FitsImageHDU) jComboBoxImage.getSelectedItem();
