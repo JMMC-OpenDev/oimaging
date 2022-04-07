@@ -858,14 +858,11 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         // Input Image View
         ButtonModel selectedButton = this.buttonsView.getSelection();
         String buttonAction = (selectedButton == null) ? null : selectedButton.getActionCommand();
-<<<<<<< HEAD
-        irModel.setInputImageView(buttonAction);
-=======
+
         mString = irModel.getInputImageView(); // previous value
         irModel.setInputImageView(buttonAction); // try setting the button value
         wString = irModel.getInputImageView(); // new current value
         changed |= Objects.equals(mString, wString);
->>>>>>> 9955908d36ed2af3ff8cf01918e94e794ddb866b
 
         // Init Image
         final FitsImageHDU comboBoxInitImage = (FitsImageHDU) jComboBoxImage.getSelectedItem();
