@@ -16,6 +16,7 @@ import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
+import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_PRIO;
 import fr.jmmc.oitools.image.ImageOiData;
 import fr.jmmc.oitools.image.ImageOiInputParam;
 import fr.jmmc.oitools.image.ImageOiOutputParam;
@@ -63,6 +64,10 @@ public final class IRModel {
 
     static {
         NULL_IMAGE_HDU.setHduName("[No Image]");
+    }
+
+    public static boolean isImageNull(final FitsImageHDU imageHdu) {
+        return (imageHdu == null || imageHdu == NULL_IMAGE_HDU);
     }
 
     /** Role of a HDU */
@@ -127,7 +132,7 @@ public final class IRModel {
      */
     private void reset() {
         this.cliOptions = null;
-        this.inputImageView = KEYWORD_INIT_IMG;
+        this.inputImageView = null;
         this.selectedInputImageHDU = null;
         this.selectedRglPrioImageHdu = null;
         this.imageLibrary.clear();
@@ -555,7 +560,7 @@ public final class IRModel {
      */
     public void setSelectedInputImageHDU(final FitsImageHDU selectedInitImage) {
         final String hduName;
-        if (selectedInitImage == null || selectedInitImage == NULL_IMAGE_HDU) {
+        if (isImageNull(selectedInitImage)) {
             hduName = "";
         } else {
             hduName = selectedInitImage.getHduName();
@@ -569,6 +574,8 @@ public final class IRModel {
         logger.info("Select hdu '{}' for selectedInputImageHDU.", hduName);
 
         this.selectedInputImageHDU = selectedInitImage;
+
+        checkInputImageView(); // update image view radio buttons
 
         oifitsFile.getImageOiData().getInputParam().setInitImg(hduName);
 
@@ -592,7 +599,7 @@ public final class IRModel {
      */
     public void setSelectedRglPrioImageHdu(final FitsImageHDU selectedRglPrioImageHdu) {
         final String hduName;
-        if (selectedRglPrioImageHdu == null || selectedRglPrioImageHdu == NULL_IMAGE_HDU) {
+        if (isImageNull(selectedRglPrioImageHdu)) {
             hduName = "";
         } else {
             hduName = selectedRglPrioImageHdu.getHduName();
@@ -606,6 +613,8 @@ public final class IRModel {
         logger.info("Select hdu '{}' for selectedRglPrioImageHdu.", hduName);
 
         this.selectedRglPrioImageHdu = selectedRglPrioImageHdu;
+
+        checkInputImageView(); // update image view radio buttons
 
         oifitsFile.getImageOiData().getInputParam().setRglPrio(hduName);
 
@@ -622,12 +631,12 @@ public final class IRModel {
         oifitsFileHDUs.clear();
 
         // init image
-        if ((selectedInputImageHDU != null) && (selectedInputImageHDU != NULL_IMAGE_HDU)) {
+        if (!isImageNull(selectedInputImageHDU)) {
             oifitsFileHDUs.add(selectedInputImageHDU);
         }
 
         // rgl image
-        if ((selectedRglPrioImageHdu != null) && (selectedRglPrioImageHdu != NULL_IMAGE_HDU)) {
+        if (!isImageNull(selectedRglPrioImageHdu)) {
             oifitsFileHDUs.add(selectedRglPrioImageHdu);
         }
     }
@@ -653,7 +662,7 @@ public final class IRModel {
      */
     private FitsImageHDU addToImageLibrary(final FitsImageHDU hdu, final String altName) {
 
-        if (hdu == null || hdu == NULL_IMAGE_HDU) {
+        if (isImageNull(hdu)) {
             logger.info("HDU not added to image library because it is null.");
             return null;
 
@@ -1022,6 +1031,48 @@ public final class IRModel {
 
     public void setInputImageView(String inputImageView) {
         this.inputImageView = inputImageView;
+        checkInputImageView();
+    }
+
+    public void checkInputImageView() {
+
+        final boolean nullInitImg = isImageNull(getSelectedInputImageHDU());
+        final boolean nullRglPrio = isImageNull(getSelectedRglPrioImageHdu());
+
+        if (getInputImageView() == null) {
+            if (!nullInitImg) {
+                // we don't let null if there is some init image
+                this.inputImageView = KEYWORD_INIT_IMG;
+            } else if (!nullRglPrio) {
+                // we don't let null if there is no init image but there is some rgl image
+                this.inputImageView = KEYWORD_RGL_PRIO;
+            }
+        } else {
+            switch (getInputImageView()) {
+                case KEYWORD_INIT_IMG:
+                    if (nullInitImg) {
+                        if (nullRglPrio) {
+                            // we set to null when no image
+                            this.inputImageView = null;
+                        } else {
+                            // when init is null and rgl not, we switch to rgl
+                            this.inputImageView = KEYWORD_RGL_PRIO;
+                        }
+                    }
+                    break;
+                case KEYWORD_RGL_PRIO:
+                    if (nullRglPrio) {
+                        if (nullInitImg) {
+                            // we set to null when no image
+                            this.inputImageView = null;
+                        } else {
+                            // when rgl is null and init not, we switch to init
+                            this.inputImageView = KEYWORD_INIT_IMG;
+                        }
+                    }
+                    break;
+            }
+        }
     }
 
     public boolean isRunning() {

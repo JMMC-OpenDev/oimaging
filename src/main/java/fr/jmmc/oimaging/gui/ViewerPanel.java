@@ -174,6 +174,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 fitsImagePanel.setFitsImage(null);
                 jPanelImage.remove(fitsImagePanel);
             }
+            jComboBoxImage.setEnabled(jComboBoxImage.getItemCount() > 1);
+            jButtonModifyImage.setEnabled(jComboBoxImage.getItemCount() != 0);
         } finally {
             syncingUI = false;
         }
