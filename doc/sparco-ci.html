@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>sparco-ci</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+</head>
+<body>
+<h2 id="sparco">SPARCO</h2>
+<p><a href="https://github.com/kluskaj/mira-sparco-multi">SPARCO (Semi-Parametric Approach for Reconstruction of Chromatic Objects) mira plugin</a></p>
+<p>SPARCO is an approach where polychromatic optical interferometric data is modeled as a sum of a geometrical model and a reconstructed image with different spectra. In this framework, the only the image is reconstructed using the MiRA algorithm (with its parameters) whereas the model is described using the the SPARCO parameters.</p>
+<h3 id="parameters-in-common-with-mira">Parameters in common with MiRA</h3>
+<ul>
+<li><code>INIT_IMG</code> : initial image</li>
+<li><code>MAXITER</code> : maximum number of iterations</li>
+<li><code>RGL_WGT</code> : hyper-parameter tuning the strength of the regularization</li>
+<li><code>RGL_NAME</code> <strong>Regularization functions</strong>
+<ul>
+<li><u>Compactness</u>: (aka soft support) favors compact solutions where images structures are concentrated within a region of full-width at half maximum <code>RGL_GAMM</code> (in mas).</li>
+<li><u>hyperbolic</u> (aka Edge-preserving smoothness) favors smooth solutions while allowing sharp edges significantly higher than <code>RGL_TAU</code>. Using a very small <code>RGL_TAU</code> compared to the norm of the local gradients, mimics the effects of <em>total variation</em> (TV) regularizations.Conversely, using a very small edge threshold yields a regularization comparable to <em>quadratic smoothness</em>.</li>
+</ul></li>
+<li><strong>Bandwidth smearing</strong> (chromatic aberration caused by the finite width of the spectral bandwidth)
+<ul>
+<li><code>SMEAR_FN</code> : function modeling the effects of the spectral bandwidth smearing. Can be <code>none</code> if there is no bandwidth smearing, <code>sinc</code> for a cardinal sine or <code>gauss</code> for Gaussian (whose full-width at half-maximum matches that of the cardinal sine)</li>
+<li><code>SMEAR_FC</code> : strictly positive factor to scale the effects of the spectral bandwidth smearing. The full-width at half-maximum of the effective spectral bandwidth is assumed to be equal to <code>SMEAR_FC</code> times <code>EFF_BAND</code> parameter in the data. The default is <code>1.0</code></li>
+</ul></li>
+</ul>
+<h3 id="sparco-specific-parameters">SPARCO specific parameters:</h3>
+<ul>
+<li><p><code>SWAVE0</code> : reference wavelength where flux ratios are enforced</p></li>
+<li><p><code>SPEC0</code>: type of spectrum for the reconstructed image. Can be either:</p>
+<ul>
+<li><p><code>pow</code> for a power law with spectral index <code>SPEC0</code></p></li>
+<li><p><code>BB</code> for a blackbody with temperature <code>STEM0</code></p></li>
+</ul></li>
+<li><p><code>SNMODS</code> : number of geometrical models</p></li>
+</ul>
+<p>For each geometrical model <code>n</code>we have:</p>
+<ul>
+<li><p><code>SMODn</code>: type of geometric model. It can be either</p>
+<ul>
+<li><p><code>star</code>: a point source</p></li>
+<li><p><code>UD</code>: a uniform disk of radius<code>SPARn</code></p></li>
+<li><p><code>bg</code>: an over-resolved background</p></li>
+</ul></li>
+<li><p><code>SFLUn</code>: flux ratio a the model <code>n</code>at wavelength <code>SWAVE0</code></p></li>
+<li><p><code>SPECn</code>: spectrum for the geometric model <code>n</code>. It can be either:</p>
+<ul>
+<li><p><code>pow</code> for a power law with spectral index <code>SPECn</code></p></li>
+<li><p><code>BB</code> for a blackbody with temperature <code>STEMn</code></p></li>
+</ul></li>
+<li><p><code>SDEXn</code>: the RA shift of the model <code>n</code> relatively to the center of the image</p></li>
+<li><p><code>SDEYn</code>: the Dec shift of the model <code>n</code> relatively to the center of the image</p></li>
+</ul>
+<h3 id="reference">Reference</h3>
+<p>Kluska, J. et al.: <em>“SPARCO : a semi-parametric approach for image reconstruction of chromatic objects. Application to young stellar objects”</em> in Astronomy &amp; Astrophysics, Volume 564, id.A80, 11 pp. <a href="https://ui.adsabs.harvard.edu/link_gateway/2014A&amp;A...564A..80K/doi:10.1051/0004-6361/201322926">DOI</a></p>
+</body>
+</html>
