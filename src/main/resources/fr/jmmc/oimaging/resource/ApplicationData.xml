@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.7.0 beta 1"/>
-    <compilation date="01/04/2022" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.7.0 beta 2"/>
+    <compilation date="08/04/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -170,7 +170,14 @@
 
     <releasenotes>
         <release version="0.7.0">
-            <pubDate>Fri, 01 Apr 2022 14:00:00 GMT</pubDate>
+            <pubDate>Fri, 08 Apr 2022 14:00:00 GMT</pubDate>
+            <prerelease version="0.7.0 beta 2" >
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/milestone/" >Some bug fixes on the input form: radio buttons, run button</change>
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/74" >Fixed Missing TARGET and INIT_IMG in MiRA</change>
+                <!--<change type="CHANGE" url="https://github.com/JMMC-OpenDev/oimaging/issues/86" >Wisard must have INIT_IMG to run</change>-->
+                <!--<change type="CHANGE" url="https://github.com/JMMC-OpenDev/oimaging/issues/91" >button load OIFits file more visible</change>-->
+                <!--<change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/pull/107" >completed Sparco documentation</change>-->
+            </prerelease>
             <prerelease version="0.7.0 beta 1" >
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/18" >Updated BSMEM to v2.3.0 to handle standard values for USE_VIS and USE_T3 parameters: NONE, AMP, PHI, ALL</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/26" >Fixed WISARD FLUXERR to 1E-4</change><!-- and apply defaults at reset -->
