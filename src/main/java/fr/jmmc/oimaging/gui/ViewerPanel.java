@@ -20,16 +20,21 @@ import fr.jmmc.oimaging.gui.action.SetAsInitImgAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.ServiceResult;
+import fr.jmmc.oitools.OIFitsConstants;
 import fr.jmmc.oitools.image.FitsImage;
 import fr.jmmc.oitools.image.FitsImageFile;
 import fr.jmmc.oitools.image.FitsImageHDU;
 import fr.jmmc.oitools.image.FitsImageLoader;
 import fr.jmmc.oitools.image.FitsImageWriter;
+import fr.jmmc.oitools.image.FitsUnit;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_PRIO;
 import fr.jmmc.oitools.image.ImageOiData;
+import fr.jmmc.oitools.model.OIArray;
+import fr.jmmc.oitools.model.OIData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.jmmc.oitools.model.OITable;
 import fr.nom.tam.fits.BasicHDU;
 import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
@@ -72,6 +77,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     public static final String TAB_LABEL_OIFITS = "OIFits data";
     public static final String TAB_LABEL_PARAMS = "Parameters";
     public static final String TAB_LABEL_EXECLOG = "Execution log";
+
+    /** divider for computing of initial inc value for create image */
+    private static final int INIT_INC_DIVIDER = 2;
 
     /* members */
     /** reference to parent MainPanel */
@@ -583,7 +591,62 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final IRModelManager irModelManager = IRModelManager.getInstance();
         final IRModel irModel = irModelManager.getIRModel();
 
-        final FitsImageHDU newHDU = fitsImagePanel.createFitsImage();
+        // computing initial values for FOV, INC, & FWMH, from the current data
+
+        // computing advised fov,
+        // max wavelength / max diameter, in mas
+        double advisedFov = -1;
+        final OIFitsFile oifitsfile = irModel.getOifitsFile();
+        // computing maximum diameter from all OI ARRAY
+        float maxDiamFile = Float.NEGATIVE_INFINITY;
+        for (OIArray oiArray : oifitsfile.getOiArrays()) {
+            float[] minMaxDiamTable = (float[]) oiArray.getMinMaxColumnValue(OIFitsConstants.COLUMN_DIAMETER);
+            if (minMaxDiamTable != null && minMaxDiamTable.length >= 1) {
+                maxDiamFile = Float.max(maxDiamFile, minMaxDiamTable[1]);
+            }
+        }
+        if (maxDiamFile <= 0) {
+            // if diameter found was 0 or below, try to identify if the instrument is PIONIER
+            // if PIONIER, then we assume DIAMETER to be 1.8 meters
+            // needed because lot of files with PIONIER set DIAMETER to 0
+            boolean isPionier = false;
+            for (OIData oiData : oifitsfile.getOiDatas()) {
+                isPionier |= oiData.getInsName().startsWith("PIONIER");
+            }
+            if (isPionier) {
+                maxDiamFile = 1.8f;
+            }
+        }
+        // getting maximum wavelength
+        double maxWaveLength = oifitsfile.getWavelengthRange().getMax();
+        if (maxDiamFile > 0 && maxWaveLength > 0) {
+            advisedFov = maxWaveLength / maxDiamFile; // in radians
+            advisedFov = FitsUnit.ANGLE_RAD.convert(advisedFov, FitsUnit.ANGLE_MILLI_ARCSEC);
+        }
+
+        // computing advised inc size, from spatial frequencies
+        // maximum of spatial frequency in mas
+        double advisedInc = -1;
+        // computing maximum spatial frequency from all OI TABLES
+        double maxFreqFile = Double.NEGATIVE_INFINITY; // in meters/radians
+        for (OITable oitable : oifitsfile.getOiTables()) {
+            double minMaxFreqTable[] = (double[]) oitable.getMinMaxColumnValue(OIFitsConstants.COLUMN_SPATIAL_FREQ);
+            if (minMaxFreqTable != null && minMaxFreqTable.length >= 1) {
+                maxFreqFile = Double.max(maxFreqFile, minMaxFreqTable[1]);
+            }
+        }
+        if (maxFreqFile > 0) {
+            advisedInc = (1 / maxFreqFile); // in radians/meters
+            advisedInc = FitsUnit.ANGLE_RAD.convert(advisedInc, FitsUnit.ANGLE_MILLI_ARCSEC); // in mas/meters
+            advisedInc = advisedInc / INIT_INC_DIVIDER;
+        }
+
+        double advisedFWMH = 10; // mas
+
+        final FitsImageHDU newHDU
+                = ((advisedInc > 0) && (advisedFov / advisedInc > 0) && (advisedFov / advisedInc < 1e4)) // some size checks
+                        ? fitsImagePanel.createFitsImage(advisedFov, advisedInc, advisedFWMH)
+                        : fitsImagePanel.createFitsImage();
 
         if (newHDU != null) {
 
