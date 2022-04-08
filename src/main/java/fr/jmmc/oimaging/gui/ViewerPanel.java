@@ -644,7 +644,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         double advisedFWMH = 10; // mas
 
         final FitsImageHDU newHDU
-                = ((advisedFov / advisedInc > 0) && (advisedFov / advisedInc < 1e4)) // some size checks
+                = ((advisedInc > 0) && (advisedFov / advisedInc > 0) && (advisedFov / advisedInc < 1e4)) // some size checks
                         ? fitsImagePanel.createFitsImage(advisedFov, advisedInc, advisedFWMH)
                         : fitsImagePanel.createFitsImage();
 
