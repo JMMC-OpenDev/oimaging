@@ -172,6 +172,7 @@
         <release version="0.7.0">
             <pubDate>Fri, 08 Apr 2022 14:00:00 GMT</pubDate>
             <prerelease version="0.7.0 beta 2" >
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/25" >Automatic computing of FOV &amp; INC when creating image</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/milestone/" >Some bug fixes on the input form: radio buttons, run button</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/74" >Fixed Missing TARGET and INIT_IMG in MiRA</change>
                 <!--<change type="CHANGE" url="https://github.com/JMMC-OpenDev/oimaging/issues/86" >Wisard must have INIT_IMG to run</change>-->
