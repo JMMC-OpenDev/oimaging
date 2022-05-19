@@ -592,20 +592,21 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         final IRModel irModel = irModelManager.getIRModel();
 
         // computing initial values for FOV, INC, & FWMH, from the current data
-
-        // computing advised fov,
-        // max wavelength / max diameter, in mas
-        double advisedFov = -1;
         final OIFitsFile oifitsfile = irModel.getOifitsFile();
+
+        // computing advised fov, max wavelength / max diameter, in mas
+        double advisedFov = -1;
+
         // computing maximum diameter from all OI ARRAY
         float maxDiamFile = Float.NEGATIVE_INFINITY;
+
         for (OIArray oiArray : oifitsfile.getOiArrays()) {
             float[] minMaxDiamTable = (float[]) oiArray.getMinMaxColumnValue(OIFitsConstants.COLUMN_DIAMETER);
             if (minMaxDiamTable != null && minMaxDiamTable.length >= 1) {
                 maxDiamFile = Float.max(maxDiamFile, minMaxDiamTable[1]);
             }
         }
-        if (maxDiamFile <= 0) {
+        if (maxDiamFile <= 0.0) {
             // if diameter found was 0 or below, try to identify if the instrument is PIONIER
             // if PIONIER, then we assume DIAMETER to be 1.8 meters
             // needed because lot of files with PIONIER set DIAMETER to 0
@@ -619,7 +620,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         }
         // getting maximum wavelength
         double maxWaveLength = oifitsfile.getWavelengthRange().getMax();
-        if (maxDiamFile > 0 && maxWaveLength > 0) {
+        if (maxDiamFile > 0.0 && maxWaveLength > 0.0) {
             advisedFov = maxWaveLength / maxDiamFile; // in radians
             advisedFov = FitsUnit.ANGLE_RAD.convert(advisedFov, FitsUnit.ANGLE_MILLI_ARCSEC);
         }
@@ -627,29 +628,30 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         // computing advised inc size, from spatial frequencies
         // maximum of spatial frequency in mas
         double advisedInc = -1;
+
         // computing maximum spatial frequency from all OI TABLES
         double maxFreqFile = Double.NEGATIVE_INFINITY; // in meters/radians
+
         for (OITable oitable : oifitsfile.getOiTables()) {
             double minMaxFreqTable[] = (double[]) oitable.getMinMaxColumnValue(OIFitsConstants.COLUMN_SPATIAL_FREQ);
             if (minMaxFreqTable != null && minMaxFreqTable.length >= 1) {
                 maxFreqFile = Double.max(maxFreqFile, minMaxFreqTable[1]);
             }
         }
-        if (maxFreqFile > 0) {
-            advisedInc = (1 / maxFreqFile); // in radians/meters
+        if (maxFreqFile > 0.0) {
+            advisedInc = (1.0 / maxFreqFile); // in radians/meters
             advisedInc = FitsUnit.ANGLE_RAD.convert(advisedInc, FitsUnit.ANGLE_MILLI_ARCSEC); // in mas/meters
-            advisedInc = advisedInc / INIT_INC_DIVIDER;
+            advisedInc /= INIT_INC_DIVIDER;
         }
 
-        double advisedFWMH = 10; // mas
+        double advisedFWMH = 10.0; // mas
 
         final FitsImageHDU newHDU
-                = ((advisedInc > 0) && (advisedFov / advisedInc > 0) && (advisedFov / advisedInc < 1e4)) // some size checks
+                           = ((advisedInc > 0.0) && (advisedFov / advisedInc > 0.0) && (advisedFov / advisedInc < 1e3)) // some size checks
                         ? fitsImagePanel.createFitsImage(advisedFov, advisedInc, advisedFWMH)
                         : fitsImagePanel.createFitsImage();
 
         if (newHDU != null) {
-
             // update keywords
             try {
                 final BasicHDU basicHdu = FitsImageWriter.createHDUnit(newHDU);
@@ -664,18 +666,21 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             // add the FitsImageHDU to the imageLibrary
             final List<FitsImageHDU> libraryHDUs = irModel.addFitsImageHDUs(Arrays.asList(newHDU), "(created)");
 
-            irModel.updateImageIdentifiers(newHDU);
+            if (!libraryHDUs.isEmpty()) {
 
-            // selecting first library HDU as inputImageHDU
-            final String selection = irModel.getInputImageView();
-            if (selection == KEYWORD_INIT_IMG || selection == null) {
-                irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
-            } else if (selection == KEYWORD_RGL_PRIO) {
-                irModel.setSelectedRglPrioImageHdu(libraryHDUs.get(0));
+                irModel.updateImageIdentifiers(newHDU);
+
+                // selecting first library HDU as inputImageHDU
+                final String selection = irModel.getInputImageView();
+                if (selection == KEYWORD_INIT_IMG || selection == null) {
+                    irModel.setSelectedInputImageHDU(libraryHDUs.get(0));
+                } else if (selection == KEYWORD_RGL_PRIO) {
+                    irModel.setSelectedRglPrioImageHdu(libraryHDUs.get(0));
+                }
+
+                // notify model update
+                irModelManager.fireIRModelChanged(this);
             }
-
-            // notify model update
-            irModelManager.fireIRModelChanged(this);
         }
     }
 

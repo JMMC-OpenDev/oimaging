@@ -306,7 +306,7 @@ public final class IRModel {
             updateImageIdentifiers(fitsImageFile);
 
             // select the equivalent of the first image
-            final FitsImageHDU firstImageEquiv = libraryHdus.get(0);
+            final FitsImageHDU firstImageEquiv = (!libraryHdus.isEmpty()) ? libraryHdus.get(0) : null;
             if (firstImageEquiv != null) {
                 setSelectedInputImageHDU(firstImageEquiv);
             }
@@ -338,19 +338,23 @@ public final class IRModel {
         final int nHdus = hdus.size();
         logger.debug("addFitsImageHDUs: {} ImageHDUs from {}", nHdus, filename);
 
+        final List<FitsImageHDU> prepHdus = new ArrayList<>(nHdus);
+
         hdus.forEach(hdu -> {
             // prepare images (negative values, padding, orientation):
             try {
                 FitsImageUtils.prepareImages(hdu);
+                prepHdus.add(hdu);
             } catch (IllegalArgumentException iae) {
-                MessagePane.showErrorMessage("Unable to prepare images from HDU \"{}\", error: {}", hdu.getHduName(), iae);
+                MessagePane.showErrorMessage("Unable to prepare images from HDU: " + hdu.getHduName(), iae);
             }
         });
 
-        final List<FitsImageHDU> libraryHdus = new ArrayList<>(nHdus);
+        final int nPrepHdus = prepHdus.size();
+        final List<FitsImageHDU> libraryHdus = new ArrayList<>(nPrepHdus);
 
-        for (int i = 0; i < nHdus; i++) {
-            final FitsImageHDU hdu = hdus.get(i);
+        for (int i = 0; i < nPrepHdus; i++) {
+            final FitsImageHDU hdu = prepHdus.get(i);
             FitsImageHDU hduRef = null;
 
             // if earlySkipInitRgl enabled, we early skip when role is INIT or RGL
@@ -380,31 +384,34 @@ public final class IRModel {
      * @param hduToReplace a library HDU that is to be replaced by the copy of hdu. (required)
      * @param hdu the HDU to add to the library. (required)
      */
-    public void addFitsImageHDUAndSelect(final FitsImageHDU hduToReplace, final FitsImageHDU hdu) {
+    public void addFitsImageHDUAndSelect(final FitsImageHDU hduToReplace, FitsImageHDU hdu) {
         // prepare images (negative values, padding, orientation):
         try {
             FitsImageUtils.prepareImages(hdu);
         } catch (IllegalArgumentException iae) {
-            MessagePane.showErrorMessage("Unable to prepare images from HDU \"{}\", error: {}", hdu.getHduName(), iae);
+            MessagePane.showErrorMessage("Unable to prepare images from HDU: " + hdu.getHduName(), iae);
+            hdu = null;
         }
 
-        final FitsImageHDU libraryHdu = addToImageLibrary(hdu, null);
+        if (hdu != null) {
+            final FitsImageHDU libraryHdu = addToImageLibrary(hdu, null);
 
-        // this needs to be done after the call addFitsImageHDU()
-        // so it uses the (possible) new name
-        updateImageIdentifiers(hdu);
+            // this needs to be done after the call addFitsImageHDU()
+            // so it uses the (possible) new name
+            updateImageIdentifiers(hdu);
 
-        if (libraryHdu != null) {
-            // change selected image according to the given source reference:
-            if (selectedRglPrioImageHdu == hduToReplace) {
-                setSelectedRglPrioImageHdu(libraryHdu);
-            } else {
-                // select first added hdu as selected input
-                setSelectedInputImageHDU(libraryHdu);
+            if (libraryHdu != null) {
+                // change selected image according to the given source reference:
+                if (selectedRglPrioImageHdu == hduToReplace) {
+                    setSelectedRglPrioImageHdu(libraryHdu);
+                } else {
+                    // select first added hdu as selected input
+                    setSelectedInputImageHDU(libraryHdu);
+                }
             }
+            // notify model change (to display model):
+            IRModelManager.getInstance().fireIRModelChanged(this);
         }
-        // notify model change (to display model):
-        IRModelManager.getInstance().fireIRModelChanged(this);
     }
 
     /**
