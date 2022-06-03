@@ -16,11 +16,11 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
-import fr.jmmc.oimaging.gui.action.LoadResultAsInputAction;
 import fr.jmmc.oimaging.gui.action.DeleteSelectionAction;
 import fr.jmmc.oimaging.gui.action.ExportFitsImageAction;
 import fr.jmmc.oimaging.gui.action.ExportOIFitsAction;
 import fr.jmmc.oimaging.gui.action.LoadOIFitsAction;
+import fr.jmmc.oimaging.gui.action.LoadResultAsInputAction;
 import fr.jmmc.oimaging.gui.action.RunAction;
 import fr.jmmc.oimaging.gui.action.RunMoreIterationsAction;
 import fr.jmmc.oimaging.gui.action.SetAsInitImgAction;
@@ -56,7 +56,6 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -674,52 +673,37 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         jPanelViewerAndActions.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         jPanelViewerAndActions.add(viewerPanelResults, gridBagConstraints);
 
-        jPanelResultsActions.setBorder(javax.swing.BorderFactory.createTitledBorder("Action panel"));
-        jPanelResultsActions.setLayout(new java.awt.GridBagLayout());
+        jPanelResultsActions.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Action panel", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
         jButtonRunMoreIterations.setAction(ActionRegistrar.getInstance().get(fr.jmmc.oimaging.gui.action.RunMoreIterationsAction.CLASS_NAME, fr.jmmc.oimaging.gui.action.RunMoreIterationsAction.ACTION_NAME));
-        jButtonRunMoreIterations.setText("Run more iterations");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanelResultsActions.add(jButtonRunMoreIterations, gridBagConstraints);
+        jButtonRunMoreIterations.setText("Continue");
+        jPanelResultsActions.add(jButtonRunMoreIterations);
 
         jButtonLoadAsInput.setAction(ActionRegistrar.getInstance().get(fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.CLASS_NAME, fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.ACTION_NAME));
-        jButtonLoadAsInput.setText("Load as input");
+        jButtonLoadAsInput.setText("Restart");
         jButtonLoadAsInput.setActionCommand(LoadResultAsInputAction.USE_INIT_IMG_AS_INIT);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanelResultsActions.add(jButtonLoadAsInput, gridBagConstraints);
+        jPanelResultsActions.add(jButtonLoadAsInput);
 
         jButtonLoadAsInputWithLastImg.setAction(ActionRegistrar.getInstance().get(fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.CLASS_NAME, fr.jmmc.oimaging.gui.action.LoadResultAsInputAction.ACTION_NAME));
-        jButtonLoadAsInputWithLastImg.setText("Load as input with last img");
+        jButtonLoadAsInputWithLastImg.setText("Update parameters");
         jButtonLoadAsInputWithLastImg.setActionCommand(LoadResultAsInputAction.USE_LAST_IMG_AS_INIT);
+        jPanelResultsActions.add(jButtonLoadAsInputWithLastImg);
+
+        jButtonExportOIFits.setText("Save OIFitsFile");
+        jButtonExportOIFits.setName("jButtonExportOIFits"); // NOI18N
+        jPanelResultsActions.add(jButtonExportOIFits);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanelResultsActions.add(jButtonLoadAsInputWithLastImg, gridBagConstraints);
-
-        jButtonExportOIFits.setText("Save OIFitsFile");
-        jButtonExportOIFits.setName("jButtonExportOIFits"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanelResultsActions.add(jButtonExportOIFits, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         jPanelViewerAndActions.add(jPanelResultsActions, gridBagConstraints);
 
         jSplitPaneResults.setTopComponent(jPanelViewerAndActions);

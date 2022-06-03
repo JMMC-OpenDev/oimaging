@@ -34,7 +34,7 @@ public class RunMoreIterationsAction extends RegisteredAction {
      */
     public final static String ACTION_NAME = "runMoreIterations";
 
-    public final static String LABEL_IDLE = "Run more iterations";
+    public final static String LABEL_IDLE = "Continue";
     public final static String LABEL_CANCEL = "Cancel";
 
     /**
