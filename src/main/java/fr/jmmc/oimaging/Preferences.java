@@ -87,6 +87,9 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
         // Disable interpolation:
         setDefaultPreference(MODEL_IMAGE_INTERPOLATION, ImageInterpolation.None.toString());
 
+        // Use 10as by default
+        setDefaultPreference(TARGET_MATCHER_SEPARATION, Double.valueOf(10.0));
+
         setDefaultPreference(RESULTS_COLUMNS_ALL, COLUMNS_DEFAULT_ALL);
         setDefaultPreference(RESULTS_COLUMNS_VISIBLE, COLUMNS_DEFAULT_VISIBLE);
     }
