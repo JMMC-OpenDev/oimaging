@@ -19,6 +19,7 @@ import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.SetAsInitImgAction;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
+import static fr.jmmc.oimaging.model.IRModelManager.FITS_EXTENSION;
 import fr.jmmc.oimaging.services.ServiceResult;
 import fr.jmmc.oitools.OIFitsConstants;
 import fr.jmmc.oitools.image.FitsImage;
@@ -69,8 +70,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(ViewerPanel.class);
-    /** fits extension including '.' (dot) character ie '.fits' */
-    public final static String FITS_EXTENSION = "." + MimeType.OIFITS.getExtension();
 
     /* constants for the labels of the tab headers */
     public static final String TAB_LABEL_IMAGES = "Images";

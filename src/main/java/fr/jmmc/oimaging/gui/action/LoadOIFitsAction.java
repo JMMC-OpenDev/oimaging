@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
+import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -49,36 +50,45 @@ public final class LoadOIFitsAction extends RegisteredAction {
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
 
-        File file;
+        File[] files;
 
         // If the action was automatically triggered from App launch
         if (evt.getSource() == ActionRegistrar.getInstance()) {
-            file = new File(evt.getActionCommand());
+            File file = new File(evt.getActionCommand());
 
             if (!file.exists() || !file.isFile()) {
                 MessagePane.showErrorMessage("Could not load the file : " + file.getAbsolutePath());
-                file = null;
+                files = null;
             } else {
                 // update current directory for oidata:
                 SessionSettingsPreferences.setCurrentDirectoryForMimeType(mimeType, file.getParent());
+                files = new File[]{file};
             }
-
         } else {
-            file = FileChooser.showOpenFileChooser("Load oifits file", null, mimeType);
+            files = FileChooser.showOpenFilesChooser("Load oifits file(s)", null, mimeType);
         }
 
         // If a file was defined (No cancel in the dialog)
-        if (file != null) {
+        if (files != null) {
+            final OIFitsChecker checker = new OIFitsChecker();
 
             try {
-                IRModelManager.getInstance().loadOIFitsFile(file);
-            } catch (IOException ex) {
-                StatusBar.show("Could not load OIFits : " + file.getAbsolutePath());
-                MessagePane.showErrorMessage("Could not load OIFits : " + file.getAbsolutePath(), ex);
+                IRModelManager.getInstance().loadOIFitsFiles(files, checker);
+
+                if (false) {
+                    // display validation messages anyway:
+                    final String checkReport = checker.getCheckReport();
+                    logger.info("validation results:\n{}", checkReport);
+
+                    MessagePane.showMessage(checkReport);
+                }
+            } catch (IOException ioe) {
+                StatusBar.show("Could not load OIFits files.");
+                MessagePane.showErrorMessage("Could not load OIFits file", ioe);
             } catch (IllegalArgumentException iae) {
                 // IllegalArgumentException matches unit conversion or mandatory CDELT keyword test
-                StatusBar.show("Could not load OIFits : " + file.getAbsolutePath());
-                MessagePane.showErrorMessage("Could not load Fits Image: " + file.getName() + "\n  " + iae.getMessage(), "Could not load file");
+                StatusBar.show("Could not load OIFits files.");
+                MessagePane.showErrorMessage("Could not load Fits Image: " + iae.getMessage(), "Could not load file");
             }
         }
     }

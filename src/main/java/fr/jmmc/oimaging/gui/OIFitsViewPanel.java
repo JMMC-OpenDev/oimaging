@@ -12,6 +12,7 @@ import fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetFilter;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.BorderLayout;
@@ -191,7 +192,6 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
                 // We could implement some fall back looking at OI_TARGET, using selected input one...
             } else {
                 this.jLabelMessage.setText("No OIFits data available.");
-
             }
             display(false, true);
         } else {
@@ -228,18 +228,23 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
 
             ocm.addOIFitsFile(this.oiFitsFile);
 
-            // get current subset definition (copy):
-            final String subdefid = ocm.getPlot(this.plotView.getPlotId()).getSubsetDefinition().getId();
-            final SubsetDefinition subsetCopy = ocm.getSubsetDefinition(subdefid);
+            final OIDataFile fileInCollection = ocm.getOIDataFile(this.oiFitsFile);
+            
+            if (fileInCollection != null) {
+                // get current subset definition (copy):
+                final String subdefid = ocm.getPlot(this.plotView.getPlotId()).getSubsetDefinition().getId();
+                final SubsetDefinition subsetCopy = ocm.getSubsetDefinition(subdefid);
 
-            OIDataFile fileInCollection = ocm.getOIDataFile(this.oiFitsFile);
+                // a filter that matches all tables of the given oifitsFile:
+                final SubsetFilter filter = subsetCopy.getFilter();
+                filter.setTargetUID(targetName); // may not match !
+                
+                filter.getTables().clear();
+                filter.getTables().add(new TableUID(fileInCollection));
 
-            // a filter that matches all tables of the given oifitsFile:
-            subsetCopy.getFilter().getTables().clear();
-            subsetCopy.getFilter().getTables().add(new TableUID(fileInCollection));
-
-            // fire subset changed event (generates OIFitsSubset and then plot asynchronously):
-            ocm.updateSubsetDefinition(this, subsetCopy);
+                // fire subset changed event (generates OIFitsSubset and then plot asynchronously):
+                ocm.updateSubsetDefinition(this, subsetCopy);
+            }
         }
     }
 

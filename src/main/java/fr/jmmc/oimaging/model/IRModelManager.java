@@ -20,12 +20,16 @@ import fr.jmmc.oitools.meta.OIFitsStandard;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsLoader;
+import fr.jmmc.oitools.model.OIFitsWriter;
+import fr.jmmc.oitools.processing.Merger;
 import fr.nom.tam.fits.FitsException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import org.apache.commons.httpclient.auth.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +43,9 @@ public final class IRModelManager {
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(IRModelManager.class);
+    /** fits extension including '.' (dot) character ie '.fits' */
+    public final static String FITS_EXTENSION = "." + MimeType.OIFITS.getExtension();
+
     /** package name for JAXB generated code */
     //private final static String IRMODEL_JAXB_PATH = IRModel.class.getPackage().getName();
     /** Singleton pattern */
@@ -160,6 +167,43 @@ public final class IRModelManager {
         RecentFilesManager.addFile(file);
     }
 
+    public void loadOIFitsFiles(File[] files, final OIFitsChecker checker) throws IOException {
+        if (files == null || files.length == 0) {
+            return;
+        }
+        if (files.length == 1) {
+            loadOIFitsFile(files[0]);
+            return;
+        }
+
+        // Load all OIFits files (blocking, not async):
+        final List<OIFitsFile> oiFitsFiles = new ArrayList<>(files.length);
+
+        for (File file : files) {
+            // may throw IOException:
+            final OIFitsFile oiFitsFile = loadOIFits(file.getAbsolutePath(), checker);
+            if (oiFitsFile != null) {
+                oiFitsFiles.add(oiFitsFile);
+            }
+        }
+
+        // Merge all into single temporary file:
+        final OIFitsFile mergedOIFitsFile = Merger.process(oiFitsFiles.toArray(new OIFitsFile[oiFitsFiles.size()]));
+        logger.debug("Merged OIFits file: {}", mergedOIFitsFile);
+
+        // Save temporary file:
+        final File file = FileUtils.getTempFile("merged-", FITS_EXTENSION);
+        try {
+            StatusBar.show("saving merged file: " + file.getAbsolutePath());
+            OIFitsWriter.writeOIFits(file.getAbsolutePath(), mergedOIFitsFile);
+        } catch (FitsException fe) {
+            throw new IOException("Unable to save merged file : " + file.getAbsolutePath(), fe);
+        }
+
+        // loaded file must represent a true local file:
+        loadOIFitsFile(mergedOIFitsFile);
+    }
+
     public void loadOIFitsFile(File file) throws IOException {
         loadOIFitsFile(file.getAbsolutePath(), null);
     }
@@ -171,7 +215,7 @@ public final class IRModelManager {
      * @param checker checker component
      * @throws IOException if a fits file can not be loaded
      */
-    public void loadOIFitsFile(final String fileLocation, final OIFitsChecker checker) throws IOException {
+    private void loadOIFitsFile(final String fileLocation, final OIFitsChecker checker) throws IOException {
         loadOIFitsFile(loadOIFits(fileLocation, checker));
     }
 

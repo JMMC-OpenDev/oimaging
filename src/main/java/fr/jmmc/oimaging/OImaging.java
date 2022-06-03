@@ -376,7 +376,6 @@ public final class OImaging extends App {
 
                             Exception e = null; // Store exception if something bad occurs                            
                             try {
-
                                 if (FileUtils.isRemote(url)) {
                                     final URI uri = new URI(url);
                                     File tmpFile = FileUtils.getTempFile(ResourceUtils.filenameFromResourcePath(url));

@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.7.0"/>
-    <compilation date="08/04/2022" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="0.7.1 beta 1"/>
+    <compilation date="03/06/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -124,8 +124,8 @@
     <menubar>
         <menu label="File">
             <menu label="New OI Image file" classpath="fr.jmmc.oimaging.gui.action.NewAction" action="newOIFits" accelerator="N" />
-            <menu label="Load OIFits file" classpath="fr.jmmc.oimaging.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="L"
-                  icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load an OIFits file"/>
+            <menu label="Load OIFits file(s)" classpath="fr.jmmc.oimaging.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="L"
+                  icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load an OIFits file(s) (merge several files)"/>
             <menu label="Load Fits Image file" classpath="fr.jmmc.oimaging.gui.action.LoadFitsImageAction" action="loadFitsImage"
                   icon="fr/jmmc/jmcs/resource/image/folder.png" description="Load a Fits Image file"/>
             <menu/> <!-- menu separator -->
@@ -169,27 +169,35 @@
     </menubar>
 
     <releasenotes>
+        <release version="0.7.1">
+            <pubDate>Fri, 03 Jun 2022 16:00:00 GMT</pubDate>
+            <prerelease version="0.7.1 beta 1">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/112">Improved Load OIFits action to allow loading multiple OIFits files
+                    and merge all of them to produce the input structure for OImaging (see Target separation preference = 10 as by default)</change>
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/110">Fixed result table sorter to consider missing values after sorted values</change>
+            </prerelease>
+        </release>
         <release version="0.7.0">
             <pubDate>Fri, 08 Apr 2022 15:00:00 GMT</pubDate>
-            <prerelease version="0.7.0 beta 2" >
-                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/25" >Automatic computing of FOV &amp; INC when creating image</change>
-                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/milestone/" >Some bug fixes on the input form: radio buttons, run button</change>
-                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/74" >Fixed Missing TARGET and INIT_IMG in MiRA</change>
-                <!--<change type="CHANGE" url="https://github.com/JMMC-OpenDev/oimaging/issues/86" >Wisard must have INIT_IMG to run</change>-->
-                <!--<change type="CHANGE" url="https://github.com/JMMC-OpenDev/oimaging/issues/91" >button load OIFits file more visible</change>-->
-                <!--<change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/pull/107" >completed Sparco documentation</change>-->
+            <prerelease version="0.7.0 beta 2">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/25">Automatic computing of FOV &amp; INC when creating image</change>
+                <change type="BUGFIX">Some bug fixes on the input form: radio buttons, run button</change>
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/74">Fixed Missing TARGET and INIT_IMG in MiRA</change>
+                <!--<change type="CHANGE" url="https://github.com/JMMC-OpenDev/oimaging/issues/86">Wisard must have INIT_IMG to run</change>-->
+                <!--<change type="CHANGE" url="https://github.com/JMMC-OpenDev/oimaging/issues/91">button load OIFits file more visible</change>-->
+                <!--<change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/pull/107">completed Sparco documentation</change>-->
             </prerelease>
-            <prerelease version="0.7.0 beta 1" >
-                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/18" >Updated BSMEM to v2.3.0 to handle standard values for USE_VIS and USE_T3 parameters: NONE, AMP, PHI, ALL</change>
-                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/26" >Fixed WISARD FLUXERR to 1E-4</change><!-- and apply defaults at reset -->
-                <!--<change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/80" >Execution log containing error message do not capture focus anymore</change>-->
-                <!--<change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/89" >Fix event over-listening on input formulary fields (MacOS)</change>-->
+            <prerelease version="0.7.0 beta 1">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/18">Updated BSMEM to v2.3.0 to handle standard values for USE_VIS and USE_T3 parameters: NONE, AMP, PHI, ALL</change>
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/26">Fixed WISARD FLUXERR to 1E-4</change><!-- and apply defaults at reset -->
+                <!--<change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/80">Execution log containing error message do not capture focus anymore</change>-->
+                <!--<change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/89">Fix event over-listening on input formulary fields (MacOS)</change>-->
             </prerelease>
         </release>
         <release version="0.6.0">
             <pubDate>Fri, 04 Feb 2022 14:00:00 GMT</pubDate>
             <prerelease version="0.6.0 beta 11">
-                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/69" >Added buttons to fill the input form with a selected result</change>
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/69">Added buttons to fill the input form with a selected result</change>
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/21">Improved GUI to adopt two views Input &amp; Results</change>
             </prerelease>
             <prerelease version="0.6.0 beta 10">

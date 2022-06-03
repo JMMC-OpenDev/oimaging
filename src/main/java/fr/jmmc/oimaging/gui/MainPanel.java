@@ -410,7 +410,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jPanelDataSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Data selection"));
         jPanelDataSelection.setLayout(new java.awt.GridBagLayout());
 
-        jButtonLoadData.setText("Load OIFIts file");
+        jButtonLoadData.setText("Load OIFIts file(s)");
         jButtonLoadData.setName("jButtonLoadData"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -425,6 +425,11 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         jComboBoxTarget.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T" }));
         jComboBoxTarget.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_TARGET));
         jComboBoxTarget.setPrototypeDisplayValue("XXXX");
+        jComboBoxTarget.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxTargetActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -795,6 +800,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         updateModel();
     }//GEN-LAST:event_jComboBoxUseT3ActionPerformed
 
+    private void jComboBoxTargetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTargetActionPerformed
+        updateModel();
+    }//GEN-LAST:event_jComboBoxTargetActionPerformed
+
     public void deleteSelectedRows() {
         final int nSelected = jTablePanel.getSelectedRowsCount();
         if (nSelected != 0) {
@@ -1086,7 +1095,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
             softwareSettingsPanel.syncUI(this, currentModel, failures);
 
-            final String fileName = (hasOIData) ? currentModel.getOifitsFile().getFileName() : "";
+            final String fileName = (hasOIData) ? currentModel.getOifitsFile().getFileName() : "(no file)";
             jLabelOifitsFile.setText(fileName);
             jLabelOifitsFile.setToolTipText(fileName);
 
