@@ -740,23 +740,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelImageSelector.setLayout(new java.awt.GridBagLayout());
 
-        jComboBoxImage.setPrototypeDisplayValue("XXXX");
         jComboBoxImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxImageActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
         jPanelImageSelector.add(jComboBoxImage, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jPanelImageSelector, gridBagConstraints);
 
@@ -767,7 +762,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
@@ -779,7 +774,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
@@ -791,7 +786,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
@@ -799,7 +794,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jButtonSetAsInitImg.setAction(ActionRegistrar.getInstance().get(SetAsInitImgAction.CLASS_NAME, SetAsInitImgAction.ACTION_NAME));
         jButtonSetAsInitImg.setText("Set as Init Img");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonSetAsInitImg, gridBagConstraints);
@@ -811,7 +806,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelImageViewer.add(jButtonRescale, gridBagConstraints);
@@ -827,7 +822,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
