@@ -697,7 +697,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         jPanelOIFitsViewer = new javax.swing.JPanel();
         jPanelOIFits = new javax.swing.JPanel();
         jPanelImageViewer = new javax.swing.JPanel();
-        jPanelImageSelector = new javax.swing.JPanel();
         jComboBoxImage = new javax.swing.JComboBox();
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
@@ -737,27 +736,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         jPanelImageViewer.setLayout(new java.awt.GridBagLayout());
 
-        jPanelImageSelector.setLayout(new java.awt.GridBagLayout());
-
-        jComboBoxImage.setPrototypeDisplayValue("XXXX");
+        jComboBoxImage.setMinimumSize(new java.awt.Dimension(100, 22));
         jComboBoxImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxImageActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        jPanelImageSelector.add(jComboBoxImage, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelImageViewer.add(jPanelImageSelector, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanelImageViewer.add(jComboBoxImage, gridBagConstraints);
 
         jButtonViewport.setText("Viewport");
         jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
@@ -766,9 +757,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanelImageViewer.add(jButtonViewport, gridBagConstraints);
 
         jButtonResample.setText("Resample");
@@ -778,9 +769,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
 
         jButtonModifyImage.setText("Modify image");
@@ -790,17 +781,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
 
         jButtonSetAsInitImg.setAction(ActionRegistrar.getInstance().get(SetAsInitImgAction.CLASS_NAME, SetAsInitImgAction.ACTION_NAME));
         jButtonSetAsInitImg.setText("Set as Init Img");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanelImageViewer.add(jButtonSetAsInitImg, gridBagConstraints);
 
         jButtonRescale.setText("Rescale");
@@ -810,9 +801,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanelImageViewer.add(jButtonRescale, gridBagConstraints);
 
         jLabelImageDebug.setForeground(java.awt.Color.red);
@@ -826,7 +817,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -939,7 +930,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private javax.swing.JLabel jLabelInput;
     private javax.swing.JLabel jLabelOutput;
     private javax.swing.JPanel jPanelImage;
-    private javax.swing.JPanel jPanelImageSelector;
     private javax.swing.JPanel jPanelImageViewer;
     private javax.swing.JPanel jPanelLogViewer;
     private javax.swing.JPanel jPanelOIFits;
