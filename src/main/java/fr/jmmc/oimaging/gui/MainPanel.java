@@ -680,7 +680,8 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints.weighty = 1.0;
         jPanelViewerAndActions.add(viewerPanelResults, gridBagConstraints);
 
-        jPanelResultsActions.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Action panel", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        jPanelResultsActions.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanelResultsActions.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 20, 5));
 
         jButtonRunMoreIterations.setAction(ActionRegistrar.getInstance().get(fr.jmmc.oimaging.gui.action.RunMoreIterationsAction.CLASS_NAME, fr.jmmc.oimaging.gui.action.RunMoreIterationsAction.ACTION_NAME));
         jButtonRunMoreIterations.setText("Continue");
@@ -703,7 +704,7 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         jPanelViewerAndActions.add(jPanelResultsActions, gridBagConstraints);
 
         jSplitPaneResults.setTopComponent(jPanelViewerAndActions);
