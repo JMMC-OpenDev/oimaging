@@ -33,11 +33,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,12 +159,23 @@ public final class IRModel {
         // store original filename
         final String originalAbsoluteFilePath = oiFitsFile.getAbsoluteFilePath();
 
-        // truncate file name to fix filepath too long crash
-        // TODO: do this more cleanly by parsing suffixes and removing them
-        final String trunkedFileName
-                     = oiFitsFile.getFileName().substring(0, Math.min(oifitsFile.getFileName().length(), 80));
+        // get target name, or default name if null or empty
+        String targetName = null;
+        if (oiFitsFile.getOiTarget() != null) {
+            final String[] targetsArray = oiFitsFile.getOiTarget().getTarget();
+            if (targetsArray != null && targetsArray.length >= 1) {
+                targetName = StringUtils.replaceNonAlphaNumericCharsByUnderscore(targetsArray[0]);
+            }
+        }
+        if (targetName == null || targetName.isEmpty()) {
+            targetName = "undefined-target";
+        }
 
-        final File tmpFile = FileUtils.getTempFile(trunkedFileName, ".export-" + exportCount + ".fits");
+        // use target name + current date
+        final String filename
+                = targetName + "_" + DateFormatUtils.ISO_DATETIME_FORMAT.format(new Date()) + "_" + exportCount + ".fits";
+
+        final File tmpFile = FileUtils.getTempFile(filename);
 
         // Pre-processing:
         // Ensure OIFITS File is correct.
