@@ -33,13 +33,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,32 +157,31 @@ public final class IRModel {
         // store original filename
         final String originalAbsoluteFilePath = oiFitsFile.getAbsoluteFilePath();
 
-        // get target name, or default name if null or empty
-        String targetName = null;
-        if (oiFitsFile.getOiTarget() != null) {
-            final String[] targetsArray = oiFitsFile.getOiTarget().getTarget();
-            if (targetsArray != null && targetsArray.length >= 1) {
-                targetName = StringUtils.replaceNonAlphaNumericCharsByUnderscore(targetsArray[0]);
+        File tmpFile = null;
+        try {
+            // get target name:
+            String targetName = null;
+            if (oiFitsFile.hasOiTarget()) {
+                final String[] targets = oiFitsFile.getOiTarget().getTarget();
+                if (targets != null && targets.length >= 1) {
+                    targetName = StringUtils.replaceNonAlphaNumericCharsByUnderscore(targets[0]);
+                }
             }
+            if (StringUtils.isEmpty(targetName)) {
+                targetName = "undefined-target";
+            }
+
+            // use target name + current date:
+            tmpFile = FileUtils.getTempFile(targetName + "_" + DateUtils.now_datetime() + "_" + exportCount + ".fits");
+
+            // Pre-processing:
+            // Ensure OIFITS File is correct.
+            OIFitsWriter.writeOIFits(tmpFile.getAbsolutePath(), oiFitsFile);
+        } finally {
+            //restore filename
+            oifitsFile.setAbsoluteFilePath(originalAbsoluteFilePath);
+            exportCount++;
         }
-        if (targetName == null || targetName.isEmpty()) {
-            targetName = "undefined-target";
-        }
-
-        // use target name + current date
-        final String filename
-                = targetName + "_" + DateFormatUtils.ISO_DATETIME_FORMAT.format(new Date()) + "_" + exportCount + ".fits";
-
-        final File tmpFile = FileUtils.getTempFile(filename);
-
-        // Pre-processing:
-        // Ensure OIFITS File is correct.
-        OIFitsWriter.writeOIFits(tmpFile.getAbsolutePath(), oiFitsFile);
-
-        //restore filename
-        oifitsFile.setAbsoluteFilePath(originalAbsoluteFilePath);
-
-        exportCount++;
         return tmpFile;
     }
 
