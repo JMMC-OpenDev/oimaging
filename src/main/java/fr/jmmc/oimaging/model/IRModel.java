@@ -157,21 +157,31 @@ public final class IRModel {
         // store original filename
         final String originalAbsoluteFilePath = oiFitsFile.getAbsoluteFilePath();
 
-        // truncate file name to fix filepath too long crash
-        // TODO: do this more cleanly by parsing suffixes and removing them
-        final String trunkedFileName
-                     = oiFitsFile.getFileName().substring(0, Math.min(oifitsFile.getFileName().length(), 80));
+        File tmpFile = null;
+        try {
+            // get target name:
+            String targetName = null;
+            if (oiFitsFile.hasOiTarget()) {
+                final String[] targets = oiFitsFile.getOiTarget().getTarget();
+                if (targets != null && targets.length >= 1) {
+                    targetName = StringUtils.replaceNonAlphaNumericCharsByUnderscore(targets[0]);
+                }
+            }
+            if (StringUtils.isEmpty(targetName)) {
+                targetName = "undefined-target";
+            }
 
-        final File tmpFile = FileUtils.getTempFile(trunkedFileName, ".export-" + exportCount + ".fits");
+            // use target name + current date:
+            tmpFile = FileUtils.getTempFile(targetName + "_" + DateUtils.now_datetime() + "_" + exportCount + ".fits");
 
-        // Pre-processing:
-        // Ensure OIFITS File is correct.
-        OIFitsWriter.writeOIFits(tmpFile.getAbsolutePath(), oiFitsFile);
-
-        //restore filename
-        oifitsFile.setAbsoluteFilePath(originalAbsoluteFilePath);
-
-        exportCount++;
+            // Pre-processing:
+            // Ensure OIFITS File is correct.
+            OIFitsWriter.writeOIFits(tmpFile.getAbsolutePath(), oiFitsFile);
+        } finally {
+            //restore filename
+            oifitsFile.setAbsoluteFilePath(originalAbsoluteFilePath);
+            exportCount++;
+        }
         return tmpFile;
     }
 
