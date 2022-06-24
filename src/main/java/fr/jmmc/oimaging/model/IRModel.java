@@ -430,13 +430,21 @@ public final class IRModel {
      * @return true if removed; false otherwise
      */
     public boolean removeFitsImageHDU(final FitsImageHDU hdu) {
+        boolean removed = false;
         // check if image is used ?
-        final boolean removed = this.imageLibrary.remove(hdu);
+        final int index = this.imageLibrary.indexOf(hdu);
 
-        if (removed) {
+        if (index >= 0) {
+            this.imageLibrary.remove(index);
+            removed = true;
+
             // cleanup references:
             if (selectedInputImageHDU == hdu) {
-                setSelectedInputImageHDU(null);
+                final int size = this.imageLibrary.size();
+                final int newIndex = (index < size) ? index : size - 1;
+                final FitsImageHDU nextHdu = (newIndex >= 0) ? this.imageLibrary.get(newIndex) : null;
+                // select next image or null:
+                setSelectedInputImageHDU(nextHdu);
             }
             if (selectedRglPrioImageHdu == hdu) {
                 setSelectedRglPrioImageHdu(null);
@@ -846,8 +854,7 @@ public final class IRModel {
                     String filename = serviceResult.getOifitsFile().getFileName();
                     if (filename == null || filename.isEmpty()) {
                         fihdu.setHduName("untitled");
-                    }
-                    else { // use filename, maximum 50 characters
+                    } else { // use filename, maximum 50 characters
                         fihdu.setHduName(filename.substring(0, Math.min(50, filename.length())));
                     }
                 }
