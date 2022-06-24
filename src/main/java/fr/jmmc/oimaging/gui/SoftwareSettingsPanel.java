@@ -692,10 +692,10 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
             boolean show;
 
             if (inputParam.getSpecificKeywords().isEmpty()) {
-                jTableKeywordsEditor.setModel(null);
+                jTableKeywordsEditor.setModel(null, service);
                 jTableKeywordsEditor.setVisible(false);
             } else {
-                jTableKeywordsEditor.setModel(inputParam, inputParam.getSpecificKeywords());
+                jTableKeywordsEditor.setModel(inputParam, inputParam.getSpecificKeywords(), service);
                 jTableKeywordsEditor.setVisible(true);
             }
 
