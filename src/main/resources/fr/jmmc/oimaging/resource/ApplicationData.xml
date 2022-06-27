@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="0.7.1 beta 2"/>
-    <compilation date="24/06/2022" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="1.0.0 beta 2"/>
+    <compilation date="27/06/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -169,15 +169,16 @@
     </menubar>
 
     <releasenotes>
-        <release version="0.7.1">
-            <pubDate>Fri, 03 Jun 2022 16:00:00 GMT</pubDate>
-            <prerelease version="0.7.1 beta 2">
+        <release version="1.0.0">
+            <pubDate>Mon, 27 Jun 2022 14:00:00 GMT</pubDate>
+            <prerelease version="1.0.0 beta 2">
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/98">Improved (local) execution to detect available commands (in the path) and skip unavailable services</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/92">Improved input form for MiRA and SPARCO</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/114">Improved image removal ('-') to use next image in the list</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/111">Fixed temporary file names using the format 'Target_&lt;date_time&gt;.fits'</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/113">Do not automatically add result image in the input panel</change>
             </prerelease>
-            <prerelease version="0.7.1 beta 1">
+            <prerelease version="1.0.0 beta 1">
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/112">Improved Load OIFits action to allow loading multiple OIFits files
                     and merge all of them to produce the input structure for OImaging (see Target separation preference = 10 as by default)</change>
                 <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oimaging/issues/110">Fixed result table sorter to consider missing values after sorted values</change>

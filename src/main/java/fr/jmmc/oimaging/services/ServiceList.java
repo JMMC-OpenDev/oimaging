@@ -57,11 +57,20 @@ public final class ServiceList {
         availableServices.add(preferedService);
 
         if (ENABLE_LOCAL_MODE) {
-            final OImagingExecutionMode localExecutionMode = LocalExecutionMode.INSTANCE;
-            availableServices.add(new Service(SERVICE_BSMEM + " (local)", CMD_BSMEM, localExecutionMode, "", swParamBsmem));
-            availableServices.add(new Service(SERVICE_MIRA + " (local)", CMD_MIRA, localExecutionMode, "", swParamMira));
-            availableServices.add(new Service(SERVICE_SPARCO + " (local)", CMD_SPARCO, localExecutionMode, "", swParamSparco));
-            availableServices.add(new Service(SERVICE_WISARD + " (local)", CMD_WISARD, localExecutionMode, "", swParamWisard));
+            final LocalExecutionMode localExecutionMode = LocalExecutionMode.INSTANCE;
+
+            if (localExecutionMode.test(CMD_BSMEM)) {
+                availableServices.add(new Service(SERVICE_BSMEM + " (local)", CMD_BSMEM, localExecutionMode, "", swParamBsmem));
+            }
+            if (localExecutionMode.test(CMD_MIRA)) {
+                availableServices.add(new Service(SERVICE_MIRA + " (local)", CMD_MIRA, localExecutionMode, "", swParamMira));
+            }
+            if (localExecutionMode.test(CMD_SPARCO)) {
+                availableServices.add(new Service(SERVICE_SPARCO + " (local)", CMD_SPARCO, localExecutionMode, "", swParamSparco));
+            }
+            if (localExecutionMode.test(CMD_WISARD)) {
+                availableServices.add(new Service(SERVICE_WISARD + " (local)", CMD_WISARD, localExecutionMode, "", swParamWisard));
+            }
         }
     }
 
@@ -112,7 +121,6 @@ public final class ServiceList {
             final FitsTable outputFitsTable = oiFitsFile.getImageOiData().getExistingOutputParam();
 
             if (outputFitsTable != null) {
-                
                 // Attempt 1: looking for a SOFTWARE output param
                 // TODO: there will be a ResultSetTableModel.getKeywordValue method in a future merge, maybe use it here
                 if (outputFitsTable.hasKeywordMeta(IRModel.KEYWORD_SOFTWARE.getName())) {

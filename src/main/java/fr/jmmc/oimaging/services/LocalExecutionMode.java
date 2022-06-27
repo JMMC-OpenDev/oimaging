@@ -7,6 +7,8 @@ import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.runner.LocalLauncher;
 import fr.jmmc.jmcs.util.runner.RootContext;
+import fr.jmmc.jmcs.util.runner.RunState;
+import fr.jmmc.jmcs.util.runner.process.ProcessContext;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
@@ -63,15 +65,28 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
 
         logger.info("exec: software={} cliOptions={} inputFilenane={} outputFilenane={} logFilename={}", software, cliOptions, inputFilename, outputFilename, logFilename);
 
-        // create the execution context without log file:
-        final RootContext jobContext = LocalLauncher.prepareMainJob(APP_NAME, USER_NAME, FileUtils.getTempDirPath(), logFilename);
-
         final String[] cmd;
         if (cliOptions == null) {
             cmd = new String[]{software, inputFilename, outputFilename};
         } else {
             cmd = new String[]{software, cliOptions, inputFilename, outputFilename};
         }
+        final RunState state = exec(cmd, logFilename).getState();
+
+        // retrieve command execution status code
+        switch (state) {
+            case STATE_CANCELED:
+            case STATE_INTERRUPTED:
+            case STATE_KILLED:
+                result.setCancelled(true);
+                break;
+            default:
+        }
+    }
+
+    private static RootContext exec(final String[] cmd, final String logFilename) {
+        // create the execution context with log file:
+        final RootContext jobContext = LocalLauncher.prepareMainJob(APP_NAME, USER_NAME, FileUtils.getTempDirPath(), logFilename);
 
         LocalLauncher.prepareChildJob(jobContext, TASK_NAME, cmd);
 
@@ -103,16 +118,7 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
         } catch (ExecutionException ee) {
             logger.info("exec: execution error", ee);
         }
-
-        // retrieve command execution status code
-        switch (jobContext.getState()) {
-            case STATE_CANCELED:
-            case STATE_INTERRUPTED:
-            case STATE_KILLED:
-                result.setCancelled(true);
-                break;
-            default:
-        }
+        return jobContext;
     }
 
     @Override
@@ -122,4 +128,22 @@ public final class LocalExecutionMode implements OImagingExecutionMode {
         return result;
     }
 
+    public boolean test(final String software) {
+        logger.debug("test: software = '{}'", software);
+
+        final String[] cmd = new String[]{software};
+
+        final RootContext ctx = exec(cmd, null); // no written log
+        logger.debug("test: ctx: {}", ctx);
+
+        // ignore state (ERROR always as service help returns code=1)
+        final ProcessContext pCtx = (ProcessContext) ctx.getChildContexts().get(0);
+        final int exitCode = pCtx.getExitCode();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("test: exitCode: {}", exitCode);
+            logger.debug("test: log:\n-----\n{}\n-----", ctx.getRing().getContent());
+        }
+        return (exitCode == 1);
+    }
 }

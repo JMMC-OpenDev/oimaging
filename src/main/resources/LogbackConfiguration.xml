@@ -9,6 +9,11 @@
     <logger name="fr.jmmc.oitools.model.Analyzer" level="DEBUG"/>
     -->
 
+    <!-- local launcher -->
+    <!--
+    <logger name="fr.jmmc.jmcs.util.runner" level="DEBUG"/>
+    -->
+
     <!-- OIExplorer -->
 <!--
     <logger name="fr.jmmc.oiexplorer" level="INFO"/>
