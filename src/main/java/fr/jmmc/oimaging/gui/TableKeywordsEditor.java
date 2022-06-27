@@ -78,7 +78,6 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
 
     private final static Insets DEFAULT_INSETS = new Insets(2, 2, 2, 2);
     private final static Insets INSET_20_2_2_2 = new Insets(20, 2, 2, 2);
-    private final static Insets INSET_40_2_2_2 = new Insets(40, 2, 2, 2);
     private final static Insets INSET_2_2_20_2 = new Insets(2, 2, 20, 2);
 
     /**
@@ -147,15 +146,12 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
         setLayout(new GridBagLayout());
         if (currentService == null) {
             defaultDisplay(0, keywordNames);
-        }
-        else {
-            switch (currentService.getName()) {
-                case ServiceList.SERVICE_MIRA:
-                case ServiceList.SERVICE_MIRA + " (local)":
+        } else {
+            switch (currentService.getProgram()) {
+                case ServiceList.CMD_MIRA:
                     miraDisplay(0, keywordNames);
                     break;
-                case ServiceList.SERVICE_SPARCO:
-                case ServiceList.SERVICE_SPARCO + " (local)":
+                case ServiceList.CMD_SPARCO:
                     sparcoDisplay(0, keywordNames);
                     break;
                 default:
@@ -196,7 +192,6 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
         gridy = defaultDisplay(gridy, keywordNames);
 
         // display mira keywords
-
         ShowHideComponentsButton button = new ShowHideComponentsButton(
                 "Bandwith smearing", "Bandwith smearing",
                 miraSmearingModel, gridy, INSET_20_2_2_2);
@@ -291,6 +286,7 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
         private final String labelUnselected;
         private final JToggleButton button;
         private final List<JComponent> components;
+
         /**
          * add a show/hide button to show/hide other components
          *
@@ -300,10 +296,9 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
          * @param gridy the y coord of the button in the layout.
          * @param insets the insets of the button in the layout.
          */
-        public ShowHideComponentsButton(
+        ShowHideComponentsButton(
                 final String labelSelected, final String labelUnselected,
                 final ToggleButtonModel buttonModel, final int gridy, final Insets insets) {
-
 
             this.labelSelected = labelSelected;
             this.labelUnselected = labelUnselected;
@@ -346,6 +341,7 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
     /**
      * Add to the panel a field
      * @param name name of the field
+     * @param label label for the field
      * @param gridy the next gridbaglayout y coord available
      * @param insets swing insets
      * @return created components
@@ -458,7 +454,7 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
     }
 
     /**
-     * return a label associated to a keyword name.
+     * Return a label associated to a keyword name.
      * The labels are specific to this form: they are chosen to be short, and clear in this context.
      *
      * @param keywordName the keyword name for which we want a label.
@@ -476,17 +472,6 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
                 return "Reference wavelength";
             case SparcoInputParam.KEYWORD_SNMODS:
                 return "Number of models";
-            // === sparco list items ===
-            case SparcoInputParam.KEYWORD_SPEC_POW:
-                return "power";
-            case SparcoInputParam.KEYWORD_SPEC_BB:
-                return "black body";
-            case SparcoInputParam.KEYWORD_MODEL_STAR:
-                return "star";
-            case SparcoInputParam.KEYWORD_MODEL_UD:
-                return "uniform disc";
-            case SparcoInputParam.KEYWORD_MODEL_BG:
-                return "background";
             default:
                 break;
         }
@@ -521,21 +506,48 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
                 }
             }
         }
-        // else, return the keywordName as label
         return keywordName;
+    }
+
+    /**
+     * Return a label associated to a value name.
+     *
+     * @param valueName the value name for which we want a label.
+     * @return the label. return the valueName if no label found.
+     */
+    private static String getValueLabel(final String valueName) {
+        switch (valueName) {
+            // === sparco list items ===
+            case SparcoInputParam.KEYWORD_SPEC_POW:
+                return "power";
+            case SparcoInputParam.KEYWORD_SPEC_BB:
+                return "black body";
+            case SparcoInputParam.KEYWORD_MODEL_STAR:
+                return "star";
+            case SparcoInputParam.KEYWORD_MODEL_UD:
+                return "uniform disc";
+            case SparcoInputParam.KEYWORD_MODEL_BG:
+                return "background";
+            default:
+                break;
+        }
+        return valueName;
     }
 
     /**
      * Render labels instead of raw values.
      */
-    private static class LabelListCellRenderer extends DefaultListCellRenderer {
+    private static final class LabelListCellRenderer extends DefaultListCellRenderer {
+
+        private static final long serialVersionUID = 1L;
+
         @Override
         public Component getListCellRendererComponent(
                 JList jList, Object value, int index, boolean selected, boolean focused
         ) {
             super.getListCellRendererComponent(jList, value, index, selected, focused);
             if (value instanceof String) {
-                this.setText(getLabel((String) value));
+                this.setText(getValueLabel((String) value));
             }
             return this;
         }
