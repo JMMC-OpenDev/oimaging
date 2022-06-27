@@ -236,7 +236,7 @@ public final class OImagingDocJUnitTest extends JmcsFestSwingJUnitTestCase {
     private void loadInput(final String fileName) {
         // hack to solve focus trouble in menu items :
         window.menuItemWithPath("File").focus();
-        window.menuItemWithPath("File", "Load OIFits file").click();
+        window.menuItemWithPath("File", "Load OIFits file(s)").click();
 
         confirmDialogDontSave();
 
