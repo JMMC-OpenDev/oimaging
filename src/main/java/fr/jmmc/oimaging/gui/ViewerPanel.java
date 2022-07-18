@@ -321,6 +321,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
                 displayImage(imageHdus, imageHDU);
                 displayOiFitsAndParams(oifitsFile, target);
+            } else {
+                // displays empty content for oifits data, images and parameters. keeps execution log content.
+                displaySelection(null);
+                displayImage(null, null);
+                displayOiFitsAndParams(null, null);
             }
             /*else {
                 lastResultPanel = jPanelLogViewer;
