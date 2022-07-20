@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.0 beta 3"/>
+    <program name="OImaging" version="1.0.0"/>
     <compilation date="20/07/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -170,7 +170,7 @@
 
     <releasenotes>
         <release version="1.0.0">
-            <pubDate>Wed, 20 Jul 2022 11:00:00 GMT</pubDate>
+            <pubDate>Wed, 20 Jul 2022 18:00:00 GMT</pubDate>
             <prerelease version="1.0.0 beta 3">
                 <change type="BUGFIX" url="https://github.com/kluskaj/mira-sparco-multi/pull/2">Updated SPARCO plugin: fixed option parsing + read keywords (optional values, decoding ...)</change>
             </prerelease>
