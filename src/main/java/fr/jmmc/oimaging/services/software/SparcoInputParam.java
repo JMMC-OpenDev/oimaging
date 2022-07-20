@@ -70,9 +70,9 @@ public final class SparcoInputParam extends MiraInputParam {
     // TODO: support for 'spectrum' for a spectrum specified in an ascii file (TO BE IMPLEMENTED)
     public static final String[] KEYWORD_SPEC_LIST = new String[]{KEYWORD_SPEC_POW, KEYWORD_SPEC_BB};
 
-    public static final String KEYWORD_MODEL_STAR = "star";
+    public static final String KEYWORD_MODEL_STAR = "STAR";
     public static final String KEYWORD_MODEL_UD = "UD";
-    public static final String KEYWORD_MODEL_BG = "bg";
+    public static final String KEYWORD_MODEL_BG = "BG";
     // TODO: support for 'image' computed from specified fits-file (TO BE IMPLEMENTED)
     public static final String[] KEYWORD_MODEL_LIST = new String[]{KEYWORD_MODEL_STAR, KEYWORD_MODEL_UD, KEYWORD_MODEL_BG};
 
