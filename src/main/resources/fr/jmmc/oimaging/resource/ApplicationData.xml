@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.0"/>
-    <compilation date="20/07/2022" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="1.0.1 beta 1"/>
+    <compilation date="21/07/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -169,6 +169,12 @@
     </menubar>
 
     <releasenotes>
+        <release version="1.0.1">
+            <pubDate>Thu, 21 Jul 2022 15:00:00 GMT</pubDate>
+            <prerelease version="1.0.1 beta 1">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1208">Fixed Windows support: written temporary files do not use characters considered invalid by Windows file system</change>
+            </prerelease>
+        </release>
         <release version="1.0.0">
             <pubDate>Wed, 20 Jul 2022 18:00:00 GMT</pubDate>
             <prerelease version="1.0.0 beta 3">
