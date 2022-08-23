@@ -4,6 +4,7 @@
 package fr.jmmc.oimaging.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.gui.util.FormatterFactoryUtils;
 import static fr.jmmc.jmcs.gui.util.ResourceImage.DOWN_ARROW;
 import static fr.jmmc.jmcs.gui.util.ResourceImage.UP_ARROW;
 import fr.jmmc.jmcs.util.SpecialChars;
@@ -375,11 +376,11 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
                     }
                     break;
                 case TYPE_DBL:
-                    component = createFormattedTextField(SoftwareSettingsPanel.getDecimalFormatterFactory(),
+                    component = new JFormattedTextField(FormatterFactoryUtils.getDecimalFormatterFactory(),
                             convertValueToField(name, meta.getUnits(), value));
                     break;
                 case TYPE_INT:
-                    component = createFormattedTextField(SoftwareSettingsPanel.getIntegerFormatterFactory(), value);
+                    component = new JFormattedTextField(FormatterFactoryUtils.getIntegerFormatterFactory(), value);
                     break;
                 case TYPE_LOGICAL:
                     final JCheckBox checkbox = new JCheckBox();
@@ -551,12 +552,6 @@ public final class TableKeywordsEditor extends javax.swing.JPanel
             }
             return this;
         }
-    }
-
-    private static JFormattedTextField createFormattedTextField(final JFormattedTextField.AbstractFormatterFactory formatterFactory, final Object value) {
-        final JFormattedTextField jFormattedTextField = new JFormattedTextField(value);
-        jFormattedTextField.setFormatterFactory(formatterFactory);
-        return jFormattedTextField;
     }
 
     /** 

@@ -6,6 +6,7 @@ package fr.jmmc.oimaging.gui;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.oimaging.gui.action.CreateImageAction;
 import fr.jmmc.jmcs.gui.component.ResizableTextViewFactory;
+import fr.jmmc.jmcs.gui.util.FormatterFactoryUtils;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.model.IRModel;
 import static fr.jmmc.oimaging.model.IRModel.NULL_IMAGE_HDU;
@@ -18,17 +19,12 @@ import fr.jmmc.oitools.image.ImageOiConstants;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_INIT_IMG;
 import static fr.jmmc.oitools.image.ImageOiConstants.KEYWORD_RGL_PRIO;
 import fr.jmmc.oitools.image.ImageOiInputParam;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.ButtonModel;
-import javax.swing.JFormattedTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,7 +241,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jLabelRglWgt, gridBagConstraints);
 
         jFormattedTextFieldRglWgt.setColumns(6);
-        jFormattedTextFieldRglWgt.setFormatterFactory(getDecimalFormatterFactory());
+        jFormattedTextFieldRglWgt.setFormatterFactory(FormatterFactoryUtils.getDecimalFormatterFactory());
         jFormattedTextFieldRglWgt.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_RGL_WGT));
         jFormattedTextFieldRglWgt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -277,7 +273,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jLabelFlux, gridBagConstraints);
 
         jFormattedTextFieldFlux.setColumns(6);
-        jFormattedTextFieldFlux.setFormatterFactory(getDecimalFormatterFactory());
+        jFormattedTextFieldFlux.setFormatterFactory(FormatterFactoryUtils.getDecimalFormatterFactory());
         jFormattedTextFieldFlux.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUX));
         jFormattedTextFieldFlux.setEnabled(false);
         jFormattedTextFieldFlux.addActionListener(new java.awt.event.ActionListener() {
@@ -309,7 +305,7 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         jPanelForm.add(jLabelFluxErr, gridBagConstraints);
 
         jFormattedTextFieldFluxErr.setColumns(6);
-        jFormattedTextFieldFluxErr.setFormatterFactory(getDecimalFormatterFactory());
+        jFormattedTextFieldFluxErr.setFormatterFactory(FormatterFactoryUtils.getDecimalFormatterFactory());
         jFormattedTextFieldFluxErr.setToolTipText(getTooltip(ImageOiConstants.KEYWORD_FLUXERR));
         jFormattedTextFieldFluxErr.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -649,38 +645,6 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
     private fr.jmmc.oimaging.gui.TableKeywordsEditor jTableKeywordsEditor;
     private javax.swing.JTextArea jTextAreaOptions;
     // End of variables declaration//GEN-END:variables
-
-    public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
-        return new DefaultFormatterFactory(new NumberFormatter(new DecimalFormat("0.0####E00")) {
-            private static final long serialVersionUID = 1L;
-
-            private final NumberFormat fmtDef = new DecimalFormat("0.0####");
-
-            @Override
-            public String valueToString(final Object value) throws ParseException {
-                if (value == null) {
-                    return "";
-                }
-                if (value instanceof Double) {
-                    // check value range:
-                    final double abs = Math.abs((Double) value);
-
-                    if ((abs > 1e-3d) && (abs < 1e3d)) {
-                        return fmtDef.format(value);
-                    }
-                }
-                final String formatted = super.valueToString(value);
-                if (formatted.endsWith("E00")) {
-                    return formatted.substring(0, formatted.length() - 3);
-                }
-                return formatted;
-            }
-        });
-    }
-
-    public static JFormattedTextField.AbstractFormatterFactory getIntegerFormatterFactory() {
-        return new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getIntegerInstance()));
-    }
 
     void syncUI(final MainPanel panel, final IRModel irModel, final List<String> failures) {
         mainPanel = panel;
