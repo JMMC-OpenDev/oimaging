@@ -290,7 +290,10 @@
         </Component>
         <Component class="javax.swing.JButton" name="jButtonLoadFitsImage">
           <Properties>
-            <Property name="text" type="java.lang.String" value="+"/>
+            <Property name="text" type="java.lang.String" value="Load"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="[0, 0, 0, 0]"/>
+            </Property>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -300,8 +303,13 @@
         </Component>
         <Component class="javax.swing.JButton" name="jButtonRemoveFitsImage">
           <Properties>
-            <Property name="text" type="java.lang.String" value="-"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="ResourceImage.LIST_DEL.icon()" type="code"/>
+            </Property>
             <Property name="enabled" type="boolean" value="false"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="[0, 0, 0, 0]"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRemoveFitsImageActionPerformed"/>
@@ -437,9 +445,11 @@
             <Component class="javax.swing.JButton" name="jButtonDocSoftware">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="fr.jmmc.jmcs.gui.util.ResourceImage.HELP_ICON.icon()" type="code"/>
+                  <Connection code="ResourceImage.HELP_ICON.icon()" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="?"/>
+                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                  <Insets value="[0, 0, 0, 0]"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonDocSoftwareActionPerformed"/>

@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.oimaging.gui.action.CreateImageAction;
 import fr.jmmc.jmcs.gui.component.ResizableTextViewFactory;
 import fr.jmmc.jmcs.gui.util.FormatterFactoryUtils;
+import fr.jmmc.jmcs.gui.util.ResourceImage;
 import fr.jmmc.oimaging.gui.action.LoadFitsImageAction;
 import fr.jmmc.oimaging.model.IRModel;
 import static fr.jmmc.oimaging.model.IRModel.NULL_IMAGE_HDU;
@@ -351,7 +352,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jComboBoxRglPrio, gridBagConstraints);
 
-        jButtonLoadFitsImage.setText("+");
+        jButtonLoadFitsImage.setText("Load");
+        jButtonLoadFitsImage.setMargin(new java.awt.Insets(0, 0, 0, 0));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -359,8 +361,9 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanelForm.add(jButtonLoadFitsImage, gridBagConstraints);
 
-        jButtonRemoveFitsImage.setText("-");
+        jButtonRemoveFitsImage.setIcon(ResourceImage.LIST_DEL.icon());
         jButtonRemoveFitsImage.setEnabled(false);
+        jButtonRemoveFitsImage.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jButtonRemoveFitsImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRemoveFitsImageActionPerformed(evt);
@@ -471,8 +474,8 @@ public class SoftwareSettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel1.add(jComboBoxSoftware, gridBagConstraints);
 
-        jButtonDocSoftware.setIcon(fr.jmmc.jmcs.gui.util.ResourceImage.HELP_ICON.icon());
-        jButtonDocSoftware.setText("?");
+        jButtonDocSoftware.setIcon(ResourceImage.HELP_ICON.icon());
+        jButtonDocSoftware.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jButtonDocSoftware.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonDocSoftwareActionPerformed(evt);
