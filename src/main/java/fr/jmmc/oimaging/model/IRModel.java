@@ -151,7 +151,7 @@ public final class IRModel {
         // validate OIFITS:
         final OIFitsChecker checker = new OIFitsChecker();
         oiFitsFile.check(checker);
-        // validation results
+        // log validation results
         logger.info("validation results:\n{}", checker.getCheckReport());
 
         // store original filename

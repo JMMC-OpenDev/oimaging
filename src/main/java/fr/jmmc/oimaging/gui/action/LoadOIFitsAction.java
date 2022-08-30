@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
+import fr.jmmc.oiexplorer.core.gui.OIFitsCheckerPanel;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -70,18 +71,12 @@ public final class LoadOIFitsAction extends RegisteredAction {
 
         // If a file was defined (No cancel in the dialog)
         if (files != null) {
-            final OIFitsChecker checker = new OIFitsChecker();
-
+            final OIFitsChecker checker = OIFitsChecker.newInstance();
             try {
                 IRModelManager.getInstance().loadOIFitsFiles(files, checker);
 
-                if (false) {
-                    // display validation messages anyway:
-                    final String checkReport = checker.getCheckReport();
-                    logger.info("validation results:\n{}", checkReport);
+                OIFitsCheckerPanel.displayReport(checker);
 
-                    MessagePane.showMessage(checkReport);
-                }
             } catch (IOException ioe) {
                 StatusBar.show("Could not load OIFits files.");
                 MessagePane.showErrorMessage("Could not load OIFits file", ioe);
