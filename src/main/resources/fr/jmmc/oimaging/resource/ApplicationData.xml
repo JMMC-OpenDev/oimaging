@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.1"/>
-    <compilation date="21/07/2022" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="1.0.2 beta 1"/>
+    <compilation date="09/09/2022" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -169,6 +169,12 @@
     </menubar>
 
     <releasenotes>
+        <release version="1.0.2">
+            <pubDate>Fri, 09 Sep 2022 15:00:00 GMT</pubDate>
+            <prerelease version="1.0.2 beta 1">
+                <change type="BUGFIX">Updated embedded OIFitsExplorer and OITools library</change>
+            </prerelease>
+        </release>
         <release version="1.0.1">
             <pubDate>Thu, 21 Jul 2022 15:00:00 GMT</pubDate>
             <prerelease version="1.0.1 beta 1">
