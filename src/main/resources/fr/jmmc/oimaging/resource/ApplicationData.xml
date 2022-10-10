@@ -61,7 +61,17 @@
 
         <!-- 1. Science / VO libraries (always on top for better visibility) -->
 
-        <!-- OifitsExplorer dependencies -->
+        <!-- OIFitsExplorer dependencies -->
+
+        <package name="ColorCET - Perceptually Uniform Colour Maps"
+                 description="Peter Kovesi. Good Colour Maps: How to Design Them. arXiv:1509.03700 [cs.GR] 2015 (https://arxiv.org/abs/1509.03700)"
+                 link="https://colorcet.com/index.html"
+                 license="Creative Commons BY License (https://creativecommons.org/licenses/by/4.0/legalcode)" />
+
+        <package name="SCM 7 - Scientific colour maps 7.0.1"
+                 description="Crameri, Fabio. (2021). Scientific colour maps (7.0.1). Zenodo. https://doi.org/10.5281/zenodo.5501399"
+                 link="https://www.fabiocrameri.ch/colourmaps/"
+                 license="MIT License (https://opensource.org/licenses/MITCopyright)" />
 
         <!-- OITools dependencies -->
 

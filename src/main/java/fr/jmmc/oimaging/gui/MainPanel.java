@@ -49,6 +49,7 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
@@ -120,6 +121,9 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
 
         // Build GUI
         initComponents();
+
+        // Use default fonts (hi-dpi) if no font defined in html:
+        jEditorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
         // Create the timeline refresh timer:
         this.timerMouseCursorRefresh = new Timer(REFRESH_PERIOD, new ActionListener() {
