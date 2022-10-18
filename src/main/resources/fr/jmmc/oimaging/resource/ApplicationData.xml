@@ -40,21 +40,21 @@
         <!-- Java Mariotti OIfitsExplorer-core -->
         <package name="OIFits Explorer core"
                  description="OIFits Explorer core is the JMMC library dedicated to share OIFits GUI components (plots)"
-                 link="http://www.jmmc.fr/dev/oiexplorer-core/"
+                 link="https://github.com/JMMC-OpenDev/oiexplorer-core/"
                  jars="oiexplorer-core.jar"
                  license="CECILL-B ???"/>
 
         <!-- Java Mariotti Astronomical library -->
         <package name="jMAL"
                  description="JMMC library to provide common astronomical computations (coordinate conversion, SIMBAD star resolver and analytical object models in interferometry)"
-                 link="http://www.jmmc.fr/dev/jmal/"
+                 link="https://github.com/JMMC-OpenDev/jmal/"
                  jars="jmal.jar"
                  license="CECILL-B ???"/>
 
         <!-- Java Mariotti OITools -->
         <package name="OITools"
                  description="OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)"
-                 link="http://www.jmmc.fr/dev/oitools/"
+                 link="https://github.com/JMMC-OpenDev/oitools/"
                  jars="oitools.jar"
                  license="CECILL-B ???"/>
 
