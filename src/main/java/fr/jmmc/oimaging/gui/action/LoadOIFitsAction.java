@@ -12,6 +12,7 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.oiexplorer.core.gui.OIFitsCheckerPanel;
+import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -75,7 +76,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
             try {
                 IRModelManager.getInstance().loadOIFitsFiles(files, checker);
 
-                OIFitsCheckerPanel.displayReport(checker);
+                OIFitsCheckerPanel.displayReport(checker, Preferences.getInstance());
 
             } catch (IOException ioe) {
                 StatusBar.show("Could not load OIFits files.");

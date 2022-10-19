@@ -47,7 +47,6 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
      * Update the combo boxes with their models
      */
     private void postInit() {
-
         // Set the Preferences:
         this.chartPreferencesView.setPreferences(myPreferences);
 
@@ -212,8 +211,12 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         jPanelTableOfResults.add(jLabelResultsTableEditor, gridBagConstraints);
 
-        jButtonResultsTableEditor.setAction(ActionRegistrar.getInstance().get(TableEditorAction.CLASS_NAME, TableEditorAction.ACTION_NAME));
         jButtonResultsTableEditor.setText("Table editor");
+        jButtonResultsTableEditor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResultsTableEditorActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -280,6 +283,10 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
             logger.error("property failure : ", pe);
         }
     }//GEN-LAST:event_jComboBoxInterpolationActionPerformed
+
+    private void jButtonResultsTableEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResultsTableEditorActionPerformed
+        ActionRegistrar.getInstance().get(TableEditorAction.CLASS_NAME, TableEditorAction.ACTION_NAME).actionPerformed(evt);
+    }//GEN-LAST:event_jButtonResultsTableEditorActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private fr.jmmc.oiexplorer.core.gui.ChartPreferencesView chartPreferencesView;

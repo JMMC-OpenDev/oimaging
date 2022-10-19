@@ -91,10 +91,10 @@
 
         <!-- VO interoperability -->
         <package name="JSAMP"
-                 description="JSAMP is a Java toolkit for use with the Simple Applications Messaging Protocol. Made by Mark Taylor, working in the Astrophysics Group at Bristol University."
-                 link="http://software.astrogrid.org/doc/jsamp/"
-                 jars="jsamp-1.3.jar"
-                 license="(at least) the Academic Free Licence and the BSD License."/>
+                 description="JSAMP is a Java toolkit for use with the Simple Applications Messaging Protocol. Made by Mark Taylor, Bristol University."
+                 link="http://www.star.bristol.ac.uk/~mbt/jsamp/"
+                 jars="jsamp-1.3-5.jar"
+                 license="AFL v2.1"/>
 
         <!-- jMAL dependencies -->
 
