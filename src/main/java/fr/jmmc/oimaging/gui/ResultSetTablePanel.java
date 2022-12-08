@@ -247,7 +247,7 @@ public final class ResultSetTablePanel extends javax.swing.JPanel implements Obs
             logger.debug("Missing SUCCESS column, cannot set Renderer.", iae);
         }
 
-        AutofitTableColumns.autoResizeTable(jResultSetTable, true, true); // include header width
+        AutofitTableColumns.autoResizeTable(jResultSetTable);
     }
 
     public void setResults(List<ServiceResult> results) {

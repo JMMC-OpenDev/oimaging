@@ -222,8 +222,8 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
             ((KeywordsTableModel) jTableOutputParamKeywords.getModel()).setFitsHdu(imageOiData.getExistingOutputParam());
             ((KeywordsTableModel) jTableInputParamKeywords.getModel()).setFitsHdu(imageOiData.getInputParam());
 
-            AutofitTableColumns.autoResizeTable(jTableOutputParamKeywords, true, true); // include header width
-            AutofitTableColumns.autoResizeTable(jTableInputParamKeywords, true, true); // include header width
+            AutofitTableColumns.autoResizeTable(jTableOutputParamKeywords);
+            AutofitTableColumns.autoResizeTable(jTableInputParamKeywords);
         } else {
             // call to plot with null so it forgets the oifitsfile 
             oifitsViewPanel.plot(null, null);
