@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.3 beta 1"/>
-    <compilation date="04/05/2023" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="1.0.3 beta 2"/>
+    <compilation date="31/05/2023" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -180,10 +180,15 @@
 
     <releasenotes>
         <release version="1.0.3">
-            <pubDate>Thu, 04 May 2023 16:00:00 GMT</pubDate>
+            <pubDate>Wed, 31 May 2023 12:00:00 GMT</pubDate>
+            <prerelease version="1.0.3 beta 2">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1313">Fixed OIFits table browser when OIData table arrays have wrong dimensions (&lt; 1)</change>
+                <change type="FEATURE">Improved scaling of exported plots as image/pdf with hi-dpi settings</change>
+                <change type="FEATURE">OIFitsExplorer: Updated U-V coverage plot presets</change>
+            </prerelease>
             <prerelease version="1.0.3 beta 1">
                 <change type="FEATURE">OIFitsExplorer: improved 'UV coverage' plot to be displayed as a squared plot</change>
-                <change type="BUGFIX">Enhanced plot settings for high-dpi screens</change>
+                <change type="FEATURE">Enhanced plot settings for high-dpi screens</change>
                 <change type="BUGFIX">Updated embedded OIFitsExplorer and OITools libraries</change>
             </prerelease>
         </release>
