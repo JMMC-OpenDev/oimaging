@@ -1056,8 +1056,10 @@ public class MainPanel extends javax.swing.JPanel implements IRModelEventListene
             jSliderWaveMin.setEnabled(hasOIData);
             jSliderWaveMax.setEnabled(hasOIData);
 
-            final Range effWaveRange = oifitsFile.getWavelengthRange();
-
+            Range effWaveRange = oifitsFile.getWavelengthRange();
+            if (!effWaveRange.isFinite()) {
+                effWaveRange = Range.EMPTY_RANGE;
+            }
             fieldSliderAdapterWaveMin.reset(effWaveRange.getMin() / MICRO_METER, effWaveRange.getMax() / MICRO_METER,
                     inputParam.getWaveMin() / MICRO_METER);
             fieldSliderAdapterWaveMax.reset(effWaveRange.getMin() / MICRO_METER, effWaveRange.getMax() / MICRO_METER,

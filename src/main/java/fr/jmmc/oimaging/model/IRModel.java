@@ -197,7 +197,7 @@ public final class IRModel {
      * @param oifitsFile oifits file to load
      */
     void loadOifitsFile(final OIFitsFile oifitsFile) {
-        logger.info("loadOifitsFile: oifitsFile: {}", oifitsFile);
+        logger.debug("loadOifitsFile: oifitsFile: {}", oifitsFile);
 
         // reset oidata and put some user data into the new containers
         loadOIFits(oifitsFile);
@@ -208,52 +208,67 @@ public final class IRModel {
      * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
      */
     private void loadOIFits(final OIFitsFile oifitsFile) {
+        loadOIFits(oifitsFile, false);
+    }
+
+    /**
+     * Load the OiData tables of the model (oifits file, targets).
+     * @param oifitsFile OIFitsFile to use. Caution: this OIFitsFile can be altered, better give a copy.
+     * @param isResult true if the given oifits file is a result file
+     */
+    private void loadOIFits(final OIFitsFile oifitsFile, final boolean isResult) {
         // change current model immediately:
         this.oifitsFile = oifitsFile;
-
-        // load targets
-        this.targetListModel.clear();
-
-        if (oifitsFile.hasOiTarget()) {
-            for (String target : oifitsFile.getOiTarget().getTarget()) {
-                targetListModel.add(target);
-            }
-        }
 
         // get ImageOiData or create a new one
         final ImageOiInputParam inputParam = oifitsFile.getImageOiData().getInputParam();
 
-// TODO: fix loading a result file (restore ImageOiData)
-        // Select first target by default
-        // assume we have one
-        if (targetListModel.isEmpty()) {
-            inputParam.setTarget("MISSING TARGET");
-        } else {
-            inputParam.setTarget(targetListModel.get(0));
-        }
+        if (!isResult) {
+            // load targets
+            this.targetListModel.clear();
 
-        // Reset WLen bounds
-        final Range effWaveRange = oifitsFile.getWavelengthRange();
-        inputParam.setWaveMin(effWaveRange.getMin());
-        inputParam.setWaveMax(effWaveRange.getMax());
-
-        // Reset observable use according available tables
-        if (oifitsFile.hasOiVis()) {
-            if (inputParam.getUseVis() == null) {
-                inputParam.setUseVis(ImageOiInputParam.USE_ALL);
+            if (oifitsFile.hasOiTarget()) {
+                for (String target : oifitsFile.getOiTarget().getTarget()) {
+                    targetListModel.add(target);
+                }
             }
-        } else {
-            inputParam.setUseVis(ImageOiInputParam.USE_NONE);
-        }
-        inputParam.setUseVis2(oifitsFile.hasOiVis2());
-        if (oifitsFile.hasOiT3()) {
-            if (inputParam.getUseT3() == null) {
-                inputParam.setUseT3(ImageOiInputParam.USE_ALL);
-            }
-        } else {
-            inputParam.setUseT3(ImageOiInputParam.USE_NONE);
-        }
 
+            // Select first target by default
+            // assume we have one
+            if (targetListModel.isEmpty()) {
+                inputParam.setTarget("MISSING TARGET");
+            } else {
+                if (inputParam.getTarget() == null || !targetListModel.contains(inputParam.getTarget())) {
+                    inputParam.setTarget(targetListModel.get(0));
+                }
+            }
+            // Reset WLen bounds
+            final Range effWaveRange = oifitsFile.getWavelengthRange();
+            if (effWaveRange.isFinite()) {
+                inputParam.setWaveMin(effWaveRange.getMin());
+                inputParam.setWaveMax(effWaveRange.getMax());
+            } else {
+                inputParam.setWaveMin(ImageOiInputParam.DEF_KEYWORD_WAVE_MIN);
+                inputParam.setWaveMax(ImageOiInputParam.DEF_KEYWORD_WAVE_MAX);
+            }
+
+            // Reset observable use according available tables
+            if (oifitsFile.hasOiVis()) {
+                if (inputParam.getUseVis() == null) {
+                    inputParam.setUseVis(ImageOiInputParam.USE_ALL);
+                }
+            } else {
+                inputParam.setUseVis(ImageOiInputParam.USE_NONE);
+            }
+            inputParam.setUseVis2(oifitsFile.hasOiVis2());
+            if (oifitsFile.hasOiT3()) {
+                if (inputParam.getUseT3() == null) {
+                    inputParam.setUseT3(ImageOiInputParam.USE_ALL);
+                }
+            } else {
+                inputParam.setUseT3(ImageOiInputParam.USE_NONE);
+            }
+        }
         // get roles in the given list order:
         final List<Role> hdusRoles = getHdusRoles(oifitsFile);
 
@@ -485,7 +500,7 @@ public final class IRModel {
                 }
             }
 
-            this.loadOIFits(oifitsfile);
+            this.loadOIFits(oifitsfile, true);
 
             // if last img must becomes init image, set the equivalent of last img in library as init image.
             // if lastImgHdu == null, it will correctly set init img to null.
@@ -699,7 +714,7 @@ public final class IRModel {
         // return an equivalent if there exists one
         final FitsImageHDU equivalentHDU = findInImageLibrary(hdu);
         if (equivalentHDU != null) {
-            logger.info("HDU {} no added to image library because the equivalent HDU {} is already in the library.",
+            logger.info("HDU {} not added to image library because the equivalent HDU {} is already in the library.",
                     hdu.getHduName(), equivalentHDU.getHduName());
             return equivalentHDU;
         }
