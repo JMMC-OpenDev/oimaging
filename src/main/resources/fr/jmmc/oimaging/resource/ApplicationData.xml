@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.4 beta 1"/>
+    <program name="OImaging" version="1.0.4"/>
     <compilation date="14/06/2023" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -180,7 +180,7 @@
 
     <releasenotes>
         <release version="1.0.4">
-            <pubDate>Wed, 14 June 2023 14:00:00 GMT</pubDate>
+            <pubDate>Wed, 14 June 2023 16:00:00 GMT</pubDate>
             <prerelease version="1.0.4 beta 1">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1316">Fixed WAVE_MIN and WAVE_MAX fields to preserve their values when clicking on 'Continue' or 'Update parameters'</change>
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1321">Fixed OIFits plot to deal with invalid wavelength range</change>
