@@ -367,12 +367,8 @@ public final class IRModel {
 
         hdus.forEach(hdu -> {
             // prepare images (negative values, padding, orientation):
-            try {
-                FitsImageUtils.prepareImages(hdu);
-                prepHdus.add(hdu);
-            } catch (IllegalArgumentException iae) {
-                MessagePane.showErrorMessage("Unable to prepare images from HDU: " + hdu.getHduName(), iae);
-            }
+            FitsImageUtils.prepareImages(hdu);
+            prepHdus.add(hdu);
         });
 
         final int nPrepHdus = prepHdus.size();
@@ -411,12 +407,7 @@ public final class IRModel {
      */
     public void addFitsImageHDUAndSelect(final FitsImageHDU hduToReplace, FitsImageHDU hdu) {
         // prepare images (negative values, padding, orientation):
-        try {
-            FitsImageUtils.prepareImages(hdu);
-        } catch (IllegalArgumentException iae) {
-            MessagePane.showErrorMessage("Unable to prepare images from HDU: " + hdu.getHduName(), iae);
-            hdu = null;
-        }
+        FitsImageUtils.prepareImages(hdu);
 
         if (hdu != null) {
             final FitsImageHDU libraryHdu = addToImageLibrary(hdu, null);
@@ -873,12 +864,7 @@ public final class IRModel {
                         fihdu.setHduName(filename.substring(0, Math.min(50, filename.length())));
                     }
                 }
-                try {
-                    FitsImageUtils.prepareImages(fihdu);
-                } catch (IllegalArgumentException iae) {
-                    MessagePane.showErrorMessage(
-                            "Unable to prepare images from HDU \"{}\", error: {}", fihdu.getHduName(), iae);
-                }
+                FitsImageUtils.prepareImages(fihdu);
             }
 
             // better labels for images in the viewer panel
