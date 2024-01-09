@@ -32,7 +32,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     // Use -DRemoteExecutionMode.local=true (dev) to use local uws server (docker)
     private static boolean USE_LOCAL = Boolean.getBoolean("RemoteExecutionMode.local");
-
+    
     // Use -DRemoteExecution.beta=true (dev) to use remote beta uws server (docker)
     private static boolean USE_BETA = Boolean.getBoolean("RemoteExecution.beta")
             || ApplicationDescription.isBetaVersion();
@@ -51,7 +51,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     private static String SERVER_URL = getServerUrl(USE_LOCAL, USE_BETA);
 
     private static String getServerUrl(final boolean local, final boolean beta) {
-        return ((local) ? "http://127.0.0.1:8080/OImaging-uws/"
+        return ((local) ? "http://127.0.0.1:8080/jmmc-uws/"
                 : ((beta) ? "http://oimaging-beta.jmmc.fr/OImaging-uws/"
                         : "http://oimaging.jmmc.fr/OImaging-uws/"));
     }
@@ -336,5 +336,19 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             parent = parent.getCause();
         }
         return parent;
+    }
+    
+    public static void main(String[] args) {            
+        String filename="/home/mellag/test.txt";
+        ServiceResult result =  new ServiceResult(new File(filename));
+        
+        try {
+            INSTANCE.callUwsOimagingService("ls", "/etc", filename, result);            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        System.out.println("res = " + result.getOifitsResultFile());
+        System.out.println("log = " + result.getExecutionLog());
+        
     }
 }
