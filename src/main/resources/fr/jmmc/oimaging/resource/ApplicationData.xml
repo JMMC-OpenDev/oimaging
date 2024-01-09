@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.5 beta 1"/>
+    <program name="OImaging" version="1.0.5"/>
     <compilation date="09/01/2024" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
@@ -180,6 +180,7 @@
 
     <releasenotes>
         <release version="1.0.5">
+            <pubDate>Tue, 09 Jan 2024 10:11:12 GMT</pubDate>            
             <prerelease version="1.0.5 beta 1">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1336">Avoid setting compression for PNG encoder (not supported on java 8)</change>
             </prerelease>            
