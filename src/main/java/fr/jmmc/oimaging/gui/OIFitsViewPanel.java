@@ -179,19 +179,24 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
      * @param oiFitsFileParam OIFits data
      * @param targetName the target to display in the data
      */
+    @SuppressWarnings("AssignmentToMethodParameter")
     public void plot(OIFitsFile oiFitsFileParam, String targetName) {
-        logger.debug("plot : {} for target {}", oiFitsFileParam, targetName);
+        logger.debug("plot: {} for target {}", oiFitsFileParam, targetName);
 
         // Remove previous OIFits in collection:
         ocm.removeOIFitsFile(this.oiFitsFile);
         this.oiFitsFile = null;
 
-        if (oiFitsFileParam == null || !oiFitsFileParam.hasOiData() || targetName == null || oiFitsFileParam.getAbsoluteFilePath() == null) {
-            if (targetName == null) {
+        if ((oiFitsFileParam != null) && (!oiFitsFileParam.hasOiData() || oiFitsFileParam.getAbsoluteFilePath() == null)) {
+            oiFitsFileParam = null;
+        }
+
+        if (oiFitsFileParam == null || targetName == null) {
+            if (oiFitsFileParam == null) {
+                this.jLabelMessage.setText("No OIFits data available.");
+            } else {
                 this.jLabelMessage.setText("Missing target name in response.");
                 // We could implement some fall back looking at OI_TARGET, using selected input one...
-            } else {
-                this.jLabelMessage.setText("No OIFits data available.");
             }
             display(false, true);
         } else {
@@ -229,16 +234,16 @@ public final class OIFitsViewPanel extends javax.swing.JPanel implements Disposa
             ocm.addOIFitsFile(this.oiFitsFile);
 
             final OIDataFile fileInCollection = ocm.getOIDataFile(this.oiFitsFile);
-            
+
             if (fileInCollection != null) {
                 // get current subset definition (copy):
-                final String subdefid = ocm.getPlot(this.plotView.getPlotId()).getSubsetDefinition().getId();
-                final SubsetDefinition subsetCopy = ocm.getSubsetDefinition(subdefid);
+                final String subsetId = ocm.getPlotRef(this.plotView.getPlotId()).getSubsetDefinition().getId();
+                final SubsetDefinition subsetCopy = ocm.getSubsetDefinition(subsetId);
 
                 // a filter that matches all tables of the given oifitsFile:
                 final SubsetFilter filter = subsetCopy.getFilter();
                 filter.setTargetUID(targetName); // may not match !
-                
+
                 filter.getTables().clear();
                 filter.getTables().add(new TableUID(fileInCollection));
 
