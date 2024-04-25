@@ -10,10 +10,20 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
 import fr.jmmc.oiexplorer.core.gui.SliderPanel;
+import fr.jmmc.oiexplorer.core.gui.chart.BeamOverlay;
 import fr.jmmc.oiexplorer.core.gui.model.KeywordsTableModel;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
+import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.SUBSET_CHANGED;
+import static fr.jmmc.oiexplorer.core.model.event.GenericEventListener.DISCARDED_SUBJECT_ID;
+import fr.jmmc.oiexplorer.core.model.oi.Plot;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oimaging.OImaging;
 import fr.jmmc.oimaging.Preferences;
 import fr.jmmc.oimaging.gui.action.SetAsInitImgAction;
@@ -36,6 +46,9 @@ import fr.jmmc.oitools.model.OIData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OIFitsWriter;
 import fr.jmmc.oitools.model.OITable;
+import fr.jmmc.oitools.processing.BeamEstimator;
+import fr.jmmc.oitools.processing.BeamInfo;
+import fr.jmmc.oitools.processing.SelectorResult;
 import fr.nom.tam.fits.BasicHDU;
 import fr.nom.tam.fits.FitsException;
 import java.awt.BorderLayout;
@@ -56,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * Main tab pane that displays Image, OIdata, Parameters or Log Reports.
  * @author mellag
  */
-public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
+public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, OIFitsCollectionManagerEventListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -81,11 +94,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     private static final int INIT_INC_DIVIDER = 2;
 
     /* members */
+    /** OIFitsCollectionManager singleton reference */
+    private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+
+    /** plot's subset identifier of the OIFits viewer */
+    private String subsetId = null;
+
     /** reference to parent MainPanel */
     private MainPanel mainPanel;
 
     /** Fits image panel */
     private final FitsImagePanel fitsImagePanel;
+    /** beam overlay */
+    private final BeamOverlay beamOverlay;
 
     /** OIFits viewer panel */
     private final OIFitsViewPanel oifitsViewPanel;
@@ -109,6 +130,9 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     /** Creates new form ViewerPanel */
     public ViewerPanel() {
+        // always bind at the beginning of the constructor (to maintain correct ordering):
+        ocm.bindSubsetDefinitionChanged(this);
+
         initComponents();
 
         // Fix row height:
@@ -122,6 +146,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
         sliderPanel = new SliderPanel(fitsImagePanel);
         fitsImagePanel.addOptionPanel(sliderPanel);
+
+        // add beam overlay:
+        beamOverlay = new BeamOverlay(fitsImagePanel);
+        fitsImagePanel.addChartOverlay(beamOverlay);
 
         oifitsViewPanel = new OIFitsViewPanel();
         java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -148,12 +176,86 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
     }
 
     /**
-     * set the plot id associated to the OIFitsViewPanel.
+     * Free any resource or reference to this instance :
+     * remove this instance from OIFitsCollectionManager event notifiers
+     */
+    @Override
+    public void dispose() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dispose: {}", ObjectUtils.getObjectInfo(this));
+        }
+        // note: never called as only 2 ViewerPanel global instances
+        ocm.unbind(this);
+    }
+
+    /**
+     * Set the subset and plot id associated to the OIFitsViewPanel.
      *
      * @param plotId the id of the plot
      */
-    public void setOIFitsViewPlotId(String plotId) {
+    public void setOIFitsViewPlotId(final String plotId) {
         this.oifitsViewPanel.updatePlotId(plotId);
+
+        // get plot's subset id:
+        final Plot plot = ocm.getPlotRef(plotId);
+
+        this.subsetId = (plot != null) ? plot.getSubsetDefinition().getId() : null;
+    }
+
+    /*
+     * OIFitsCollectionManagerEventListener implementation 
+     */
+    /**
+     * Return the optional subject id i.e. related object id that this listener accepts
+     * @param type event type
+     * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
+     */
+    @Override
+    public String getSubjectId(final OIFitsCollectionManagerEventType type) {
+        if (subsetId != null) {
+            switch (type) {
+                case SUBSET_CHANGED:
+                    return subsetId;
+                default:
+            }
+        }
+        return DISCARDED_SUBJECT_ID;
+    }
+
+    /**
+     * Handle the given OIFits collection event
+     * @param event OIFits collection event
+     */
+    @Override
+    public void onProcess(final OIFitsCollectionManagerEvent event) {
+        logger.debug("onProcess {}", event);
+
+        switch (event.getType()) {
+            case SUBSET_CHANGED:
+                handleSubsetChanged(event.getSubsetDefinition());
+                break;
+            default:
+        }
+        logger.debug("onProcess {} - done", event);
+    }
+
+    private void handleSubsetChanged(final SubsetDefinition subsetDefinition) {
+        logger.debug("handleSubsetChanged: {}", subsetDefinition);
+
+        // Check OIFits selector result:
+        final SelectorResult selectorResult = subsetDefinition.getSelectorResult();
+
+        BeamInfo beamInfo = null;
+
+        if (selectorResult != null) {
+            logger.debug("handleSubsetChanged: result: {}", selectorResult);
+            // compute beam:
+            beamInfo = BeamEstimator.computeBeamInfo(selectorResult);
+        }
+
+        logger.debug("handleSubsetChanged: beamInfo: {}", beamInfo);
+        // update overlay:
+        beamOverlay.setBeamInfo(beamInfo);
     }
 
     private void displayImage(List<FitsImageHDU> imageHdus, FitsImageHDU imageHDU) {
@@ -214,6 +316,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
 
     // Display Oifits and Params
     private void displayOiFitsAndParams(OIFitsFile oifitsFile, String targetName) {
+        logger.debug("displayOiFitsAndParams: targetName: {} oifits: {} ", targetName, oifitsFile);
         if (oifitsFile != null) {
             oifitsViewPanel.plot(oifitsFile, targetName);
             jPanelOIFits.add(oifitsViewPanel);
@@ -319,24 +422,19 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener {
                 final FitsImageHDU imageHDU = imageHdus.isEmpty() ? null : imageHdus.get(0);
                 final String target = oifitsFile.getImageOiData().getInputParam().getTarget();
 
-                displayImage(imageHdus, imageHDU);
                 displayOiFitsAndParams(oifitsFile, target);
+                displayImage(imageHdus, imageHDU);
             } else {
                 // displays empty content for oifits data, images and parameters. keeps execution log content.
+                displayOiFitsAndParams(null, null);
                 displaySelection(null);
                 displayImage(null, null);
-                displayOiFitsAndParams(null, null);
             }
-            /*else {
-                lastResultPanel = jPanelLogViewer;
-            }*/
-
             setTabMode(SHOW_MODE.RESULT);
         }
     }
 
     private int calculateGridSize(int resultsSize) {
-
         int i = resultsSize;
         double size;
 
