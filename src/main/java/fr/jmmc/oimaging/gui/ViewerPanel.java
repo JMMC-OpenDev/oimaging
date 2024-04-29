@@ -10,6 +10,7 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
+import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
@@ -251,6 +252,13 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
             logger.debug("handleSubsetChanged: result: {}", selectorResult);
             // compute beam:
             beamInfo = BeamEstimator.computeBeamInfo(selectorResult);
+
+            logger.info("Subset[{}]: beam = (rx = {} mas, ry = {} mas, angle = {} deg)",
+                    subsetDefinition.getId(),
+                    NumberUtils.trimTo3Digits(beamInfo.rx),
+                    NumberUtils.trimTo3Digits(beamInfo.ry),
+                    NumberUtils.trimTo3Digits(beamInfo.angle)
+            );
         }
 
         logger.debug("handleSubsetChanged: beamInfo: {}", beamInfo);
