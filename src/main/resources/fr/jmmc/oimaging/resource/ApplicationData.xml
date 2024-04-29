@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.5"/>
-    <compilation date="09/01/2024" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="1.0.6 beta 1"/>
+    <compilation date="29/04/2024" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -179,11 +179,18 @@
     </menubar>
 
     <releasenotes>
+        <release version="1.0.6">
+            <pubDate>Mon, 29 Apr 2024 12:00:00 GMT</pubDate>
+            <prerelease version="1.0.6 beta 1">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/24">Implemented the beam estimation based on the OIBEAM document
+                    (https://github.com/JMMC-OpenDev/oibeam) using UV coordinates (VIS2) that is displayed as an ellipse (rx, ry, position angle) on both input and resut images</change>
+            </prerelease>
+        </release>
         <release version="1.0.5">
-            <pubDate>Tue, 09 Jan 2024 10:11:12 GMT</pubDate>            
+            <pubDate>Tue, 09 Jan 2024 10:00:00 GMT</pubDate>
             <prerelease version="1.0.5 beta 1">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1336">Avoid setting compression for PNG encoder (not supported on java 8)</change>
-            </prerelease>            
+            </prerelease>
         </release>
         <release version="1.0.4">
             <pubDate>Wed, 14 June 2023 16:00:00 GMT</pubDate>
