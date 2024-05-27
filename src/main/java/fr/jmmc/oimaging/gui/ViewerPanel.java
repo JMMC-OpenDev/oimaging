@@ -10,7 +10,6 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.util.AutofitTableColumns;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.FileUtils;
-import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.gui.FitsImagePanel;
@@ -145,12 +144,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
         fitsImagePanel = new FitsImagePanel(Preferences.getInstance(), true, true, null);
         jPanelImage.add(fitsImagePanel);
 
-        sliderPanel = new SliderPanel(fitsImagePanel);
-        fitsImagePanel.addOptionPanel(sliderPanel);
-
         // add beam overlay:
         beamOverlay = new BeamOverlay(fitsImagePanel);
         fitsImagePanel.addChartOverlay(beamOverlay);
+
+        this.jToggleButtonShowBeam.setSelected(beamOverlay.isEnabled());
+        fitsImagePanel.addOptionPanel(this.jPanelImageExtraActions);
+
+        sliderPanel = new SliderPanel(fitsImagePanel);
+        fitsImagePanel.addOptionPanel(sliderPanel);
 
         oifitsViewPanel = new OIFitsViewPanel();
         java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -248,17 +250,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
 
         BeamInfo beamInfo = null;
 
-        if (selectorResult != null) {
+        if ((selectorResult != null) && !selectorResult.isEmpty()) {
             logger.debug("handleSubsetChanged: result: {}", selectorResult);
             // compute beam:
             beamInfo = BeamEstimator.computeBeamInfo(selectorResult);
 
-            logger.info("Subset[{}]: beam = (rx = {} mas, ry = {} mas, angle = {} deg)",
-                    subsetDefinition.getId(),
-                    NumberUtils.trimTo3Digits(beamInfo.rx),
-                    NumberUtils.trimTo3Digits(beamInfo.ry),
-                    NumberUtils.trimTo3Digits(beamInfo.angle)
-            );
+            final String displayString = beamInfo.getDisplayString();
+            logger.info("Subset[{}]: beam = {}", subsetDefinition.getId(), displayString);
+
+            this.jToggleButtonShowBeam.setToolTipText("Beam information:\n" + displayString);
         }
 
         logger.debug("handleSubsetChanged: beamInfo: {}", beamInfo);
@@ -307,10 +307,11 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
             jLabelImageDebug.setText("Frame: " + frame);
         }
         if (imageHDU != null) {
-            sliderPanel.setVisible(false);
             if (imageHDU.getImageCount() > 1) {
                 sliderPanel.setFitsImages(imageHDU.getFitsImages());
                 sliderPanel.setVisible(true);
+            } else {
+                sliderPanel.setVisible(false);
             }
             FitsImage image = imageHDU.getFitsImages().get(0);
             fitsImagePanel.setFitsImage(image);
@@ -804,15 +805,17 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jPanelImageExtraActions = new javax.swing.JPanel();
+        jToggleButtonShowBeam = new javax.swing.JToggleButton();
         jTabbedPaneVizualizations = new javax.swing.JTabbedPane();
         jPanelOIFitsViewer = new javax.swing.JPanel();
         jPanelOIFits = new javax.swing.JPanel();
         jPanelImageViewer = new javax.swing.JPanel();
         jComboBoxImage = new javax.swing.JComboBox();
+        jButtonSetAsInitImg = new javax.swing.JButton();
+        jButtonModifyImage = new javax.swing.JButton();
         jButtonViewport = new javax.swing.JButton();
         jButtonResample = new javax.swing.JButton();
-        jButtonModifyImage = new javax.swing.JButton();
-        jButtonSetAsInitImg = new javax.swing.JButton();
         jButtonRescale = new javax.swing.JButton();
         jLabelImageDebug = new javax.swing.JLabel();
         jPanelImage = new javax.swing.JPanel();
@@ -826,6 +829,18 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
         jLabelInput = new javax.swing.JLabel();
         jScrollPaneTableInput = new javax.swing.JScrollPane();
         jTableInputParamKeywords = new javax.swing.JTable();
+
+        jPanelImageExtraActions.setLayout(new java.awt.GridBagLayout());
+
+        jToggleButtonShowBeam.setText("Beam");
+        jToggleButtonShowBeam.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButtonShowBeamActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        jPanelImageExtraActions.add(jToggleButtonShowBeam, gridBagConstraints);
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Data Visualisation"));
         setLayout(new java.awt.GridBagLayout());
@@ -861,6 +876,26 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanelImageViewer.add(jComboBoxImage, gridBagConstraints);
 
+        jButtonSetAsInitImg.setAction(ActionRegistrar.getInstance().get(SetAsInitImgAction.CLASS_NAME, SetAsInitImgAction.ACTION_NAME));
+        jButtonSetAsInitImg.setText("Set as Init Img");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanelImageViewer.add(jButtonSetAsInitImg, gridBagConstraints);
+
+        jButtonModifyImage.setText("Modify image");
+        jButtonModifyImage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonModifyImageActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
+
         jButtonViewport.setText("Viewport");
         jButtonViewport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -884,26 +919,6 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanelImageViewer.add(jButtonResample, gridBagConstraints);
-
-        jButtonModifyImage.setText("Modify image");
-        jButtonModifyImage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonModifyImageActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        jPanelImageViewer.add(jButtonModifyImage, gridBagConstraints);
-
-        jButtonSetAsInitImg.setAction(ActionRegistrar.getInstance().get(SetAsInitImgAction.CLASS_NAME, SetAsInitImgAction.ACTION_NAME));
-        jButtonSetAsInitImg.setText("Set as Init Img");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        jPanelImageViewer.add(jButtonSetAsInitImg, gridBagConstraints);
 
         jButtonRescale.setText("Rescale");
         jButtonRescale.addActionListener(new java.awt.event.ActionListener() {
@@ -1029,6 +1044,10 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
         modifyFitsImage();
     }//GEN-LAST:event_jButtonModifyImageActionPerformed
 
+    private void jToggleButtonShowBeamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonShowBeamActionPerformed
+        this.beamOverlay.setEnabled(this.jToggleButtonShowBeam.isSelected());
+    }//GEN-LAST:event_jToggleButtonShowBeamActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonModifyImage;
     private javax.swing.JButton jButtonResample;
@@ -1041,6 +1060,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
     private javax.swing.JLabel jLabelInput;
     private javax.swing.JLabel jLabelOutput;
     private javax.swing.JPanel jPanelImage;
+    private javax.swing.JPanel jPanelImageExtraActions;
     private javax.swing.JPanel jPanelImageViewer;
     private javax.swing.JPanel jPanelLogViewer;
     private javax.swing.JPanel jPanelOIFits;
@@ -1052,6 +1072,7 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
     private javax.swing.JTabbedPane jTabbedPaneVizualizations;
     private javax.swing.JTable jTableInputParamKeywords;
     private javax.swing.JTable jTableOutputParamKeywords;
+    private javax.swing.JToggleButton jToggleButtonShowBeam;
     // End of variables declaration//GEN-END:variables
 
     /**
