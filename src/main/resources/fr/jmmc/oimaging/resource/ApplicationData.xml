@@ -16,7 +16,7 @@
     </company>
 
     <program name="OImaging" version="1.0.6 beta 2"/>
-    <compilation date="27/05/2024" compiler="JDK 1.8.0"/>
+    <compilation date="28/05/2024" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -183,6 +183,7 @@
             <pubDate>Mon, 27 May 2024 12:00:00 GMT</pubDate>
             <prerelease version="1.0.6 beta 2">
                 <change type="FEATURE">Added the toogle button 'Beam' on image panels to show or hide the beam info (displayed in its tooltip)</change>
+                <change type="FEATURE">Modified the beam estimation to use distinct spatial frequencies from both OI_VIS and OI_VIS2 tables</change>
             </prerelease>
             <prerelease version="1.0.6 beta 1">
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oimaging/issues/24">Implemented the beam estimation based on the OIBEAM document
