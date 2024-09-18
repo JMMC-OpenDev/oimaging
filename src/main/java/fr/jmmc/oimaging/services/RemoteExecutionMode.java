@@ -7,10 +7,13 @@ import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWS;
 import fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWSException;
 import fr.jmmc.jmcs.data.app.ApplicationDescription;
 import fr.jmmc.jmcs.util.StringUtils;
+import fr.jmmc.oimaging.Preferences;
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URISyntaxException;
+import java.util.Observable;
+import java.util.Observer;
 import net.ivoa.xml.uws.v1.ExecutionPhase;
 import net.ivoa.xml.uws.v1.JobSummary;
 import net.ivoa.xml.uws.v1.ResultReference;
@@ -28,17 +31,21 @@ import org.slf4j.LoggerFactory;
  * Support remote service runner.
  * @author Guillaume MELLA.
  */
-public final class RemoteExecutionMode implements OImagingExecutionMode {
+public final class RemoteExecutionMode implements Observer, OImagingExecutionMode {
 
     // Use -DRemoteExecutionMode.local=true (dev) to use local uws server (docker)
     private static boolean USE_LOCAL = Boolean.getBoolean("RemoteExecutionMode.local");
-    
+
     // Use -DRemoteExecution.beta=true (dev) to use remote beta uws server (docker)
     private static boolean USE_BETA = Boolean.getBoolean("RemoteExecution.beta")
             || ApplicationDescription.isBetaVersion();
 
     /** Class logger */
     private static final Logger _logger = LoggerFactory.getLogger(RemoteExecutionMode.class.getName());
+
+    /* members */
+    /** preference singleton */
+    private final static Preferences PREFS = Preferences.getInstance();
 
     public static final String SERVICE_PATH = "oimaging/oimaging";
 
@@ -47,35 +54,38 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
     /** singleton */
     public static final RemoteExecutionMode INSTANCE = new RemoteExecutionMode();
 
-    @SuppressWarnings("StaticNonFinalUsedInInitialization")
-    private static String SERVER_URL = getServerUrl(USE_LOCAL, USE_BETA);
+    private static String SERVER_URL = null;
 
-    private static String getServerUrl(final boolean local, final boolean beta) {
-        return ((local) ? "http://127.0.0.1:8080/jmmc-uws/"
-                : ((beta) ? "http://oimaging-beta.jmmc.fr/OImaging-uws/"
-                        : "http://oimaging.jmmc.fr/OImaging-uws/"));
+    private static String getServerHost(final boolean local, final boolean beta) {
+        return ((local) ? "127.0.0.1:8080" : ((beta) ? "oimaging-beta.jmmc.fr" : "oimaging.jmmc.fr"));
     }
 
-    public static void resolveRemoteServer() {
-        SERVER_URL = getServerUrl(USE_LOCAL, USE_BETA);
+    private static String getServerURL(final String host) {
+        return "http://" + host + "/OImaging-uws/";
+    }
+
+    private static String resolveServerURL() {
+        if (SERVER_URL == null) {
+            // Check server mode:
+            String host = null;
+            if (PREFS.isServerModeCustom()) {
+                host = PREFS.getPreference(Preferences.SERVER_CUSTOM);
+            }
+            if (StringUtils.isEmpty(host)) {
+                host = getServerHost(USE_LOCAL, USE_BETA);
+            }
+            SERVER_URL = getServerURL(host);
+
+            _logger.info("resolveServerURL: {}", SERVER_URL);
+        }
+        return SERVER_URL;
+    }
+
+    public static void resetRemoteServer() {
+        // clear SERVER_URL:
+        SERVER_URL = null;
         // reset to be sure:
         FACTORY.reset();
-    }
-
-    public static boolean isUSE_LOCAL() {
-        return USE_LOCAL;
-    }
-
-    public static void setUSE_LOCAL(final boolean local) {
-        RemoteExecutionMode.USE_LOCAL = local;
-    }
-
-    public static boolean isUSE_BETA() {
-        return USE_BETA;
-    }
-
-    public static void setUSE_BETA(final boolean beta) {
-        RemoteExecutionMode.USE_BETA = beta;
     }
 
     private final static class ClientFactory {
@@ -95,7 +105,7 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
             if (uwsClient == null) {
                 ClientUWSException cue = null;
                 // Move it in a property file (or constant at least)
-                final String url = SERVER_URL;
+                final String url = resolveServerURL();
                 try {
                     final ClientUWS c = new ClientUWS(url, SERVICE_PATH);
 
@@ -131,6 +141,18 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
 
     private RemoteExecutionMode() {
         super();
+
+        PREFS.addObserver(this);
+    }
+
+    /**
+     * Listen to preferences changes
+     * @param o Preferences
+     * @param arg unused
+     */
+    @Override
+    public void update(final Observable o, final Object arg) {
+        resetRemoteServer();
     }
 
     /**
@@ -337,18 +359,18 @@ public final class RemoteExecutionMode implements OImagingExecutionMode {
         }
         return parent;
     }
-    
-    public static void main(String[] args) {            
-        String filename="/home/mellag/test.txt";
-        ServiceResult result =  new ServiceResult(new File(filename));
-        
+
+    public static void main(String[] args) {
+        String filename = "/home/mellag/test.txt";
+        ServiceResult result = new ServiceResult(new File(filename));
+
         try {
-            INSTANCE.callUwsOimagingService("ls", "/etc", filename, result);            
+            INSTANCE.callUwsOimagingService("ls", "/etc", filename, result);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         System.out.println("res = " + result.getOifitsResultFile());
         System.out.println("log = " + result.getExecutionLog());
-        
+
     }
 }

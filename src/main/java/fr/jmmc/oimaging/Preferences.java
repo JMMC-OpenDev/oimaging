@@ -23,6 +23,18 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     private static Preferences _singleton = null;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(Preferences.class.getName());
+
+    /** remote server mode = auto */
+    public final static String SERVER_MODE_AUTO = "auto";
+    /** remote server mode = custom */
+    public final static String SERVER_MODE_CUSTOM = "custom";
+
+    /* Preferences */
+    /** Preference : remote server mode */
+    public final static String SERVER_MODE = "server.mode";
+    /** Preference : custom remote server */
+    public final static String SERVER_CUSTOM = "server.custom";
+
     /** prefix for all results columns */
     public static final String RESULTS_COLUMNS_ALL = "results.columns.all";
     /** prefix for visible results columns */
@@ -81,6 +93,9 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
 
         logger.debug("Preferences.setDefaultPreferences()");
 
+        setDefaultPreference(SERVER_MODE, SERVER_MODE_AUTO);
+        setDefaultPreference(SERVER_CUSTOM, "");
+
         // Use GD's prefered value for a better image viewing that isophot...
         setDefaultPreference(MODEL_IMAGE_LUT, ColorModels.COLOR_MODEL_HEAT);
         setDefaultPreference(MODEL_IMAGE_SCALE, ColorScale.LINEAR.toString());
@@ -102,6 +117,10 @@ public class Preferences extends fr.jmmc.oiexplorer.core.Preferences {
     @Override
     protected int getPreferencesVersionNumber() {
         return 1;
+    }
+
+    public boolean isServerModeCustom() {
+        return SERVER_MODE_CUSTOM.equalsIgnoreCase(getPreference(SERVER_MODE));
     }
 
     public List<String> getResultsAllColumns() {
