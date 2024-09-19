@@ -42,15 +42,20 @@ public class RunAction extends RegisteredAction {
     public final static String className = RunAction.class.getName();
     /** Action name. This name is used to register to the ActionRegistrar */
     public static final String actionName = "run";
-    
+
     private static final boolean TEST_WORK_LOAD = false;
+    private static final int WORK_LOAD_JOBS = 500;
 
     /** Task Run IR */
     public static final Task TASK_RUN_IR = new Task("RUN_IR");
-    /**
-     * Spinner icon gif to decorate "cancel" label.
-     */
+    /** Spinner icon gif to decorate "cancel" label. */
     private static final ImageIcon spinnerIcon = ImageUtils.loadResourceIcon("fr/jmmc/jmcs/resource/image/spinner.gif");
+
+    static {
+        if (TEST_WORK_LOAD) {
+            logger.warn("WARNING: TEST_WORK_LOAD=true (dev) - DO NOT USE IN PRODUCTION !");
+        }
+    }
 
     public RunAction() {
         super(className, actionName);
@@ -118,30 +123,29 @@ public class RunAction extends RegisteredAction {
             ServiceResult result = null;
             try {
                 if (TEST_WORK_LOAD) {
-                    final int N = 200;
-                    final List<Callable<ServiceResult>> jobs = new ArrayList<>(N);
+                    final List<Callable<ServiceResult>> jobs = new ArrayList<>(WORK_LOAD_JOBS);
 
-                    for (int i = 0; i < N; i++) {
+                    for (int i = 0; i < WORK_LOAD_JOBS; i++) {
                         jobs.add(new Callable<ServiceResult>() {
                             @Override
                             public ServiceResult call() throws Exception {
                                 ServiceResult r = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
-                                System.out.println("Result : " + r);
+                                logger.warn("Result: {}", r);
                                 return r;
                             }
                         });
                     }
 
-                    final List<Future<ServiceResult>> futures = new ArrayList<>(N);
-                    System.out.println("Spawning jobs : " + N);
+                    final List<Future<ServiceResult>> futures = new ArrayList<>(WORK_LOAD_JOBS);
+                    logger.warn("Spawning jobs: {}", WORK_LOAD_JOBS);
 
-                    for (int i = 0; i < N; i++) {
+                    for (int i = 0; i < WORK_LOAD_JOBS; i++) {
                         futures.add(ThreadExecutors.getRunnerExecutor().submit(jobs.get(i)));
                     }
 
-                    System.out.println("Waiting for completion...");
+                    logger.warn("Waiting for completion...");
 
-                    for (int i = 0; i < N; i++) {
+                    for (int i = 0; i < WORK_LOAD_JOBS; i++) {
                         try {
                             result = futures.get(i).get(); // wait
                         } catch (Exception e) {
@@ -150,7 +154,7 @@ public class RunAction extends RegisteredAction {
                         }
                     }
 
-                    System.out.println("All jobs completed.");
+                    logger.warn("All jobs completed.");
 
                     // result should be defined now !
                     if (result == null) {
