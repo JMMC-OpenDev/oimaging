@@ -48,6 +48,8 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
     private final static Preferences PREFS = Preferences.getInstance();
 
     public static final String SERVICE_PATH = "oimaging/oimaging";
+    
+    public static final long POLL_INTERVAL = 200L;
 
     private static final ClientFactory FACTORY = new ClientFactory();
 
@@ -254,7 +256,7 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
             
             while ((phase == ExecutionPhase.EXECUTING) || (phase == ExecutionPhase.QUEUED)) {
                 try {
-                    Thread.sleep(1000L);
+                    Thread.sleep(POLL_INTERVAL);
                 } catch (InterruptedException ie) {
                     _logger.debug("Interrupted.");
                     result.setErrorMessage("Cancelled job.");
