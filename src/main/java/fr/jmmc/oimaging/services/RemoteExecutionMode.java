@@ -76,7 +76,7 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
             }
             SERVER_URL = getServerURL(host);
 
-            _logger.info("resolveServerURL: {}", SERVER_URL);
+            _logger.debug("resolveServerURL: {}", SERVER_URL);
         }
         return SERVER_URL;
     }
