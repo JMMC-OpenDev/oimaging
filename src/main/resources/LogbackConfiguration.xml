@@ -23,6 +23,7 @@
     <!--
     <logger name="org.restlet" level="DEBUG"/>
     -->
+    <logger name="org.restlet" level="WARN"/>
 
     <!-- http client 4.x -->
     <!--
