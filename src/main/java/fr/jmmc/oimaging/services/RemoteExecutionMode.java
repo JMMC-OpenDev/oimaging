@@ -66,7 +66,7 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
         return "http://" + host + "/OImaging-uws/";
     }
 
-    private static String resolveServerURL() {
+    private static synchronized String resolveServerURL() {
         if (SERVER_URL == null) {
             // Check server mode:
             String host = null;
@@ -83,7 +83,7 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
         return SERVER_URL;
     }
 
-    public static void resetRemoteServer() {
+    public static synchronized void resetRemoteServer() {
         // clear SERVER_URL:
         SERVER_URL = null;
         // reset to be sure:
