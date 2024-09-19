@@ -90,6 +90,8 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
 
     private final static class ClientFactory {
 
+        private final static boolean USE_CACHE = true;
+        
         /** UWS client to execute IR on a remote server */
         private ClientUWS uwsClient = null;
 
@@ -102,16 +104,16 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
          * @throws fr.cnes.sitools.extensions.astro.application.uws.client.ClientUWSException
          */
         public ClientUWS getClient() throws ClientUWSException {
+            ClientUWS c = null;
             if (uwsClient == null) {
                 ClientUWSException cue = null;
                 // Move it in a property file (or constant at least)
                 final String url = resolveServerURL();
                 try {
-                    final ClientUWS c = new ClientUWS(url, SERVICE_PATH);
+                    c = new ClientUWS(url, SERVICE_PATH);
 
                     // Get home page as an isAlive request:
                     if (c.getHomePage() != null) {
-                        uwsClient = c;
                         _logger.info("UWS service endpoint : '{}'", url);
                     }
                 } catch (ClientUWSException ce) {
@@ -124,11 +126,16 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
                     _logger.info("UWS service endpoint unreachable: '{}'", url);
                     throw new IllegalStateException("UWS service endpoint unreachable: '" + url + "'", e);
                 }
-                if (uwsClient == null) {
+                if (c == null) {
                     if (cue != null) {
                         throw cue;
                     }
                     throw new ClientUWSException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, "No available endpoint !");
+                }
+                if (USE_CACHE) {
+                    uwsClient = c;
+                } else {
+                    return c;
                 }
             }
             return uwsClient;
@@ -238,13 +245,14 @@ public final class RemoteExecutionMode implements Observer, OImagingExecutionMod
             }
         }
 
-        // Assume that first state is executing
-        ExecutionPhase phase = ExecutionPhase.EXECUTING;
-
         boolean cancelled = false;
         try {
-            // loop and query return status
-            while (phase == ExecutionPhase.EXECUTING) {
+            // Get the first state:
+            ExecutionPhase phase = client.getJobPhase(jobId);
+
+            _logger.debug("getJobPhase[{}] : {}", jobId, phase);
+            
+            while ((phase == ExecutionPhase.EXECUTING) || (phase == ExecutionPhase.QUEUED)) {
                 try {
                     Thread.sleep(1000L);
                 } catch (InterruptedException ie) {
