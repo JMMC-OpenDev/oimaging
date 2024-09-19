@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.task.Task;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorker;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.util.ImageUtils;
+import fr.jmmc.jmcs.util.concurrent.ThreadExecutors;
 import fr.jmmc.oimaging.model.IRModel;
 import fr.jmmc.oimaging.model.IRModelManager;
 import fr.jmmc.oimaging.services.Service;
@@ -20,8 +21,12 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import org.apache.commons.httpclient.ConnectTimeoutException;
@@ -37,6 +42,9 @@ public class RunAction extends RegisteredAction {
     public final static String className = RunAction.class.getName();
     /** Action name. This name is used to register to the ActionRegistrar */
     public static final String actionName = "run";
+    
+    private static final boolean TEST_WORK_LOAD = false;
+
     /** Task Run IR */
     public static final Task TASK_RUN_IR = new Task("RUN_IR");
     /**
@@ -109,7 +117,48 @@ public class RunAction extends RegisteredAction {
             final Service service = irModel.getSelectedService();
             ServiceResult result = null;
             try {
-                result = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
+                if (TEST_WORK_LOAD) {
+                    final int N = 200;
+                    final List<Callable<ServiceResult>> jobs = new ArrayList<>(N);
+
+                    for (int i = 0; i < N; i++) {
+                        jobs.add(new Callable<ServiceResult>() {
+                            @Override
+                            public ServiceResult call() throws Exception {
+                                ServiceResult r = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
+                                System.out.println("Result : " + r);
+                                return r;
+                            }
+                        });
+                    }
+
+                    final List<Future<ServiceResult>> futures = new ArrayList<>(N);
+                    System.out.println("Spawning jobs : " + N);
+
+                    for (int i = 0; i < N; i++) {
+                        futures.add(ThreadExecutors.getRunnerExecutor().submit(jobs.get(i)));
+                    }
+
+                    System.out.println("Waiting for completion...");
+
+                    for (int i = 0; i < N; i++) {
+                        try {
+                            result = futures.get(i).get(); // wait
+                        } catch (Exception e) {
+                            logger.warn("futures: exception: ", e);
+                            break;
+                        }
+                    }
+
+                    System.out.println("All jobs completed.");
+
+                    // result should be defined now !
+                    if (result == null) {
+                        throw new IllegalStateException("result is null");
+                    }
+                } else {
+                    result = service.getExecMode().reconstructsImage(service.getProgram(), cliOptions, inputFile);
+                }
                 result.setService(service);
 
                 if (result.getErrorMessage() == null) {
