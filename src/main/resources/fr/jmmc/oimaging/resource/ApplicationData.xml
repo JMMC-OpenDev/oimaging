@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OImaging" version="1.0.6 beta 4"/>
-    <compilation date="03/10/2024" compiler="JDK 1.8.0"/>
+    <program name="OImaging" version="1.0.7 beta 1"/>
+    <compilation date="18/04/2025" compiler="JDK 1.8.0"/>
 
     <text>OImaging send your interferometric observation reduced data as OIFits files to standardized Image Reconstruction software.</text>
 
@@ -179,6 +179,12 @@
     </menubar>
 
     <releasenotes>
+        <release version="1.0.7">
+            <pubDate>Fri, 18 Apr 2025 10:00:00 GMT</pubDate>
+            <prerelease version="1.0.7 beta 1">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1324">Update MiRA (and SPARCO) that fixes a bug for better model generated data.</change>
+            </prerelease>            
+        </release>
         <release version="1.0.6">
             <pubDate>Thu, 03 Oct 2024 14:00:00 GMT</pubDate>
             <prerelease version="1.0.6 beta 4">
