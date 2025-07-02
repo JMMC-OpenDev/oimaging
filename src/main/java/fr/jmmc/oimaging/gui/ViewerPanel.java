@@ -254,11 +254,15 @@ public class ViewerPanel extends javax.swing.JPanel implements ChangeListener, O
             logger.debug("handleSubsetChanged: result: {}", selectorResult);
             // compute beam:
             beamInfo = BeamEstimator.computeBeamInfo(selectorResult);
+            
+            if ( beamInfo != null ){
+                final String displayString = beamInfo.getDisplayString();
+                logger.info("Subset[{}]: beam = {}", subsetDefinition.getId(), displayString);
 
-            final String displayString = beamInfo.getDisplayString();
-            logger.info("Subset[{}]: beam = {}", subsetDefinition.getId(), displayString);
-
-            this.jToggleButtonShowBeam.setToolTipText("Beam information:\n" + displayString);
+                this.jToggleButtonShowBeam.setToolTipText("Beam information:\n" + displayString);
+            } else {
+                this.jToggleButtonShowBeam.setToolTipText("Beam information failed to be computed");
+            }
         }
 
         logger.debug("handleSubsetChanged: beamInfo: {}", beamInfo);
